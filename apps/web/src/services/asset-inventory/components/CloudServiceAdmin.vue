@@ -13,7 +13,7 @@ import {
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useUserStore } from '@/store/user/user-store';

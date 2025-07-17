@@ -24,7 +24,7 @@ import type { ProtocolListParameters } from '@/api-clients/notification/protocol
 import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
 import type { UserChannelModel as UserChannelModelV1 } from '@/api-clients/notification/user-channel/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 

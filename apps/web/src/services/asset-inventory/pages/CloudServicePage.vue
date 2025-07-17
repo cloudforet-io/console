@@ -16,7 +16,7 @@ import {
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 

@@ -17,7 +17,7 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

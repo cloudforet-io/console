@@ -14,7 +14,7 @@ import {
 } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/api-clients/alert-manager/alert/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

@@ -2,7 +2,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { referenceQueryClient as queryClient } from '@/query/clients';
-import { useReferenceQueryKey } from '@/query/core/query-key/use-reference-query-key';
+import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import { referenceConfigMap } from '@/query/reference/reference-config';
 import type { ReferenceQueryParams, ReferenceQueryResponse } from '@/query/reference/types/reference-query-type';
 import type { ReferenceFetchInfo, ReferenceKeyType } from '@/query/reference/types/reference-type';
@@ -15,7 +15,7 @@ export const useReferenceQueryStat = <T>(
         throw new Error(`Invalid reference key - stat : ${resourceKey}`);
     }
 
-    const { withSuffix: referenceStatQueryKey } = useReferenceQueryKey(resourceKey, 'stat');
+    const { withSuffix: referenceStatQueryKey } = useResourceQueryKey(resourceKey, 'stat');
 
     const {
         statFetchFn,

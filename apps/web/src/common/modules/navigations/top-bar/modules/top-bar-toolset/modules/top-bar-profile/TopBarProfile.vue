@@ -20,7 +20,7 @@ import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

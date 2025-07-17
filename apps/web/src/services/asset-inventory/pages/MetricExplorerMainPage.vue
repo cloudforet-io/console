@@ -9,7 +9,7 @@ import {
 import MetricImgAlert from '@/assets/images/metric/img_alert.png';
 import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';
 import MetricImgVisualization from '@/assets/images/metric/img_visualization.png';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

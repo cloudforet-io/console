@@ -20,7 +20,7 @@ import type {
     EventRuleActionsMatchAssetType, EventRuleActionsType,
     EventRuleActionsMergeAssetLabelsType,
 } from '@/api-clients/alert-manager/event-rule/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';

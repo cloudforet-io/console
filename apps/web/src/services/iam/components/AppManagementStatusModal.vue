@@ -17,7 +17,7 @@ import type { AppEnableParameters } from '@/api-clients/identity/app/schema/api-
 import type { AppGenerateClientSecretParameters } from '@/api-clients/identity/app/schema/api-verbs/generateClientSecret';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';

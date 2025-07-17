@@ -5,7 +5,7 @@ import { computed, reactive, watch } from 'vue';
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

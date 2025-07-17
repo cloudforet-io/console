@@ -14,7 +14,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { EVENT_RULE_SCOPE } from '@/api-clients/alert-manager/event-rule/schema/constants';
 import type { EventRuleScopeType } from '@/api-clients/alert-manager/event-rule/schema/type';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

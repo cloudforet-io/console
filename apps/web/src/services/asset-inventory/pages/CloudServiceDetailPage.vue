@@ -29,7 +29,7 @@ import type { ExportParameter } from '@/api-clients/_common/schema/api-verbs/exp
 import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/schema/api-verbs/get';
 import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';
 

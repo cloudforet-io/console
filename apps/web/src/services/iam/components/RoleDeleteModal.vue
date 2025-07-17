@@ -11,7 +11,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { RoleBindingListParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/list';
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 import type { RoleDeleteParameters } from '@/api-clients/identity/role/schema/api-verbs/delete';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

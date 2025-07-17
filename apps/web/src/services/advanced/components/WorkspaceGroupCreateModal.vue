@@ -14,7 +14,7 @@ import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

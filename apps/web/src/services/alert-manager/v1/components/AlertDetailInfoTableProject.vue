@@ -6,7 +6,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 

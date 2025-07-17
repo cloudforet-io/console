@@ -3,11 +3,10 @@ import type { Ref, ComputedRef } from 'vue';
 import { computed } from 'vue';
 
 import { useQueryKeyAppContext } from '@/query/core/query-key/_composable/use-app-context-query-key';
-import { createImmutableObjectKeyItem, normalizeQueryKeyPart } from '@/query/core/query-key/_helpers/query-key-helper';
+import { createImmutableObjectKeyItem, normalizeQueryKeyPart, omitPageParamsByVerb } from '@/query/core/query-key/_helpers/query-key-helper';
 import type {
-    QueryKeyArray, ResourceName, ServiceName, Verb,
+    QueryKeyArray, QueryKeyContext, QueryKeyWithSuffix, ResourceName, ServiceName, Verb,
 } from '@/query/core/query-key/types/query-key-type';
-import { omitPageFromLoadParams, omitPageQueryParams } from '@/query/service-query/pagination/pagination-query-helper';
 
 
 // Cache for debug logs
@@ -49,16 +48,15 @@ type _MaybeRefOrGetter<T> = T | Ref<T> | ComputedRef<T> | (() => T);
  *
  */
 interface UseServiceQueryKeyOptions<T extends object = object> {
-    contextKey?: _MaybeRefOrGetter<ContextKeyType>;
+    contextKey?: _MaybeRefOrGetter<QueryKeyContext>;
     params?: _MaybeRefOrGetter<T>;
     pagination?: boolean;
 }
-type ContextKeyType = string|unknown[]|object;
 
 type UseServiceQueryKeyResult<T extends object = object> = {
     key: ComputedRef<QueryKeyArray>;
     params: ComputedRef<T>;
-    withSuffix: (arg: ContextKeyType) => QueryKeyArray;
+    withSuffix: QueryKeyWithSuffix;
 };
 
 export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName<S>, V extends Verb<S, R>, T extends object = object>(
@@ -93,7 +91,7 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     });
 
     const queryKey = computed(() => {
-        const resolvedParams = pagination ? _omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
+        const resolvedParams = pagination ? omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
         return [
             ...queryKeyAppContext.value,
             service, resource, verb,
@@ -113,16 +111,17 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
     return {
         key: queryKey,
         params: computed(() => {
-            const resolvedParams = pagination ? _omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
+            const resolvedParams = pagination ? omitPageParamsByVerb(verb, toValue(params)) as T : toValue(params);
             return createImmutableObjectKeyItem(resolvedParams);
         }),
         withSuffix: (arg) => {
             if (typeof arg === 'object' && arg !== null) {
-                const cached = suffixCache.get(arg);
+                const resolvedArg = createImmutableObjectKeyItem(arg);
+                const cached = suffixCache.get(resolvedArg);
                 if (cached) return cached;
 
-                const result = [...queryKey.value, ...normalizeQueryKeyPart(createImmutableObjectKeyItem(arg))];
-                suffixCache.set(arg, result);
+                const result = [...queryKey.value, ...normalizeQueryKeyPart(resolvedArg)];
+                suffixCache.set(resolvedArg, result);
                 return result;
             }
             return [...queryKey.value, arg];
@@ -136,8 +135,3 @@ export const useServiceQueryKey = <S extends ServiceName, R extends ResourceName
 //     return [key];
 // };
 
-const _omitPageParamsByVerb = <S extends ServiceName, R extends ResourceName<S>>(verb: Verb<S, R>, params = {}) => {
-    if (verb === 'load') return omitPageFromLoadParams(params);
-    if (verb === 'list' || verb === 'analyze' || verb === 'stat') return omitPageQueryParams(params);
-    return params;
-};

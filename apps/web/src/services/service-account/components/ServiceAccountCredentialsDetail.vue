@@ -10,7 +10,7 @@ import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynami
 
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import type { TrustedSecretModel } from '@/api-clients/secret/trusted-secret/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -47,7 +47,7 @@ const credentialJsonSchema = computed<JsonSchema|undefined>(() => currentProvide
 
 const state = reactive({
     attachedTrustedAccount: computed(() => {
-        if (props.attachedTrustedAccountId) return referenceMap[props.attachedTrustedAccountId];
+        if (props.attachedTrustedAccountId) return referenceMap.trustedAccount[props.attachedTrustedAccountId];
         return undefined;
     }),
     convertedCredentialData: computed(() => {

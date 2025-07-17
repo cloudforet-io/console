@@ -25,7 +25,7 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { useCostApi } from '@/api-clients/cost-analysis/cost/composables/use-cost-api';
 import { useUnifiedCostApi } from '@/api-clients/cost-analysis/unified-cost/composables/use-unified-cost-api';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 

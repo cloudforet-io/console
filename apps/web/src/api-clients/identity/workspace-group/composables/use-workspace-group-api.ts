@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { WorkspaceGroupAddUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/add-users';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
 import type { WorkspaceGroupDeleteParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/delete';
@@ -22,7 +23,7 @@ export const useWorkspaceGroupApi = () => {
         addUsers: SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>,
         removeUsers: SpaceConnector.clientV2.identity.workspaceGroup.removeUsers<WorkspaceGroupRemoveUsersParameters, WorkspaceGroupModel>,
         updateRole: SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters, WorkspaceGroupModel>,
-        stat: SpaceConnector.clientV2.identity.workspaceGroup.stat<WorkspaceGroupStatParameters, any>,
+        stat: SpaceConnector.clientV2.identity.workspaceGroup.stat<WorkspaceGroupStatParameters, StatResponse>,
     };
 
     return {

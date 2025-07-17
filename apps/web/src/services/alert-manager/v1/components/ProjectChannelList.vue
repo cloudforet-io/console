@@ -2,7 +2,7 @@
 import { PI } from '@cloudforet/mirinae';
 
 import type { ProjectChannelModel } from '@/api-clients/notification/project-channel/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 const CHANNEL_STATE = Object.freeze({
     ENABLED: 'ENABLED',

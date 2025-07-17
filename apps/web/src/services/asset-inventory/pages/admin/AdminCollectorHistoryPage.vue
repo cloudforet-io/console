@@ -24,7 +24,7 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 

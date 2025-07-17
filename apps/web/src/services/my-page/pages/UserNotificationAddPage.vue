@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router/composables';
 
 import { PHeading } from '@cloudforet/mirinae';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';

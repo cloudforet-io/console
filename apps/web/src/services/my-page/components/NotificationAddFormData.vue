@@ -14,7 +14,7 @@ import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notifica
 import type { NotificationLevel } from '@/api-clients/notification/notification/schema/type';
 import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 

@@ -10,7 +10,7 @@ import {
 import type { DynamicLayoutFieldHandler } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-layout/type';
 
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';

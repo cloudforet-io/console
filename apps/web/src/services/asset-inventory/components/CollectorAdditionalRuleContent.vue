@@ -11,7 +11,7 @@ import {
     COLLECTOR_RULE_CONDITION_OPERATOR_LABEL,
 } from '@/api-clients/inventory/collector-rule/schema/constant';
 import type { CollectorRuleModel, AdditionalRuleAction } from '@/api-clients/inventory/collector-rule/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

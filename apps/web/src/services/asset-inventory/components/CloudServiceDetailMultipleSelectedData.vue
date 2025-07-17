@@ -24,7 +24,7 @@ import type { PageSchemaGetParameters } from '@/api-clients/add-ons/page-schema/
 import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
 import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useServiceRouter } from '@/router/composables/use-service-router';

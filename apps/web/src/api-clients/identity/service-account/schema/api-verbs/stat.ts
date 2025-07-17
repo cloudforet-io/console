@@ -1,5 +1,5 @@
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { StatQuery } from '@/api-clients/_common/schema/type';
 
 export interface ServiceAccountStatParameters {
-    query: Query;
+    query: StatQuery;
 }

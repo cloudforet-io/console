@@ -13,8 +13,8 @@ import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/typ
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
-import type { ProjectGroupReferenceItem } from '@/query/resource-query/reference-model/use-project-group-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import type { ProjectGroupReferenceItem } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-group-reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -40,6 +40,7 @@ import ProjectDetailTab from '@/services/project/v1/components/ProjectDetailTab.
 import ProjectDetailTabHeader from '@/services/project/v1/components/ProjectDetailTabHeader.vue';
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/v1/stores/project-detail-page-store';
+
 
 interface Props {
     id?: string;

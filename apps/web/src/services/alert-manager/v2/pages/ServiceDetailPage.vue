@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router/composables';
 
 import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/type';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';

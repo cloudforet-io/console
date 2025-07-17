@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useDataSourceGetQuery } from '@/services/cost-explorer/composables/use-data-source-get-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';

@@ -11,7 +11,7 @@ import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/us
 import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

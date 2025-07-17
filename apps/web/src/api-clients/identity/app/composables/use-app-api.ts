@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { AppCreateParameters } from '@/api-clients/identity/app/schema/api-verbs/create';
 import type { AppDeleteParameters } from '@/api-clients/identity/app/schema/api-verbs/delete';
 import type { AppDisableParameters } from '@/api-clients/identity/app/schema/api-verbs/disable';
@@ -22,7 +23,7 @@ export const useAppApi = () => {
         enable: SpaceConnector.clientV2.identity.app.enable<AppEnableParameters, AppModel>,
         disable: SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>,
         generateClientSecret: SpaceConnector.clientV2.identity.app.generateClientSecret<AppGenerateClientSecretParameters>,
-        stat: SpaceConnector.clientV2.identity.app.stat<AppStatParameters, any>,
+        stat: SpaceConnector.clientV2.identity.app.stat<AppStatParameters, StatResponse>,
     };
 
     return {

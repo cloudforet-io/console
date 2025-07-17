@@ -12,7 +12,7 @@ import {
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

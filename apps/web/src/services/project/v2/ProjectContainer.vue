@@ -2,7 +2,7 @@
 import { computed, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { MENU_ID } from '@/lib/menu/config';

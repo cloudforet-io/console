@@ -10,7 +10,7 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { AlertModel } from '@/api-clients/alert-manager/alert/schema/model';
 import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/get';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-model/use-all-reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
