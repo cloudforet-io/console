@@ -1,73 +1,60 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { partition, sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PButton, PButtonTab, PIconButton, PEmpty,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserProfileGetWorkspacesParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/get-workspaces';
-import type { MyWorkspaceModel } from '@/api-clients/identity/user-profile/schema/model';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupManageOverlay.vue';
+import { useUserProfileGetWorkspaceGroupsQuery } from '@/services/landing/composables/use-user-profile-get-workspace-groups-query';
+import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 const PAGE_SIZE = 16;
 
-interface Props {
-    favoriteList?: FavoriteItem[];
-    isDomainAdmin?: boolean;
+const props = defineProps<{
     hasReadWriteAccess?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    favoriteList: undefined,
-    isDomainAdmin: false,
-});
-
+}>();
 const emit = defineEmits<{(e: 'create'): void}>();
+
 const router = useRouter();
 
-// store setting
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceStoreGetters = userWorkspaceStore.getters;
-const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
-const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const landingPageStore = useLandingPageStore();
 const landingPageStoreState = landingPageStore.state;
+const userStore = useUserStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
+const storeState = reactive({
+    isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
+    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems as FavoriteItem[], 'label')),
+});
 const state = reactive({
     isShowAll: false,
-    workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceStoreGetters.workspaceList),
     selectedGroupWorkspaceList: computed(() => {
-        if (landingPageStoreState.selectedWorkspaceGroup === 'all') {
-            return state.workspaceList;
+        if (landingPageStoreState.selectedWorkspaceGroupId === 'all') {
+            return workspaceList.value;
         }
-        return state.workspacesInSelectedGroup;
+        return workspaceListByGroup.value;
     }),
-    workspacesInSelectedGroup: [] as MyWorkspaceModel[],
-    workspacesInSelectedGroupTotalCount: 0,
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
-            const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
-            return correspondingAItem ? props.favoriteList?.indexOf(correspondingAItem) : Infinity;
+            const correspondingAItem = storeState.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
+            return correspondingAItem ? storeState.favoriteList?.indexOf(correspondingAItem) : Infinity;
         });
         const [active, dormant] = partition(favoriteOrderList, (item) => !item.is_dormant);
 
@@ -78,56 +65,46 @@ const state = reactive({
             rounded: true,
         }));
     }),
-    workspaceGroupList: computed(() => userWorkspaceGroupStoreGetters.workspaceGroupList),
     workspaceFilterList: computed(() => [
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
-        ...state.workspaceGroupList.map((group:WorkspaceGroupModel) => ({ label: group.name, name: group.workspace_group_id })),
+        ...workspaceGroupList.value?.map((group) => ({ label: group.name, name: group.workspace_group_id })) || [],
     ]),
-    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedWorkspaceGroup === 'all'),
+    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedWorkspaceGroupId === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
     isShowAllVisible: computed(() => {
-        if (landingPageStoreState.selectedWorkspaceGroup === 'all') {
-            return state.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.workspaceList.length;
+        if (landingPageStoreState.selectedWorkspaceGroupId === 'all') {
+            return workspaceListTotalCount.value > PAGE_SIZE && state.workspaceBoardSets.length < workspaceListTotalCount.value;
         }
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
     }),
 });
 
+/* Query */
+const { data: workspaceList, totalCount: workspaceListTotalCount } = useUserProfileGetWorkspacesQuery();
+const { data: workspaceListByGroup, totalCount: workspaceListByGroupTotalCount } = useUserProfileGetWorkspacesQuery(computed(() => {
+    if (landingPageStoreState.selectedWorkspaceGroupId === 'all' || !landingPageStoreState.selectedWorkspaceGroupId) {
+        return undefined;
+    }
+    return {
+        workspace_group_id: landingPageStoreState.selectedWorkspaceGroupId,
+    };
+}));
+const { data: workspaceGroupList } = useUserProfileGetWorkspaceGroupsQuery();
+
+/* Event Handler */
 const handleClickShowAll = () => {
     state.isShowAll = true;
 };
-
 const handleClickButtonGroupToggle = () => {
     state.isButtonGroupOpened = !state.isButtonGroupOpened;
 };
 const handleOpenOverlay = () => {
     state.isOverlayOpen = true;
 };
-
-const fetchWorkspaces = async (groupId:string) => {
-    if (groupId === 'all') {
-        return;
-    }
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
-            workspace_group_id: groupId,
-        });
-        state.workspacesInSelectedGroup = results ?? [];
-        state.workspacesInSelectedGroupTotalCount = results?.length ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+const handleChangeWorkspaceGroup = (selected: string) => {
+    landingPageStore.setSelectedWorkspaceGroupId(selected);
 };
-
-watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
-    fetchWorkspaces(groupId);
-});
-
-(async () => {
-    await userWorkspaceGroupStore.load();
-})();
-
 </script>
 
 <template>
@@ -135,11 +112,13 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <p-button-tab v-model="landingPageStoreState.selectedWorkspaceGroup"
+            <p-button-tab :active-tab="landingPageStoreState.selectedWorkspaceGroupId"
                           :tabs="state.workspaceFilterList"
+                          keep-alive-all
+                          @change="handleChangeWorkspaceGroup"
             >
                 <template #additional-button>
-                    <p-icon-button v-if="props.hasReadWriteAccess && props.isDomainAdmin"
+                    <p-icon-button v-if="props.hasReadWriteAccess && storeState.isDomainAdmin"
                                    name="ic_settings"
                                    style-type="tertiary"
                                    size="sm"
@@ -161,11 +140,11 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
                            class="title"
             >
                 <template #right>
-                    <span class="cnt">({{ state.isAllWorkspaceTab ? state.workspaceList.length : state.workspacesInSelectedGroupTotalCount }})</span>
+                    <span class="cnt">({{ state.isAllWorkspaceTab ? workspaceListTotalCount : workspaceListByGroupTotalCount }})</span>
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
-                <p-button v-if="landingPageStoreState.selectedWorkspaceGroup !== 'all'"
+                <p-button v-if="landingPageStoreState.selectedWorkspaceGroupId !== 'all'"
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"
@@ -173,7 +152,7 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
                 >
                     {{ $t('LADING.SETTINGS') }}
                 </p-button>
-                <p-button v-if="props.hasReadWriteAccess && props.isDomainAdmin"
+                <p-button v-if="props.hasReadWriteAccess && storeState.isDomainAdmin"
                           style-type="primary"
                           size="md"
                           icon-left="ic_plus_bold"
@@ -185,7 +164,7 @@ watch(() => landingPageStoreState.selectedWorkspaceGroup, (groupId) => {
         </div>
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
-                                 :is-domain-admin="props.isDomainAdmin"
+                                 :is-domain-admin="storeState.isDomainAdmin"
         />
         <p-empty v-if="state.workspaceBoardSets.length === 0"
                  show-image

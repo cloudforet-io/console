@@ -11,6 +11,7 @@ import { sortTableItems } from '@/common/utils/table-sort';
 interface LandingPageStoreState {
     loading: boolean;
     selectedWorkspaceGroup: string;
+    selectedWorkspaceGroupId: string;
     redirectPath?: string;
 }
 
@@ -21,6 +22,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
     const state = reactive<LandingPageStoreState>({
         loading: false,
         selectedWorkspaceGroup: 'all',
+        selectedWorkspaceGroupId: 'all',
         redirectPath: undefined,
     });
 
@@ -33,6 +35,12 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         pageStart: 1,
         pageLimit: 15,
     });
+
+    const mutations = {
+        setSelectedWorkspaceGroupId(workspaceGroupId: string) {
+            state.selectedWorkspaceGroupId = workspaceGroupId;
+        },
+    };
 
     const getters = {
         loading: computed<boolean>(() => state.loading),
@@ -94,6 +102,7 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         state,
         groupUserTableState,
         getters,
+        ...mutations,
         ...actions,
     };
 });
