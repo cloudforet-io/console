@@ -23,7 +23,7 @@ export const useAlertGetQuery = (alertId: string): UseAlertGetQueryReturn => {
         queryKey: alertQueryKey,
         queryFn: () => alertAPI.get(alertQueryParams.value),
         gcTime: 1000 * 60 * 2,
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 
     return {

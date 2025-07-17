@@ -11,10 +11,10 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
+import type { PostModel } from '@/api-clients/board/post/schema/model';
 import { SpaceRouter } from '@/router';
-import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { PostModel } from '@/schema/board/post/model';
 import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice/notice-store';

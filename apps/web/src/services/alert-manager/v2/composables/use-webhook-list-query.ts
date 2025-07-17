@@ -30,10 +30,7 @@ export const useWebhookListQuery = (serviceId: ComputedRef<string>): UseWebhookL
     const { data: queryData, isFetching: webhookListFetching } = useScopedQuery({
         queryKey: webhookListQueryKey,
         queryFn: async () => webhookAPI.list(webhookListQueryParams.value),
-        initialData: {
-            results: [],
-            total_count: 0,
-        },
+        staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 

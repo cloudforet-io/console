@@ -31,6 +31,7 @@ export const useWebhookListPaginationQuery = ({ params, thisPage, pageSize }: Us
         queryFn: webhookAPI.list,
         params: webhookListPaginationQueryParams,
         gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
         enabled: true,
     }, {
         thisPage,
@@ -45,7 +46,7 @@ export const useWebhookListPaginationQuery = ({ params, thisPage, pageSize }: Us
 
     return {
         data: computed<WebhookModel[]>(() => query.data.value?.results || []),
-        totalCount: computed<number>(() => query.data.value?.total_count || 0),
+        totalCount: query.totalCount,
         isLoading: query.isLoading,
         refresh,
     };

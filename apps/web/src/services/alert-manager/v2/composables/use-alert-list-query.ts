@@ -41,11 +41,8 @@ export const useAlertListQuery = ({ params }: UseAlertListQueryOptions): UseAler
     const { data: queryData, isFetching: alertListFetching } = useScopedQuery({
         queryKey: alertListQueryKey,
         queryFn: async () => alertAPI.list(alertListQueryParams.value),
-        initialData: {
-            results: [],
-            total_count: 0,
-        },
         gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 
     const alertListData = computed<AlertModel[]>(() => (queryData.value?.results ?? []).map((alert) => ({

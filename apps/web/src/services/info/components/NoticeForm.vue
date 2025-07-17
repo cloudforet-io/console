@@ -3,6 +3,7 @@ import {
     computed, reactive, watch, toRef, ref,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEqual } from 'lodash';
 
 import {
@@ -17,10 +18,12 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { ContentsType, ResourceGroupType } from '@/api-clients/_common/schema/type';
+import { usePostApi } from '@/api-clients/board/post/composables/use-post-api';
+import type { PostUpdateParameters } from '@/api-clients/board/post/schema/api-verbs/update';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { SpaceRouter } from '@/router';
-import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -37,27 +40,31 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 
 import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
+import { usePostGetQuery } from '@/services/info/composables/use-post-get-query';
 import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
-import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 import type { NoticeFormType, WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
 
 interface Props {
     type?: NoticeFormType;
+    postId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'CREATE',
+    postId: undefined,
 });
 
-const noticeDetailStore = useNoticeDetailStore();
-const noticeDetailState = noticeDetailStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const userStore = useUserStore();
 
+const postId = computed(() => props.postId ?? '');
+
+const { postData, isLoading } = usePostGetQuery(postId);
+
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    postResourceGroup: computed<ResourceGroupType|undefined>(() => noticeDetailState.post?.resource_group),
+    postResourceGroup: computed<ResourceGroupType|undefined>(() => postData.value?.resource_group),
     userName: computed<string|undefined>(() => userStore.state.name),
 });
 const state = reactive({
@@ -85,9 +92,9 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    noticeTitle: noticeDetailState.post?.title ?? '',
-    writerName: noticeDetailState.post?.writer || storeState.userName || '',
-    contents: noticeDetailState.post?.contents || '',
+    noticeTitle: postData.value?.title ?? '',
+    writerName: postData.value?.writer || storeState.userName || '',
+    contents: postData.value?.contents || '',
 }, {
     noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
     writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
@@ -122,61 +129,79 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     },
 }));
 
+const queryClient = useQueryClient();
+const { postAPI } = usePostApi();
+const { withSuffix: noticeGetQueryKey } = useServiceQueryKey('board', 'post', 'get');
+const { key: noticeListBaseQueryKey } = useServiceQueryKey('board', 'post', 'list', {
+    params: computed(() => ({
+        board_type: POST_BOARD_TYPE.NOTICE,
+    })),
+});
 
+const { mutate: createNoticeMutation, isPending: isCreatingNotice } = useMutation({
+    mutationFn: postAPI.create,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: noticeListBaseQueryKey.value });
+        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
+        await SpaceRouter.router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME, query: {} });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
+    },
+});
+const { mutate: updateNoticeMutation, isPending: isUpdatingNotice } = useMutation({
+    mutationFn: postAPI.update,
+    onSuccess: async (data) => {
+        queryClient.invalidateQueries({ queryKey: noticeGetQueryKey(data.post_id) });
+        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
+        SpaceRouter.router.back();
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
+    },
+});
 
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
     else if (props.type === 'EDIT') handleEditNotice();
 };
 
-
-const handleCreateNotice = async () => {
-    try {
-        const data = formData.value;
-        if (!data.title || !data.contents) throw new Error('Invalid form data');
-        await noticeDetailStore.createNoticePost({
-            board_type: POST_BOARD_TYPE.NOTICE,
-            title: data.title,
-            contents: data.contents,
-            category: data.category,
-            files: data.files,
-            options: data.options,
-            writer: data.writer,
-            resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
-            workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
-        });
-        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
-        await SpaceRouter.router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME, query: {} });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
-    }
+const handleCreateNotice = () => {
+    const data = formData.value;
+    if (!data.title || !data.contents) throw new Error('Invalid form data');
+    createNoticeMutation({
+        board_type: POST_BOARD_TYPE.NOTICE,
+        title: data.title,
+        contents: data.contents,
+        category: data.category,
+        files: data.files,
+        options: data.options,
+        writer: data.writer,
+        resource_group: workspaceState.selectedRadioIdx === 0 ? 'DOMAIN' : 'WORKSPACE',
+        workspaces: workspaceState.selectedRadioIdx === 0 ? ['*'] : workspaceState.selectedItems.map((item) => item.name),
+    });
 };
-const handleEditNotice = async () => {
-    try {
-        const originData = noticeDetailState.post;
-        if (!originData) throw new Error('Origin data is not found');
-        const postData: Omit<PostUpdateParameters, 'post_id'> = {};
-        if (originData.title !== formData.value.title) postData.title = formData.value.title;
-        if (originData.writer !== formData.value.writer) postData.writer = formData.value.writer;
-        if (originData.contents !== formData.value.contents) postData.contents = formData.value.contents;
-        if (!isEqual(originData.files, formData.value.files)) {
-            postData.files = formData.value.files?.filter((f) => !!f);
-        }
-        if (!isEqual(originData.options, formData.value.options)) postData.options = formData.value.options;
-
-        await noticeDetailStore.updateNoticePost({
-            ...postData,
-            workspaces: workspaceState.selectedRadioIdx === 0 ? [] : workspaceState.selectedItems.map((item) => item.name),
-        });
-        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
-        SpaceRouter.router.back();
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
+const handleEditNotice = () => {
+    const originData = postData.value;
+    if (!originData) throw new Error('Origin data is not found');
+    const data: Omit<PostUpdateParameters, 'post_id'> = {};
+    if (originData.title !== formData.value.title) data.title = formData.value.title;
+    if (originData.writer !== formData.value.writer) data.writer = formData.value.writer;
+    if (originData.contents !== formData.value.contents) data.contents = formData.value.contents;
+    if (!isEqual(originData.files, formData.value.files)) {
+        data.files = formData.value.files?.filter((f) => !!f);
     }
+    if (!isEqual(originData.options, formData.value.options)) data.options = formData.value.options;
+
+    updateNoticeMutation({
+        ...data,
+        post_id: originData.post_id || '',
+        workspaces: workspaceState.selectedRadioIdx === 0 ? [] : workspaceState.selectedItems.map((item) => item.name),
+    });
 };
 
-watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([notice, loading]) => {
-    if (loading) return;
+watch(() => postData.value, async (notice) => {
+    if (props.type === 'CREATE') return;
 
     // INIT STATES
     state.isPinned = notice?.options?.is_pinned ?? false;
@@ -201,15 +226,15 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             };
         });
     }
-});
+}, { immediate: true });
 
 </script>
 
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <p-data-loader :loading="noticeDetailState.loading"
-                           :data="noticeDetailState.post"
+            <p-data-loader :loading="isLoading"
+                           :data="postData"
             >
                 <p-field-group class="notice-label-wrapper writer-name-input"
                                :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
@@ -290,7 +315,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
         <div class="notice-create-buttons-wrapper">
             <p-button style-type="tertiary"
                       size="lg"
-                      :disabled="noticeDetailState.loadingForCUD"
+                      :disabled="isUpdatingNotice || isCreatingNotice"
                       @click="$router.go(-1)"
             >
                 {{ $t('INFO.NOTICE.FORM.CANCEL') }}
@@ -298,7 +323,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             <p-button style-type="primary"
                       size="lg"
                       :disabled="!isAllValid || (workspaceState.selectedRadioIdx === 1 && workspaceState.selectedItems.length === 0)"
-                      :loading="noticeDetailState.loadingForCUD"
+                      :loading="isUpdatingNotice || isCreatingNotice"
                       @click="handleConfirm"
             >
                 {{ $t('INFO.NOTICE.FORM.CONFIRM') }}

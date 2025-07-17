@@ -129,6 +129,7 @@ const { data: webhookDetailData } = useScopedQuery({
     queryFn: async () => webhookAPI.get(webhookDetailQueryParams.value),
     enabled: computed(() => !!storeState.selectedWebhookId),
     gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
 }, ['WORKSPACE']);
 
 const errorListApiQueryHelper = new ApiQueryHelper();
@@ -155,6 +156,7 @@ const { data: webhookErrorListData, isLoading: webhookErrorListFetching, totalCo
     queryFn: webhookAPI.listErrors,
     params: webhookErrorListQueryParams,
     gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
     enabled: true,
 }, {
     thisPage: computed(() => messageState.pagination.thisPage),

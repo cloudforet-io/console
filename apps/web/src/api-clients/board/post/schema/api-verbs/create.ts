@@ -1,5 +1,5 @@
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
-import type { PostBoardType } from '@/schema/board/post/type';
+import type { PostBoardType } from '@/api-clients/board/post/schema/type';
 
 export interface PostCreateParameters {
     board_type: PostBoardType;

@@ -1,30 +1,24 @@
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted } from 'vue';
+import { computed } from 'vue';
 
 import { PHeading } from '@cloudforet/mirinae';
 
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
-import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
+import { usePostGetQuery } from '@/services/info/composables/use-post-get-query';
 
 const props = defineProps<{
     postId: string;
 }>();
 
-const noticeDetailStore = useNoticeDetailStore();
-const noticeDetailState = noticeDetailStore.state;
+const postId = computed(() => props.postId);
 
-onBeforeMount(() => {
-    noticeDetailStore.getNoticePost(props.postId);
-});
-onUnmounted(() => {
-    noticeDetailStore.reset();
-});
+const { postData } = usePostGetQuery(postId);
 </script>
 
 <template>
     <div>
         <p-heading class="mb-6"
-                   :title="noticeDetailState.post?.title"
+                   :title="postData?.title"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
