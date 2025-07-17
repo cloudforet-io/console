@@ -1,8 +1,11 @@
+import { AZURE_MANAGEMENT_GROUP_MAPPING_TYPE } from '@/api-clients/identity/trusted-account/schema/constant';
 
 export const WORKSPACE_MAPPING_OPTIONS_MAP = {
     MULTI: 'multi',
     SINGLE: 'single',
     MULTI_MANAGEMENT_GROUP_FOR_AZURE: 'multi_management_group_for_azure', // only for Azure
+    TOP_AZURE_MANAGEMENT_GROUP_MAPPING: AZURE_MANAGEMENT_GROUP_MAPPING_TYPE.TOP_MANAGEMENT_GROUP, // only for Azure
+    LEAF_AZURE_MANAGEMENT_GROUP_MAPPING: AZURE_MANAGEMENT_GROUP_MAPPING_TYPE.LEAF_MANAGEMENT_GROUP, // only for Azure
 } as const;
 
 export const CSP_AUTO_SYNC_OPTIONS_MAP = {
@@ -33,9 +36,12 @@ export const CSP_AUTO_SYNC_OPTIONS_MAP = {
                 value: WORKSPACE_MAPPING_OPTIONS_MAP.MULTI,
             },
             {
-                label: 'Azure Management Group',
-                value: WORKSPACE_MAPPING_OPTIONS_MAP.MULTI_MANAGEMENT_GROUP_FOR_AZURE,
-                info: 'This option is only available for Azure Management Group.',
+                label: 'Azure Management Group (Top-level)',
+                value: WORKSPACE_MAPPING_OPTIONS_MAP.TOP_AZURE_MANAGEMENT_GROUP_MAPPING,
+            },
+            {
+                label: 'Azure Management Group (Leaf-level)',
+                value: WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING,
             },
             {
                 label: 'Azure Tenant',
