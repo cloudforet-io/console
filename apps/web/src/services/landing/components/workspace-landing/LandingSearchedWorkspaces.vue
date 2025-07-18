@@ -43,8 +43,9 @@ const state = reactive({
         }));
     }),
 });
-const isDomainAdmin = computed(() => userStore.getters.isDomainAdmin);
-const searchedWorkspaceList = computed<WorkspaceModel[]>(() => workspaceList.value?.filter((item) => item.name.toLowerCase()?.includes(props.searchText.toLowerCase())) || []);
+const isDomainAdmin = computed<boolean>(() => userStore.getters.isDomainAdmin);
+const lowercasedSearchText = computed<string>(() => props.searchText.toLowerCase());
+const searchedWorkspaceList = computed<WorkspaceModel[]>(() => workspaceList.value?.filter((item) => item.name.toLowerCase()?.includes(lowercasedSearchText.value)) || []);
 
 /* Query */
 const { data: workspaceList } = useUserProfileGetWorkspacesQuery();
