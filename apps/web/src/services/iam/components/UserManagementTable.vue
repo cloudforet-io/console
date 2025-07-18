@@ -253,8 +253,8 @@ const dropdownMenuHandler: AutocompleteHandler = async () => {
 
 const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
     onSuccess: (variables) => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
         queryClient.invalidateQueries({
             queryKey: workspaceUserGetQueryKey({
                 user_id: variables.user_id,

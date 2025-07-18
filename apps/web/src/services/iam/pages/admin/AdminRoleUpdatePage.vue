@@ -55,7 +55,7 @@ const { mutateAsync: updateRole, isPending: isUpdateRolePending } = useMutation(
     onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_UPDATE_ROLE'), '');
         router.go(-1);
-        queryClient.invalidateQueries({ queryKey: roleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: roleListQueryKey.value });
         queryClient.invalidateQueries({ queryKey: roleGetQueryKey(roleId) });
     },
     onError: (error) => {

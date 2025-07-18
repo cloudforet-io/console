@@ -121,7 +121,7 @@ const { mutate: createCollector } = useMutation({
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
-        queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
+        queryClient.invalidateQueries({ queryKey: collectorListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));

@@ -21,7 +21,7 @@ export const useWorkspaceGroupAddUsersMutation = (options: UseWorkspaceGroupAddU
     return useMutation({
         mutationFn: workspaceGroupAPI.addUsers,
         onSuccess: async (data) => {
-            queryClient.invalidateQueries({ queryKey: workspaceGroupQueryKey });
+            queryClient.invalidateQueries({ queryKey: workspaceGroupQueryKey.value });
             if (onSuccess) await onSuccess(data);
         },
         onError: async (error) => {

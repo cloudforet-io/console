@@ -119,7 +119,7 @@ const { mutateAsync: updateCostReportConfig } = useMutation(
     {
         mutationFn: (params: CostReportConfigUpdateParameters) => costReportConfigAPI.update(params),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: costReportConfigListQueryKey });
+            queryClient.invalidateQueries({ queryKey: costReportConfigListQueryKey.value });
             showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_UPDATE_COST_REPORT_CONFIGURATION'), '');
         },
         onError: (error) => {

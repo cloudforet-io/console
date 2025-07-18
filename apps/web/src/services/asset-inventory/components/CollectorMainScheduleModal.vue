@@ -93,7 +93,7 @@ const fetchCollectorUpdate = async () => {
         },
     };
     await collectorAPI.update(params);
-    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey });
+    queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
 };
 
 /* Watcher */

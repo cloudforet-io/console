@@ -21,7 +21,7 @@ export const useUserCreateMutation = (options: UseUserCreateMutationOptions) => 
     return useMutation({
         mutationFn: userAPI.create,
         onSuccess: async (data) => {
-            queryClient.invalidateQueries({ queryKey: userQueryKey });
+            queryClient.invalidateQueries({ queryKey: userQueryKey.value });
             if (onSuccess) await onSuccess(data);
         },
         onError: async (error) => {

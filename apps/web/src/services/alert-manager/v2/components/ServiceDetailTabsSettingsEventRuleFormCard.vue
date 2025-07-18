@@ -196,14 +196,14 @@ const { mutate: eventRuleMutation, isPending: eventRuleMutationPending } = useMu
         } else {
             showSuccessMessage(i18n.t('ALERT_MANAGER.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '');
         }
-        await queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
+        await queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey.value });
         if (!storeState.isEventRuleEditMode) {
             await replaceUrlQuery({
                 webhookId: data.webhook_id || 'global',
                 eventRuleId: data.event_rule_id,
             });
         } else {
-            queryClient.invalidateQueries({ queryKey: eventRuleQueryKey });
+            queryClient.invalidateQueries({ queryKey: eventRuleQueryKey.value });
         }
         await handleDeleteForm();
     },

@@ -34,7 +34,7 @@ const { mutate: createRole, isPending: isCreateRolePending } = useMutation({
     onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_CREATE_ROLE'), '');
         router.go(-1);
-        queryClient.invalidateQueries({ queryKey: roleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: roleListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));

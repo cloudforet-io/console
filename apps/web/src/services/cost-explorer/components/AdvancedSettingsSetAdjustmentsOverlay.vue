@@ -304,7 +304,7 @@ const handleSyncCurrency = async (policyIdList: string[]) => {
             });
         }));
         showSuccessMessage(i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_S_SYNC_EXCHANGE_RATE'), '');
-        queryClient.invalidateQueries({ queryKey: raQueryKey });
+        queryClient.invalidateQueries({ queryKey: raQueryKey.value });
     } catch (error) {
         ErrorHandler.handleRequestError(error, i18n.t('COST_EXPLORER.ADVANCED_SETTINGS.ALT_E_SYNC_EXCHANGE_RATE'));
     }

@@ -139,15 +139,15 @@ const handleClose = () => {
 /* Mutation */
 const { mutateAsync: createUser } = useUserCreateMutation({
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });
 const { mutateAsync: createWorkspaceUser } = useWorkspaceUserCreateMutation({
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });
@@ -194,8 +194,8 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
 
 const { mutateAsync: createRoleBinding } = useRoleBindingCreateMutation({
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
     },
 });
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
@@ -224,8 +224,8 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
 
 const { mutateAsync: addUserToWorkspaceGroup } = useWorkspaceGroupAddUsersMutation({
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
     },
 });
 

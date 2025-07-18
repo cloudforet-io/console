@@ -64,7 +64,7 @@ const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'works
 const { mutate: updateWorkspaceMutation, isPending: isUpdateWorkspacePending } = useMutation({
     mutationFn: (params: WorkspaceUpdateParameters) => workspaceAPI.update(params),
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
         tableState.tagEditPageVisible = false;
         state.items = convertUserTagsToKeyValueArray(state.tags);

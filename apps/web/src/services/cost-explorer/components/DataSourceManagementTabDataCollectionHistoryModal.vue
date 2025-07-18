@@ -125,7 +125,7 @@ const handleConfirmButton = async () => {
         default: break;
         }
 
-        queryClient.invalidateQueries({ queryKey: costJobListQueryKey });
+        queryClient.invalidateQueries({ queryKey: costJobListQueryKey.value });
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

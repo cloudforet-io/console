@@ -63,7 +63,7 @@ export const useUserListPaginationQuery = ({ params, thisPage, pageSize }: UseUs
     }, isAdminMode.value ? ['DOMAIN'] : ['WORKSPACE']);
 
     const refresh = async () => {
-        await queryClient.invalidateQueries({ queryKey: isAdminMode.value ? userListPaginationQueryKey : workspaceUserListPaginationQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: isAdminMode.value ? userListPaginationQueryKey.value : workspaceUserListPaginationQueryKey.value });
     };
 
     return {

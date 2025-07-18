@@ -198,7 +198,7 @@ const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.i
 
 const { mutate: deleteRoleBinding } = useRoleBindingDeleteMutation({
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });

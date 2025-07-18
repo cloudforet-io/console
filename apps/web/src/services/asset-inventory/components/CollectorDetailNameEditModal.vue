@@ -62,8 +62,8 @@ const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collecto
 const { mutate: updateCollectorName, isPending: isUpdating } = useMutation({
     mutationFn: (params: CollectorUpdateParameters) => collectorAPI.update(params),
     onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: collectorGetQueryKey });
-        await queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
+        await queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: collectorListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_CHANGE_COLLECTOR_NAME'), '');
         emits('update:visible', false);
     },

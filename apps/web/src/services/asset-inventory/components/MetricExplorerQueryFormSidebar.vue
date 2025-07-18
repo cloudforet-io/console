@@ -123,7 +123,7 @@ const { mutate: createCustomMetric, isPending: createCustomMetricLoading } = use
                 metricId: data.metric_id,
             },
         }).catch(() => {});
-        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
     },
     onError: (e) => {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
@@ -135,7 +135,7 @@ const { mutate: updateCustomMetric, isPending: updateCustomMetricLoading } = use
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
         metricExplorerPageStore.setRefreshMetricData(true);
-        queryClient.resetQueries({ queryKey: metricGetQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricGetQueryKey.value });
     },
     onError: (e) => {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);

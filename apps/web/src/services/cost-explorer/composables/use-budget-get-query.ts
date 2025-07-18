@@ -38,7 +38,7 @@ export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
     };
 
     const invalidateBudgetGetQuery = () => {
-        queryClient.invalidateQueries({ queryKey: budgetGetQueryKey });
+        queryClient.invalidateQueries({ queryKey: budgetGetQueryKey.value });
     };
 
     return {

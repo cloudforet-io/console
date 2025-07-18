@@ -120,7 +120,7 @@ const queryClient = useQueryClient();
 const { mutate: createMetricExample } = useMutation({
     mutationFn: metricExampleAPI.create,
     onSuccess: async (data) => {
-        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
         await gnbStore.fetchMetricExample();
@@ -139,8 +139,8 @@ const { mutate: createMetricExample } = useMutation({
 const { mutate: updateMetricExampleName } = useMutation({
     mutationFn: metricExampleAPI.update,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
-        queryClient.invalidateQueries({ queryKey: metricExampleGetQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: metricExampleGetQueryKey.value });
         state.proxyVisible = false;
         await gnbStore.fetchMetricExample();
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
@@ -152,8 +152,8 @@ const { mutate: updateMetricExampleName } = useMutation({
 const { mutate: updateMetricName } = useMutation({
     mutationFn: metricAPI.update,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
-        queryClient.invalidateQueries({ queryKey: metricGetQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: metricGetQueryKey.value });
         state.proxyVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     },
