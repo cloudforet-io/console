@@ -12,7 +12,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import type { DateRange } from '@/api-clients/dashboard/_types/dashboard-type';
 
-import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/data-table/use-widget-date-range';
 import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import {
     DAILY_ENABLED_VALUES,

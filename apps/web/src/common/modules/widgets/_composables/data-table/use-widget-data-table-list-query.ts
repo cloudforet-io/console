@@ -12,7 +12,7 @@ import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 
-const DEFAULT_LIST_DATA = { results: [] };
+// const DEFAULT_LIST_DATA = { results: [] };
 // const DEFAULT_LOAD_DATA = { results: {}, labels_info: {}, data_info: {} };
 const STALE_TIME = 1000 * 60 * 5;
 
@@ -46,7 +46,7 @@ export const useWidgetDataTableListQuery = ({
         privateDataTableAPI,
     } = usePrivateDataTableApi();
 
-    const isPrivate = computed(() => !!widgetId?.value?.startsWith('private'));
+    const isPrivate = computed(() => !!widgetId.value?.startsWith('private'));
 
     /* Query Keys */
     const { key: publicDataTableListQueryKey, params: publicDataTableListParams } = useServiceQueryKey('dashboard', 'public-data-table', 'list', {
@@ -67,18 +67,18 @@ export const useWidgetDataTableListQuery = ({
         queryKey: publicDataTableListQueryKey,
         queryFn: () => publicDataTableAPI.list(publicDataTableListParams.value),
         select: (data) => data?.results || [],
-        enabled: computed(() => !!widgetId?.value && !isPrivate.value),
-        initialData: DEFAULT_LIST_DATA,
-        initialDataUpdatedAt: 0,
+        enabled: computed(() => !!widgetId.value && !isPrivate.value),
+        // initialData: DEFAULT_LIST_DATA,
+        // initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
     }, ['DOMAIN', 'WORKSPACE']);
     const privateDataTableListQuery = useScopedQuery({
         queryKey: privateDataTableListQueryKey,
         queryFn: () => privateDataTableAPI.list(privateDataTableListParams.value),
         select: (data) => data?.results || [],
-        enabled: computed(() => !!widgetId?.value && isPrivate.value),
-        initialData: DEFAULT_LIST_DATA,
-        initialDataUpdatedAt: 0,
+        enabled: computed(() => !!widgetId.value && isPrivate.value),
+        // initialData: DEFAULT_LIST_DATA,
+        // initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
     }, ['WORKSPACE']);
 

@@ -17,8 +17,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/widget/use-widget-query';
 import {
     DATA_TABLE_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';

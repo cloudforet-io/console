@@ -30,7 +30,7 @@ import {
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
+import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardFilters.vue';
 import {
     DATA_SOURCE_DOMAIN,
     GROUP_BY_INFO_ITEMS_FOR_TAGS,
@@ -49,9 +49,8 @@ interface Props {
     sourceType?: string;
     sourceId?: string;
     sourceKey?: string;
-    sourceItems: SelectDropdownMenuItem[];
     selectedGroupByItems: any[];
-    selectedGroupByTagsMap: Record<string, string[]>;
+    selectedGroupByTagsMap: Record<string, { name: string; label: string }[]>;
     filter: Record<string, DataTableQueryFilter>;
     dataFieldName: string;
     dataUnit: string;
@@ -225,13 +224,13 @@ const handleClickTimeDiff = (timeDiff: string) => {
 const handleClickTimeDiffDate = (timeDiffDate: string) => {
     advancedOptionsState.proxySelectedTimeDiffDate = timeDiffDate;
 
-    const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
+    // const defaultFieldName = props.sourceItems.find((source) => source.name === props.sourceKey)?.label || '';
     const timeDiffOptions = {
         none: '',
         months: 'month',
         years: 'year',
     };
-    advancedOptionsState.proxyTimeDiffDataName = `${defaultFieldName} (- ${timeDiffDate} ${timeDiffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
+    advancedOptionsState.proxyTimeDiffDataName = `${state.proxyDataFieldName} (- ${timeDiffDate} ${timeDiffOptions[advancedOptionsState.proxySelectedTimeDiff]})`;
 };
 const handleUpdateSelectedGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected && (state.proxySelectedGroupByItems.length > MAX_GROUP_BY_COUNT)) {

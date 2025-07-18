@@ -39,8 +39,8 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFiltersItem
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardFiltersItem.vue';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardFiltersItem.vue';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_QUERY_OPERATOR,

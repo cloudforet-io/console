@@ -12,9 +12,9 @@ import {
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformFormWrapper.vue';
 import WidgetFormDataTableGlobalVariableViewButton
-    from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableGlobalVariableViewButton.vue';
 import {
     DATA_TABLE_OPERATOR,
 } from '@/common/modules/widgets/_constants/data-table-constant';

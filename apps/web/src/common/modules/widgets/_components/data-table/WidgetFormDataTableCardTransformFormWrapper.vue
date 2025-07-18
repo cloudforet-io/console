@@ -5,7 +5,7 @@ import { PI } from '@cloudforet/mirinae';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformDataTableDropdown
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformDataTableDropdown.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformDataTableDropdown.vue';
 import type { TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableOperator,
