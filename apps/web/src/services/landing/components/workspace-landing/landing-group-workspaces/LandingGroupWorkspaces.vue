@@ -192,7 +192,6 @@ const handleChangeWorkspaceGroup = (selected: string) => {
                     >
                         {{ $t('LADING.SHOW_ALL') }}
                     </p-button>
-                    <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
                 </div>
             </div>
             <template #no-data>
@@ -207,6 +206,7 @@ const handleChangeWorkspaceGroup = (selected: string) => {
                 </p-empty>
             </template>
         </p-data-loader>
+        <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
     </div>
 </template>
 
