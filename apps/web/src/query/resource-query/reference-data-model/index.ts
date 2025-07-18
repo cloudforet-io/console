@@ -10,5 +10,5 @@ const proxy = makeReferenceDataModelProxy(referenceDataModelMap, (target, prop) 
 });
 
 export const useAllReferenceDataModel = () => proxy;
-export * from './adaptors/implementations';
+export * from '@/query/resource-query/reference-data-model/adaptors/implementations';
 
