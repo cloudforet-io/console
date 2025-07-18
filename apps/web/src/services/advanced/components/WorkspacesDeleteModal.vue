@@ -61,7 +61,7 @@ const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'works
 const { mutate: deleteWorkspaceMutation } = useMutation({
     mutationFn: (params: WorkspaceDeleteParameters) => workspaceAPI.delete(params),
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         showSuccessMessage(_i18n.t('IAM.WORKSPACES.ALT_S_DELETE_WORKSPACE'), '');
         workspacePageStore.setSelectedIndex(undefined);
         workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);

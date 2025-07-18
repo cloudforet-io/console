@@ -21,7 +21,7 @@ export const useWorkspaceUserCreateMutation = (options: UseWorkspaceUserCreateMu
     return useMutation({
         mutationFn: workspaceUserAPI.create,
         onSuccess: async (data) => {
-            queryClient.invalidateQueries({ queryKey: workspaceUserQueryKey });
+            queryClient.invalidateQueries({ queryKey: workspaceUserQueryKey.value });
             if (onSuccess) await onSuccess(data);
         },
         onError: async (error) => {

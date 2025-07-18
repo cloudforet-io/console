@@ -99,7 +99,7 @@ const { mutate: createWorkspaceMutation } = useMutation({
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
         createDefaultBookmark(data.workspace_id);
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         emit('confirm', {
             id: data.workspace_id,
             name: data.name,
@@ -117,7 +117,7 @@ const { mutate: updateWorkspaceMutation } = useMutation({
     onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_UPDATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleError(e, true);

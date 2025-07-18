@@ -72,7 +72,7 @@ const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'works
 const { mutate: enableWorkspaceMutation, isPending: isEnableWorkspacePending } = useMutation({
     mutationFn: (params: WorkspaceEnableParameters) => workspaceAPI.enable(params),
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_ENABLE_WORKSPACE'), '');
         workspacePageStore.setSelectedIndex(undefined);
         workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
@@ -89,7 +89,7 @@ const { mutate: enableWorkspaceMutation, isPending: isEnableWorkspacePending } =
 const { mutate: disableWorkspaceMutation, isPending: isDisableWorkspacePending } = useMutation({
     mutationFn: (params: WorkspaceDisableParameters) => workspaceAPI.disable(params),
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_DISABLE_WORKSPACE'), '');
         workspacePageStore.setSelectedIndex(undefined);
         workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);

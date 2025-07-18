@@ -47,7 +47,7 @@ const { mutate: eventRuleDeleteMutation, isPending: eventRuleDeleteMutationPendi
             webhookId: undefined,
             eventRuleId: undefined,
         });
-        queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: eventRuleListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleError(e, true);

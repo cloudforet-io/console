@@ -114,7 +114,7 @@ const { mutate: updateOrResetLinkedAccount } = useMutation<void, Error>({
         } else {
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
         }
-        queryClient.invalidateQueries({ queryKey: linkedAccountListQueryKey });
+        queryClient.invalidateQueries({ queryKey: linkedAccountListQueryKey.value });
     },
     onError: (error) => {
         ErrorHandler.handleError(error);

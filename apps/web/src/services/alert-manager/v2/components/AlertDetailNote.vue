@@ -80,7 +80,7 @@ const { mutate: noteMutation } = useMutation({
         } else {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_NOTE_DELETE'), '');
         }
-        queryClient.invalidateQueries({ queryKey: noteListQueryKey });
+        queryClient.invalidateQueries({ queryKey: noteListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleError(e, true);

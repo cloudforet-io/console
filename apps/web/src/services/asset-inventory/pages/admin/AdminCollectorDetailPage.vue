@@ -164,7 +164,7 @@ const { mutate: deleteCollector } = useMutation({
     onMutate: () => { state.deleteLoading = true; },
     onSuccess: () => {
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
-        queryClient.invalidateQueries({ queryKey: collectorListQueryKey });
+        queryClient.invalidateQueries({ queryKey: collectorListQueryKey.value });
         goBackToMainPage();
     },
     onError: (e) => {

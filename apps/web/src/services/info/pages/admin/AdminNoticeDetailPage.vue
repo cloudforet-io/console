@@ -113,7 +113,7 @@ const { mutate: sendEmailMutation, isPending: isSendingEmail } = useMutation({
 const { mutate: deleteNoticeMutation, isPending: isDeletingNotice } = useMutation({
     mutationFn: postAPI.delete,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: noticeListBaseQueryKey });
+        queryClient.invalidateQueries({ queryKey: noticeListBaseQueryKey.value });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
         await router.push({ name: ADMIN_INFO_ROUTE.NOTICE._NAME });
     },

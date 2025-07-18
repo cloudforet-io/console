@@ -181,7 +181,7 @@ const { mutate: duplicateMetric } = useMutation({
     },
     onSuccess: async (data) => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
-        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { metricId: data.metric_id },
@@ -197,7 +197,7 @@ const { mutate: duplicateMetric } = useMutation({
 const { mutateAsync: deleteMetric } = useMutation({
     mutationFn: metricAPI.delete,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: metricListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
     },
     onError: async (e) => {
@@ -207,7 +207,7 @@ const { mutateAsync: deleteMetric } = useMutation({
 const { mutate: deleteMetricExample } = useMutation({
     mutationFn: metricExampleAPI.delete,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,

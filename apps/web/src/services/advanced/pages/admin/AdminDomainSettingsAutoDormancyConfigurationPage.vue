@@ -80,7 +80,7 @@ const { data: currencyData } = useScopedQuery({
 const { mutate: createDomainDormancyMutation } = useMutation({
     mutationFn: (params: DomainConfigCreateParameters) => domainConfigAPI.create(params),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey });
+        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleError(e);
@@ -89,7 +89,7 @@ const { mutate: createDomainDormancyMutation } = useMutation({
 const { mutate: updateDomainDormancyMutation } = useMutation({
     mutationFn: (params: DomainConfigUpdateParameters) => domainConfigAPI.update(params),
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey });
+        queryClient.invalidateQueries({ queryKey: domainConfigListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleError(e);

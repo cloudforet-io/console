@@ -205,8 +205,8 @@ const queryClient = useQueryClient();
 const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
     onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        queryClient.invalidateQueries({ queryKey: userListQueryKey });
-        queryClient.invalidateQueries({ queryKey: userGroupListQueryKey });
+        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, e.message);
