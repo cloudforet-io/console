@@ -9,13 +9,15 @@ import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
+import type { NamespaceModel } from '@/api-clients/inventory/namespace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { hideLoadingMessage, showErrorMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import getRandomId from '@/lib/random-id-generator';
 import type { ListResponse } from '@/lib/variable-models/_base/types';
@@ -29,6 +31,9 @@ import WidgetFormUnifiedCostDataSourcePopper
     from '@/common/modules/widgets/_components/data-source-popover/WidgetFormUnifiedCostDataSourcePopper.vue';
 import { useDataTableAddMutation } from '@/common/modules/widgets/_composables/data-table/mutations/use-data-table-add-mutation';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
+import { useCostDataSourceQueryFetcher } from '@/common/modules/widgets/_composables/use-cost-data-source-query-fetcher';
+import { useMetricQueryFetcher } from '@/common/modules/widgets/_composables/use-metric-query-fetcher';
+import { useNamespaceQueryFetcher } from '@/common/modules/widgets/_composables/use-namespace-query-fetcher';
 import { useWidgetCreateMutation } from '@/common/modules/widgets/_composables/widget/mutations/use-widget-create-mutation';
 import {
     DATA_SOURCE_DOMAIN,
@@ -44,6 +49,7 @@ import type {
 } from '@/common/modules/widgets/types/widget-model';
 
 
+
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const widgetContextStore = useWidgetContextStore();
@@ -51,13 +57,6 @@ const widgetContextState = widgetContextStore.state;
 const widgetContextGetters = widgetContextStore.getters;
 const userStore = useUserStore();
 const dashboardId = computed(() => widgetContextGetters.dashboardId);
-
-/* Reference Data Model */
-const referenceMap = useAllReferenceDataModel();
-const costDataSourceMap = referenceMap.costDataSource;
-const metricMap = referenceMap.metric;
-const namespaceMap = referenceMap.namespace;
-
 
 const emit = defineEmits<{(e: 'scroll'): void;}>();
 
@@ -97,22 +96,25 @@ const state = reactive({
 
     selectedCostDataTypeLabel: computed(() => {
         if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
-        const targetCostDataSource = costDataSourceMap[state.selectedCostDataSourceId];
-        const costAlias: string|undefined = costDataSourceMap[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.name;
+        const targetCostDataSource = selectedResourceState.costDataSource;
+        const costAlias: string|undefined = targetCostDataSource?.plugin_info?.metadata?.cost_info?.name;
         if (state.selectedCostDataType === 'cost') {
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
         if (state.selectedCostDataType === 'usage_quantity') {
             return 'Usage';
         }
-        return targetCostDataSource?.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
+        return targetCostDataSource?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
 });
 
-/* Computed Selected Data (reference data) */
-const selectedCostDataSource = computed(() => costDataSourceMap[state.selectedCostDataSourceId]);
-const selectedMetric = computed(() => metricMap[state.selectedMetricId]);
-const selectedNamespace = computed(() => namespaceMap[selectedMetric.value?.data?.namespace_id ?? '']);
+/* Selected Resource State */
+const selectedResourceState = reactive({
+    costDataSource: undefined as undefined|CostDataSourceModel,
+    metric: undefined as undefined|MetricModel,
+    namespace: undefined as undefined|NamespaceModel,
+});
+
 
 /* Api */
 const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useWidgetCreateMutation({
@@ -124,7 +126,6 @@ const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useWidgetC
     },
 });
 const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useDataTableAddMutation({
-    widgetId: computed(() => widgetGenerateState.widgetId),
     onSuccess: (data) => {
         widgetGenerateStore.setSelectedDataTableId(data?.data_table_id);
     },
@@ -134,6 +135,27 @@ const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useDataTab
     },
 });
 
+/* Api - Selected Resource Query */
+const { getCostDataSource } = useCostDataSourceQueryFetcher();
+const { getMetric } = useMetricQueryFetcher();
+const { getNamespace } = useNamespaceQueryFetcher();
+
+const getSelectedResource = async () => {
+    try {
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+            const costDataSource = await getCostDataSource(state.selectedCostDataSourceId);
+            selectedResourceState.costDataSource = costDataSource;
+        } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.ASSET) {
+            const metric = await getMetric(state.selectedMetricId);
+            selectedResourceState.metric = metric;
+            const namespace = await getNamespace(metric.namespace_id);
+            selectedResourceState.namespace = namespace;
+        }
+    } catch (error: any) {
+        showErrorMessage(error.message, error);
+        throw new Error(`Failed to fetch selected resource: ${error.message}`);
+    }
+};
 
 /* Util */
 const resetSelectedDataSource = () => {
@@ -141,35 +163,6 @@ const resetSelectedDataSource = () => {
     state.selectedCostDataType = undefined;
     state.selectedUnifiedCostDataType = undefined;
     state.selectedMetricId = undefined;
-};
-
-const loadingMessageIdSet = new Set<string>();
-const getDataTableBaseName = () => {
-    let baseName = '';
-
-    if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
-        if (!selectedCostDataSource.value) {
-            const loadingMessageId = showLoadingMessage('Wait for moment', 'CostDataSource is preparing...');
-            loadingMessageIdSet.add(loadingMessageId);
-            throw new Error('selectedCostDataSource is undefined');
-        }
-        baseName = `${selectedCostDataSource.value?.name} - ${state.selectedCostDataTypeLabel}`;
-    } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
-        baseName = 'Unified Cost';
-    } else {
-        if (!selectedNamespace.value || !selectedMetric.value) {
-            const loadingMessageId = showLoadingMessage('Wait for moment', 'Namespace or Metric is preparing...');
-            loadingMessageIdSet.add(loadingMessageId);
-            throw new Error('selectedNamespace or selectedMetric is undefined');
-        }
-        baseName = `${selectedNamespace.value?.name} - ${selectedMetric.value?.label}`;
-    }
-
-    loadingMessageIdSet.forEach((id) => {
-        hideLoadingMessage(id);
-    });
-    loadingMessageIdSet.clear();
-    return baseName;
 };
 
 /* Event */
@@ -225,17 +218,26 @@ const handleConfirmDataSource = async () => {
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
-        const dataTableBaseName = getDataTableBaseName();
+        // NOTE: get selected resource
+        await getSelectedResource();
+        let dataTableName = '';
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+            dataTableName = `${selectedResourceState.costDataSource?.name} - ${state.selectedCostDataTypeLabel}`;
+        } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            dataTableName = 'Unified Cost';
+        } else {
+            dataTableName = `${selectedResourceState.namespace?.name} - ${selectedResourceState.metric?.name}`;
+        }
 
         // add parameters
         const addParameters = {
             widget_id: widgetGenerateState.widgetId as string,
             source_type: state.selectedDataSourceDomain,
-            name: getDuplicatedDataTableName(dataTableBaseName, dataTableList.value),
+            name: getDuplicatedDataTableName(dataTableName, dataTableList.value),
         } as DataTableAddParameters;
         const dataKey = state.selectedCostDataType?.replace('data.', '');
-        const costUnit: string|undefined = selectedCostDataSource.value?.data?.plugin_info?.metadata?.cost_info?.unit;
-        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = selectedCostDataSource.value?.data?.plugin_info?.metadata?.data_info;
+        const costUnit: string|undefined = selectedResourceState.costDataSource?.plugin_info?.metadata?.cost_info?.unit;
+        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = selectedResourceState.costDataSource?.plugin_info?.metadata?.data_info;
         const additionalDataUnit = dataKey !== 'cost' && additionalDataInfo ? additionalDataInfo[dataKey]?.unit : undefined;
 
         // data unit
@@ -259,15 +261,15 @@ const handleConfirmDataSource = async () => {
             };
         } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
             options = {
-                data_name: dataTableBaseName,
+                data_name: dataTableName,
                 UNIFIED_COST: {
                     data_key: state.selectedUnifiedCostDataType,
                 },
             };
         } else {
             options = {
-                data_name: selectedMetric.value?.label,
-                data_unit: selectedMetric.value?.data?.unit,
+                data_name: selectedResourceState.metric?.name || '',
+                data_unit: selectedResourceState.metric?.unit || '',
                 ASSET: {
                     metric_id: state.selectedMetricId,
                 },
