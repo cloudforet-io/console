@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {
-    computed,
-    reactive,
+    computed, reactive, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip, PHeadingLayout,
@@ -13,16 +15,17 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { BasicRoleModel, RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { RoleType } from '@/api-clients/identity/role/type';
 import type { WorkspaceGroupUserUpdateRoleParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/update-role';
 import type { WorkspaceGroupModel, WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { sortTableItems } from '@/common/utils/table-sort';
 
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
@@ -30,21 +33,18 @@ import LandingWorkspaceGroupAddUsersModal
     from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupAddUsersModal.vue';
 import LandingWorkspaceGroupRemoveUserModal
     from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupRemoveUserModal.vue';
+import { useUserProfileGetWorkspaceGroupsQuery } from '@/services/landing/composables/use-user-profile-get-workspace-groups-query';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
-const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
-const userWorkspaceGroupStoreState = userWorkspaceGroupStore.state;
-const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
+
+const queryClient = useQueryClient();
 const landingPageStore = useLandingPageStore();
 const landingPageState = landingPageStore.state;
-const landingPageGetters = landingPageStore.getters;
-const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 const userStore = useUserStore();
 
 const state = reactive({
     addUserModalVisible: false,
     removeUserModalVisible: false,
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageState.selectedWorkspaceGroupId]),
     removeUserList: [] as WorkspaceUser[],
 });
 
@@ -56,10 +56,34 @@ const tableState = reactive({
         { name: 'role', label: 'Role' },
         { name: 'remove_button', label: ' ', sortable: false },
     ],
+    searchText: '',
+    sortBy: 'user_id',
+    sortDesc: false,
+    thisPage: 1,
+    pageSize: 10,
+    selectedIndices: [] as number[],
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
-    loginUserRoleType: computed(() => landingPageGetters.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
+    loginUserRoleType: computed<RoleType|undefined>(() => workspaceGroupUsers.value?.find((user) => user.user_id === tableState.loginUserId)?.role_type),
     isUserOwnerRole: computed(() => userStore.state.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
     roleMap: {} as Record<string, BasicRoleModel>,
+});
+const workspaceGroup = computed<WorkspaceGroupModel|undefined>(() => workspaceGroupList.value?.find((item) => item.workspace_group_id === landingPageState.selectedWorkspaceGroupId));
+const workspaceGroupUsers = computed<WorkspaceUser[]>(() => workspaceGroup.value?.users || []);
+const filteredUsers = computed<WorkspaceUser[]>(() => {
+    if (!tableState.searchText || tableState.searchText === '') {
+        return workspaceGroupUsers.value;
+    }
+    return workspaceGroupUsers.value
+        .filter((user) => (user.user_id && user.user_id.includes(tableState.searchText))
+        || (user.user_name && user.user_name.includes(tableState.searchText)));
+});
+const tableItems = computed<WorkspaceUser[]>(() => {
+    const sortedUsers = sortTableItems<WorkspaceUser>(filteredUsers.value, tableState.sortBy, tableState.sortDesc);
+    const pageStart = getPageStart(tableState.thisPage, tableState.pageSize);
+    if (filteredUsers.value.length < pageStart - 1 + tableState.pageSize) {
+        return sortedUsers?.slice(pageStart - 1) || [];
+    }
+    return sortedUsers?.slice(pageStart - 1, pageStart - 1 + tableState.pageSize) || [];
 });
 
 const {
@@ -83,44 +107,38 @@ const {
     }),
 });
 
+/* Query */
+const {
+    data: workspaceGroupList,
+    isLoading: isWorkspaceGroupListLoading,
+    key: workspaceGroupListQueryKey,
+    refetch: refetchWorkspaceGroupList,
+} = useUserProfileGetWorkspaceGroupsQuery();
 
-const handleSelect = (index) => {
-    landingPageStoreGroupUserState.selectedIndices = index;
-};
 
-const handleChange = (options: any = {}) => {
-    if (options.pageStart) {
-        landingPageStore.$patch((_state) => {
-            _state.groupUserTableState.pageStart = options.pageStart;
-        });
-    }
-
-    if (options.pageLimit) {
-        landingPageStore.$patch((_state) => {
-            _state.groupUserTableState.pageStart = 1;
-            _state.groupUserTableState.pageLimit = options.pageLimit;
-            _state.groupUserTableState.thisPage = 1;
-        });
-    }
-};
-
+/* Event Handler */
 const handleSelectMenu = async (role: BasicRoleModel, user_id: string) => {
     try {
         if (!role.name || !user_id) throw new Error('role_id or user_id is not exist');
         await SpaceConnector.clientV2.identity.workspaceGroupUser.updateRole<WorkspaceGroupUserUpdateRoleParameters>({
-            workspace_group_id: state.workspaceGroup?.workspace_group_id ?? '',
+            workspace_group_id: workspaceGroup.value?.workspace_group_id ?? '',
             target_user_id: user_id,
             role_id: role.name,
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
-        await userWorkspaceGroupStore.load();
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListQueryKey.value });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.ALT_E_UPDATE_ROLE'));
     }
 };
 
 const handleRefresh = () => {
-    userWorkspaceGroupStore.load();
+    refetchWorkspaceGroupList();
+};
+
+const handleConfirmRemoveUser = () => {
+    handleRefresh();
+    tableState.selectedIndices = [];
 };
 
 const handleAddUsersButtonClick = () => {
@@ -128,9 +146,8 @@ const handleAddUsersButtonClick = () => {
 };
 
 const handleSelectedGroupUsersRemoveButtonClick = () => {
-    state.removeUserList = landingPageGetters.workspaceGroupUserTableItem
-        .map((item, index) => (landingPageStoreGroupUserState.selectedIndices.includes(index) ? item : null))
-        .filter((item) => item);
+    state.removeUserList = tableItems.value
+        .filter((item, index) => tableState.selectedIndices.includes(index));
     state.removeUserModalVisible = true;
 };
 
@@ -139,17 +156,10 @@ const handleSelectedGroupUserRemoveButtonClick = async (item:WorkspaceUser) => {
     state.removeUserModalVisible = true;
 };
 
-const handleChangeSort = (name:string, isDesc:boolean) => {
-    landingPageStore.$patch((_state) => {
-        if (name === 'role') {
-            _state.groupUserTableState.sortBy = `${name}_type`;
-        } else {
-            _state.groupUserTableState.sortBy = name;
-        }
-
-        _state.groupUserTableState.selectedIndices = [];
-        _state.groupUserTableState.isDesc = isDesc;
-    });
+const handleChange = (options: any = {}) => {
+    if (!options) return;
+    tableState.thisPage = 1;
+    tableState.selectedIndices = [];
 };
 
 const setRoleMap = async () => {
@@ -163,6 +173,13 @@ const setRoleMap = async () => {
 (() => {
     setRoleMap();
 })();
+
+watch([
+    () => tableState.searchText,
+], () => {
+    tableState.thisPage = 1;
+    tableState.selectedIndices = [];
+}, { immediate: true });
 </script>
 
 <template>
@@ -171,7 +188,7 @@ const setRoleMap = async () => {
             <template #heading>
                 <p-heading :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                            use-total-count
-                           :total-count="landingPageGetters.workspaceGroupUserTotalCount"
+                           :total-count="workspaceGroupUsers.length"
                            heading-type="sub"
                 />
             </template>
@@ -180,7 +197,7 @@ const setRoleMap = async () => {
                      class="workspace-group-tab-group-user-button-wrapper"
                 >
                     <p-button style-type="negative-primary"
-                              :disabled="!landingPageStoreGroupUserState.selectedIndices.length"
+                              :disabled="!tableState.selectedIndices.length"
                               @click="handleSelectedGroupUsersRemoveButtonClick"
                     >
                         {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -196,23 +213,22 @@ const setRoleMap = async () => {
         </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
                          style="height: calc(100vh - 25rem);"
-                         :loading="userWorkspaceGroupStoreState.loading"
+                         :loading="isWorkspaceGroupListLoading"
                          :fields="tableState.fields"
-                         :items="landingPageGetters.workspaceGroupUserTableItem"
-                         :select-index="landingPageStoreGroupUserState.selectedIndices"
-                         :total-count="landingPageGetters.workspaceGroupUserTotalCount"
-                         sort-by="user_id"
+                         :items="tableItems"
+                         :select-index.sync="tableState.selectedIndices"
+                         :total-count="workspaceGroupUsers.length"
                          search-type="plain"
-                         :sort-desc="true"
-                         :this-page.sync="landingPageStoreGroupUserState.thisPage"
-                         :search-text.sync="landingPageStoreGroupUserState.searchText"
+                         :sort-by.sync="tableState.sortBy"
+                         :sort-desc.sync="tableState.sortDesc"
+                         :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
+                         :search-text.sync="tableState.searchText"
                          selectable
                          sortable
                          searchable
-                         @select="handleSelect"
                          @change="handleChange"
                          @refresh="handleRefresh"
-                         @changeSort="handleChangeSort"
         >
             <template #col-state-format="{ value }">
                 <p-status v-bind="groupUserStateFormatter(value)"
@@ -232,7 +248,7 @@ const setRoleMap = async () => {
                         :search-text.sync="searchText"
                         :loading="loading"
                         disable-handler
-                        page-size="10"
+                        :page-size="10"
                         @click-show-more="handleClickShowMore"
                         @select="handleSelectMenu($event, item.user_id)"
                     >
@@ -283,13 +299,13 @@ const setRoleMap = async () => {
             </template>
         </p-toolbox-table>
         <landing-workspace-group-add-users-modal :visible.sync="state.addUserModalVisible"
-                                                 :workspace-group="state.workspaceGroup"
+                                                 :workspace-group="workspaceGroup"
                                                  @confirm="handleRefresh"
         />
         <landing-workspace-group-remove-user-modal :visible.sync="state.removeUserModalVisible"
-                                                   :workspace-group="state.workspaceGroup"
+                                                   :workspace-group="workspaceGroup"
                                                    :remove-user-list="state.removeUserList"
-                                                   @confirm="handleRefresh"
+                                                   @confirm="handleConfirmRemoveUser"
         />
     </section>
 </template>
