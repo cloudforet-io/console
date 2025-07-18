@@ -1,6 +1,7 @@
 import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -12,7 +13,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type ServiceAccountReferenceItem = ReferenceItem<ServiceAccountModel>;
 export type ServiceAccountReferenceMap = ReferenceMap<ServiceAccountReferenceItem>;
 
-export const useServiceAccountReferenceDataModel = () => {
+export const useServiceAccountReferenceDataModel: ReferenceDataModelImplementationAdaptor<ServiceAccountReferenceItem> = () => {
     const { serviceAccountAPI } = useServiceAccountApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ServiceAccountModel> = {
         listFetcher: serviceAccountAPI.list,

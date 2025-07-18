@@ -1,6 +1,7 @@
 import { useTrustedAccountApi } from '@/api-clients/identity/trusted-account/composables/use-trusted-account-api';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -12,7 +13,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type TrustedAccountReferenceItem = ReferenceItem<TrustedAccountModel>;
 export type TrustedAccountReferenceMap = ReferenceMap<TrustedAccountReferenceItem>;
 
-export const useTrustedAccountReferenceDataModel = () => {
+export const useTrustedAccountReferenceDataModel: ReferenceDataModelImplementationAdaptor<TrustedAccountReferenceItem> = () => {
     const { trustedAccountAPI } = useTrustedAccountApi();
     const fetchConfig: ReferenceDataModelFetchConfig<TrustedAccountModel> = {
         listFetcher: trustedAccountAPI.list,

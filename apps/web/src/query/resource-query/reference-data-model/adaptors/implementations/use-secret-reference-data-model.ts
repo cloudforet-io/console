@@ -1,6 +1,7 @@
 import { useSecretApi } from '@/api-clients/secret/secret/composables/use-secret-api';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type SecretReferenceItem = ReferenceItem<SecretModel>;
 export type SecretReferenceMap = ReferenceMap<SecretReferenceItem>;
 
-export const useSecretReferenceDataModel = () => {
+export const useSecretReferenceDataModel: ReferenceDataModelImplementationAdaptor<SecretReferenceItem> = () => {
     const { secretAPI } = useSecretApi();
     const fetchConfig: ReferenceDataModelFetchConfig<SecretModel> = {
         listFetcher: secretAPI.list,

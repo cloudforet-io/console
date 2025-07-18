@@ -2,6 +2,7 @@ import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/compo
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
 import { useRoleReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-role-reference-data-model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -13,7 +14,7 @@ import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-
 export type WorkspaceUserReferenceItem = ReferenceItem<WorkspaceUserModel>;
 export type WorkspaceUserReferenceMap = ReferenceMap<WorkspaceUserReferenceItem>;
 
-export const useWorkspaceUserReferenceDataModel = () => {
+export const useWorkspaceUserReferenceDataModel: ReferenceDataModelImplementationAdaptor<WorkspaceUserReferenceItem> = () => {
     const { map: roleReferenceMap } = useRoleReferenceDataModel();
 
     const { workspaceUserAPI } = useWorkspaceUserApi();

@@ -1,6 +1,7 @@
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -13,7 +14,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 export type CollectorReferenceItem = ReferenceItem<CollectorModel>;
 export type CollectorReferenceMap = ReferenceMap<CollectorReferenceItem>;
 
-export const useCollectorReferenceDataModel = () => {
+export const useCollectorReferenceDataModel: ReferenceDataModelImplementationAdaptor<CollectorReferenceItem> = () => {
     const { collectorAPI } = useCollectorApi();
     const fetchConfig: ReferenceDataModelFetchConfig<CollectorModel> = {
         listFetcher: collectorAPI.list,

@@ -35,12 +35,12 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'cloud_service_type_id',
         nameKey: 'name',
     },
-    cloudServiceQuerySet: {
-        name: 'Cloud Service Query Set',
-        resourceKey: 'cloudServiceQuerySet',
-        idKey: 'query_set_id',
-        nameKey: 'name',
-    },
+    // cloudServiceQuerySet: {
+    //     name: 'Cloud Service Query Set',
+    //     resourceKey: 'cloudServiceQuerySet',
+    //     idKey: 'query_set_id',
+    //     nameKey: 'name',
+    // },
     collector: {
         name: 'Collector',
         resourceKey: 'collector',
@@ -113,9 +113,15 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'protocol_id',
         nameKey: 'name',
     },
-    webhook: {
+    alertManagerWebhook: {
         name: 'Webhook',
-        resourceKey: 'webhook',
+        resourceKey: 'alertManagerWebhook',
+        idKey: 'webhook_id',
+        nameKey: 'name',
+    },
+    monitoringWebhook: {
+        name: 'Webhook',
+        resourceKey: 'monitoringWebhook',
         idKey: 'webhook_id',
         nameKey: 'name',
     },
@@ -125,9 +131,15 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'service_id',
         nameKey: 'name',
     },
-    escalationPolicy: {
+    alertManagerEscalationPolicy: {
         name: 'Escalation Policy',
-        resourceKey: 'escalationPolicy',
+        resourceKey: 'alertManagerEscalationPolicy',
+        idKey: 'escalation_policy_id',
+        nameKey: 'name',
+    },
+    monitoringEscalationPolicy: {
+        name: 'Escalation Policy',
+        resourceKey: 'monitoringEscalationPolicy',
         idKey: 'escalation_policy_id',
         nameKey: 'name',
     },

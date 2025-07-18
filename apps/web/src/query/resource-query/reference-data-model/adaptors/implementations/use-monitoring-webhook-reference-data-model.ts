@@ -1,6 +1,7 @@
 import { useWebhookApi } from '@/api-clients/monitoring/webhook/composables/use-webhook-api';
 import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type MonitoringWebhookReferenceItem = ReferenceItem<WebhookModel>;
 export type MonitoringWebhookReferenceMap = ReferenceMap<MonitoringWebhookReferenceItem>;
 
-export const useMonitoringWebhookReferenceDataModel = () => {
+export const useMonitoringWebhookReferenceDataModel: ReferenceDataModelImplementationAdaptor<MonitoringWebhookReferenceItem> = () => {
     const { webhookAPI } = useWebhookApi();
     const fetchConfig: ReferenceDataModelFetchConfig<WebhookModel> = {
         listFetcher: webhookAPI.list,
@@ -22,7 +23,7 @@ export const useMonitoringWebhookReferenceDataModel = () => {
     const {
         referenceMap,
     } = useReferenceDataModel<WebhookModel, MonitoringWebhookReferenceItem>(
-        RESOURCE_CONFIG_MAP.webhook.resourceKey,
+        RESOURCE_CONFIG_MAP.monitoringWebhook.resourceKey,
         (webhookInfo: WebhookModel) => ({
             key: webhookInfo.webhook_id,
             label: webhookInfo.name,

@@ -3,6 +3,7 @@ import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-group-reference-data-model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -24,7 +25,7 @@ interface ProjectResourceItemData {
 export type ProjectReferenceItem = ReferenceItem<ProjectResourceItemData>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 
-export const useProjectReferenceDataModel = () => {
+export const useProjectReferenceDataModel: ReferenceDataModelImplementationAdaptor<ProjectReferenceItem> = () => {
     const { map: projectGroupReferenceMap } = useProjectGroupReferenceDataModel();
     const { projectAPI } = useProjectApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ProjectModel> = {

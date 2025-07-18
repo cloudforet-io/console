@@ -1,6 +1,7 @@
 import { useProviderApi } from '@/api-clients/identity/provider/composables/use-provider-api';
 import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -15,7 +16,7 @@ import { indigo } from '@/styles/colors';
 export type ProviderReferenceItem = ReferenceItem<ProviderModel>;
 export type ProviderReferenceMap = ReferenceMap<ProviderReferenceItem>;
 
-export const useProvodierReferenceDataModel = () => {
+export const useProvodierReferenceDataModel: ReferenceDataModelImplementationAdaptor<ProviderReferenceItem> = () => {
     const { providerAPI } = useProviderApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ProviderModel> = {
         listFetcher: providerAPI.list,

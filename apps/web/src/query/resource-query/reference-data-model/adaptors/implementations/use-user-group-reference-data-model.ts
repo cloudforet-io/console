@@ -1,6 +1,7 @@
 import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type UserGroupReferenceItem = ReferenceItem<UserGroupModel>;
 export type UserGroupReferenceMap = ReferenceMap<UserGroupReferenceItem>;
 
-export const useUserGroupReferenceDataModel = () => {
+export const useUserGroupReferenceDataModel: ReferenceDataModelImplementationAdaptor<UserGroupReferenceItem> = () => {
     const { userGroupAPI } = useUserGroupApi();
     const fetchConfig: ReferenceDataModelFetchConfig<UserGroupModel> = {
         listFetcher: userGroupAPI.list,

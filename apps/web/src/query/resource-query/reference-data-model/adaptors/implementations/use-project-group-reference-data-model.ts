@@ -1,6 +1,7 @@
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type { ReferenceDataModelFetchConfig, ReferenceItem, ReferenceMap } from '@/query/resource-query/reference-data-model/types/reference-type';
 import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
@@ -17,7 +18,7 @@ interface ProjectGroupResourceItemData {
 export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
-export const useProjectGroupReferenceDataModel = () => {
+export const useProjectGroupReferenceDataModel: ReferenceDataModelImplementationAdaptor<ProjectGroupReferenceItem> = () => {
     const { projectGroupAPI } = useProjectGroupApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ProjectGroupModel> = {
         listFetcher: projectGroupAPI.list,

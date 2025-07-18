@@ -1,6 +1,7 @@
 import { useServiceApi } from '@/api-clients/alert-manager/service/composables/use-service-api';
 import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type ServiceReferenceItem = ReferenceItem<ServiceModel>;
 export type ServiceReferenceMap = ReferenceMap<ServiceReferenceItem>;
 
-export const useServiceReferenceDataModel = () => {
+export const useServiceReferenceDataModel: ReferenceDataModelImplementationAdaptor<ServiceReferenceItem> = () => {
     const { serviceAPI } = useServiceApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ServiceModel> = {
         listFetcher: serviceAPI.list,
