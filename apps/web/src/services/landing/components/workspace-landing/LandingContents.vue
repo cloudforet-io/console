@@ -5,8 +5,6 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { sortBy } from 'lodash';
-
 import {
     PButton, PDataLoader, PDivider, screens, PSearch,
 } from '@cloudforet/mirinae';
@@ -18,7 +16,6 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
@@ -34,7 +31,6 @@ import { useLandingPageStore } from '@/services/landing/store/landing-page-store
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
 const landingPageStore = useLandingPageStore();
@@ -52,16 +48,11 @@ const storeState = reactive({
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
     isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
-    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
 const state = reactive({
     searchText: '',
     isSearchMode: computed(() => state.searchText !== ''),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.isSearchMode
-        ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
-        : storeState.workspaceList)),
-    refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.isSearchMode ? state.searchedWorkspaceList : storeState.workspaceList)),
 });
 
 const handleSearch = (value: string) => {
@@ -79,7 +70,6 @@ const handleClickButton = () => {
 onMounted(async () => {
     try {
         landingPageStore.setLoading(true);
-        // await userWorkspaceStore.load();
         await recentStore.fetchRecent({
             type: RECENT_TYPE.WORKSPACE,
             limit: 6,
@@ -123,9 +113,7 @@ onUnmounted(() => {
                 <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
                 <p-divider v-if="!state.isSearchMode" />
                 <landing-searched-workspaces v-show="state.isSearchMode"
-                                             :workspace-list="state.refinedWorkspaceList"
-                                             :favorite-list="storeState.favoriteList"
-                                             :is-domain-admin="storeState.isDomainAdmin"
+                                             :search-text="state.searchText"
                                              @create="handleClickButton"
                 />
                 <landing-group-workspaces v-if="!state.isSearchMode"

@@ -5,32 +5,33 @@ import { partition, sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { useUserStore } from '@/store/user/user-store';
+
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
+import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 const PAGE_SIZE = 16;
 
 interface Props {
-    workspaceList?: WorkspaceModel[];
-    favoriteList?: FavoriteItem[];
-    isDomainAdmin?: boolean;
+    searchText: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    workspaceList: () => ([]),
-    favoriteList: undefined,
-    isDomainAdmin: false,
-});
+const props = defineProps<Props>();
+
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const userStore = useUserStore();
 
 const state = reactive({
     isShowAll: false,
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
-        const favoriteOrderList = sortBy(props.workspaceList, (workspaceItem) => {
-            const correspondingAItem = props.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
-            return correspondingAItem ? props.favoriteList?.indexOf(correspondingAItem) : Infinity;
+        const favoriteOrderList = sortBy(searchedWorkspaceList.value, (workspaceItem) => {
+            const correspondingAItem = favoriteGetters.workspaceItems?.find((item) => item?.itemId === workspaceItem.workspace_id);
+            return correspondingAItem ? favoriteGetters.workspaceItems?.indexOf(correspondingAItem) : Infinity;
         });
         const [active, dormant] = partition(favoriteOrderList, (item) => !item.is_dormant);
 
@@ -42,13 +43,18 @@ const state = reactive({
         }));
     }),
 });
+const isDomainAdmin = computed(() => userStore.getters.isDomainAdmin);
+const searchedWorkspaceList = computed<WorkspaceModel[]>(() => workspaceList.value?.filter((item) => item.name.toLowerCase()?.includes(props.searchText.toLowerCase())) || []);
+
+/* Query */
+const { data: workspaceList } = useUserProfileGetWorkspacesQuery();
 </script>
 
 <template>
     <div class="landing-searched-workspaces">
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
-                                 :is-domain-admin="props.isDomainAdmin"
+                                 :is-domain-admin="isDomainAdmin"
         />
     </div>
 </template>
