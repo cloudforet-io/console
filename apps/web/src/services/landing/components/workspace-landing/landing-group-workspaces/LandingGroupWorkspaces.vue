@@ -34,7 +34,7 @@ const emit = defineEmits<{(e: 'create'): void}>();
 const router = useRouter();
 
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
+const landingPageState = landingPageStore.state;
 const userStore = useUserStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -46,7 +46,7 @@ const storeState = reactive({
 const state = reactive({
     isShowAll: false,
     selectedGroupWorkspaceList: computed(() => {
-        if (landingPageStoreState.selectedWorkspaceGroupId === 'all') {
+        if (landingPageState.selectedWorkspaceGroupId === 'all') {
             return workspaceList.value;
         }
         return workspaceListByGroup.value;
@@ -69,11 +69,11 @@ const state = reactive({
         { label: i18n.t('LADING.ALL_WORKSPACE'), name: 'all' },
         ...workspaceGroupList.value?.map((group) => ({ label: group.name, name: group.workspace_group_id })) || [],
     ]),
-    isAllWorkspaceTab: computed(() => landingPageStoreState.selectedWorkspaceGroupId === 'all'),
+    isAllWorkspaceTab: computed(() => landingPageState.selectedWorkspaceGroupId === 'all'),
     isOverlayOpen: false,
     isButtonGroupOpened: false,
     isShowAllVisible: computed(() => {
-        if (landingPageStoreState.selectedWorkspaceGroupId === 'all') {
+        if (landingPageState.selectedWorkspaceGroupId === 'all') {
             return workspaceListTotalCount.value > PAGE_SIZE && state.workspaceBoardSets.length < workspaceListTotalCount.value;
         }
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
@@ -83,11 +83,11 @@ const state = reactive({
 /* Query */
 const { data: workspaceList, totalCount: workspaceListTotalCount } = useUserProfileGetWorkspacesQuery();
 const { data: workspaceListByGroup, totalCount: workspaceListByGroupTotalCount } = useUserProfileGetWorkspacesQuery(computed(() => {
-    if (landingPageStoreState.selectedWorkspaceGroupId === 'all' || !landingPageStoreState.selectedWorkspaceGroupId) {
+    if (landingPageState.selectedWorkspaceGroupId === 'all' || !landingPageState.selectedWorkspaceGroupId) {
         return undefined;
     }
     return {
-        workspace_group_id: landingPageStoreState.selectedWorkspaceGroupId,
+        workspace_group_id: landingPageState.selectedWorkspaceGroupId,
     };
 }));
 const { data: workspaceGroupList } = useUserProfileGetWorkspaceGroupsQuery();
@@ -112,7 +112,7 @@ const handleChangeWorkspaceGroup = (selected: string) => {
         <div class="workspace-group-filter-container"
              :class="{ 'is-opened': state.isButtonGroupOpened }"
         >
-            <p-button-tab :active-tab="landingPageStoreState.selectedWorkspaceGroupId"
+            <p-button-tab :active-tab="landingPageState.selectedWorkspaceGroupId"
                           :tabs="state.workspaceFilterList"
                           keep-alive-all
                           @change="handleChangeWorkspaceGroup"
@@ -144,7 +144,7 @@ const handleChangeWorkspaceGroup = (selected: string) => {
                 </template>
             </p-field-title>
             <div class="right-part-wrapper">
-                <p-button v-if="landingPageStoreState.selectedWorkspaceGroupId !== 'all'"
+                <p-button v-if="landingPageState.selectedWorkspaceGroupId !== 'all'"
                           style-type="tertiary"
                           size="md"
                           icon-left="ic_settings"

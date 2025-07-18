@@ -1,7 +1,5 @@
-
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-
 
 import {
     PFieldGroup, POverlayLayout, PTextInput, PButton, PDivider,
@@ -28,11 +26,11 @@ const emit = defineEmits<{(e: 'update:is-overlay-open'): void}>();
 const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
+const landingPageState = landingPageStore.state;
 
 const state = reactive({
     isOverlayOpenProxy: useProxyValue('isOverlayOpen', props, emit),
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedWorkspaceGroup]),
+    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageState.selectedWorkspaceGroupId]),
 });
 
 const handleClose = () => {
