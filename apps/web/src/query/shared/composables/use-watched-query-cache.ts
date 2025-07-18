@@ -1,5 +1,5 @@
 import type { UnwrapRef } from 'vue';
-import { onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 
 import { hashKey } from '@tanstack/vue-query';
 
@@ -21,11 +21,15 @@ export const useWatchedQueryCache = <T>(queryKey: QueryKeyArray) => {
         }
     });
 
-    onUnmounted(() => {
+    const _unsubscribe = () => {
+        if (import.meta.env.DEV) {
+            console.debug(`[Query Cache Unsubscribe] queryKey: ${queryKey}`);
+        }
         unsubscribe();
-    });
+    };
 
     return {
         data,
+        unsubscribe: _unsubscribe,
     };
 };
