@@ -44,10 +44,6 @@ const {
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 
-const storeState = reactive({
-    allDataTableInvalid: computed(() => widgetGenerateGetters.allDataTableInvalid),
-});
-
 const displayState = reactive({
     dataTablesSortedByCreatedAt: computed<Partial<PublicDataTableModel|PrivateDataTableModel>[]>(() => orderBy(dataTableList.value, ['created_at'], ['asc'])),
     dataTableAreaOpen: true,
@@ -201,7 +197,7 @@ onMounted(async () => {
                     <p-button icon-left="ic_refresh"
                               style-type="secondary"
                               :loading="displayState.loading"
-                              :disabled="storeState.allDataTableInvalid"
+                              :disabled="widgetGenerateGetters.allDataTableInvalid"
                               @click="handleClickAllApply"
                     >
                         {{ $t('COMMON.WIDGETS.DATA_TABLE.APPLY_ALL') }}
