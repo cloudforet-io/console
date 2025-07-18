@@ -3,7 +3,7 @@ import type { DashboardVars } from '@/api-clients/dashboard/_types/dashboard-typ
 
 import type {
     DataTableOperator,
-    DataTableOptions,
+    DataTableTransformOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -12,7 +12,7 @@ export interface DataTableTransformParameters {
     widget_id: string;
     name?: string;
     operator: DataTableOperator;
-    options?: DataTableOptions;
+    options?: DataTableTransformOptions;
     tags?: Tags;
     vars?: DashboardVars;
 }
