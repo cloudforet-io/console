@@ -5,9 +5,10 @@ import { useRouter } from 'vue-router/composables';
 import { partition, sortBy } from 'lodash';
 
 import {
-    PFieldTitle, PButton, PButtonTab, PIconButton, PEmpty,
+    PFieldTitle, PButton, PButtonTab, PIconButton, PEmpty, PDataLoader,
 } from '@cloudforet/mirinae';
 
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -15,14 +16,18 @@ import { useUserStore } from '@/store/user/user-store';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
+import { gray } from '@/styles/colors';
+
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import LandingWorkspaceGroupManageOverlay from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupManageOverlay.vue';
+import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
 import { useUserProfileGetWorkspaceGroupsQuery } from '@/services/landing/composables/use-user-profile-get-workspace-groups-query';
 import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
+
 
 const PAGE_SIZE = 16;
 
@@ -45,11 +50,11 @@ const storeState = reactive({
 });
 const state = reactive({
     isShowAll: false,
-    selectedGroupWorkspaceList: computed(() => {
+    selectedGroupWorkspaceList: computed<WorkspaceModel[]>(() => {
         if (landingPageState.selectedWorkspaceGroupId === 'all') {
-            return workspaceList.value;
+            return workspaceList.value || [];
         }
-        return workspaceListByGroup.value;
+        return workspaceListByGroup.value || [];
     }),
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
@@ -79,10 +84,16 @@ const state = reactive({
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
     }),
 });
+const isLoading = computed<boolean>(() => isWorkspaceListLoading.value || isWorkspaceListByGroupLoading.value);
+const showEmptyContents = computed<boolean>(() => {
+    if (isLoading.value) return false;
+    if (landingPageState.selectedWorkspaceGroupId !== 'all') return false;
+    return true;
+});
 
 /* Query */
-const { data: workspaceList, totalCount: workspaceListTotalCount } = useUserProfileGetWorkspacesQuery();
-const { data: workspaceListByGroup, totalCount: workspaceListByGroupTotalCount } = useUserProfileGetWorkspacesQuery(computed(() => {
+const { data: workspaceList, totalCount: workspaceListTotalCount, isLoading: isWorkspaceListLoading } = useUserProfileGetWorkspacesQuery();
+const { data: workspaceListByGroup, totalCount: workspaceListByGroupTotalCount, isLoading: isWorkspaceListByGroupLoading } = useUserProfileGetWorkspacesQuery(computed(() => {
     if (landingPageState.selectedWorkspaceGroupId === 'all' || !landingPageState.selectedWorkspaceGroupId) {
         return undefined;
     }
@@ -162,28 +173,40 @@ const handleChangeWorkspaceGroup = (selected: string) => {
                 </p-button>
             </div>
         </div>
-        <landing-workspace-board :board-sets="state.workspaceBoardSets"
-                                 :board-type="BOARD_TYPE.ALL_WORKSPACE"
-                                 :is-domain-admin="storeState.isDomainAdmin"
-        />
-        <p-empty v-if="state.workspaceBoardSets.length === 0"
-                 show-image
-                 image-size="sm"
+        <p-data-loader :loading="isLoading"
+                       :data="state.workspaceBoardSets"
+                       :loader-backdrop-color="gray[100]"
         >
-            {{ $t('LADING.NO_WORKSPACE') }}
-        </p-empty>
-        <div class="show-more-button-wrapper">
-            <p-button v-if="state.isShowAllVisible"
-                      icon-right="ic_chevron-down"
-                      style-type="transparent"
-                      size="md"
-                      class="show-more-button"
-                      @click="handleClickShowAll"
-            >
-                {{ $t('LADING.SHOW_ALL') }}
-            </p-button>
-            <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
-        </div>
+            <div>
+                <landing-workspace-board :board-sets="state.workspaceBoardSets"
+                                         :board-type="BOARD_TYPE.ALL_WORKSPACE"
+                                         :is-domain-admin="storeState.isDomainAdmin"
+                />
+                <div class="show-more-button-wrapper">
+                    <p-button v-if="state.isShowAllVisible"
+                              icon-right="ic_chevron-down"
+                              style-type="transparent"
+                              size="md"
+                              class="show-more-button"
+                              @click="handleClickShowAll"
+                    >
+                        {{ $t('LADING.SHOW_ALL') }}
+                    </p-button>
+                    <landing-workspace-group-manage-overlay :is-overlay-open.sync="state.isOverlayOpen" />
+                </div>
+            </div>
+            <template #no-data>
+                <landing-empty-contents v-if="showEmptyContents"
+                                        :is-domain-admin="storeState.isDomainAdmin"
+                />
+                <p-empty v-else
+                         show-image
+                         image-size="sm"
+                >
+                    {{ $t('LADING.NO_WORKSPACE') }}
+                </p-empty>
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
