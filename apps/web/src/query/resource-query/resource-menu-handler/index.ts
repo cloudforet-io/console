@@ -39,4 +39,4 @@ const proxy = makeResourceProxy<typeof resourceMenuHandlerMap, UseResourceMenuHa
     return handler.getHandler;
 });
 
-export const useResourceMenuHandler = () => proxy;
+export const useResourceMenuHandlerMap = () => proxy;

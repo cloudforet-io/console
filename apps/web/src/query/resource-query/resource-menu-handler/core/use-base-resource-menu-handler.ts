@@ -46,7 +46,7 @@ export const useBaseResourceMenuHandler = <TModelData extends Record<string, any
                 distinct: dataKey,
                 fixedFilters,
             });
-        } else if (fetchConfig.list) {
+        } else if (!dataKey && fetchConfig.list) {
             if (import.meta.env.DEV) {
                 console.log(`[useBaseResourceMenuHandler] generated List Menu Handler for "${resourceType}"`);
             }
