@@ -2,26 +2,20 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButton, PPopover, PSelectCard, PI, PDivider,
 } from '@cloudforet/mirinae';
 
-import type { WidgetCreateParams, WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/add';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { hideLoadingMessage, showErrorMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import getRandomId from '@/lib/random-id-generator';
 import type { ListResponse } from '@/lib/variable-models/_base/types';
@@ -33,13 +27,14 @@ import WidgetFormAssetSecurityDataSourcePopper
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 import WidgetFormUnifiedCostDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormUnifiedCostDataSourcePopper.vue';
+import { useDataTableAddMutation } from '@/common/modules/widgets/_composables/mutations/use-data-table-add-mutation';
+import { useWidgetCreateMutation } from '@/common/modules/widgets/_composables/mutations/use-widget-create-mutation';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
 import {
     DATA_SOURCE_DOMAIN,
-    DATA_TABLE_OPERATOR,
     DATA_TABLE_TYPE, TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS,
 } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_TABLE_OPERATOR_INFO } from '@/common/modules/widgets/_constants/data-table-operator-constant';
 import { getDuplicatedDataTableName } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetContextStore } from '@/common/modules/widgets/_store/widget-context-store';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -51,12 +46,18 @@ import type {
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const allReferenceStore = useAllReferenceStore();
 const widgetContextStore = useWidgetContextStore();
 const widgetContextState = widgetContextStore.state;
 const widgetContextGetters = widgetContextStore.getters;
 const userStore = useUserStore();
 const dashboardId = computed(() => widgetContextGetters.dashboardId);
+
+/* Reference Data Model */
+const referenceMap = useAllReferenceDataModel();
+const costDataSourceMap = referenceMap.costDataSource;
+const metricMap = referenceMap.metric;
+const namespaceMap = referenceMap.namespace;
+
 
 const emit = defineEmits<{(e: 'scroll'): void;}>();
 
@@ -64,45 +65,16 @@ const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
 /* Query */
 const {
-    api: widgetApi,
-} = useWidgetQuery({
-    widgetId: computed(() => widgetGenerateState.widgetId),
-});
-const {
     dataTableList,
     keys: dataTableKeys,
-    api: dataTableApi,
 } = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const queryClient = useQueryClient();
 
-const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-});
-
 const state = reactive({
     showPopover: false,
     selectedPopperCondition: undefined as undefined|DataTableDataType,
-    dataSourceDomainItems: computed(() => ([
-        {
-            name: DATA_SOURCE_DOMAIN.COST,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST'),
-            icon: '_ic-ds-cost',
-        },
-        {
-            name: DATA_SOURCE_DOMAIN.ASSET,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET'),
-            icon: '_ic-ds-asset',
-        },
-        {
-            name: DATA_SOURCE_DOMAIN.SECURITY,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.SECURITY'),
-            icon: '_ic-ds-security',
-        },
-    ])),
     selectedDataSourceDomain: undefined as undefined|DataTableSourceType,
     disableConfirmButton: computed(() => {
         if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
@@ -122,16 +94,11 @@ const state = reactive({
     selectedUnifiedCostDataType: undefined as undefined|string,
     // asset & security
     selectedMetricId: undefined as undefined|string,
-    selectedNamespace: computed(() => {
-        if (!state.selectedMetricId) return undefined;
-        const namespaceId = storeState.metrics[state.selectedMetricId]?.data.namespace_id;
-        if (!namespaceId) return undefined;
-        return storeState.namespaces[namespaceId];
-    }),
+
     selectedCostDataTypeLabel: computed(() => {
         if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
-        const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
-        const costAlias: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.name;
+        const targetCostDataSource = costDataSourceMap[state.selectedCostDataSourceId];
+        const costAlias: string|undefined = costDataSourceMap[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.name;
         if (state.selectedCostDataType === 'cost') {
             return costAlias ? `Cost (${costAlias})` : 'Cost';
         }
@@ -140,101 +107,25 @@ const state = reactive({
         }
         return targetCostDataSource?.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType.replace('data.', '')) || '';
     }),
-    operatorInfoList: computed<{ key: DataTableOperator, name: string; description: string|TranslateResult; icon: string;}[]>(() => [
-        {
-            key: DATA_TABLE_OPERATOR.CONCAT,
-            name: 'Concatenate',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.CONCAT_DESC'),
-            icon: 'ic_db-concat',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.JOIN,
-            name: 'Join',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.JOIN_DESC'),
-            icon: 'ic_join',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.EVAL,
-            name: 'Evaluate',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.EVAL_DESC'),
-            icon: 'ic_db-evaluation',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.QUERY,
-            name: 'Query',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.QUERY_DESC'),
-            icon: 'ic_db-where',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.AGGREGATE,
-            name: 'Aggregate',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.AGGREGATE_DESC'),
-            icon: 'ic_db-dimensions',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.VALUE_MAPPING,
-            name: 'Value Mapping',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.VALUE_MAPPING_DESC'),
-            icon: 'ic_db-value-mapping',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.ADD_LABELS,
-            name: 'Additional Labels',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.ADD_LABELS_DESC'),
-            icon: 'ic_db-additional-labels',
-        },
-        {
-            key: DATA_TABLE_OPERATOR.PIVOT,
-            name: 'Pivot Table',
-            description: i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.PIVOT_DESC'),
-            icon: 'ic_db-pivot-table',
-        },
-    ]),
 });
 
+/* Computed Selected Data (reference data) */
+const selectedCostDataSource = computed(() => costDataSourceMap[state.selectedCostDataSourceId]);
+const selectedMetric = computed(() => metricMap[state.selectedMetricId]);
+const selectedNamespace = computed(() => namespaceMap[selectedMetric.value?.data?.namespace_id ?? '']);
+
 /* Api */
-const { withSuffix: privateWidgetListWithSuffix } = useServiceQueryKey('dashboard', 'private-widget', 'list');
-const { withSuffix: publicWidgetListWithSuffix } = useServiceQueryKey('dashboard', 'public-widget', 'list');
-
-const widgetCreateFn = (params: WidgetCreateParams): Promise<WidgetModel> => {
-    if (!params.dashboard_id) {
-        throw new Error('dashboardId is undefined');
-    }
-
-    if (params.dashboard_id.startsWith('private')) {
-        return widgetApi.privateWidgetAPI.create(params);
-    }
-    return widgetApi.publicWidgetAPI.create(params);
-};
-const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useMutation({
-    mutationFn: widgetCreateFn,
-    onSuccess: (data, variables) => {
-        const _isPrivate = variables.dashboard_id.startsWith('private');
-        const widgetListQueryKey = _isPrivate ? privateWidgetListWithSuffix(variables.dashboard_id) : publicWidgetListWithSuffix(variables.dashboard_id);
-        queryClient.invalidateQueries({ queryKey: widgetListQueryKey });
+const { mutateAsync: createWidget, isPending: widgetCreateLoading } = useWidgetCreateMutation({
+    onSuccess: (data) => {
         widgetGenerateStore.setWidgetFormInfo(data);
     },
     onError: (e) => {
         ErrorHandler.handleError(e);
     },
 });
-const dataTableAddFn = (params: DataTableAddParameters): Promise<DataTableModel> => {
-    if (params.widget_id.startsWith('private')) {
-        return dataTableApi.privateDataTableAPI.add(params);
-    }
-    return dataTableApi.publicDataTableAPI.add(params);
-};
-const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutation({
-    mutationFn: dataTableAddFn,
+const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useDataTableAddMutation({
+    widgetId: computed(() => widgetGenerateState.widgetId),
     onSuccess: (data) => {
-        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-        const dataTableListQueryKey = _isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
-        queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<DataTableModel>) => (oldData.results?.length ? {
-            ...oldData, results: [...oldData.results, data],
-        } : {
-            ...oldData, results: [data],
-        }));
-
         widgetGenerateStore.setSelectedDataTableId(data?.data_table_id);
     },
     onError: (e) => {
@@ -243,12 +134,42 @@ const { mutateAsync: addDataTable, isPending: dataTableAddLoading } = useMutatio
     },
 });
 
+
 /* Util */
 const resetSelectedDataSource = () => {
     state.selectedCostDataSourceId = undefined;
     state.selectedCostDataType = undefined;
     state.selectedUnifiedCostDataType = undefined;
     state.selectedMetricId = undefined;
+};
+
+const loadingMessageIdSet = new Set<string>();
+const getDataTableBaseName = () => {
+    let baseName = '';
+
+    if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+        if (!selectedCostDataSource.value) {
+            const loadingMessageId = showLoadingMessage('Wait for moment', 'CostDataSource is preparing...');
+            loadingMessageIdSet.add(loadingMessageId);
+            throw new Error('selectedCostDataSource is undefined');
+        }
+        baseName = `${selectedCostDataSource.value?.name} - ${state.selectedCostDataTypeLabel}`;
+    } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+        baseName = 'Unified Cost';
+    } else {
+        if (!selectedNamespace.value || !selectedMetric.value) {
+            const loadingMessageId = showLoadingMessage('Wait for moment', 'Namespace or Metric is preparing...');
+            loadingMessageIdSet.add(loadingMessageId);
+            throw new Error('selectedNamespace or selectedMetric is undefined');
+        }
+        baseName = `${selectedNamespace.value?.name} - ${selectedMetric.value?.label}`;
+    }
+
+    loadingMessageIdSet.forEach((id) => {
+        hideLoadingMessage(id);
+    });
+    loadingMessageIdSet.clear();
+    return baseName;
 };
 
 /* Event */
@@ -292,6 +213,8 @@ const handleConfirmDataSource = async () => {
     if (!dashboardId.value) {
         throw new Error('dashboardId is undefined');
     }
+
+
     // create widget
     if (widgetGenerateState.overlayType === 'ADD' && !widgetGenerateState.widgetId) {
         await createWidget({
@@ -302,47 +225,54 @@ const handleConfirmDataSource = async () => {
     }
 
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADDED) {
-        let dataTableBaseName: string;
-        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) dataTableBaseName = `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`;
-        else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) dataTableBaseName = 'Unified Cost';
-        else dataTableBaseName = `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
+        const dataTableBaseName = getDataTableBaseName();
 
+        // add parameters
         const addParameters = {
             widget_id: widgetGenerateState.widgetId as string,
             source_type: state.selectedDataSourceDomain,
             name: getDuplicatedDataTableName(dataTableBaseName, dataTableList.value),
         } as DataTableAddParameters;
         const dataKey = state.selectedCostDataType?.replace('data.', '');
-        const costUnit: string|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.cost_info?.unit;
-        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = storeState.costDataSources[state.selectedCostDataSourceId]?.data?.plugin_info?.metadata?.data_info;
+        const costUnit: string|undefined = selectedCostDataSource.value?.data?.plugin_info?.metadata?.cost_info?.unit;
+        const additionalDataInfo: Record<string, { name: string, unit: string }>|undefined = selectedCostDataSource.value?.data?.plugin_info?.metadata?.data_info;
         const additionalDataUnit = dataKey !== 'cost' && additionalDataInfo ? additionalDataInfo[dataKey]?.unit : undefined;
+
+        // data unit
         let dataUnit: string|undefined;
         if (dataKey === 'cost') {
             dataUnit = costUnit;
         } else {
             dataUnit = additionalDataUnit;
         }
-        const costOptions: DataTableAddOptions = {
-            data_name: state.selectedCostDataTypeLabel,
-            data_unit: dataUnit,
-            COST: {
-                data_source_id: state.selectedCostDataSourceId,
-                data_key: state.selectedCostDataType,
-            },
-        };
-        const unifiedCostOptions: DataTableAddOptions = {
-            data_name: dataTableBaseName,
-            UNIFIED_COST: {
-                data_key: state.selectedUnifiedCostDataType,
-            },
-        };
-        const assetOptions: DataTableAddOptions = {
-            data_name: storeState.metrics[state.selectedMetricId]?.label,
-            data_unit: storeState.metrics[state.selectedMetricId]?.data.unit,
-            ASSET: {
-                metric_id: state.selectedMetricId,
-            },
-        };
+
+        // options
+        let options: DataTableAddOptions;
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+            options = {
+                data_name: state.selectedCostDataTypeLabel,
+                data_unit: dataUnit,
+                COST: {
+                    data_source_id: state.selectedCostDataSourceId,
+                    data_key: state.selectedCostDataType,
+                },
+            };
+        } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+            options = {
+                data_name: dataTableBaseName,
+                UNIFIED_COST: {
+                    data_key: state.selectedUnifiedCostDataType,
+                },
+            };
+        } else {
+            options = {
+                data_name: selectedMetric.value?.label,
+                data_unit: selectedMetric.value?.data?.unit,
+                ASSET: {
+                    metric_id: state.selectedMetricId,
+                },
+            };
+        }
 
         // NOTE: For DataTable-Create loading
         widgetGenerateStore.setDataTableCreateLoading(true);
@@ -352,13 +282,7 @@ const handleConfirmDataSource = async () => {
             ...addParameters,
             vars: widgetContextState.dashboard?.vars || {},
         };
-        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
-            mergedParams.options = costOptions;
-        } else if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
-            mergedParams.options = unifiedCostOptions;
-        } else {
-            mergedParams.options = assetOptions;
-        }
+        mergedParams.options = options;
 
         await addDataTable(mergedParams);
         emit('scroll');
@@ -538,7 +462,7 @@ watch(() => state.showPopover, (val) => {
                     </div>
                     <div class="content-part flex">
                         <div class="left-part">
-                            <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(0, 2)"
+                            <p-select-card v-for="(operatorInfo) in DATA_TABLE_OPERATOR_INFO.slice(0, 2)"
                                            :key="operatorInfo.key"
                                            value="operatorKey"
                                            label="a"
@@ -556,7 +480,7 @@ watch(() => state.showPopover, (val) => {
                                             {{ operatorInfo.name }}
                                         </p>
                                         <p class="description">
-                                            {{ operatorInfo.description }}
+                                            {{ $t(operatorInfo.description) }}
                                         </p>
                                     </div>
                                 </div>
@@ -566,7 +490,7 @@ watch(() => state.showPopover, (val) => {
                                    vertical
                         />
                         <div class="right-part">
-                            <p-select-card v-for="(operatorInfo) in state.operatorInfoList.slice(2)"
+                            <p-select-card v-for="(operatorInfo) in DATA_TABLE_OPERATOR_INFO.slice(2)"
                                            :key="operatorInfo.key"
                                            value="operatorKey"
                                            label="a"
@@ -584,7 +508,7 @@ watch(() => state.showPopover, (val) => {
                                             {{ operatorInfo.name }}
                                         </p>
                                         <p class="description">
-                                            {{ operatorInfo.description }}
+                                            {{ $t(operatorInfo.description) }}
                                         </p>
                                     </div>
                                 </div>
