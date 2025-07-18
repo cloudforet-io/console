@@ -7,14 +7,16 @@ import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import WidgetFormDataTableCardAddContents
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddContents.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardAddContents.vue';
 import WidgetFormDataTableCardLoadingContents
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardLoadingContents.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardLoadingContents.vue';
 import WidgetFormDataTableCardTransformContents
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformContents.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformContents.vue';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetFormDataTableCardContents } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
+
 
 const LOADING_STATE = 'LOADING';
 interface Props {
@@ -27,8 +29,8 @@ const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 
-const addContents = ref<typeof WidgetFormDataTableCardAddContents|null>(null);
-const transformContents = ref<typeof WidgetFormDataTableCardTransformContents|null>(null);
+const addContents = ref<WidgetFormDataTableCardContents>();
+const transformContents = ref<WidgetFormDataTableCardContents>();
 
 const state = reactive({
     dataTableId: computed<string|undefined>(() => props.item?.data_table_id),
@@ -38,9 +40,9 @@ const state = reactive({
 
 const updateDataTable = async () => {
     if (state.dataType === DATA_TABLE_TYPE.ADDED) {
-        await addContents?.value?.updateDataTable();
+        await addContents.value?.updateDataTable();
     } else if (state.dataType === DATA_TABLE_TYPE.TRANSFORMED) {
-        await transformContents?.value?.updateDataTable();
+        await transformContents.value?.updateDataTable();
     }
 };
 

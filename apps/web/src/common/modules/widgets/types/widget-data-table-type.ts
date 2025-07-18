@@ -1,3 +1,5 @@
+import type { ComponentPublicInstance } from 'vue';
+
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
@@ -47,4 +49,10 @@ export interface DataTableReference {
     data_table_id: string;
     parents: string[];
     children: string[];
+}
+
+export interface WidgetFormDataTableCardContents extends ComponentPublicInstance, DataTableFormContentsExpose {}
+
+export interface DataTableFormContentsExpose {
+    updateDataTable: () => Promise<DataTableModel|undefined>;
 }
