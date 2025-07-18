@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router/composables';
 import { sortBy } from 'lodash';
 
 import {
-    PButton, PDataLoader, PDivider, screens,
+    PButton, PDataLoader, PDivider, screens, PSearch,
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
@@ -28,7 +28,6 @@ import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-con
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/workspace-landing/LandingRecentVisits.vue';
-import LandingSearch from '@/services/landing/components/workspace-landing/LandingSearch.vue';
 import LandingSearchedWorkspaces from '@/services/landing/components/workspace-landing/LandingSearchedWorkspaces.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
@@ -59,10 +58,10 @@ const state = reactive({
     searchText: '',
     isSearchMode: computed(() => state.searchText !== ''),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText !== ''
+    searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.isSearchMode
         ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
         : storeState.workspaceList)),
-    refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
+    refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.isSearchMode ? state.searchedWorkspaceList : storeState.workspaceList)),
 });
 
 const handleSearch = (value: string) => {
@@ -116,7 +115,11 @@ onUnmounted(() => {
                        :loader-backdrop-color="gray[100]"
         >
             <div class="contents-wrapper">
-                <landing-search @search="handleSearch" />
+                <p-search :value="state.searchText"
+                          :placeholder="$t('LADING.SEARCH_WORKSPACE')"
+                          class="workspace-search-bar"
+                          @update:value="handleSearch"
+                />
                 <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
                 <p-divider v-if="!state.isSearchMode" />
                 <landing-searched-workspaces v-show="state.isSearchMode"
