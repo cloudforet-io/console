@@ -1,9 +1,8 @@
 import { referenceDataModelMap } from '@/query/resource-query/reference-data-model/adaptors/registry';
-import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
+import { makeReferenceDataModelProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
 
 
-
-const proxy = makeResourceProxy<typeof referenceDataModelMap>(referenceDataModelMap, (target, prop) => {
+const proxy = makeReferenceDataModelProxy(referenceDataModelMap, (target, prop) => {
     if (!(prop in target)) {
         throw new Error(`[all-reference-data-model] Reference Data Model for "${prop}" not found`);
     }
@@ -11,3 +10,5 @@ const proxy = makeResourceProxy<typeof referenceDataModelMap>(referenceDataModel
 });
 
 export const useAllReferenceDataModel = () => proxy;
+export * from './adaptors/implementations';
+
