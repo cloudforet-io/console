@@ -19,7 +19,7 @@ export const useReferenceReactiveCache = <T extends Record<string, any>, R exten
 
     const { data: cachedData, unsubscribe } = useWatchedQueryCache<Record<string, T>>(queryKey.value);
 
-    watchEffect(() => {
+    const stopWatchEffect = watchEffect(() => {
         if (cachedData.value) {
             Object.entries(cachedData.value).forEach(([id, item]) => {
                 const referenceData = adaptor(item) as R;
@@ -32,8 +32,13 @@ export const useReferenceReactiveCache = <T extends Record<string, any>, R exten
         }
     });
 
+    const unsubscribeCache = () => {
+        stopWatchEffect();
+        unsubscribe();
+    };
+
     return {
         referenceMapRefs,
-        unsubscribe,
+        unsubscribeCache,
     };
 };

@@ -37,7 +37,7 @@ export const useReferenceDataModel = <T extends Record<string, any>, R extends R
         referenceRepository.requestItem(id);
     });
 
-    const { referenceMapRefs, unsubscribe } = useReferenceReactiveCache<T, R>(queryKey, referenceAdaptor);
+    const { referenceMapRefs, unsubscribeCache } = useReferenceReactiveCache<T, R>(queryKey, referenceAdaptor);
 
     const referenceMap = makeResourceProxy<Record<string, R|undefined>>({}, (_, id: string) => {
         if (!(id in referenceMapRefs)) {
@@ -47,7 +47,7 @@ export const useReferenceDataModel = <T extends Record<string, any>, R extends R
         return referenceMapRefs[id].value;
     });
 
-    subscriptionManager.register(referenceMap, unsubscribe);
+    subscriptionManager.register(referenceMap, unsubscribeCache);
 
     return {
         referenceMap,
