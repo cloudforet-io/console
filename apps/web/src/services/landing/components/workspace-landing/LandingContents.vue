@@ -26,10 +26,10 @@ import { gray } from '@/styles/colors';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
-import LandingAllWorkspaces from '@/services/landing/components/workspace-landing/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/workspace-landing/LandingRecentVisits.vue';
 import LandingSearch from '@/services/landing/components/workspace-landing/LandingSearch.vue';
+import LandingSearchedWorkspaces from '@/services/landing/components/workspace-landing/LandingSearchedWorkspaces.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -119,11 +119,11 @@ onUnmounted(() => {
                 <landing-search @search="handleSearch" />
                 <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
                 <p-divider v-if="!state.isSearchMode" />
-                <landing-all-workspaces v-show="state.isSearchMode"
-                                        :workspace-list="state.refinedWorkspaceList"
-                                        :favorite-list="storeState.favoriteList"
-                                        :is-domain-admin="storeState.isDomainAdmin"
-                                        @create="handleClickButton"
+                <landing-searched-workspaces v-show="state.isSearchMode"
+                                             :workspace-list="state.refinedWorkspaceList"
+                                             :favorite-list="storeState.favoriteList"
+                                             :is-domain-admin="storeState.isDomainAdmin"
+                                             @create="handleClickButton"
                 />
                 <landing-group-workspaces v-if="!state.isSearchMode"
                                           :has-read-write-access="hasReadWriteAccess"
