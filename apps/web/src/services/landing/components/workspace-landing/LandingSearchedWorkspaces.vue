@@ -45,7 +45,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="landing-all-workspaces">
+    <div class="landing-searched-workspaces">
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
                                  :board-type="BOARD_TYPE.ALL_WORKSPACE"
                                  :is-domain-admin="props.isDomainAdmin"
@@ -54,7 +54,7 @@ const state = reactive({
 </template>
 
 <style scoped lang="postcss">
-.landing-all-workspaces {
+.landing-searched-workspaces {
     @apply flex flex-col;
     gap: 1rem;
 }
