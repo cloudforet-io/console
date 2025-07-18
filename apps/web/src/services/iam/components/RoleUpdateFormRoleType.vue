@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PFieldTitle,
@@ -15,6 +16,7 @@ import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
 import { FORM_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/iam/constants/role-constant';
 import type { RoleFormData } from '@/services/iam/types/role-type';
 
@@ -24,16 +26,19 @@ interface RoleTypeForm {
     description: string;
 }
 interface Props {
-    initialData?: string;
     formType?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    initialData: undefined,
     formType: FORM_TYPE.CREATE,
 });
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void}>();
+
+const router = useRouter();
+const roleId: string = router.currentRoute.params.id;
+
+const { roleData } = useRoleGetQuery(roleId);
 
 const state = reactive({
     roleTypes: computed<RoleTypeForm[]>(() => [
@@ -54,23 +59,22 @@ const state = reactive({
         },
     ]),
     selectedRoleType: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
-    savedRoleType: computed<RoleTypeForm|undefined>(() => state.roleTypes.find((type) => type.key === props.initialData)),
 });
 
 /* Component */
 const handleChangeCard = (value: string) => {
     if (props.formType === FORM_TYPE.UPDATE) return;
-    state.selectedRoleType = value;
+    state.selectedRoleType = value as RoleType;
 };
 
 /* Watcher */
 watch(() => state.selectedRoleType, (value) => {
     emit('update-form', { role_type: value });
 });
-watch(() => props.initialData, (initialData) => {
-    if (!initialData) return;
-    state.selectedRoleType = initialData as RoleType;
-});
+watch(() => roleData, (initialData) => {
+    if (!initialData.value?.role_type) return;
+    state.selectedRoleType = initialData.value?.role_type as RoleType;
+}, { deep: true, immediate: true });
 </script>
 
 <template>

@@ -2,12 +2,14 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import type { RoleCreateParameters } from '@/api-clients/identity/role/schema/api-verbs/create';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,21 +23,25 @@ import RoleUpdateForm from '@/services/iam/components/RoleUpdateForm.vue';
 const router = useRouter();
 
 const state = reactive({
-    loading: false,
     isAllValid: false,
     formData: {} as RoleCreateParameters,
 });
-const handleClickConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.role.create<RoleCreateParameters, RoleModel>(state.formData);
+const { roleAPI } = useRoleApi();
+const queryClient = useQueryClient();
+const { key: roleListQueryKey } = useServiceQueryKey('identity', 'role', 'list');
+const { mutate: createRole, isPending: isCreateRolePending } = useMutation({
+    mutationFn: roleAPI.create,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_CREATE_ROLE'), '');
         router.go(-1);
-    } catch (e: any) {
+        queryClient.invalidateQueries({ queryKey: roleListQueryKey });
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));
-    } finally {
-        state.loading = false;
-    }
+    },
+});
+const handleClickConfirm = async () => {
+    createRole(state.formData);
 };
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
 const handleUpdateForm = (data: RoleCreateParameters) => {
@@ -74,7 +80,7 @@ const handleUpdateForm = (data: RoleCreateParameters) => {
                 {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
             <p-button style-type="primary"
-                      :loading="state.loading"
+                      :loading="isCreateRolePending"
                       :disabled="!state.isAllValid"
                       @click="handleClickConfirm"
             >

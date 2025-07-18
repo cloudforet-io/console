@@ -2,13 +2,15 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 
-import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-verbs/get';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import type { RoleUpdateParameters } from '@/api-clients/identity/role/schema/api-verbs/update';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,48 +22,52 @@ import RoleCreateEditHandbook from '@/services/iam/components/RoleCreateEditHand
 import RoleUpdateForm from '@/services/iam/components/RoleUpdateForm.vue';
 import { FORM_TYPE } from '@/services/iam/constants/role-constant';
 
+
 const router = useRouter();
 const roleId = router.currentRoute.params.id;
 
-const state = reactive({
+const { roleAPI } = useRoleApi();
+const queryClient = useQueryClient();
+
+const { key: roleListQueryKey } = useServiceQueryKey('identity', 'role', 'list');
+const { withSuffix: roleGetQueryKey } = useServiceQueryKey('identity', 'role', 'get');
+
+interface RoleUpdateState {
+    loading: boolean;
+    isAllValid: boolean;
+    initialRoleData: RoleModel | undefined;
+    formData: RoleUpdateParameters | undefined;
+}
+
+const state = reactive<RoleUpdateState>({
     loading: false,
     isAllValid: false,
-    initialRoleData: {} as RoleModel,
-    formData: {} as RoleUpdateParameters,
+    initialRoleData: undefined,
+    formData: undefined,
 });
 
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
 const handleUpdateForm = (data: RoleUpdateParameters) => {
     state.formData = data;
 };
-const handleClickConfirm = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.role.update<RoleUpdateParameters, RoleModel>({
-            ...state.formData,
-            role_id: roleId,
-        });
+const { mutateAsync: updateRole, isPending: isUpdateRolePending } = useMutation({
+    mutationFn: roleAPI.update,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_UPDATE_ROLE'), '');
         router.go(-1);
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_UPDATE_ROLE'));
-    } finally {
-        state.loading = false;
-    }
+        queryClient.invalidateQueries({ queryKey: roleListQueryKey });
+        queryClient.invalidateQueries({ queryKey: roleGetQueryKey(roleId) });
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('IAM.ROLE.FORM.ALT_E_UPDATE_ROLE'));
+    },
+});
+const handleClickConfirm = async () => {
+    await updateRole({
+        ...state.formData,
+        role_id: roleId,
+    });
 };
-const getRoleData = async () => {
-    try {
-        state.initialRoleData = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
-            role_id: roleId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.initialRoleData = {} as RoleModel;
-    }
-};
-(async () => {
-    await getRoleData();
-})();
 </script>
 
 <template>
@@ -83,10 +89,11 @@ const getRoleData = async () => {
                 </handbook-button>
             </template>
         </p-heading-layout>
-        <role-update-form :initial-role-data="state.initialRoleData"
-                          :form-type="FORM_TYPE.UPDATE"
-                          @update-validation="handleFormValidate"
-                          @update-form-data="handleUpdateForm"
+        <role-update-form
+            :role-id="roleId"
+            :form-type="FORM_TYPE.UPDATE"
+            @update-validation="handleFormValidate"
+            @update-form-data="handleUpdateForm"
         />
         <div class="text-right mt-4">
             <p-button style-type="secondary"
@@ -96,7 +103,7 @@ const getRoleData = async () => {
                 {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
             <p-button style-type="primary"
-                      :loading="state.loading"
+                      :loading="isUpdateRolePending"
                       :disabled="!state.isAllValid"
                       @click="handleClickConfirm"
             >

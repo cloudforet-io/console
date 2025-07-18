@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PPaneLayout, PHeading, PFieldGroup, PTextInput,
@@ -9,19 +10,17 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
 import type { RoleFormData } from '@/services/iam/types/role-type';
 
-interface Props {
-    initialData?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    initialData: undefined,
-});
+const router = useRouter();
+const roleId: string = router.currentRoute.params.id;
 
 const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
     (e: 'update-form', formData: RoleFormData): void,
 }>();
+
+const { roleData } = useRoleGetQuery(roleId);
 
 const {
     forms: {
@@ -46,10 +45,10 @@ watch(() => roleName.value, (value) => {
         emit('update-validation', true);
     }
 });
-watch(() => props.initialData, (initialData) => {
-    if (!initialData) return;
-    setForm('roleName', initialData);
-});
+watch(() => roleData, (initialData) => {
+    if (!initialData.value?.name) return;
+    setForm('roleName', initialData.value?.name);
+}, { deep: true, immediate: true });
 </script>
 
 <template>
