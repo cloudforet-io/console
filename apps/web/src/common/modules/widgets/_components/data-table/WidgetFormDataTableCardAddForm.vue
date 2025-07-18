@@ -30,7 +30,7 @@ import {
 import { useCostDataSourceFilterMenuItems } from '@/common/composables/data-source/use-cost-data-source-filter-menu-items';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
+import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardFilters.vue';
 import {
     DATA_SOURCE_DOMAIN,
     GROUP_BY_INFO_ITEMS_FOR_TAGS,

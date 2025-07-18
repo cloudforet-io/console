@@ -9,7 +9,7 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import { createDataTableReferenceMap } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel, DataTableReference } from '@/common/modules/widgets/types/widget-data-table-type';

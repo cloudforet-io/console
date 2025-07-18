@@ -12,8 +12,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import {
     DATA_TABLE_OPERATOR, JOIN_TYPE,
 } from '@/common/modules/widgets/_constants/data-table-constant';

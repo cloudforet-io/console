@@ -19,10 +19,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformFormWrapper.vue';
 import WidgetFormDataTableGlobalVariableViewButton
-    from '@/common/modules/widgets/_components/WidgetFormDataTableGlobalVariableViewButton.vue';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableGlobalVariableViewButton.vue';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import { DATA_TABLE_FIELD_TYPE, DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { TransformDataTableInfo, TransformDataTableProps } from '@/common/modules/widgets/types/widget-data-table-type';

@@ -16,10 +16,10 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
-import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
+import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/data-source-popover/WidgetFormDataSourcePopover.vue';
+import WidgetFormDataTableCard from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCard.vue';
 import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import {
     createDataTableReferenceMap,
     getDataTableReferenceMapExecutionOrder,

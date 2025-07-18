@@ -11,7 +11,7 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import {
     FORMAT_RULE_TYPE,
 } from '@/common/modules/widgets/_constants/widget-field-constant';

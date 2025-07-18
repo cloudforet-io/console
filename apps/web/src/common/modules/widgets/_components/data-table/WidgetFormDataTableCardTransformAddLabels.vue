@@ -15,8 +15,8 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardTransformFormWrapper
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardTransformFormWrapper.vue';
-import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardTransformFormWrapper.vue';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { isFieldNameValid } from '@/common/modules/widgets/_helpers/widget-data-table-helper';
 import type { TransformDataTableProps, TransformDataTableInfo } from '@/common/modules/widgets/types/widget-data-table-type';

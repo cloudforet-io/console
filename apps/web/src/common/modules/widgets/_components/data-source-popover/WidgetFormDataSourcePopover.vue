@@ -23,13 +23,13 @@ import type { ListResponse } from '@/lib/variable-models/_base/types';
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFormAssetSecurityDataSourcePopper
-    from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
-import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
+    from '@/common/modules/widgets/_components/data-source-popover/WidgetFormAssetSecurityDataSourcePopper.vue';
+import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/data-source-popover/WidgetFormCostDataSourcePopper.vue';
 import WidgetFormUnifiedCostDataSourcePopper
-    from '@/common/modules/widgets/_components/WidgetFormUnifiedCostDataSourcePopper.vue';
-import { useDataTableAddMutation } from '@/common/modules/widgets/_composables/mutations/use-data-table-add-mutation';
-import { useWidgetCreateMutation } from '@/common/modules/widgets/_composables/mutations/use-widget-create-mutation';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
+    from '@/common/modules/widgets/_components/data-source-popover/WidgetFormUnifiedCostDataSourcePopper.vue';
+import { useDataTableAddMutation } from '@/common/modules/widgets/_composables/data-table/mutations/use-data-table-add-mutation';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
+import { useWidgetCreateMutation } from '@/common/modules/widgets/_composables/widget/mutations/use-widget-create-mutation';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_TYPE, TRANSFORM_DATA_TABLE_DEFAULT_OPTIONS,
