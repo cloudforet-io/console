@@ -1,29 +1,32 @@
-import { useAlertManagerEscalationPolicyReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-alert-manager-escalation-policy-reference-data-model';
-import { useAlertManagerWebhookReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-alert-manager-webhook-reference-data-model';
-import { useAppReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-app-reference-data-model';
-import { useCloudServiceTypeReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-cloud-service-type-reference-data-model';
-import { useCollectorReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-collector-reference-data-model';
-import { useCostDataSourceReferenceModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-cost-data-source-reference-data-model';
-import { useMetricReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-metric-reference-data-model';
-import { useMonitoringEscalationPolicyReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-monitoring-escalation-policy-reference-data-model';
-import { useMonitoringWebhookReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-monitoring-webhook-reference-data-model';
-import { useNamespaceReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-namespace-reference-data-model';
-import { usePluginReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-plugin-reference-data-model';
-import { useProjectGroupReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-group-reference-data-model';
-import { useProjectReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-project-reference-data-model';
-import { useProtocolReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-protocol-reference-data-model';
-import { useProvodierReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-provider-reference-data-model';
-import { useRegionReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-region-reference-data-model';
-import { useRoleReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-role-reference-data-model';
-import { useSecretReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-secret-reference-data-model';
-import { useServiceAccountReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-service-account-reference-data-model';
-import { useServiceReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-service-reference-data-model';
-import { useTrustedAccountReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-trusted-account-reference-data-model';
-import { useUserGroupReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-user-group-reference-data-model';
-import { useUserReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-user-reference-data-model';
-import { useWorkspaceGroupReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-workspace-group-reference-data-model';
-import { useWorkspaceReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-workspace-reference-data-model';
-import { useWorkspaceUserReferenceDataModel } from '@/query/resource-query/reference-data-model/adaptors/implementations/use-workspace-user-reference-data-model';
+
+import {
+    useAppReferenceDataModel,
+    useWorkspaceReferenceDataModel,
+    useWorkspaceGroupReferenceDataModel,
+    useUserReferenceDataModel,
+    useWorkspaceUserReferenceDataModel,
+    useUserGroupReferenceDataModel,
+    useProvodierReferenceDataModel,
+    useProtocolReferenceDataModel,
+    useCloudServiceTypeReferenceDataModel,
+    useCollectorReferenceDataModel,
+    useCostDataSourceReferenceModel,
+    useMetricReferenceDataModel,
+    useNamespaceReferenceDataModel,
+    useProjectReferenceDataModel,
+    useProjectGroupReferenceDataModel,
+    useRoleReferenceDataModel,
+    useRegionReferenceDataModel,
+    useSecretReferenceDataModel,
+    usePluginReferenceDataModel,
+    useServiceAccountReferenceDataModel,
+    useTrustedAccountReferenceDataModel,
+    useAlertManagerWebhookReferenceDataModel,
+    useMonitoringWebhookReferenceDataModel,
+    useServiceReferenceDataModel,
+    useAlertManagerEscalationPolicyReferenceDataModel,
+    useMonitoringEscalationPolicyReferenceDataModel,
+} from '@/query/resource-query/reference-data-model/adaptors/implementations';
 
 export const referenceDataModelMap = {
     app: useAppReferenceDataModel,
@@ -52,4 +55,4 @@ export const referenceDataModelMap = {
     service: useServiceReferenceDataModel,
     alertManagerEscalationPolicy: useAlertManagerEscalationPolicyReferenceDataModel,
     monitoringEscalationPolicy: useMonitoringEscalationPolicyReferenceDataModel,
-} as const;
+};

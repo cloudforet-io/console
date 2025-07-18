@@ -1,6 +1,7 @@
 import { usePluginApi } from '@/api-clients/repository/plugin/composables/use-plugin-api';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -13,7 +14,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 export type PluginReferenceItem = ReferenceItem<PluginModel>;
 export type PluginReferenceMap = ReferenceMap<PluginReferenceItem>;
 
-export const usePluginReferenceDataModel = () => {
+export const usePluginReferenceDataModel: ReferenceDataModelImplementationAdaptor<PluginReferenceItem> = () => {
     const { pluginAPI } = usePluginApi();
     const fetchConfig: ReferenceDataModelFetchConfig<PluginModel> = {
         listFetcher: pluginAPI.list,

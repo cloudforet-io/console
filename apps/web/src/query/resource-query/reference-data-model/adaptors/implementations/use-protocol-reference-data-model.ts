@@ -1,6 +1,7 @@
 import { useProtocolApi } from '@/api-clients/notification/protocol/composables/use-protocol-api';
 import type { ProtocolModel } from '@/api-clients/notification/protocol/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -10,7 +11,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type ProtocolReferenceItem = ReferenceItem<ProtocolModel>;
 export type ProtocolReferenceMap = ReferenceMap<ProtocolReferenceItem>;
 
-export const useProtocolReferenceDataModel = () => {
+export const useProtocolReferenceDataModel: ReferenceDataModelImplementationAdaptor<ProtocolReferenceItem> = () => {
     const { protocolAPI } = useProtocolApi();
     const fetchConfig: ReferenceDataModelFetchConfig<ProtocolModel> = {
         listFetcher: protocolAPI.list,

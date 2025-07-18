@@ -1,6 +1,7 @@
 import { useRegionApi } from '@/api-clients/inventory/region/composables/use-region-api';
 import type { RegionModel } from '@/api-clients/inventory/region/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -18,7 +19,7 @@ const CONTINENT_LABEL_MAP = {
 export type RegionReferenceItem = ReferenceItem<RegionModel>;
 export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>;
 
-export const useRegionReferenceDataModel = () => {
+export const useRegionReferenceDataModel: ReferenceDataModelImplementationAdaptor<RegionReferenceItem> = () => {
     const { regionAPI } = useRegionApi();
     const fetchConfig: ReferenceDataModelFetchConfig<RegionModel> = {
         listFetcher: regionAPI.list,

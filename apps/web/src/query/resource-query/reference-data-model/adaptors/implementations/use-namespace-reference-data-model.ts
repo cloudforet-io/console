@@ -1,6 +1,7 @@
 import { useNamespaceApi } from '@/api-clients/inventory/namespace/composables/use-namespace-api';
 import type { NamespaceModel } from '@/api-clients/inventory/namespace/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type NamespaceReferenceItem = ReferenceItem<NamespaceModel>;
 export type NamespaceReferenceMap = ReferenceMap<NamespaceReferenceItem>;
 
-export const useNamespaceReferenceDataModel = () => {
+export const useNamespaceReferenceDataModel: ReferenceDataModelImplementationAdaptor<NamespaceReferenceItem> = () => {
     const { namespaceAPI } = useNamespaceApi();
     const fetchConfig: ReferenceDataModelFetchConfig<NamespaceModel> = {
         listFetcher: namespaceAPI.list,

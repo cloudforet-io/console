@@ -1,6 +1,7 @@
 import { useDataSourceApi } from '@/api-clients/cost-analysis/data-source/composables/use-data-source-api';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -10,7 +11,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type CostDataSourceReferenceItem = ReferenceItem<CostDataSourceModel>;
 export type CostDataSourceReferenceMap = ReferenceMap<CostDataSourceReferenceItem>;
 
-export const useCostDataSourceReferenceModel = () => {
+export const useCostDataSourceReferenceModel: ReferenceDataModelImplementationAdaptor<CostDataSourceReferenceItem> = () => {
     const { dataSourceAPI } = useDataSourceApi();
     const fetchConfig: ReferenceDataModelFetchConfig<CostDataSourceModel> = {
         listFetcher: dataSourceAPI.list,

@@ -11,6 +11,7 @@ import type { ReferenceItem, ReferenceDataModelFetchConfig } from '@/query/resou
 import { createEventEmitter } from '@/query/resource-query/reference-data-model/utils/create-event-emitter';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 import { makeResourceProxy } from '@/query/resource-query/shared/utils/resource-proxy-helper';
+import { subscriptionManager } from '@/query/shared/subscription-manager';
 
 
 const ID_REQUEST_BUS_KEY = Symbol('IDRequestBus');
@@ -36,7 +37,7 @@ export const useReferenceDataModel = <T extends Record<string, any>, R extends R
         referenceRepository.requestItem(id);
     });
 
-    const { referenceMapRefs } = useReferenceReactiveCache(queryKey, referenceAdaptor);
+    const { referenceMapRefs, unsubscribe } = useReferenceReactiveCache<T, R>(queryKey, referenceAdaptor);
 
     const referenceMap = makeResourceProxy<Record<string, R|undefined>>({}, (_, id: string) => {
         if (!(id in referenceMapRefs)) {
@@ -45,6 +46,8 @@ export const useReferenceDataModel = <T extends Record<string, any>, R extends R
         }
         return referenceMapRefs[id].value;
     });
+
+    subscriptionManager.register(referenceMap, unsubscribe);
 
     return {
         referenceMap,

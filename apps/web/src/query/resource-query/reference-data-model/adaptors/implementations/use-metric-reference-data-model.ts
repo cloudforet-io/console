@@ -1,6 +1,7 @@
 import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -11,7 +12,7 @@ import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/reso
 export type MetricReferenceItem = ReferenceItem<MetricModel>;
 export type MetricReferenceMap = ReferenceMap<MetricReferenceItem>;
 
-export const useMetricReferenceDataModel = () => {
+export const useMetricReferenceDataModel: ReferenceDataModelImplementationAdaptor<MetricReferenceItem> = () => {
     const { metricAPI } = useMetricApi();
     const fetchConfig: ReferenceDataModelFetchConfig<MetricModel> = {
         listFetcher: metricAPI.list,

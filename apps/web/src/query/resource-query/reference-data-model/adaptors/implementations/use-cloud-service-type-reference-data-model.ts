@@ -1,6 +1,7 @@
 import { useCloudServiceTypeApi } from '@/api-clients/inventory/cloud-service-type/composables/use-cloud-service-type-api';
 import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
 import { useReferenceDataModel } from '@/query/resource-query/reference-data-model/composables/use-reference-data-model';
+import type { ReferenceDataModelImplementationAdaptor } from '@/query/resource-query/reference-data-model/types/reference-data-model.adaptor';
 import type {
     ReferenceDataModelFetchConfig,
     ReferenceItem, ReferenceMap,
@@ -13,7 +14,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 export type CloudServiceTypeReferenceItem = ReferenceItem<CloudServiceTypeModel>;
 export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>;
 
-export const useCloudServiceTypeReferenceDataModel = () => {
+export const useCloudServiceTypeReferenceDataModel: ReferenceDataModelImplementationAdaptor<CloudServiceTypeReferenceItem> = () => {
     const { cloudServiceTypeAPI } = useCloudServiceTypeApi();
     const fetchConfig: ReferenceDataModelFetchConfig<CloudServiceTypeModel> = {
         listFetcher: cloudServiceTypeAPI.list,
