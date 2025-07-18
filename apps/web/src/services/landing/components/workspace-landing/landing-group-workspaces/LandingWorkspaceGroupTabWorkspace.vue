@@ -30,7 +30,7 @@ const fields = [
     { name: 'created_at', label: 'Created' },
 ];
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
+const landingPageState = landingPageStore.state;
 const userStore = useUserStore();
 
 const tableState = reactive({
@@ -96,7 +96,7 @@ const fetchWorkspaces = async () => {
     tableState.loading = true;
     try {
         const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
-            workspace_group_id: landingPageStoreState.selectedWorkspaceGroup,
+            workspace_group_id: landingPageState.selectedWorkspaceGroupId,
         });
         tableState.items = results ?? [];
     } catch (e) {

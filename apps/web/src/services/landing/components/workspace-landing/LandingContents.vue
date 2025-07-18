@@ -34,7 +34,7 @@ const favoriteStore = useFavoriteStore();
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
 const landingPageStore = useLandingPageStore();
-const landingPageStoreGetters = landingPageStore.getters;
+const landingPageGetters = landingPageStore.getters;
 
 const router = useRouter();
 const { width } = useWindowSize();
@@ -45,7 +45,7 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
-    loading: computed<boolean>(() => landingPageStoreGetters.loading),
+    loading: computed<boolean>(() => landingPageGetters.loading),
     isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });

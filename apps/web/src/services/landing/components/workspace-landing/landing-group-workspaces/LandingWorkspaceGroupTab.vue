@@ -12,7 +12,7 @@ import LandingWorkspaceGroupTabWorkspace from '@/services/landing/components/wor
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const landingPageStore = useLandingPageStore();
-const landingPageStoreGetter = landingPageStore.getters;
+const landingPageGetters = landingPageStore.getters;
 const state = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER'), name: WORKSPACE_GROUP_TABS.GROUP_USER },
@@ -35,7 +35,7 @@ const state = reactive({
                          style-type="gray100"
                          size="sm"
                 >
-                    {{ landingPageStoreGetter.workspaceGroupUserTotalCount }}
+                    {{ landingPageGetters.workspaceGroupUserTotalCount }}
                 </p-badge>
             </template>
             <template #group_user>

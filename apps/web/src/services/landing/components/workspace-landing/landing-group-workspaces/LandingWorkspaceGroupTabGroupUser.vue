@@ -36,15 +36,15 @@ const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const userWorkspaceGroupStoreState = userWorkspaceGroupStore.state;
 const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
-const landingPageStoreGetter = landingPageStore.getters;
+const landingPageState = landingPageStore.state;
+const landingPageGetters = landingPageStore.getters;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 const userStore = useUserStore();
 
 const state = reactive({
     addUserModalVisible: false,
     removeUserModalVisible: false,
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageStoreState.selectedWorkspaceGroup]),
+    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageState.selectedWorkspaceGroupId]),
     removeUserList: [] as WorkspaceUser[],
 });
 
@@ -57,7 +57,7 @@ const tableState = reactive({
         { name: 'remove_button', label: ' ', sortable: false },
     ],
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
-    loginUserRoleType: computed(() => landingPageStoreGetter.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
+    loginUserRoleType: computed(() => landingPageGetters.workspaceGroupUsers.find((user) => user.user_id === tableState.loginUserId).role_type),
     isUserOwnerRole: computed(() => userStore.state.roleType === ROLE_TYPE.DOMAIN_ADMIN || tableState.loginUserRoleType === ROLE_TYPE.WORKSPACE_OWNER),
     roleMap: {} as Record<string, BasicRoleModel>,
 });
@@ -128,7 +128,7 @@ const handleAddUsersButtonClick = () => {
 };
 
 const handleSelectedGroupUsersRemoveButtonClick = () => {
-    state.removeUserList = landingPageStoreGetter.workspaceGroupUserTableItem
+    state.removeUserList = landingPageGetters.workspaceGroupUserTableItem
         .map((item, index) => (landingPageStoreGroupUserState.selectedIndices.includes(index) ? item : null))
         .filter((item) => item);
     state.removeUserModalVisible = true;
@@ -171,7 +171,7 @@ const setRoleMap = async () => {
             <template #heading>
                 <p-heading :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                            use-total-count
-                           :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
+                           :total-count="landingPageGetters.workspaceGroupUserTotalCount"
                            heading-type="sub"
                 />
             </template>
@@ -198,9 +198,9 @@ const setRoleMap = async () => {
                          style="height: calc(100vh - 25rem);"
                          :loading="userWorkspaceGroupStoreState.loading"
                          :fields="tableState.fields"
-                         :items="landingPageStoreGetter.workspaceGroupUserTableItem"
+                         :items="landingPageGetters.workspaceGroupUserTableItem"
                          :select-index="landingPageStoreGroupUserState.selectedIndices"
-                         :total-count="landingPageStoreGetter.workspaceGroupUserTotalCount"
+                         :total-count="landingPageGetters.workspaceGroupUserTotalCount"
                          sort-by="user_id"
                          search-type="plain"
                          :sort-desc="true"

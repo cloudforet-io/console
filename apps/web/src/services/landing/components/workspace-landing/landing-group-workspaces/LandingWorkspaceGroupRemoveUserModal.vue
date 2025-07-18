@@ -36,7 +36,7 @@ const props = defineProps<Props>();
 
 const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
+const landingPageState = landingPageStore.state;
 const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
 
 const state = reactive({
@@ -67,7 +67,7 @@ const deleteGroupUsers = async () => {
     state.loading = true;
     try {
         await SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>({
-            workspace_group_id: landingPageStoreState.selectedWorkspaceGroup,
+            workspace_group_id: landingPageState.selectedWorkspaceGroupId,
             users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
         });
         await userWorkspaceGroupStore.load();
