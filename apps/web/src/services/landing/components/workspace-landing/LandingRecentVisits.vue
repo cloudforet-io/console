@@ -25,12 +25,10 @@ import { workspaceStateFormatter } from '@/services/advanced/composables/refined
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
-import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
-const landingPageStore = useLandingPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
@@ -85,7 +83,6 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
         state.selectedPopoverItem = item.workspace_id;
         return;
     }
-    landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
 };

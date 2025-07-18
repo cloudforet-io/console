@@ -8,7 +8,7 @@ export const useUserProfileGetWorkspaceGroupsQuery = () => {
 
     const { key: userProfileGetWorkspaceGroupsQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get-workspace-groups');
 
-    const { data, isLoading } = useScopedQuery({
+    const { data, isLoading, refetch } = useScopedQuery({
         queryKey: userProfileGetWorkspaceGroupsQueryKey,
         queryFn: () => userProfileAPI.getWorkspaceGroups(),
         select: (d) => d.results || [],
@@ -21,5 +21,6 @@ export const useUserProfileGetWorkspaceGroupsQuery = () => {
         data,
         isLoading,
         key: userProfileGetWorkspaceGroupsQueryKey,
+        refetch,
     };
 };

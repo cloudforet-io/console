@@ -9,10 +9,11 @@ import { i18n } from '@/translations';
 import { WORKSPACE_GROUP_TABS } from '@/services/advanced/constants/workspace-group-constant';
 import LandingWorkspaceGroupTabGroupUser from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTabGroupUser.vue';
 import LandingWorkspaceGroupTabWorkspace from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTabWorkspace.vue';
+import { useUserProfileGetWorkspaceGroupsQuery } from '@/services/landing/composables/use-user-profile-get-workspace-groups-query';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const landingPageStore = useLandingPageStore();
-const landingPageGetters = landingPageStore.getters;
+const landingPageState = landingPageStore.state;
 const state = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER'), name: WORKSPACE_GROUP_TABS.GROUP_USER },
@@ -20,6 +21,13 @@ const state = reactive({
     ])),
     activeTab: WORKSPACE_GROUP_TABS.GROUP_USER,
 });
+const workspaceGroupTotalCount = computed<number>(() => {
+    const target = workspaceGroupList.value?.find((item) => item.workspace_group_id === landingPageState.selectedWorkspaceGroupId);
+    return target?.users?.length ?? 0;
+});
+
+/* Query */
+const { data: workspaceGroupList } = useUserProfileGetWorkspaceGroupsQuery();
 
 </script>
 
@@ -35,7 +43,7 @@ const state = reactive({
                          style-type="gray100"
                          size="sm"
                 >
-                    {{ landingPageGetters.workspaceGroupUserTotalCount }}
+                    {{ workspaceGroupTotalCount }}
                 </p-badge>
             </template>
             <template #group_user>

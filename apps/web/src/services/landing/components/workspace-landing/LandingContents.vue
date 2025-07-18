@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PButton, PDataLoader, PDivider, screens, PSearch,
+    PButton, PDivider, screens, PSearch,
 } from '@cloudforet/mirinae';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
@@ -19,22 +19,16 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { gray } from '@/styles/colors';
-
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
-import LandingEmptyContents from '@/services/landing/components/workspace-landing/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/workspace-landing/LandingRecentVisits.vue';
 import LandingSearchedWorkspaces from '@/services/landing/components/workspace-landing/LandingSearchedWorkspaces.vue';
-import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const favoriteStore = useFavoriteStore();
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
-const landingPageStore = useLandingPageStore();
-const landingPageGetters = landingPageStore.getters;
 
 const router = useRouter();
 const { width } = useWindowSize();
@@ -45,7 +39,6 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const storeState = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
-    loading: computed<boolean>(() => landingPageGetters.loading),
     isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
@@ -68,20 +61,11 @@ const handleClickButton = () => {
 };
 
 onMounted(async () => {
-    try {
-        landingPageStore.setLoading(true);
-        await recentStore.fetchRecent({
-            type: RECENT_TYPE.WORKSPACE,
-            limit: 6,
-        });
-        await favoriteStore.fetchWorkspaceFavorite();
-    } finally {
-        landingPageStore.setLoading(false);
-    }
-});
-
-onUnmounted(() => {
-    landingPageStore.initState();
+    await recentStore.fetchRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        limit: 6,
+    });
+    await favoriteStore.fetchWorkspaceFavorite();
 });
 </script>
 
@@ -100,31 +84,23 @@ onUnmounted(() => {
                 </p>
             </div>
         </div>
-        <p-data-loader :loading="storeState.loading"
-                       :data="storeState.workspaceList"
-                       :loader-backdrop-color="gray[100]"
-        >
-            <div class="contents-wrapper">
-                <p-search :value="state.searchText"
-                          :placeholder="$t('LADING.SEARCH_WORKSPACE')"
-                          class="workspace-search-bar"
-                          @update:value="handleSearch"
-                />
-                <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
-                <p-divider v-if="!state.isSearchMode" />
-                <landing-searched-workspaces v-show="state.isSearchMode"
-                                             :search-text="state.searchText"
-                                             @create="handleClickButton"
-                />
-                <landing-group-workspaces v-if="!state.isSearchMode"
-                                          :has-read-write-access="hasReadWriteAccess"
-                                          @create="handleClickButton"
-                />
-            </div>
-            <template #no-data>
-                <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
-            </template>
-        </p-data-loader>
+        <div class="contents-wrapper">
+            <p-search :value="state.searchText"
+                      :placeholder="$t('LADING.SEARCH_WORKSPACE')"
+                      class="workspace-search-bar"
+                      @update:value="handleSearch"
+            />
+            <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
+            <p-divider v-if="!state.isSearchMode" />
+            <landing-searched-workspaces v-show="state.isSearchMode"
+                                         :search-text="state.searchText"
+                                         @create="handleClickButton"
+            />
+            <landing-group-workspaces v-if="!state.isSearchMode"
+                                      :has-read-write-access="hasReadWriteAccess"
+                                      @create="handleClickButton"
+            />
+        </div>
         <div v-if="hasReadWriteAccess && storeState.isDomainAdmin && storeState.workspaceList.length > 0"
              class="banner-wrapper"
         >

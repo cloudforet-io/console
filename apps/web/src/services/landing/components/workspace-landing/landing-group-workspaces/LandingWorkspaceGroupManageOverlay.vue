@@ -7,35 +7,35 @@ import {
 
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 
-import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import LandingWorkspaceGroupTab from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceGroupTab.vue';
+import { useUserProfileGetWorkspaceGroupsQuery } from '@/services/landing/composables/use-user-profile-get-workspace-groups-query';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
+
 
 interface Props {
     isOverlayOpen: boolean;
 }
-
 const props = withDefaults(defineProps<Props>(), {
     isOverlayOpen: false,
 });
 const emit = defineEmits<{(e: 'update:is-overlay-open'): void}>();
 
-const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
-const userWorkspaceGroupStoreGetters = userWorkspaceGroupStore.getters;
 const landingPageStore = useLandingPageStore();
 const landingPageState = landingPageStore.state;
 
 const state = reactive({
     isOverlayOpenProxy: useProxyValue('isOverlayOpen', props, emit),
-    workspaceGroup: computed<WorkspaceGroupModel|undefined>(() => userWorkspaceGroupStoreGetters.workspaceGroupMap[landingPageState.selectedWorkspaceGroupId]),
 });
+const selectedWorkspaceGroup = computed<WorkspaceGroupModel|undefined>(() => workspaceGroupList.value?.find((item) => item.workspace_group_id === landingPageState.selectedWorkspaceGroupId));
 
+/* Query */
+const { data: workspaceGroupList } = useUserProfileGetWorkspaceGroupsQuery();
+
+/* Event Handler */
 const handleClose = () => {
     state.isOverlayOpenProxy = false;
-    landingPageStore.resetGroupUserTableState();
 };
 </script>
 
@@ -56,7 +56,7 @@ const handleClose = () => {
                            class="title"
             >
                 <div class="name-field-contents">
-                    <p-text-input :value="state.workspaceGroup?.name ?? ''"
+                    <p-text-input :value="selectedWorkspaceGroup?.name ?? ''"
                                   :disabled="true"
                                   required
                                   class="name-input"
