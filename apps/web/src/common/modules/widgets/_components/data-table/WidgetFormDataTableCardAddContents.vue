@@ -3,21 +3,13 @@ import {
     computed, defineExpose, onMounted, reactive, watch,
 } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import {
     cloneDeep, isArray, isEqual, uniq,
 } from 'lodash';
 
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
-import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
-import type { DataTableDeleteParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/delete';
 import type { DataTableUpdateParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/update';
-import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -28,19 +20,23 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
+import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardAddForm.vue';
 import WidgetFormDataTableCardAlertModal
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardAlertModal.vue';
-import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/WidgetFormDataTableCardFooter.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardAlertModal.vue';
+import WidgetFormDataTableCardFooter from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardFooter.vue';
 import WidgetFormDataTableCardHeaderTitle
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardHeaderTitle.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardHeaderTitle.vue';
 import WidgetFormDataTableCardSourceForm
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceForm.vue';
+    from '@/common/modules/widgets/_components/data-table/WidgetFormDataTableCardSourceForm.vue';
+import { useDataTableDeleteMutation } from '@/common/modules/widgets/_composables/data-table/mutations/use-data-table-delete-mutation';
+import { useDataTableUpdateMutation } from '@/common/modules/widgets/_composables/data-table/mutations/use-data-table-update-mutation';
 import {
     useDataTableCascadeUpdate,
-} from '@/common/modules/widgets/_composables/use-data-table-cascade-update';
-import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-list-query';
-import { useWidgetQuery } from '@/common/modules/widgets/_composables/use-widget-query';
+} from '@/common/modules/widgets/_composables/data-table/use-data-table-cascade-update';
+import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
+import { useDataTableRelatedLoadQueryInvalidator } from '@/common/modules/widgets/_composables/data-table/useDataTableRelatedInvalidator';
+import { useWidgetUpdateMutation } from '@/common/modules/widgets/_composables/widget/mutations/use-widget-update-mutation';
+import { useWidgetQuery } from '@/common/modules/widgets/_composables/widget/use-widget-query';
 import {
     DATA_SOURCE_DOMAIN,
     DATA_TABLE_OPERATOR,
@@ -48,45 +44,47 @@ import {
 } from '@/common/modules/widgets/_constants/data-table-constant';
 import { sanitizeWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableAlertModalMode } from '@/common/modules/widgets/types/widget-data-table-type';
+import type { DataTableAlertModalMode, DataTableFormContentsExpose, DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
     DataTableAddOptions,
-    DataTableQueryFilter, TimeDiff,
+    DataTableQueryFilter, TimeDiff, CostOptions,
+    DataTableGroupByInfo,
+    UnifiedCostOptions,
+    AssetOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
+import { useMetricQueryFetcher } from '../../_composables/use-metric-query-fetcher';
+
+
+
 interface Props {
     selected: boolean;
-    item: PublicDataTableModel|PrivateDataTableModel;
+    item: DataTableModel;
     loading?: boolean;
 }
-
-type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
+type GroupByItem = { name: string; label: string; tags?: string[] };
 
 const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+const metricMap = referenceMap.metric;
 
 /* Query */
 const {
     widget,
-    keys: widgetKeys,
-    fetcher: widgetFetcher,
 } = useWidgetQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
 const {
     dataTableList,
-    keys: dataTableKeys,
-    api: dataTableApi,
-    fetcher: dataTableFetcher,
 } = useWidgetDataTableListQuery({
     widgetId: computed(() => widgetGenerateState.widgetId),
 });
-const queryClient = useQueryClient();
 const {
     cascadeUpdateDataTable,
 } = useDataTableCascadeUpdate({
@@ -108,59 +106,19 @@ const state = reactive({
     options: computed(() => props.item.options),
     dataSourceId: computed(() => state.options[state.sourceType].data_source_id), // COST only
     metricId: computed(() => state.options[state.sourceType].metric_id), // ASSET only
-    namespaceId: computed(() => storeState.metrics[state.metricId]?.data.namespace_id || ''), // ASSET only
+    namespaceId: computed(() => metricMap[state.metricId]?.data?.namespace_id ?? ''), // ASSET only
     selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
-    selectedGroupByItems: [] as { name: string; label: string; tags?: [] }[],
+    selectedGroupByItems: [] as GroupByItem[],
     selectedGroupByTagsMap: {
         [GROUP_BY.PROJECT]: [],
         [GROUP_BY.REGION]: [],
-    } as Record<string, string[]>,
+    } as Record<string, { name: string; label: string }[]>,
     filter: {} as Record<string, DataTableQueryFilter>,
     dataFieldName: '',
     dataUnit: '',
-    selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return state.costDataTypeItems;
-        }
-        if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
-            return Object.values(storeState.metrics)
-                .filter((metric) => metric.data.namespace_id === state.namespaceId)
-                .map((metric) => ({
-                    label: metric.label,
-                    name: metric.key,
-                }));
-        }
-        return [];
-    }),
-    costDataTypeItems: computed(() => {
-        const targetCostDataSource = storeState.costDataSources[state.dataSourceId];
-        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost || targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
-        const additionalMenuItems: MenuItem[] = targetCostDataSource?.data?.cost_data_keys?.map((key) => ({
-            name: `data.${key}`, label: key,
-        }));
-        return [
-            { name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
-            { name: 'usage_quantity', label: 'Usage' },
-            ...(additionalMenuItems || []),
-        ];
-    }),
     filterFormKey: getRandomId(),
-    optionsChanged: computed(() => {
-        const sourceKeyChanged = state.sourceType !== DATA_SOURCE_DOMAIN.UNIFIED_COST && state.selectedSourceEndItem !== originDataState.sourceKey;
-        const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
-        const groupByTagsChanged = !isEqual(state.selectedGroupByTagsMap, originDataState.groupByTagsMap);
-        const filterChanged = !isEqual(state.filter, originDataState.filter);
-        const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
-        const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
-        const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
-        const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
-
-        return sourceKeyChanged || groupByChanged || groupByTagsChanged || filterChanged
-            || dataTableNameChanged || dataUnitChanged
-            || timeDiffChanged || timeDiffDateChanged;
-    }),
     failStatus: false,
     isUnavailable: computed<boolean>(() => props.item.state === 'UNAVAILABLE'),
 });
@@ -194,7 +152,7 @@ const originDataState = reactive({
         const _groupByTagsMap = {
             [GROUP_BY.PROJECT]: [],
             [GROUP_BY.REGION]: [],
-        } as Record<string, string[]>;
+        } as Record<string, { name: string; label: string }[]>;
         ((props.item.options as DataTableAddOptions).group_by ?? []).forEach((group) => {
             const isGroupByTags = GROUP_BY_INFO_ITEMS_FOR_TAGS.some((tag) => tag.key === group.key);
             if (isGroupByTags) {
@@ -219,7 +177,7 @@ const originDataState = reactive({
         return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
     }),
     timeDiffDate: computed<string|undefined>(() => {
-        const timeDiff = (props.item.options as DataTableAddOptions).timediff;
+        const timeDiff = (props.item.options as DataTableAddOptions).timediff || {};
         const timeDiffKeys = Object.keys(timeDiff || {}).filter((key) => key !== 'data_name');
         return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
     }),
@@ -229,60 +187,37 @@ const originDataState = reactive({
     }),
 });
 
+const optionChanged = computed<boolean>(() => {
+    const sourceKeyChanged = state.sourceType !== DATA_SOURCE_DOMAIN.UNIFIED_COST && state.selectedSourceEndItem !== originDataState.sourceKey;
+    const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
+    const groupByTagsChanged = !isEqual(state.selectedGroupByTagsMap, originDataState.groupByTagsMap);
+    const filterChanged = !isEqual(state.filter, originDataState.filter);
+    const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
+    const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
+    const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
+    const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
+
+    return sourceKeyChanged || groupByChanged || groupByTagsChanged || filterChanged
+            || dataTableNameChanged || dataUnitChanged
+            || timeDiffChanged || timeDiffDateChanged;
+});
+
 const modalState = reactive({
     visible: false,
     mode: '' as DataTableAlertModalMode,
     referenceDataTableName: '',
 });
 
-/* Query Keys */
-const { withSuffix: privateDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'get');
-const { withSuffix: publicDataTableGetQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'get');
-const { withSuffix: privateDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'private-data-table', 'load');
-const { withSuffix: publicDataTableLoadQueryKey } = useServiceQueryKey('dashboard', 'public-data-table', 'load');
-const { withSuffix: privateWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load');
-const { withSuffix: publicWidgetLoadQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load');
-const { withSuffix: privateWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'private-widget', 'load-sum');
-const { withSuffix: publicWidgetLoadSumQueryKey } = useServiceQueryKey('dashboard', 'public-widget', 'load-sum');
 
 /* APIs */
-const invalidateLoadQueries = async (data: DataTableModel) => {
-    if (!widgetGenerateState.widgetId) return;
-    if (data.data_table_id.startsWith('private')) {
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: privateDataTableLoadQueryKey(state.dataTableId) }),
-            queryClient.invalidateQueries({ queryKey: privateWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
-            queryClient.invalidateQueries({ queryKey: privateWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
-        ]);
-    } else {
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: publicDataTableLoadQueryKey(state.dataTableId) }),
-            queryClient.invalidateQueries({ queryKey: publicWidgetLoadQueryKey(widgetGenerateState.widgetId) }),
-            queryClient.invalidateQueries({ queryKey: publicWidgetLoadSumQueryKey(widgetGenerateState.widgetId) }),
-        ]);
-    }
-};
-const { mutateAsync: updateDataTableMutation } = useMutation({
-    mutationFn: dataTableFetcher.updateDataTableFn,
-    onSuccess: async (data) => {
-        const dataTableListQueryKey = state.isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
-        await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
-            if (oldData.results) {
-                return {
-                    ...oldData,
-                    results: oldData.results.map((dataTable) => {
-                        if (dataTable.data_table_id === data.data_table_id) {
-                            return data;
-                        }
-                        return dataTable;
-                    }),
-                };
-            }
-            return oldData;
-        });
-        await queryClient.invalidateQueries({ queryKey: state.isPrivate ? privateDataTableGetQueryKey(state.dataTableId) : publicDataTableGetQueryKey(state.dataTableId) });
-        await invalidateLoadQueries(data);
+const { invalidateLoadQueries: invalidateLoadQueriesForRelatedQueries } = useDataTableRelatedLoadQueryInvalidator({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+});
 
+const { mutateAsync: updateDataTableMutation } = useDataTableUpdateMutation({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+    onSuccess: async (data) => {
+        await invalidateLoadQueriesForRelatedQueries(data);
         setInitialDataTableForm();
         state.filterFormKey = getRandomId();
         setFailStatus(false);
@@ -292,42 +227,85 @@ const { mutateAsync: updateDataTableMutation } = useMutation({
         showErrorMessage(error.message, error);
         ErrorHandler.handleError(error);
     },
-});
-const { mutateAsync: updateWidget } = useMutation({
-    mutationFn: widgetFetcher.updateWidgetFn,
-    onSuccess: (data) => {
-        const widgetQueryKey = widgetGenerateState.widgetId?.startsWith('private')
-            ? widgetKeys.privateWidgetGetQueryKey
-            : widgetKeys.publicWidgetGetQueryKey;
-        queryClient.setQueryData(widgetQueryKey.value, () => data);
-    },
-    onError: (e) => {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    },
-});
-const updateDataTable = async (): Promise<DataTableModel|undefined> => {
-    if (!state.dataFieldName.length) {
-        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
-        setFailStatus(true);
-        return undefined;
-    }
 
-    let domainOptions;
-    if (state.sourceType === DATA_SOURCE_DOMAIN.COST) domainOptions = { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem };
-    if (state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) domainOptions = { data_key: 'cost' };
-    if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) domainOptions = { metric_id: state.selectedSourceEndItem };
+});
 
-    const costGroupBy = state.selectedGroupByItems.map((group) => ({
+const { mutateAsync: deleteDataTable } = useDataTableDeleteMutation({
+    widgetId: computed(() => widgetGenerateState.widgetId),
+    onSuccess: async (_, variables) => {
+        const _allDataTableInvalidMap = {
+            ...storeState.allDataTableInvalidMap,
+        };
+        delete _allDataTableInvalidMap[variables.data_table_id];
+        widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
+        if (storeState.selectedDataTableId === variables.data_table_id) {
+            const dataTableId = dataTableList.value.length ? dataTableList.value[0]?.data_table_id : undefined;
+            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
+        }
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
+
+const { mutateAsync: updateWidget } = useWidgetUpdateMutation({
+    onError: (error) => {
+        showErrorMessage(error.message, error);
+        ErrorHandler.handleError(error);
+    },
+});
+
+/* Utils */
+/* Generate DataTable Update Params */
+const getCostSpecificParams = (): { domainOptions: CostOptions; groupBy: DataTableGroupByInfo[] } => {
+    const domainOptions = { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem };
+    const groupBy = state.selectedGroupByItems.map((group: GroupByItem) => ({
         key: group.name,
         name: group.label,
         tags: group.tags,
     }));
-    const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
-    const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+    return { domainOptions, groupBy };
+};
+const getUnifiedCostSpecificParams = (): { domainOptions: UnifiedCostOptions; groupBy: DataTableGroupByInfo[] } => {
+    const domainOptions = { data_key: 'cost' };
+    const groupBy = state.selectedGroupByItems.map((group: GroupByItem) => ({
+        key: group.name,
+        name: group.label,
+        tags: group.tags,
+    }));
+    return { domainOptions, groupBy };
+};
+const { getMetric } = useMetricQueryFetcher();
+const getAssetSpecificParams = async (): Promise<{ domainOptions: AssetOptions; groupBy: DataTableGroupByInfo[] }> => {
+    const domainOptions = { metric_id: state.selectedSourceEndItem };
+    if (!state.metricId) {
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        throw new Error('Metric ID is required');
+    }
+    const metric = await getMetric(state.metricId);
 
-    const groupBy = (state.sourceType === DATA_SOURCE_DOMAIN.COST || state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) ? costGroupBy : assetGroupBy;
+    const metricLabelsInfo: MetricLabelKey[] = metric?.labels_info || [];
+    const filteredAssetGroupBy = metricLabelsInfo.filter((labelInfo) => state.selectedGroupByItems.map((group) => group.name).includes(labelInfo.key));
+    const assetGroupBy: DataTableGroupByInfo[] = filteredAssetGroupBy.map((labelInfo) => ({
+        key: labelInfo.key,
+        name: labelInfo.name,
+        reference: labelInfo.reference,
+        search_key: labelInfo.search_key,
+    }));
+    return { domainOptions, groupBy: assetGroupBy };
+};
 
+const getDataTableUpdateParams = async (): Promise<DataTableUpdateParameters> => {
+    let { domainOptions, groupBy } = { domainOptions: {} as CostOptions|UnifiedCostOptions|AssetOptions, groupBy: [] as DataTableGroupByInfo[] };
+    if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
+        ({ domainOptions, groupBy } = getCostSpecificParams());
+    } else if (state.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
+        ({ domainOptions, groupBy } = getUnifiedCostSpecificParams());
+    } else if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
+        ({ domainOptions, groupBy } = await getAssetSpecificParams());
+    }
+
+    /* Group By Tags */
     GROUP_BY_INFO_ITEMS_FOR_TAGS.forEach((tag) => {
         const groupByTags = groupBy.find((group) => group.key === tag.key);
         if (groupByTags) {
@@ -340,6 +318,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         }
     });
 
+    /* Filter */
     const refinedFilter = Object.values(state.filter as Record<string, DataTableQueryFilter>)
         .filter((filter) => {
             if (isArray(filter.v)) return filter?.v?.length;
@@ -358,7 +337,9 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             };
         });
 
-    const updateParams: DataTableUpdateParameters = {
+
+    /* Update Params */
+    return {
         data_table_id: state.dataTableId,
         options: {
             [state.sourceType]: domainOptions,
@@ -369,43 +350,18 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
             timediff: getTimeDiffValue(),
         },
     };
+};
+
+/* Update DataTable */
+const updateDataTable = async (): Promise<DataTableModel|undefined> => {
+    if (!state.dataFieldName.length) {
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        setFailStatus(true);
+        return undefined;
+    }
+    const updateParams = await getDataTableUpdateParams();
     return updateDataTableMutation(updateParams);
 };
-const deleteDataTableFn = (params: DataTableDeleteParameters): Promise<void> => {
-    if (params.data_table_id.startsWith('private')) {
-        return dataTableApi.privateDataTableAPI.delete(params);
-    } return dataTableApi.publicDataTableAPI.delete(params);
-};
-const { mutateAsync: deleteDataTable } = useMutation({
-    mutationFn: deleteDataTableFn,
-    onSuccess: async (_, variables) => {
-        const _allDataTableInvalidMap = {
-            ...storeState.allDataTableInvalidMap,
-        };
-        delete _allDataTableInvalidMap[variables.data_table_id];
-        widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
-
-        const _isPrivate = widgetGenerateState.widgetId?.startsWith('private');
-        const dataTableListQueryKey = _isPrivate ? dataTableKeys.privateDataTableListQueryKey : dataTableKeys.publicDataTableListQueryKey;
-        await queryClient.setQueryData(dataTableListQueryKey.value, (oldData: ListResponse<WidgetModel>) => {
-            if (oldData.results) {
-                return {
-                    ...oldData,
-                    results: oldData.results.filter((dataTable) => dataTable.data_table_id !== variables.data_table_id),
-                };
-            }
-            return oldData;
-        });
-
-        if (storeState.selectedDataTableId === variables.data_table_id) {
-            const dataTableId = dataTableList.value.length ? dataTableList.value[0]?.data_table_id : undefined;
-            widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
-        }
-    },
-    onError: (error) => {
-        ErrorHandler.handleError(error);
-    },
-});
 
 /* Events */
 const handleSelectSourceItem = (selectedItem: string) => {
@@ -493,7 +449,7 @@ const setFailStatus = (status: boolean) => {
 };
 const getTimeDiffValue = (): TimeDiff|undefined => {
     if (advancedOptionsState.selectedTimeDiff === 'none' || !Number(advancedOptionsState.selectedTimeDiffDate)) return undefined;
-    const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label || '';
+    // const defaultFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label || '';
     const timeDiffOptions = {
         none: '',
         months: 'month',
@@ -501,7 +457,7 @@ const getTimeDiffValue = (): TimeDiff|undefined => {
     };
     return {
         [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate),
-        data_name: advancedOptionsState.timeDiffDataName || `${defaultFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
+        data_name: advancedOptionsState.timeDiffDataName || `${state.dataFieldName} (- ${advancedOptionsState.selectedTimeDiffDate} ${timeDiffOptions[advancedOptionsState.selectedTimeDiff]})`,
     };
 };
 
@@ -514,7 +470,7 @@ onMounted(() => {
 watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     // Base Options
     state.selectedGroupByItems = [];
-    state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
+    // state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
     state.dataUnit = state.sourceType === DATA_SOURCE_DOMAIN.ASSET ? storeState.metrics[_selectedSourceItem]?.data?.unit || '' : '';
     state.filter = {};
 
@@ -534,7 +490,7 @@ watch(() => validationState.dataTableApplyInvalid, (invalid) => {
     widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
 }, { immediate: true });
 
-defineExpose({
+defineExpose<DataTableFormContentsExpose>({
     updateDataTable,
 });
 
@@ -553,7 +509,6 @@ defineExpose({
             <widget-form-data-table-card-source-form v-if="state.sourceType !== DATA_SOURCE_DOMAIN.UNIFIED_COST"
                                                      :source-type="state.sourceType"
                                                      :parent-source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.namespaceId"
-                                                     :menu="state.selectableSourceItems"
                                                      :selected="state.selectedSourceEndItem"
                                                      @select="handleSelectSourceItem"
             />
@@ -563,7 +518,6 @@ defineExpose({
                                               :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                               :source-key="state.selectedSourceEndItem"
                                               :source-type="state.sourceType"
-                                              :source-items="state.selectableSourceItems"
                                               :selected-group-by-items.sync="state.selectedGroupByItems"
                                               :selected-group-by-tags-map.sync="state.selectedGroupByTagsMap"
                                               :filter.sync="state.filter"
@@ -575,7 +529,7 @@ defineExpose({
                                               :form-invalid.sync="validationState.dataTableApplyInvalid"
         />
         <widget-form-data-table-card-footer :disabled="validationState.dataTableApplyInvalid"
-                                            :changed="state.optionsChanged"
+                                            :changed="optionChanged"
                                             :loading="state.loading || props.loading"
                                             @delete="handleClickDeleteDataTable"
                                             @reset="handleClickResetDataTable"

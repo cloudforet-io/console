@@ -1,50 +1,85 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, reactive, ref, toRef, watch,
+    computed, reactive, ref, toRef,
 } from 'vue';
 
 import {
     PContextMenu, PI, useContextMenuController, PButtonModal,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import type { CostDataSourceReferenceItem } from '@/query/resource-query/reference-data-model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
-
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+
 
 interface Props {
     parentSourceId: string;
     sourceType?: string;
-    menu: SelectDropdownMenuItem[];
     selected: string;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'select', value?: string): void;}>();
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+const costDataSourceMap = referenceMap.costDataSource;
+const metricMap = referenceMap.metric;
+const namespaceMap = referenceMap.namespace;
+const handlerMap = useResourceMenuHandlerMap();
 
-const storeState = reactive({
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
+const costDataTypeMenuItems = computed<MenuItem[]>(() => {
+    if (props.sourceType !== DATA_SOURCE_DOMAIN.COST) return [];
+    const targetCostDataSource: CostDataSourceReferenceItem|undefined = costDataSourceMap[props.parentSourceId];
+    if (!targetCostDataSource) return [];
+    const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost || targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
+    const costDataKeys = targetCostDataSource?.data?.cost_data_keys || [];
+    const additionalMenuItems: MenuItem[] = costDataKeys.map((key) => ({
+        name: `data.${key}`, label: key,
+    }));
+    return [
+        { name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
+        { name: 'usage_quantity', label: 'Usage' },
+        ...(additionalMenuItems || []),
+    ];
 });
+
+const assetTypeMenuHandler = computed<AutocompleteHandler>(() => {
+    if (props.sourceType !== DATA_SOURCE_DOMAIN.ASSET) return () => ({ results: [] });
+    return handlerMap.metric({
+        fixedFilters: {
+            namespace_id: props.parentSourceId,
+        },
+    });
+});
+
 const state = reactive({
-    menuItems: computed(() => props.menu),
-    selectedItems: undefined,
-    selectedItemLabel: computed(() => {
-        const selectedItem = state.menuItems.find((item) => item.name === state.selectedItems);
-        return selectedItem ? selectedItem.label : '';
+    selectedItems: computed<MenuItem[]>(() => {
+        const selectedId = props.selected;
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+            return [{
+                name: selectedId,
+                label: costDataTypeMenuItems.value.find((item) => item.name === selectedId)?.label,
+            }];
+        }
+        if (props.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
+            return [{
+                name: selectedId,
+                label: metricMap[selectedId]?.label,
+            }];
+        }
+        return [];
     }),
     selectedParentSourceName: computed(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return storeState.costDataSources[props.parentSourceId]?.label;
+            return costDataSourceMap[props.parentSourceId]?.label;
         }
         if (props.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
-            return storeState.namespaces[props.parentSourceId]?.label;
+            return namespaceMap[props.parentSourceId]?.label;
         }
         return '';
     }),
@@ -77,7 +112,8 @@ const {
     contextMenuRef,
     useReorderBySelection: true,
     // useFixedStyle: true,
-    menu: toRef(state, 'menuItems'),
+    handler: props.sourceType === DATA_SOURCE_DOMAIN.COST ? undefined : assetTypeMenuHandler,
+    menu: props.sourceType === DATA_SOURCE_DOMAIN.COST ? costDataTypeMenuItems : undefined,
     selected: toRef(state, 'selectedItems'),
     pageSize: 10,
 });
@@ -92,16 +128,16 @@ const handleClickDropdown = () => {
     }
 };
 
-const handleClickShowMore = async (item: SelectDropdownMenuItem) => {
+const handleClickShowMore = async (item: MenuItem) => {
     await showMoreMenu(item._resultIndex);
 };
 
-const handleSelectMenuItem = (item: SelectDropdownMenuItem) => {
-    if (state.selectedItems[0].name === item.name) {
+const handleSelectMenuItem = (item: MenuItem) => {
+    if (state.selectedItems?.[0]?.name === item.name) {
         hideContextMenu();
         return;
     }
-    modalState.beforeSelectedItem = state.selectedItems[0].name;
+    modalState.beforeSelectedItem = state.selectedItems?.[0]?.name;
     modalState.afterSelectedItem = item.name;
     modalState.visible = true;
 };
@@ -112,7 +148,6 @@ const handleConfirmModal = () => {
     resetModalState();
 };
 const handleCancelModal = () => {
-    state.selectedItems = [state.menuItems.find((item) => item.name === modalState.beforeSelectedItem)];
     resetModalState();
 };
 
@@ -121,11 +156,6 @@ const resetModalState = () => {
     modalState.beforeSelectedItem = undefined;
     modalState.afterSelectedItem = undefined;
 };
-
-watch(() => props.selected, () => {
-    const selectedMenu = props.menu.find((item) => item.name === props.selected);
-    state.selectedItems = [selectedMenu];
-}, { immediate: true });
 
 </script>
 
