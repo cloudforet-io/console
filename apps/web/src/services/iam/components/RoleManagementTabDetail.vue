@@ -5,15 +5,12 @@ import {
 
 import { find } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PI, PCodeEditor, PEmpty, PDataTable,
 } from '@cloudforet/mirinae';
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleGetParameters } from '@/api-clients/identity/role/schema/api-verbs/get';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { i18n } from '@/translations';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
@@ -21,15 +18,15 @@ import {
     getPageAccessMapFromRawData,
 } from '@/lib/access-control/page-access-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { gray, green } from '@/styles/colors';
 
 import { useRoleBasedMenus } from '@/services/iam/composables/role-based-menus';
+import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
 import { MANAGED_PAGE_ACCESS } from '@/services/iam/constants/role-constant';
 import { getPageAccessMenuListByRoleType } from '@/services/iam/helpers/role-page-access-menu-list';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
 import type { PageAccessMenuItem, TableItem, AccessType } from '@/services/iam/types/role-type';
+
 
 type DataTableTranslationField = DataTableField | { label?: string };
 interface DetailMenuItems {
@@ -47,15 +44,16 @@ const detailMenuItems = computed<DetailMenuItems[]>(() => [
     { name: 'api_policy', label: i18n.t('IAM.ROLE.DETAIL.API_POLICY') as string },
 ]);
 
+const selectedRoleId = computed(() => rolePageState.selectedRoleIds[0] ?? '');
+
+const { roleData } = useRoleGetQuery(selectedRoleId);
+
 const state = reactive({
-    loading: false,
-    data: {} as Partial<RoleModel>,
-    selectedRole: computed<RoleModel>(() => rolePageStore.selectedRoles[0]),
-    permissions: computed<string[]>(() => state.data?.permissions ?? []),
+    permissions: computed<string[]>(() => roleData.value?.permissions ?? []),
     permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
-    pageAccess: computed<string[]>(() => (state.data.is_managed ? MANAGED_PAGE_ACCESS : state.data.page_access ?? [])),
+    pageAccess: computed<string[] | readonly ['*']>(() => (roleData.value?.is_managed ? MANAGED_PAGE_ACCESS : roleData.value?.page_access ?? [])),
     pageAccessDataList: [] as PageAccessMenuItem[],
-    readOnly: computed<boolean>(() => state.data.page_access?.every((item) => {
+    readOnly: computed<boolean | undefined>(() => roleData.value?.page_access?.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
         return accessType === PAGE_ACCESS.READONLY;
     })),
@@ -70,7 +68,7 @@ const tableState = reactive({
     ]),
     items: computed<TableItem[] | undefined>(() => state.pageAccessDataList?.map((i) => {
         const pageAccess: AccessType | undefined = (() => {
-            if (i.isParent && i.subMenuList.length === 0) {
+            if (i.isParent && i.subMenuList?.length === 0) {
                 return getAccessType(PAGE_ACCESS.RESTRICTED);
             }
             if (i.accessType) {
@@ -125,25 +123,8 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
     });
 };
 
-const getRoleDetailData = async (roleId: string) => {
-    state.loading = true;
-    try {
-        state.data = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({ role_id: roleId });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.data = {};
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => state.selectedRole.role_id, async (roleId) => {
-    const selectedRoleId = rolePageStore.selectedRoles.length === 0 && rolePageState.selectedIndices.length !== 0
-        ? rolePageState.roles[rolePageState.selectedIndices[0]].role_id
-        : roleId;
-
-    await getRoleDetailData(selectedRoleId);
-    state.pageAccessDataList = getPageAccessMenuListByRoleType(state.data.role_type, state.menuList);
+watch(roleData, async () => {
+    state.pageAccessDataList = getPageAccessMenuListByRoleType(roleData.value?.role_type ?? ROLE_TYPE.DOMAIN_ADMIN, state.menuList);
 
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
         pageAccessPermissions: state.pageAccess, menuList: state.menuList,
@@ -161,7 +142,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
         }
         handleUpdateForm({ id: itemId, isAccessible: accessible.access, accessType });
     });
-}, { immediate: true });
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -178,7 +159,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                     <p-empty v-if="state.pageAccessDataList.length === 0">
                         {{ $t('IAM.ROLE.DETAIL.NO_DATA') }}
                     </p-empty>
-                    <div v-else-if="state.data.role_type === ROLE_TYPE.DOMAIN_ADMIN">
+                    <div v-else-if="roleData?.role_type === ROLE_TYPE.DOMAIN_ADMIN">
                         <div class="page-access-info-wrapper">
                             <p-i name="ic_settings"
                                  width="2rem"
