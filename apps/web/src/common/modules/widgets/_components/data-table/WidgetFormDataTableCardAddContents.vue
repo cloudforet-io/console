@@ -12,10 +12,6 @@ import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type'
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
@@ -35,6 +31,7 @@ import {
 } from '@/common/modules/widgets/_composables/data-table/use-data-table-cascade-update';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import { useDataTableRelatedLoadQueryInvalidator } from '@/common/modules/widgets/_composables/data-table/useDataTableRelatedInvalidator';
+import { useMetricQueryFetcher } from '@/common/modules/widgets/_composables/use-metric-query-fetcher';
 import { useWidgetUpdateMutation } from '@/common/modules/widgets/_composables/widget/mutations/use-widget-update-mutation';
 import { useWidgetQuery } from '@/common/modules/widgets/_composables/widget/use-widget-query';
 import {
@@ -55,7 +52,6 @@ import type {
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
-import { useMetricQueryFetcher } from '../../_composables/use-metric-query-fetcher';
 
 
 
@@ -70,7 +66,6 @@ const props = defineProps<Props>();
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const allReferenceStore = useAllReferenceStore();
 const referenceMap = useAllReferenceDataModel();
 const metricMap = referenceMap.metric;
 
@@ -89,13 +84,6 @@ const {
     cascadeUpdateDataTable,
 } = useDataTableCascadeUpdate({
     widgetId: computed(() => widgetGenerateState.widgetId),
-});
-
-const storeState = reactive({
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
-    allDataTableInvalidMap: computed(() => widgetGenerateState.allDataTableInvalidMap),
 });
 
 const state = reactive({
@@ -234,11 +222,11 @@ const { mutateAsync: deleteDataTable } = useDataTableDeleteMutation({
     widgetId: computed(() => widgetGenerateState.widgetId),
     onSuccess: async (_, variables) => {
         const _allDataTableInvalidMap = {
-            ...storeState.allDataTableInvalidMap,
+            ...widgetGenerateState.allDataTableInvalidMap,
         };
         delete _allDataTableInvalidMap[variables.data_table_id];
         widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
-        if (storeState.selectedDataTableId === variables.data_table_id) {
+        if (widgetGenerateState.selectedDataTableId === variables.data_table_id) {
             const dataTableId = dataTableList.value.length ? dataTableList.value[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId?.startsWith('UNSAVED-') ? undefined : dataTableId);
         }
@@ -467,11 +455,16 @@ onMounted(() => {
     setInitialDataTableForm();
 });
 
-watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
+watch(() => state.selectedSourceEndItem, async (_selectedSourceItem) => {
     // Base Options
     state.selectedGroupByItems = [];
     // state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
-    state.dataUnit = state.sourceType === DATA_SOURCE_DOMAIN.ASSET ? storeState.metrics[_selectedSourceItem]?.data?.unit || '' : '';
+    if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
+        const metric = await getMetric(_selectedSourceItem);
+        state.dataUnit = metric?.unit || '';
+    } else {
+        state.dataUnit = '';
+    }
     state.filter = {};
 
 
@@ -484,7 +477,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 // Validation
 watch(() => validationState.dataTableApplyInvalid, (invalid) => {
     const _allDataTableInvalidMap = {
-        ...storeState.allDataTableInvalidMap,
+        ...widgetGenerateState.allDataTableInvalidMap,
         [state.dataTableId]: invalid,
     };
     widgetGenerateStore.setAllDataTableInvalidMap(_allDataTableInvalidMap);
