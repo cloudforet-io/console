@@ -51,7 +51,7 @@ const recentBoardSets = computed<WorkspaceBoardSet[]>(() => {
     if (isRecentWorkspaceListLoading.value) return [];
     const orderList: WorkspaceBoardSet[] = [];
     recentWorkspace.value.forEach((recentItem) => {
-        const matchingObj = recentWorkspaceListData.value.find((workspaceItem) => !workspaceItem.is_dormant && workspaceItem.workspace_id === recentItem.itemId);
+        const matchingObj = recentWorkspaceListData.value?.find((workspaceItem) => !workspaceItem.is_dormant && workspaceItem.workspace_id === recentItem.itemId);
         if (matchingObj) {
             orderList.push({
                 ...matchingObj,

@@ -20,7 +20,6 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
-import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray } from '@/styles/colors';
@@ -55,11 +54,6 @@ const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
-    recentWorkspace: computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
-        itemType: i.data.type,
-        workspaceId: i.data.workspace_id,
-        itemId: i.data.id,
-    }))),
 });
 const state = reactive({
     searchText: '',
@@ -123,10 +117,7 @@ onUnmounted(() => {
         >
             <div class="contents-wrapper">
                 <landing-search @search="handleSearch" />
-                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0 && !state.isSearchMode"
-                                       :workspace-list="storeState.workspaceList"
-                                       :recent-visits="storeState.recentWorkspace"
-                />
+                <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
                 <p-divider v-if="!state.isSearchMode" />
                 <landing-all-workspaces v-show="state.isSearchMode"
                                         :workspace-list="state.refinedWorkspaceList"
@@ -149,9 +140,9 @@ onUnmounted(() => {
             <p-divider />
             <div class="banner">
                 <img alt="empty-cloud-service-img"
-                     src="../../../../assets/images/landing/img_landing_create_workspace.png"
+                     src="@/assets/images/landing/img_landing_create_workspace.png"
                      class="create-workspace-img"
-                     srcset="../../../../assets/images/landing/img_landing_create_workspace@2x.png 2x,
+                     srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
                         @/assets/images/landing/img_landing_create_workspace@3x.png 3x"
                 >
                 <span v-if="!state.isMobileSize"
