@@ -63,7 +63,7 @@ interface UsePaginationQueryPageOptions {
     verb: 'list' | 'load' | 'get-data' | 'analyze';
 }
 
-export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData<TPageData>, TError = unknown>(
+export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData, TError = unknown>(
     options: UsePaginationQueryOptions<TParams, TPageData, TError>,
     pageOptions: UsePaginationQueryPageOptions,
     requiredScopes: [GrantScope, ...GrantScope[]],
