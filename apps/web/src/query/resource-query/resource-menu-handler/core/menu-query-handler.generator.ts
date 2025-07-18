@@ -99,7 +99,7 @@ export const generateMenuQueryHandler = (
     };
 
     // Stat Menu Handler
-    const makeStatMenuHandler = (queryKeyWithSuffix: QueryKeyWithSuffix, fetchConfig: ResourceMenuHandlerStatFetchConfig): MenuAttachHandler => {
+    const makeStatMenuHandler = (queryKeyWithSuffix: QueryKeyWithSuffix, fetchConfig: ResourceMenuHandlerStatFetchConfig): MenuAttachHandler<any> => {
         const {
             fetcher,
             distinct,

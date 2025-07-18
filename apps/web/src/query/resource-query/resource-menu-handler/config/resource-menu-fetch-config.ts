@@ -4,9 +4,9 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
     app: {
         searchTargets: ['name'],
     },
-    cloudServiceQuerySet: {
-        searchTargets: ['name', 'query_set_id'],
-    },
+    // cloudServiceQuerySet: {
+    //     searchTargets: ['name', 'query_set_id'],
+    // },
     cloudServiceType: {
         only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'],
         searchTargets: ['cloud_service_type_id', 'name', 'group'],
@@ -54,7 +54,10 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
     workspaceUser: {
         searchTargets: ['name', 'user_id'],
     },
-    webhook: {
+    alertManagerWebhook: {
+        searchTargets: ['name', 'webhook_id'],
+    },
+    monitoringWebhook: {
         searchTargets: ['name', 'webhook_id'],
     },
     workspaceGroup: {
@@ -66,7 +69,10 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
     protocol: {
         searchTargets: ['name', 'protocol_id'],
     },
-    escalationPolicy: {
+    alertManagerEscalationPolicy: {
+        searchTargets: ['name', 'escalation_policy_id'],
+    },
+    monitoringEscalationPolicy: {
         searchTargets: ['name', 'escalation_policy_id'],
     },
     plugin: {

@@ -4,23 +4,14 @@ import {
 } from 'vue';
 
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-
-import { VariableModelFactory } from '@/lib/variable-models';
-import type {
-    VariableModelMenuHandlerInfo,
-} from '@/lib/variable-models/variable-model-menu-handler';
-import {
-    getVariableModelMenuHandler,
-} from '@/lib/variable-models/variable-model-menu-handler';
 
 import DataSelector from '@/common/components/select/DataSelector.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 
 interface Props {
@@ -33,28 +24,21 @@ const emit = defineEmits<{(e: 'update:selected-cost-data-source-id', costDataSou
 }>();
 
 
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-});
+const referenceMap = useAllReferenceDataModel();
+const costDataSourceMap = referenceMap.costDataSource;
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 const state = reactive({
     proxySelectedCostDataSourceId: useProxyValue('selectedCostDataSourceId', props, emit),
     proxySelectedCostDataType: useProxyValue('selectedCostDataType', props, emit),
     // data source
     selectedDataSource: [] as MenuItem[],
-    dataSourceMenuHandler: computed<AutocompleteHandler>(() => {
-        const variableModelInfo: VariableModelMenuHandlerInfo = {
-            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cost_data_source' }),
-        };
-        return getVariableModelMenuHandler([variableModelInfo]);
-    }),
+    dataSourceMenuHandler: resourceMenuHandlerMap.costDataSource(),
     // data type
     dataTypeMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedDataSource.length) return [];
-        const targetCostDataSource = storeState.costDataSource[state.selectedDataSource[0].name];
+        const targetCostDataSource = costDataSourceMap[state.selectedDataSource[0].name];
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.cost_info?.name;
-        // const dataInfo = targetCostDataSource?.data?.plugin_info?.metadata?.data_info ?? {};
-        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
+        const additionalMenuItems: MenuItem[] = targetCostDataSource?.data?.cost_data_keys?.map((key) => ({
             type: 'item',
             name: `data.${key}`,
             label: key,

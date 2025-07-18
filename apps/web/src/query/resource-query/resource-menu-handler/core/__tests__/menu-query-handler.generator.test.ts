@@ -12,8 +12,8 @@ const mockQueryClient = {
 };
 
 // Mock Fetchers
-const mockListFetcher = vi.fn<[any], Promise<ListResponse<any>>>();
-const mockStatFetcher = vi.fn<[any], Promise<StatResponse>>();
+const mockListFetcher = vi.fn<(arg: any) => Promise<ListResponse<any>>>();
+const mockStatFetcher = vi.fn<(arg: any) => Promise<StatResponse>>();
 
 const mockQueryKeyWithSuffix = (params: any) => ['test-query-key', params];
 

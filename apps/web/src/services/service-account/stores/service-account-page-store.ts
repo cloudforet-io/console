@@ -125,11 +125,12 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             state.syncJobList = [];
         },
         initToOriginServiceAccountItem: () => {
-            formState.isAutoSyncEnabled = state.originServiceAccountItem?.schedule?.state === 'ENABLED';
-            formState.scheduleHours = state.originServiceAccountItem?.schedule?.hours ?? [];
-            formState.selectedSingleWorkspace = state.originServiceAccountItem?.sync_options?.single_workspace_id ?? '';
-            formState.skipProjectGroup = state.originServiceAccountItem?.sync_options?.skip_project_group ?? false;
-            formState.additionalOptions = state.originServiceAccountItem?.plugin_options ?? {};
+            // auto sync option for trusted account
+            formState.isAutoSyncEnabled = (state.originServiceAccountItem as TrustedAccountModel)?.schedule?.state === 'ENABLED';
+            formState.scheduleHours = (state.originServiceAccountItem as TrustedAccountModel)?.schedule?.hours ?? [];
+            formState.selectedSingleWorkspace = (state.originServiceAccountItem as TrustedAccountModel)?.sync_options?.single_workspace_id ?? '';
+            formState.skipProjectGroup = (state.originServiceAccountItem as TrustedAccountModel)?.sync_options?.skip_project_group ?? false;
+            formState.additionalOptions = (state.originServiceAccountItem as TrustedAccountModel)?.plugin_options ?? {};
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
         setFormState: (key:string, data: any) => {
@@ -140,10 +141,11 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     watch(() => state.originServiceAccountItem, (item) => {
         if (getters.isOriginAutoSyncEnabled) {
             formState.isAutoSyncEnabled = true;
-            formState.scheduleHours = item?.schedule?.hours ?? [];
-            formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
-            formState.skipProjectGroup = item?.sync_options?.skip_project_group ?? false;
-            formState.additionalOptions = item?.plugin_options ?? {};
+            // auto sync option for trusted account
+            formState.scheduleHours = (item as TrustedAccountModel)?.schedule?.hours ?? [];
+            formState.selectedSingleWorkspace = (item as TrustedAccountModel)?.sync_options?.single_workspace_id ?? '';
+            formState.skipProjectGroup = (item as TrustedAccountModel)?.sync_options?.skip_project_group ?? false;
+            formState.additionalOptions = (item as TrustedAccountModel)?.plugin_options ?? {};
         } else {
             formState.isAutoSyncEnabled = false;
             formState.scheduleHours = [];
