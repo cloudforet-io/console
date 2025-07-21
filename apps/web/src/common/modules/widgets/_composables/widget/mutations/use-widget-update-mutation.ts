@@ -48,11 +48,11 @@ export const useWidgetUpdateMutation = ({
             await queryClient.invalidateQueries({ queryKey: _isPrivate ? privateWidgetGetQueryKey(data.widget_id) : publicWidgetGetQueryKey(data.widget_id) });
             if (onSuccess) onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };

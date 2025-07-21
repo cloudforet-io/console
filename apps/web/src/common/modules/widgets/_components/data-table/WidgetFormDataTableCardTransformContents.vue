@@ -43,8 +43,8 @@ import { useDataTableUpdateMutation } from '@/common/modules/widgets/_composable
 import {
     useDataTableCascadeUpdate,
 } from '@/common/modules/widgets/_composables/data-table/use-data-table-cascade-update';
+import { useDataTableRelatedLoadQueryInvalidator } from '@/common/modules/widgets/_composables/data-table/use-data-table-related-invalidator';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
-import { useDataTableRelatedLoadQueryInvalidator } from '@/common/modules/widgets/_composables/data-table/useDataTableRelatedInvalidator';
 import { useWidgetUpdateMutation } from '@/common/modules/widgets/_composables/widget/mutations/use-widget-update-mutation';
 import { useWidgetQuery } from '@/common/modules/widgets/_composables/widget/use-widget-query';
 import {

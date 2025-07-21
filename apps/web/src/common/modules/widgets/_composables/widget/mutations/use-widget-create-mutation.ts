@@ -35,17 +35,17 @@ export const useWidgetCreateMutation = ({
 
     return useMutation({
         mutationFn: widgetCreateFn,
-        onSuccess: (data, variables) => {
+        onSuccess: async (data, variables) => {
             const _isPrivate = variables.dashboard_id.startsWith('private');
             const widgetListQueryKey = _isPrivate ? privateWidgetListWithSuffix(variables.dashboard_id) : publicWidgetListWithSuffix(variables.dashboard_id);
-            queryClient.invalidateQueries({ queryKey: widgetListQueryKey });
-            if (onSuccess) onSuccess(data, variables);
+            await queryClient.invalidateQueries({ queryKey: widgetListQueryKey });
+            if (onSuccess) await onSuccess(data, variables);
         },
-        onError: (error, variables) => {
-            if (onError) onError(error, variables);
+        onError: async (error, variables) => {
+            if (onError) await onError(error, variables);
         },
-        onSettled: (data, error, variables) => {
-            if (onSettled) onSettled(data, error, variables);
+        onSettled: async (data, error, variables) => {
+            if (onSettled) await onSettled(data, error, variables);
         },
     });
 };
