@@ -113,6 +113,12 @@ watch(totalCount, (newTotalCount) => {
     });
 });
 
+watch(data, (newData) => {
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.workspaceGroups = newData;
+    });
+});
+
 
 // const handleUpdateSelectIndices = (indices: number[]) => {
 //     workspaceGroupPageStore.$patch((_state) => {
@@ -124,7 +130,6 @@ watch(totalCount, (newTotalCount) => {
 //     });
 // };
 const handleUpdateSelectIndices = (indices: number[]) => {
-    console.log('handleUpdateSelectIndices', indices);
     workspaceGroupPageState.selectedIndices = indices;
 };
 
