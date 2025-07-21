@@ -153,7 +153,7 @@ const handleConfirm = async () => {
             closeModal();
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk update MFA failed
             if (import.meta.env.DEV) {
-                const joinedFailedUserIds = Array.from(failedUserIds.keys())?.join(', ');
+                const joinedFailedUserIds = Array.from(failedUserIds.keys()).join(', ');
                 throw new Error(`[UserMFASettingModal.vue] Bulk update MFA failed user IDs: [${joinedFailedUserIds}]`);
             } else throw new Error('[User MFA Setting] Something went wrong! Try again later. If the problem persists, please contact support.');
         }
@@ -212,7 +212,7 @@ const handleConfirm = async () => {
 
                     <p-divider horizontal />
 
-                    <p-field-group :label="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELET_FIELD_TITLE')"
+                    <p-field-group :label="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELECT_FIELD_TITLE')"
                                    class="mt-4"
                                    required
                     >
