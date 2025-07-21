@@ -58,7 +58,7 @@ const { queryTags } = queryTagHelper;
 
 /* Query */
 const queryState = reactive({
-    sortKey: 'name',
+    sortKey: 'is_managed',
     sortDesc: true,
 });
 
