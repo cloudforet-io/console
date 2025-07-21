@@ -33,12 +33,8 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType, ExtendUserListItemType } from '@/services/iam/types/user-type';
 
-
-
-
 interface Props {
     hasReadWriteAccess?: boolean;
-    selectedUser: UserListItemType;
 }
 
 const props = defineProps<Props>();
@@ -57,6 +53,8 @@ const storeState = reactive({
 const selectedUserId = computed(() => userPageState.selectedUserIds[0] ?? '');
 const { userData, workspaceUserData } = useUserGetQuery(selectedUserId);
 
+const selectedUser = computed<UserListItemType>(() => userData.value ?? workspaceUserData.value ?? {});
+
 const { roleListData } = useRoleListQuery();
 
 const roleMap = computed(() => {
@@ -70,19 +68,16 @@ const roleMap = computed(() => {
 const state = reactive({
     loading: false,
     verifyEmailLoading: false,
-    isWorkspaceGroupUser: computed<boolean>(() => !!props.selectedUser?.role_binding_info?.workspace_group_id),
-    refinedUserItems: computed<ExtendUserListItemType>(() => {
-        const selectedUser: UserListItemType = userData.value ?? workspaceUserData.value ?? {};
-        return {
-            ...selectedUser,
-            role_binding: {
-                name: roleMap.value[selectedUser?.role_binding_info?.role_id ?? '']?.name ?? '',
-                type: selectedUser?.role_binding_info?.role_type ?? ROLE_TYPE.USER,
-            },
-            last_accessed_at: selectedUser?.last_accessed_at,
-            user_group: userGroupListData.value.filter((group) => group.users?.includes(selectedUser?.user_id ?? '')),
-        };
-    }),
+    isWorkspaceGroupUser: computed<boolean>(() => !!selectedUser.value?.role_binding_info?.workspace_group_id),
+    refinedUserItems: computed<ExtendUserListItemType>(() => ({
+        ...selectedUser.value,
+        role_binding: {
+            name: roleMap.value[selectedUser.value?.role_binding_info?.role_id ?? '']?.name ?? '',
+            type: selectedUser.value?.role_binding_info?.role_type ?? ROLE_TYPE.USER,
+        },
+        last_accessed_at: selectedUser.value?.last_accessed_at,
+        user_group: userGroupListData.value.filter((group) => group.users?.includes(selectedUser.value?.user_id ?? '')),
+    })),
 });
 
 
@@ -109,10 +104,10 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
             );
-            if (props.selectedUser?.role_id) {
+            if (selectedUser.value?.role_id) {
                 additionalRoleFields.push(
                     {
-                        name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
+                        name: 'role_id', label: 'Admin Role',
                     },
                 );
             }
@@ -289,17 +284,17 @@ const handleClickVerifyButton = async () => {
                 </div>
             </template>
             <template #data-last_accessed_at="{data}">
-                <span v-if="calculateTime(data, props.selectedUser.timezone) === -1">
+                <span v-if="calculateTime(data, selectedUser.timezone) === -1">
                     -
                 </span>
-                <span v-else-if="calculateTime(data, props.selectedUser.timezone) === 0">
+                <span v-else-if="calculateTime(data, selectedUser.timezone) === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
-                <span v-else-if="calculateTime(data, props.selectedUser.timezone) === 1">
+                <span v-else-if="calculateTime(data, selectedUser.timezone) === 1">
                     {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ calculateTime(data, props.selectedUser.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
+                    {{ calculateTime(data, selectedUser.timezone) }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #data-created_at="{data}">

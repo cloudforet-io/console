@@ -6,12 +6,18 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_MODAL_TYPE, USER_STATE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
+
+const selectedUserIds = computed(() => userPageState.selectedUserIds);
+
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+
 
 const state = reactive({
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
@@ -30,13 +36,13 @@ const state = reactive({
             type: 'item',
             name: USER_MODAL_TYPE.ENABLE,
             label: i18n.t('IAM.USER.MAIN.ENABLE'),
-            disabled: !state.isSelected || userPageGetters.selectedUsers[0].state === USER_STATE.ENABLE,
+            disabled: !state.isSelected || selectedUsers.value?.[0]?.state === USER_STATE.ENABLE,
         },
         {
             type: 'item',
             name: USER_MODAL_TYPE.DISABLE,
             label: i18n.t('IAM.USER.MAIN.DISABLE'),
-            disabled: !state.isSelected || userPageGetters.selectedUsers[0].state === USER_STATE.DISABLE,
+            disabled: !state.isSelected || selectedUsers.value?.[0]?.state === USER_STATE.DISABLE,
         },
     ])),
 });

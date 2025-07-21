@@ -17,16 +17,22 @@ import {
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
+
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
+    data: computed<UserListItemType>(() => selectedUsers.value?.[0] ?? {}),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     passwordStatus: 0,
     passwordTypeArr: computed(() => {

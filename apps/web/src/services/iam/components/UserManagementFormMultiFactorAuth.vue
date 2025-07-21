@@ -10,8 +10,10 @@ import type { UserMfa } from '@/api-clients/identity/user/schema/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 interface Props {
     isChangedToggle?: boolean
@@ -22,11 +24,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
 
 const emit = defineEmits<{(e: 'update:is-changed-toggle'): void }>();
 
 const storeState = reactive({
-    mfaData: computed<UserMfa|undefined>(() => userPageStore.state.selectedUsers[0]?.mfa),
+    mfaData: computed<UserMfa|undefined>(() => selectedUsers.value?.[0]?.mfa),
 });
 const state = reactive({
     proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),

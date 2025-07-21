@@ -71,9 +71,6 @@ export const useUserPageStore = defineStore('page-user', () => {
                 visible: undefined,
             } as ModalState;
         },
-        setSelectedUsers(users: UserListItemType[]) {
-            state.selectedUsers = users;
-        },
         setSelectedUserIds(userIds: string[]) {
             state.selectedUserIds = userIds;
         },

@@ -36,9 +36,12 @@ import UserManagementFormMultiFactorAuth
 import UserManagementFormNotificationEmailForm
     from '@/services/iam/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/iam/components/UserManagementFormPasswordForm.vue';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
+
 
 interface UserManagementData {
     user_id: string;
@@ -55,12 +58,16 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userStore = useUserStore();
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+const { roleListData: roles } = useRoleListQuery();
+
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
     mfaLoading: false,
-    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
+    data: computed<UserListItemType>(() => selectedUsers.value?.[0] ?? {}),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed<UserMfa|undefined>(() => userStore.state.mfa),
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
@@ -214,7 +221,7 @@ const fetchListRoleBindingInfo = async () => {
     });
     const results = response.results || [];
     if (results?.length > 0) {
-        const matchingRole = userPageState.roles.find((r) => r.role_id === results[0].role_id);
+        const matchingRole = roles.value?.find((r) => r.role_id === results[0].role_id);
         formState.role = matchingRole ? {
             label: matchingRole.name,
             name: matchingRole.role_id,

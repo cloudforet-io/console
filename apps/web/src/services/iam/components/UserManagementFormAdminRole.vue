@@ -24,9 +24,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
+
 
 interface Props {
     role?: AddModalMenuItem
@@ -42,13 +44,18 @@ const emit = defineEmits<{(e: 'update:role', formState): void,
     (e: 'update:is-changed-toggle', type: string): void,
 }>();
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+
 const userStore = useUserStore();
 
 const roleState = reactive({
     loading: true,
     visible: false,
     searchText: '',
-    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
+    data: computed<UserListItemType>(() => selectedUsers.value?.[0] ?? {}),
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
     selectedItems: computed(() => {

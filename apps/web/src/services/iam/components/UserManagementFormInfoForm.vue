@@ -7,8 +7,10 @@ import {
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
+
 
 interface Props {
     name?: string
@@ -18,11 +20,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
 
 const emit = defineEmits<{(e: 'update:name', value: string): void}>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.state.selectedUsers[0]),
+    data: computed<UserListItemType>(() => selectedUsers.value?.[0] ?? {}),
     proxyName: useProxyValue('name', props, emit),
 });
 
