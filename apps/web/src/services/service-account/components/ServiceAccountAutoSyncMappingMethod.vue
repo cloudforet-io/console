@@ -4,79 +4,33 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldTitle, PRadio } from '@cloudforet/mirinae';
 
+
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
-import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
 import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue';
+import type { MappingItem } from '@/common/components/mapping-method/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import WorkspaceDropdown from '@/services/service-account/components/WorkspaceDropdown.vue';
 import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
+import { CSP_AUTO_SYNC_OPTIONS_MAP, WORKSPACE_MAPPING_OPTIONS_MAP } from '@/services/service-account/constants/auto-sync-options-contant';
+import type { ServiceAccountStoreFormState } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
-const cspAdditionalOptionMap = {
-    aws: {
-        name: 'AWS Organization',
-        workspaceMappingOptions: [
-            {
-                label: 'Top-level Organization Units',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Nested Organization Units',
-                value: 'projectGroups',
-            },
-        ],
-    },
-    azure: {
-        name: 'Azure Tenant',
-        workspaceMappingOptions: [
-            {
-                label: 'Multitenant Organization',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'Azure Tenant',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Nested Management Groups',
-                value: 'projectGroups',
-            },
-        ],
-    },
-    google_cloud: {
-        name: 'Google Cloud Organization',
-        workspaceMappingOptions: [
-            {
-                label: 'Top-level Folders in Google Cloud Organization',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'Google Cloud Organization',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Folders in Google Cloud Organization',
-                value: 'projectGroups',
-            },
-        ],
-    },
+
+type FormData = Partial<Pick<ServiceAccountStoreFormState, 'selectedSingleWorkspace' | 'skipProjectGroup' | 'azureManagementGroupMappingType'>>;
+type MappingMethodOptionType = {
+    label: string;
+    value: any;
+    info?: string;
 };
 
+type WorkspaceMapping = (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP];
 interface Props {
     mode: 'UPDATE'|'READ';
     serviceAccountId?: string;
@@ -93,8 +47,6 @@ const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
-const referenceMap = useAllReferenceDataModel();
-
 
 const {
     serviceAccountData,
@@ -103,49 +55,152 @@ const {
 });
 
 const state = reactive({
-    selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
-    additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
-    workspaceMapping: 'multipleWorkspaces',
-    projectGroupMapping: 'projectGroups',
+    selectedWorkspace: computed<string|undefined>(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? undefined),
+    mappingMethodProviderLabel: computed<string|undefined>(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider]?.name ?? ''),
+    workspaceMappingOptions: computed<MappingMethodOptionType[]>(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].workspaceMappingOptions),
+    projectGroupMappingOptions: computed<MappingMethodOptionType[]>(() => [
+        ...CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].projectGroupMappingOptions,
+        {
+            label: i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SKIP_PROJECT_GROUP_MAPPING'),
+            value: false,
+        },
+    ]),
+    workspaceMapping: 'multi' as WorkspaceMapping,
+    projectGroupMappingDisabled: computed<boolean>(() => serviceAccountPageState.selectedProvider === 'azure'
+    && state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING),
+    projectGroupMapping: true as boolean,
+
+    formData: computed<FormData>(() => convertToMappingMethodDTO(state.isDomainForm, state.workspaceMapping, state.projectGroupMapping, state.selectedWorkspace)),
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isResourceGroupDomain: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === 'DOMAIN'),
     isCreatePage: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === undefined),
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
-    mappingItems: computed(() => (state.isDomainForm ? [
-        {
-            imageUrl: referenceMap.provider[serviceAccountPageStore.state.selectedProvider]?.icon,
-            name: 'provider',
-        },
-        {
-            icon: 'ic_workspaces',
-            name: 'workspace',
-        },
-        {
-            icon: 'ic_document-filled',
-            name: 'project_group',
-        },
-    ] : [
-        {
-            icon: 'ic_document-filled',
-            name: 'project_group',
-        },
-    ])),
-    formData: computed(() => (state.isDomainForm ? {
-        selectedSingleWorkspace: state.workspaceMapping === 'singleWorkspace' ? state.selectedWorkspace : '',
-        skipProjectGroup: state.projectGroupMapping === 'skip',
-    } : {
-        skipProjectGroup: state.projectGroupMapping === 'skip',
-    })),
-    selectedWorkspaceMappingOptionLabel: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider].workspaceMappingOptions
-        .find((option) => (option.value === (state.selectedWorkspace ? 'singleWorkspace' : 'multipleWorkspaces')))?.label),
-    selectedProjectGroupMappingOptionLabel: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider].projectGroupMappingOptions[0].label),
+    mappingItems: computed<MappingItem[]>(() => {
+        if (state.isDomainForm) {
+            return [
+                {
+                    imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
+                    name: 'provider',
+                },
+                {
+                    icon: 'ic_workspaces',
+                    name: 'workspace',
+                },
+                {
+                    icon: 'ic_document-filled',
+                    name: 'project_group',
+                },
+            ].filter((item) => (state.projectGroupMappingDisabled ? item.name !== 'project_group' : true));
+        }
+        return [
+            {
+                icon: 'ic_document-filled',
+                name: 'project_group',
+            },
+        ];
+    }),
+    selectedWorkspaceMappingOptionLabel: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].workspaceMappingOptions
+        .find((option) => (option.value === state.workspaceMapping))?.label),
+    selectedProjectGroupMappingOptionLabel: computed(() => CSP_AUTO_SYNC_OPTIONS_MAP[serviceAccountPageState.selectedProvider].projectGroupMappingOptions[0].label),
 });
 
+
+/* Utils */
+/*
+* This functions are used to convert the mapping method form data to the service account form data.
+* And also, convert the service account form data to the mapping method form data.
+*
+* 1. convertToMappingMethodDTO
+* 2. convertToMappingMethodClientEntity
+*
+* Azure Account has additional mapping method options (Top Node Management Group, Leaf Node Management Group).
+*/
+const convertToMappingMethodDTO = (isDomainForm: boolean, workspaceMapping: WorkspaceMapping, projectGroupMapping: boolean, selectedWorkspace: string) => {
+    // In Workspace Tenant
+    if (!isDomainForm) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+        };
+    }
+    // In Admin Mode : Multi Workspace
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.MULTI) {
+        return {
+            azureManagementGroupMappingType: undefined,
+            skipProjectGroup: !projectGroupMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // In Admin Mode : Single Workspace
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: undefined,
+            selectedSingleWorkspace: selectedWorkspace,
+        };
+    }
+    // In Admin Mode : (Only Azure) Top Node Management Group
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.TOP_AZURE_MANAGEMENT_GROUP_MAPPING) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: workspaceMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // In Admin Mode : (Only Azure) Leaf Node Management Group
+    if (workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING) {
+        return {
+            skipProjectGroup: !projectGroupMapping,
+            azureManagementGroupMappingType: workspaceMapping,
+            selectedSingleWorkspace: undefined,
+        };
+    }
+    // default
+    return {
+        skipProjectGroup: !projectGroupMapping,
+        selectedSingleWorkspace: undefined,
+        azureManagementGroupMappingType: undefined,
+    };
+};
+const convertToMappingMethodClientEntity = (originServiceAccountItem: TrustedAccountModel) => {
+    const skipProjectGroup = originServiceAccountItem.sync_options?.skip_project_group;
+    const singleWorkspaceId = originServiceAccountItem.sync_options?.single_workspace_id;
+    const azureManagementGroupMappingType = originServiceAccountItem.sync_options?.azure_management_group_mapping_type;
+
+    // Multi Workspace
+    if (!singleWorkspaceId && !azureManagementGroupMappingType) {
+        state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.MULTI;
+        state.projectGroupMapping = !skipProjectGroup;
+    // Azure Multi Management Group Workspace
+    } else if (azureManagementGroupMappingType) {
+        state.workspaceMapping = azureManagementGroupMappingType;
+        state.projectGroupMapping = azureManagementGroupMappingType === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING ? true : !skipProjectGroup;
+    // Single Workspace
+    } else if (singleWorkspaceId) {
+        state.workspaceMapping = WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE;
+        state.projectGroupMapping = !skipProjectGroup;
+    // Default (Workspace Tenant)
+    } else {
+        state.projectGroupMapping = !skipProjectGroup;
+    }
+};
+
+
+
+/* Event */
 const handleUpdateWorkspace = (workspaceId:string) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.selectedSingleWorkspace = workspaceId;
     });
+};
+
+const handleWorkspaceMappingChange = (value: WorkspaceMapping) => {
+    state.workspaceMapping = value;
+    if (value === WORKSPACE_MAPPING_OPTIONS_MAP.LEAF_AZURE_MANAGEMENT_GROUP_MAPPING) state.projectGroupMapping = false;
+};
+
+const handleProjectGroupMappingChange = (value: boolean) => {
+    state.projectGroupMapping = value;
 };
 
 watch(() => state.formData, (formData) => {
@@ -156,8 +211,8 @@ watch(() => state.formData, (formData) => {
 
 watch(serviceAccountData, (_serviceAccountData) => {
     if (_serviceAccountData) {
-        state.workspaceMapping = (_serviceAccountData as TrustedAccountModel).sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
-        state.projectGroupMapping = (_serviceAccountData as TrustedAccountModel).sync_options?.skip_project_group ? 'skip' : 'projectGroups';
+        const _item = _serviceAccountData as TrustedAccountModel;
+        convertToMappingMethodClientEntity(_item);
     }
 }, { immediate: true });
 
@@ -173,7 +228,7 @@ watch(serviceAccountData, (_serviceAccountData) => {
                         class="mb-6"
         >
             <template #provider>
-                <p>{{ state.additionalOptionUiByProvider.name }}</p>
+                <p>{{ state.mappingMethodProviderLabel }}</p>
             </template>
             <template #workspace>
                 <div>
@@ -184,16 +239,23 @@ watch(serviceAccountData, (_serviceAccountData) => {
                         />
 
                         <div class="flex flex-col gap-1">
-                            <p-radio v-for="option in state.additionalOptionUiByProvider.workspaceMappingOptions"
+                            <p-radio v-for="option in state.workspaceMappingOptions"
                                      :key="option.value"
-                                     v-model="state.workspaceMapping"
                                      :value="option.value"
+                                     :selected="state.workspaceMapping"
+                                     @change="handleWorkspaceMappingChange"
                             >
-                                {{ `${option.label} ➔ ${option.value === 'multipleWorkspaces' ? 'Multiple workspaces' : 'Single Workspace'}` }}
+                                {{ `${option.label} ➔ ${(option.value === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE) ?
+                                    'Single Workspace' : 'Multiple Workspaces'}` }}
+                                <info-tooltip v-if="option.info"
+                                              :tooltip-contents="option.info"
+                                              width="0.875rem"
+                                              height="0.875rem"
+                                />
                             </p-radio>
                         </div>
                         <div>
-                            <workspace-dropdown :disabled="state.workspaceMapping !== 'singleWorkspace'"
+                            <workspace-dropdown v-if="state.workspaceMapping === WORKSPACE_MAPPING_OPTIONS_MAP.SINGLE"
                                                 :selected="state.selectedWorkspace"
                                                 class="mt-2"
                                                 @update="handleUpdateWorkspace"
@@ -226,17 +288,13 @@ watch(serviceAccountData, (_serviceAccountData) => {
                                    class="mb-1"
                     />
                     <div class="flex flex-col gap-1">
-                        <p-radio v-for="option in state.additionalOptionUiByProvider.projectGroupMappingOptions"
+                        <p-radio v-for="option in state.projectGroupMappingOptions"
                                  :key="option.value"
-                                 v-model="state.projectGroupMapping"
                                  :value="option.value"
+                                 :selected="state.projectGroupMapping"
+                                 @change="handleProjectGroupMappingChange"
                         >
-                            {{ `${option.label} ➔ ${option.value === 'projectGroups' ? 'Project Groups' : 'Skip'}` }}
-                        </p-radio>
-                        <p-radio v-model="state.projectGroupMapping"
-                                 value="skip"
-                        >
-                            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SKIP_PROJECT_GROUP_MAPPING') }}
+                            {{ `${option.label} ➔ ${option.value === false ? 'Skip' : 'Project Groups'}` }}
                         </p-radio>
                     </div>
                 </div>

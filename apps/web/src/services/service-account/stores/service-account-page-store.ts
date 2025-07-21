@@ -9,6 +9,7 @@ import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/cons
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import type { AzureManagementGroupMappingType } from '@/api-clients/identity/trusted-account/schema/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
@@ -36,7 +37,7 @@ interface State {
     syncJobList: IdentityJobModel[];
 }
 
-interface FormState {
+export interface ServiceAccountStoreFormState {
     isBaseInformationFormValid: boolean;
     baseInformation: Partial<BaseInformationForm>;
     isCredentialFormValid: boolean;
@@ -45,6 +46,7 @@ interface FormState {
     isAutoSyncEnabled: boolean;
     additionalOptions: { [key: string]: any };
     selectedSingleWorkspace: string;
+    azureManagementGroupMappingType: AzureManagementGroupMappingType|undefined; // only for Azure
     skipProjectGroup: boolean;
     scheduleHours: number[];
 }
@@ -67,7 +69,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         syncJobList: [],
     });
 
-    const formState = reactive<FormState>({
+    const formState = reactive<ServiceAccountStoreFormState>({
         // baseInformation
         isBaseInformationFormValid: true,
         baseInformation: {},
@@ -79,6 +81,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
+        azureManagementGroupMappingType: undefined, // only for Azure
         skipProjectGroup: false,
         scheduleHours: [] as number[],
     });
@@ -120,6 +123,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};
             formState.selectedSingleWorkspace = '';
+            formState.azureManagementGroupMappingType = undefined;
             formState.skipProjectGroup = false;
             formState.scheduleHours = [];
             state.syncJobList = [];
@@ -130,6 +134,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.scheduleHours = (state.originServiceAccountItem as TrustedAccountModel)?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = (state.originServiceAccountItem as TrustedAccountModel)?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = (state.originServiceAccountItem as TrustedAccountModel)?.sync_options?.skip_project_group ?? false;
+            formState.azureManagementGroupMappingType = (state.originServiceAccountItem as TrustedAccountModel)?.sync_options?.azure_management_group_mapping_type ?? undefined;
             formState.additionalOptions = (state.originServiceAccountItem as TrustedAccountModel)?.plugin_options ?? {};
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
@@ -145,12 +150,14 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.scheduleHours = (item as TrustedAccountModel)?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = (item as TrustedAccountModel)?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = (item as TrustedAccountModel)?.sync_options?.skip_project_group ?? false;
+            formState.azureManagementGroupMappingType = (item as TrustedAccountModel)?.sync_options?.azure_management_group_mapping_type ?? undefined;
             formState.additionalOptions = (item as TrustedAccountModel)?.plugin_options ?? {};
         } else {
             formState.isAutoSyncEnabled = false;
             formState.scheduleHours = [];
             formState.selectedSingleWorkspace = '';
             formState.skipProjectGroup = false;
+            formState.azureManagementGroupMappingType = undefined;
             formState.additionalOptions = {};
         }
     });
