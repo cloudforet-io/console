@@ -28,12 +28,14 @@ import RoleDeleteModal
 import RoleStateUpdateModal from '@/services/iam/components/RoleStateUpdateModal.vue';
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { useRoleListPaginationQuery } from '@/services/iam/composables/use-role-list-pagination-query';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
 } from '@/services/iam/constants/role-constant';
 import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
+
 
 interface Props {
     tableHeight?: number;
@@ -64,6 +66,16 @@ const pageState = reactive({
     thisPage: 1,
     pageLimit: 15,
 });
+
+const selectedRoleIds = computed<string[]>(() => rolePageState.selectedRoleIds);
+
+const { roleListData: selectedRoles } = useRoleListQuery(
+    computed(() => ({
+        query: {
+            filter: [{ k: 'role_id', v: selectedRoleIds.value, o: 'in' }],
+        },
+    })),
+);
 
 const {
     data: roleList,
@@ -112,13 +124,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.ROLE.EDIT'),
-        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
+        disabled: rolePageState.selectedIndices.length === 0 || selectedRoles.value.filter((item) => item.is_managed).length > 0,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.ROLE.DELETE'),
-        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
+        disabled: rolePageState.selectedIndices.length === 0 || selectedRoles.value.filter((item) => item.is_managed).length > 0,
     },
     { type: 'divider' },
     {
@@ -126,16 +138,16 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         name: 'enabled',
         label: i18n.t('IAM.ROLE.ENABLE'),
         disabled: rolePageState.selectedIndices.length === 0
-            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
-            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.DISABLED).length === 0,
+            || selectedRoles.value.filter((item) => item.is_managed).length > 0
+            || selectedRoles.value.filter((item) => item.state === ROLE_STATE.DISABLED).length === 0,
     },
     {
         type: 'item',
         name: 'disabled',
         label: i18n.t('IAM.ROLE.DISABLE'),
         disabled: rolePageState.selectedIndices.length === 0
-            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
-            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.ENABLED).length === 0,
+            || selectedRoles.value.filter((item) => item.is_managed).length > 0
+            || selectedRoles.value.filter((item) => item.state === ROLE_STATE.ENABLED).length === 0,
     },
 ]));
 
@@ -147,7 +159,7 @@ const handleEditRole = (id: string) => {
 const handleSelectDropdown = (name) => {
     switch (name) {
     case 'edit':
-        handleEditRole(rolePageStore.selectedRoles[0].role_id);
+        handleEditRole(selectedRoles.value[0].role_id);
         break;
     case 'delete':
         modalState.modalVisible = true;
@@ -164,11 +176,17 @@ const handleSelectDropdown = (name) => {
     }
 };
 const handleSelect = (index: number[]) => {
-    rolePageStore.$patch({ selectedIndices: index });
+    const selectedIds = index.map((i) => roleList.value?.[i]?.role_id).filter((id): id is string => id !== undefined);
+    rolePageStore.setSelectedIndices(index);
+    rolePageStore.setSelectedRoleIds(selectedIds);
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
+    }
+    if (options.queryTags?.length === 0) {
+        rolePageStore.setSelectedRoleIds([]);
+        rolePageStore.setSelectedIndices([]);
     }
     if (options.sortBy !== undefined && options.sortDesc !== undefined) {
         queryState.sortKey = options.sortBy;
