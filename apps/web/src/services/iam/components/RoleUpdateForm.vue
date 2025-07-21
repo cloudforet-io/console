@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleCreateParameters } from '@/api-clients/identity/role/schema/api-verbs/create';
@@ -29,7 +30,10 @@ const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
     (e: 'update-form-data', after: RoleCreateParameters|RoleUpdateParameters): void,
 }>();
 
-const { roleData } = useRoleGetQuery(props.roleId ?? '');
+const router = useRouter();
+const roleId = computed<string>(() => router.currentRoute.params.id);
+
+const { roleData } = useRoleGetQuery(roleId);
 
 const state = reactive({
     isBaseInformationValid: false,
@@ -101,6 +105,7 @@ watch(() => state.formData, (after) => {
         <role-update-form-permission-form
             :is-policy-valid.sync="state.isPolicyValid"
             :is-page-access-valid.sync="state.isPageAccessValid"
+            :role-type="state.roleTypeData"
             :form-type="props.formType"
             @update-form="handleUpdateForm"
         />

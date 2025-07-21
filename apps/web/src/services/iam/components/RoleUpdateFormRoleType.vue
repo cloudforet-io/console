@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void}>();
 
 const router = useRouter();
-const roleId: string = router.currentRoute.params.id;
+const roleId = computed<string>(() => router.currentRoute.params.id);
 
 const { roleData } = useRoleGetQuery(roleId);
 

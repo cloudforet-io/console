@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -14,7 +14,7 @@ import { useRoleGetQuery } from '@/services/iam/composables/use-role-get-query';
 import type { RoleFormData } from '@/services/iam/types/role-type';
 
 const router = useRouter();
-const roleId: string = router.currentRoute.params.id;
+const roleId = computed<string>(() => router.currentRoute.params.id);
 
 const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
     (e: 'update-form', formData: RoleFormData): void,
