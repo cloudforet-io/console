@@ -2,6 +2,8 @@
 import { debouncedWatch } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput, PScopedNotification,
@@ -14,8 +16,9 @@ import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceGroupUserFindParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/find';
 import type { WorkspaceGroupUserSummaryModel } from '@/api-clients/identity/workspace-group-user/schema/model';
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupAddUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/add-users';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -80,31 +83,50 @@ const resetState = () => {
     userDropdownState.menuList = [];
 };
 
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const queryClient = useQueryClient();
+
+const { mutateAsync: addUsersMutation } = useMutation({
+    mutationFn: (params: WorkspaceGroupAddUsersParameters) => workspaceGroupAPI.addUsers(params),
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e);
+    },
+    onSettled: () => {
+        resetState();
+        workspaceGroupPageStore.closeModal();
+    },
+});
+
 const handleConfirm = async () => {
     try {
         state.loading = true;
-        await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
+        await addUsersMutation({
             workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
             users: userDropdownState.selectedItems.map((item) => ({
                 user_id: item, role_id: roleSelectedItems.value[0]?.name,
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
-        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
-        await workspaceGroupPageStore.listWorkspaceGroupUsers();
+        await workspaceGroupPageStore.reset();
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
         resetState();
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
         workspaceGroupPageStore.closeModal();
         state.loading = false;
     }
 };
 
-const handleCloseModal = () => {
+const handleCloseModal = async () => {
     resetState();
-    workspaceGroupPageStore.closeModal();
+    queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+    await workspaceGroupPageStore.reset();
 };
 
 const handleRemoveUser = (item: string) => {
