@@ -4,13 +4,14 @@ import {
     computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
@@ -28,6 +29,8 @@ import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
+
+
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 
@@ -42,6 +45,7 @@ const state = reactive({
 });
 const referenceMap = useAllReferenceDataModel();
 const { workspaceAPI } = useWorkspaceApi();
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
 const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
@@ -77,45 +81,40 @@ const {
     }),
 });
 
-const createWorkspaceGroup = async (): Promise<string | undefined> => {
-    state.loading = true;
+const { mutateAsync: createWorkspaceGroupMutation } = useMutation({
+    mutationFn: (params: WorkspaceGroupCreateParameters) => workspaceGroupAPI.create(params),
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+});
 
-    try {
-        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
-            name: groupName.value,
-        });
+const { mutateAsync: changeWorkspaceGroupMutation } = useMutation({
+    mutationFn: (params: WorkspaceChangeWorkspaceGroupParameters) => workspaceAPI.changeWorkspaceGroup(params),
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+});
 
-        if (!selectedItems.value.length) {
-            return workspace_group_id;
-        }
-
-
-        await Promise.allSettled(selectedItems.value.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
-            workspace_group_id,
-            workspace_id: item.name,
-        })));
-        await resetWorkspaceMenuList();
-
-        return workspace_group_id;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    } finally {
-        state.loading = false;
-    }
-};
 
 const handleConfirm = async () => {
-    const workspaceGroupId = await createWorkspaceGroup();
+    state.loading = true;
+    const { workspace_group_id } = await createWorkspaceGroupMutation({
+        name: groupName.value,
+    });
+    await Promise.allSettled(selectedItems.value.map((item) => changeWorkspaceGroupMutation({
+        workspace_group_id,
+        workspace_id: item.name,
+    })));
+    await resetWorkspaceMenuList();
+    state.loading = false;
     showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_CREATE_WORKSPACE'), '');
     workspaceGroupPageStore.closeModal();
     emit('confirm');
-
     workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: groupName.value }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        additionalData: { workspaceGroupId },
+        additionalData: { workspaceGroupId: workspace_group_id },
     });
 };
 
