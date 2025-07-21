@@ -238,7 +238,7 @@ const updateDataTable = async (): Promise<DataTableModel|undefined> => {
         && dataTableList.value.some((dataTable) => dataTable.data_table_id === _targetDataTables[0])
         && dataTableList.value.some((dataTable) => dataTable.data_table_id === _targetDataTables[1]);
     if (!isValidDataTableId && !isValidDataTables) {
-        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TABLE_INVALID_WARNING'), '');
         setFailStatus(true);
         return undefined;
     }

@@ -1863,7 +1863,7 @@
 					"TYPE_DATA_FIELD": "Data Field",
 					"TYPE_LABEL_FIELD": "Label Field",
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "Changes have been successfully applied.",
-					"UPDATE_DATA_TALBE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
+					"UPDATE_DATA_TABLE_INVALID_WARNING": "Unable to apply changes. Please check the form.",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' cannot be joined with '{second_data}' because the two data tables have one or more identical data fields.",
 					"VALUE": "Value",
 					"VALUE_MAPPING_DESC": "Transform field values based on conditions."

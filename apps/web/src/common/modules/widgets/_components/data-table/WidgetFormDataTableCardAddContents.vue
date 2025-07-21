@@ -267,7 +267,7 @@ const { getMetric } = useMetricQueryFetcher();
 const getAssetSpecificParams = async (): Promise<{ domainOptions: AssetOptions; groupBy: DataTableGroupByInfo[] }> => {
     const domainOptions = { metric_id: state.selectedSourceEndItem };
     if (!state.metricId) {
-        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TABLE_INVALID_WARNING'), '');
         throw new Error('Metric ID is required');
     }
     const metric = await getMetric(state.metricId);
@@ -343,7 +343,7 @@ const getDataTableUpdateParams = async (): Promise<DataTableUpdateParameters> =>
 /* Update DataTable */
 const updateDataTable = async (): Promise<DataTableModel|undefined> => {
     if (!state.dataFieldName.length) {
-        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TALBE_INVALID_WARNING'), '');
+        showErrorMessage(i18n.t('COMMON.WIDGETS.DATA_TABLE.FORM.UPDATE_DATA_TABLE_INVALID_WARNING'), '');
         setFailStatus(true);
         return undefined;
     }

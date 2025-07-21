@@ -1863,7 +1863,7 @@
 					"TYPE_DATA_FIELD": "데이터 필드",
 					"TYPE_LABEL_FIELD": "레이블 필드",
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "변경 사항 반영 완료",
-					"UPDATE_DATA_TALBE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
+					"UPDATE_DATA_TABLE_INVALID_WARNING": "변경 사항 반영 실패. 입력 폼을 다시 한번 확인해 주세요. ",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "선택한 '{first_data}', '{second_data}' 두 데이터는 한 개 이상의 동일한 데이터 필드가 있어 Join을 수행할 수 없습니다. ",
 					"VALUE": "값 ",
 					"VALUE_MAPPING_DESC": "조건에 따라 필드 값을 변환합니다."
