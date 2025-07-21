@@ -1863,7 +1863,7 @@
 					"TYPE_DATA_FIELD": "データフィールド",
 					"TYPE_LABEL_FIELD": "ラベルフィールド",
 					"UPDATE_DATA_TALBE_INVALID_SUCCESS": "変更が正常に適用されました。",
-					"UPDATE_DATA_TALBE_INVALID_WARNING": "変更を適用できません。フォームを確認してください。",
+					"UPDATE_DATA_TABLE_INVALID_WARNING": "変更を適用できません。フォームを確認してください。",
 					"UPDATE_DATA_TALBE_JOIN_FAIL_WARNING": "'{first_data}' と '{second_data}' を結合できません。両方のデータテーブルに同一のデータフィールドが1つ以上あります。",
 					"VALUE": "値",
 					"VALUE_MAPPING_DESC": "条件に基づいてフィールド値を変換します。"
