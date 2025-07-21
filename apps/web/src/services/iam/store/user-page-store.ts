@@ -38,7 +38,7 @@ export const useUserPageStore = defineStore('page-user', () => {
         selectedUser: {} as UserListItemType,
         roles: [] as RoleModel[],
         totalCount: 0,
-        selectedIndices: [],
+        selectedIndices: [] as number[],
         pageStart: 1,
         pageLimit: 15,
         searchFilters: [] as ConsoleFilter[],

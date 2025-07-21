@@ -24,7 +24,7 @@ export interface ExtendUserListItemType extends UserListItemType {
     mfa_state?: 'ON'|'OFF'
 }
 
-export type UserPageModalType = 'removeMixed' | 'removeOnlyWorkspaceGroup' | 'removeOnlyWorkspace' | 'add' | 'form' | 'status' | 'assignToUserGroup';
+export type UserPageModalType = 'removeMixed' | 'removeOnlyWorkspaceGroup' | 'removeOnlyWorkspace' | 'add' | 'form' | 'status' | 'assignToUserGroup' | 'setMfa' | 'deleteMfaSecretKey';
 
 export interface ModalSettingState {
     type: string;
@@ -36,7 +36,7 @@ export interface ModalSettingState {
 export interface ModalState {
     visible?: UserPageModalType;
     type: string;
-    title: string;
+    title: string | TranslateResult;
     themeColor: string;
 }
 

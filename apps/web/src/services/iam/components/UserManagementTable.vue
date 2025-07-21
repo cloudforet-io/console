@@ -134,8 +134,8 @@ const modalState = reactive({
 });
 
 /* Component */
-const handleSelect = async (index) => {
-    userPageState.selectedIndices = index;
+const handleSelect = async (indices: number[]) => {
+    userPageState.selectedIndices = indices;
 };
 const handleClickButton = async (value: RoleBindingModel|undefined) => {
     if (!value) return;

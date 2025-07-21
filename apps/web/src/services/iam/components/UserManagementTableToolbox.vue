@@ -38,11 +38,18 @@ const state = reactive({
             label: i18n.t('IAM.USER.MAIN.DISABLE'),
             disabled: !state.isSelected || userPageGetters.selectedUsers[0].state === USER_STATE.DISABLE,
         },
+        {
+            type: 'item',
+            name: USER_MODAL_TYPE.SET_MFA,
+            label: i18n.t('IAM.USER.MAIN.SET_MFA'),
+            disabled: !state.isSelected || !isMfaBulkControlEnabled.value,
+        },
     ])),
 });
+const isMfaBulkControlEnabled = computed(() => userPageGetters.selectedUsers.some((user) => user.auth_type === 'LOCAL'));
 
 /* Component */
-const handleSelectDropdown = (name:string) => {
+const handleSelectDropdown = (name: typeof USER_MODAL_TYPE[keyof typeof USER_MODAL_TYPE]) => {
     switch (name) {
     case USER_MODAL_TYPE.ENABLE: userPageStore.updateModalSettings({
         type: name,
@@ -67,6 +74,12 @@ const handleSelectDropdown = (name:string) => {
         title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
         themeColor: 'primary',
         modalVisibleType: 'form',
+    }); break;
+    case USER_MODAL_TYPE.SET_MFA: userPageStore.updateModalSettings({
+        type: name,
+        title: '',
+        themeColor: 'primary',
+        modalVisibleType: 'setMfa',
     }); break;
     default: break;
     }
