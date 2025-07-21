@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PScopedNotification, PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio, PButton,
+    PButtonModal, PScopedNotification, PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio, PButton, PCollapsibleToggle, PStatus,
 } from '@cloudforet/mirinae';
+import type { StatusTheme } from '@cloudforet/mirinae/types/data-display/status/type';
+
 
 import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
 import type { UserUpdateParameters } from '@/api-clients/identity/user/schema/api-verbs/update';
@@ -14,12 +17,13 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
+import { gray, green, red } from '@/styles/colors';
 
 import { useUserUpdateMutation } from '@/services/iam/composables/mutations/use-user-update-mutation';
 import { MULTI_FACTOR_AUTH_ITEMS, USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
+
 
 
 /* Store */
@@ -30,11 +34,37 @@ const userPageGetters = userPageStore.getters;
 /* State */
 const selectedMfaType = ref<MultiFactorAuthType>(MULTI_FACTOR_AUTH_ITEMS[0].type);
 const isRequiredMfa = ref(false);
+const isCollapsed = ref(false);
 
 /* Computed */
 // Only Local Auth Type Users can be updated
 const selectedMFAControllableUsers = computed<UserListItemType[]>(() => userPageGetters.selectedUsers.filter((user) => user.auth_type === 'LOCAL'));
 
+// Single User Selected Case
+const isSingleUserSelected = computed<boolean>(() => userPageGetters.selectedUsers.length === 1);
+const noActiveMfaType = computed<boolean>(() => {
+    if (!isSingleUserSelected.value) return false;
+    const selectedUserMFAType = userPageGetters.selectedUsers[0].mfa?.mfa_type;
+    const selectedUserMFAState = userPageGetters.selectedUsers[0].mfa?.state;
+    if (!selectedUserMFAType || !selectedUserMFAState) return true;
+    return false;
+});
+const currentSelectedMfaType = computed<string|TranslateResult|undefined>(() => {
+    if (!isSingleUserSelected.value) return '';
+    const selectedUserMFAType = userPageGetters.selectedUsers[0].mfa?.mfa_type;
+    const selectedUserMFAState = userPageGetters.selectedUsers[0].mfa?.state;
+    if (!selectedUserMFAType || !selectedUserMFAState) return i18n.t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_NO_ACTIVE_METHOD');
+    return MULTI_FACTOR_AUTH_ITEMS.find((item) => item.type === selectedUserMFAType)?.title;
+});
+const singleUserMfaTypeStatusTheme = computed<StatusTheme|undefined>(() => {
+    if (!isSingleUserSelected.value) return undefined;
+    if (noActiveMfaType.value) return gray[300];
+    const selectedUserMFAState = userPageGetters.selectedUsers[0].mfa?.state;
+    if (!selectedUserMFAState) return gray[300];
+    return selectedUserMFAState === 'ENABLED' ? green[600] : red[500];
+});
+
+// UI Conditions
 const isIncludedExternalAuthTypeUser = computed<boolean>(() => userPageGetters.selectedUsers.some((user) => user.auth_type !== 'LOCAL'));
 const isDisableButtonEnabled = computed<boolean>(() => userPageGetters.selectedUsers.some((user) => user.mfa?.state === 'ENABLED'));
 
@@ -139,7 +169,7 @@ const handleConfirm = async () => {
 </script>
 
 <template>
-    <p-button-modal class="mfa-setting-modal"
+    <p-button-modal class="user-mfa-setting-modal"
                     size="sm"
                     :visible="userPageState.modal.visible === 'setMfa'"
                     :header-title="$t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_MODAL_TITLE')"
@@ -179,7 +209,9 @@ const handleConfirm = async () => {
                                          @change-toggle="handleChangeRequiredMfa"
                         />
                     </p-field-group>
+
                     <p-divider horizontal />
+
                     <p-field-group :label="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELET_FIELD_TITLE')"
                                    class="mt-4"
                                    required
@@ -203,7 +235,21 @@ const handleConfirm = async () => {
                             </p-radio>
                         </p-radio-group>
                     </p-field-group>
+                    <div v-if="isSingleUserSelected"
+                         class="single-user-mfa-type-info inline-flex flex-col gap-1 mb-4"
+                    >
+                        <p-collapsible-toggle v-model="isCollapsed">
+                            {{ $t('IAM.USER.MAIN.MODAL.MFA.SINGLE_USER_MFA_TYPE_INFO_TEXT') }}
+                        </p-collapsible-toggle>
+                        <p-status v-if="!isCollapsed"
+                                  :text="currentSelectedMfaType"
+                                  :icon-color="singleUserMfaTypeStatusTheme"
+                                  :text-color="noActiveMfaType ? gray[400] : undefined"
+                        />
+                    </div>
+
                     <p-divider horizontal />
+
                     <p-button style-type="negative-secondary"
                               class="mt-4"
                               size="md"
@@ -221,3 +267,14 @@ const handleConfirm = async () => {
         </template>
     </p-button-modal>
 </template>
+
+
+<style scoped lang="postcss">
+/* custom design-system component - p-status */
+:deep(.p-status) {
+    justify-content: unset;
+    .text {
+        @apply text-label-md;
+    }
+}
+</style>

@@ -3286,6 +3286,7 @@
 						"DELETE_MFA_SECRET_KEY_MODAL_DESC": "Deletes the Multi-factor Authentication(MFA) secret key for the [{selectedUsers}] selected users.",
 						"DELETE_MFA_SECRET_KEY_MODAL_TITLE": "Delete Multi-factor Authentication Secret Key",
 						"DELETE_MFA_SECRET_KEY_SUCCESS_MESSAGE": "MFA secret key successfully deleted for the selected users.",
+						"MFA_TYPE_NO_ACTIVE_METHOD": "No active method",
 						"MFA_TYPE_SELET_FIELD_TITLE": "Multi-factor Authentication Method",
 						"MFA_TYPE_SELET_FIELD_TOOLTIP_TEXT": ".",
 						"REQUIRED_FIELD_TOOLTIP_TEXT": "Choose whether to require Multi-Factor Authentication (MFA) for the selected users.",
@@ -3294,7 +3295,8 @@
 						"SET_MFA_MODAL_TITLE": "Set Multi-factor Authentication Policy",
 						"SET_MFA_SUCCESS_MESSAGE": "MFA settings applied to the selected users.s",
 						"SET_MFA_WARNING_DESC": "This setting only affects selected Local Users, as it is not applicable to External Users.",
-						"SET_MFA_WARNING_TITLE": "External Users Excluded"
+						"SET_MFA_WARNING_TITLE": "External Users Excluded",
+						"SINGLE_USER_MFA_TYPE_INFO_TEXT": "MFA type currently in use by this account"
 					},
 					"NON_REMOVABLE": "Non-Removable",
 					"REMOVABLE": "Removable",
