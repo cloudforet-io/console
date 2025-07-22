@@ -31,16 +31,16 @@ export const useBookmarkListQuery = (): UseBookmarkListQueryReturn => {
     const { workspaceListData } = useWorkspaceListQuery();
     const bookmarkPageStore = useBookmarkPageStore();
 
-    const BookmarkListApiQueryHelper = new ApiQueryHelper().setSort('updated_at', true);
+    const bookmarkListApiQueryHelper = new ApiQueryHelper().setSort('updated_at', true);
     const { sharedConfigAPI } = useSharedConfigApi();
     const { key: sharedConfigQueryKey, params: sharedConfigParams } = useServiceQueryKey('config', 'shared-config', 'list', {
         params: computed(() => {
-            BookmarkListApiQueryHelper.setFilters([
+            bookmarkListApiQueryHelper.setFilters([
                 ...bookmarkPageStore.getters.bookmarkFilters,
                 { k: 'name', v: 'console:bookmark', o: '' },
             ]);
             return {
-                query: BookmarkListApiQueryHelper.data,
+                query: bookmarkListApiQueryHelper.data,
             };
         }),
     });
