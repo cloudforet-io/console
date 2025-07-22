@@ -34,7 +34,6 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -95,10 +94,10 @@ const tableState = reactive<TableState>({
 });
 
 const {
-    data: workspaceGroupUserListData, totalCount: workspaceGroupUserTotalCount, isLoading: workspaceGroupUserListLoading,
+    data: workspaceGroupUserListData, totalCount: workspaceGroupUserTotalCount, isLoading: workspaceGroupUserListLoading, refetch: workspaceGroupUserListRefetch,
 } = useWorkspaceGroupUserListQuery({
     params: computed(() => ({
-        workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
     })),
 });
 
@@ -169,7 +168,7 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.workspaceGroups[workspaceGroupPageState.selectedIndices[0]]?.name }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.selectedWorkspaceGroup?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
@@ -220,8 +219,11 @@ const handleSelectMenu = async (value:SelectDropdownMenuItem|string|number, user
     }
     try {
         const roleId = value.name;
-        const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroupId;
-
+        const workspaceGroupId = workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id;
+        if (!workspaceGroupId) {
+            ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+            return;
+        }
         await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
             workspace_group_id: workspaceGroupId,
             user_id: userId,
@@ -231,12 +233,12 @@ const handleSelectMenu = async (value:SelectDropdownMenuItem|string|number, user
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
-        await workspaceGroupPageStore.listWorkspaceGroupUsers();
+        await workspaceGroupUserListRefetch();
     }
 };
 
 const handleRefresh = async () => {
-    await workspaceGroupPageStore.listWorkspaceGroupUsers();
+    await workspaceGroupUserListRefetch();
 
     emit('refresh', { isGroupUser: true });
 };
@@ -256,8 +258,8 @@ const handleSelectedGroupUserRemoveButtonClick = (item:WorkspaceUser) => {
     };
 };
 
-watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
-    workspaceGroupPageStore.listWorkspaceGroupUsers();
+watch(() => workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id, () => {
+
 }, { immediate: true });
 
 onUnmounted(() => {

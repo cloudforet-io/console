@@ -33,7 +33,6 @@ import { USER_STATE } from '@/services/iam/constants/user-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void}>();
 
@@ -104,8 +103,12 @@ const { mutateAsync: addUsersMutation } = useMutation({
 const handleConfirm = async () => {
     try {
         state.loading = true;
+        if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+            ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+            return;
+        }
         await addUsersMutation({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
+            workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
             users: userDropdownState.selectedItems.map((item) => ({
                 user_id: item, role_id: roleSelectedItems.value[0]?.name,
             })),
@@ -136,9 +139,9 @@ const handleRemoveUser = (item: string) => {
 const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
     userDropdownState.loading = true;
     try {
-        if (!(workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId)) throw Error('Invalid Workspace Group Id.');
+        if (!(workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id)) throw Error('Invalid Workspace Group Id.');
         const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
+            workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
             keyword: userDropdownState.searchText,
             state: USER_STATE.ENABLE,
             page: {

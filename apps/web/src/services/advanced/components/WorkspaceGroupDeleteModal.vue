@@ -22,7 +22,6 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const { workspaceGroupAPI } = useWorkspaceGroupApi();
 
 const emit = defineEmits<{(e: 'confirm'): void,
@@ -35,7 +34,7 @@ const state = reactive<{
 }>({
     sequence: WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST,
     loading: false,
-    isDeleteAble: computed(() => (workspaceGroupPageGetters.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageGetters.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
+    isDeleteAble: computed(() => (workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageState.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
 });
 
 
@@ -66,9 +65,12 @@ const handleConfirm = async () => {
         state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.LAST;
         return;
     }
-
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
     await deleteWorkspaceGroupMutation({
-        workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
     });
     workspaceGroupPageStore.reset();
     resetSequence();
@@ -99,7 +101,7 @@ const handleCloseModal = () => {
             >
                 <p>
                     {{ $t('IAM.WORKSPACE_GROUP.MODAL.DELETE_MODAL_FIRST_MESSAGE', {
-                        WorkspaceGroupName: workspaceGroupPageGetters.selectedWorkspaceGroup.name,
+                        WorkspaceGroupName: workspaceGroupPageState.selectedWorkspaceGroup?.name,
                     }) }}
                 </p>
                 <div class="count-wrappers">
@@ -108,7 +110,7 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || 0 }}
+                            {{ workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count || 0 }}
                         </p>
                     </div>
                     <div class="count-wrapper">
@@ -116,11 +118,11 @@ const handleCloseModal = () => {
                             Group User
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length || 0 }}
+                            {{ workspaceGroupPageState.selectedWorkspaceGroup?.users?.length || 0 }}
                         </p>
                     </div>
                 </div>
-                <div v-if="workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length"
+                <div v-if="workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count || workspaceGroupPageState.selectedWorkspaceGroup?.users?.length"
                      class="warning-message-wrapper"
                 >
                     <div>
