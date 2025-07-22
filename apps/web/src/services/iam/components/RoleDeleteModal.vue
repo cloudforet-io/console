@@ -99,9 +99,7 @@ const { roleBindingListData: roleBindingList, roleBindingListIsLoading } = useRo
 
 
 const { mutateAsync: deleteRole } = useMutation({
-    mutationFn: async (roleIds: string[]) => {
-        await Promise.all(roleIds.map((roleId) => roleAPI.delete({ role_id: roleId })));
-    },
+    mutationFn: roleAPI.delete,
     onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.ALT_S_DELETE_ROLE'), '');
         queryClient.invalidateQueries({ queryKey: roleListKey });
@@ -119,7 +117,7 @@ const { mutateAsync: deleteRole } = useMutation({
 });
 
 const handleDelete = async () => {
-    await deleteRole(selectedRoleIds.value);
+    await Promise.allSettled(selectedRoleIds.value.map((roleId) => deleteRole({ role_id: roleId })));
 };
 </script>
 

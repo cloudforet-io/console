@@ -52,7 +52,7 @@ const state = reactive({
     permissions: computed<string[]>(() => roleData.value?.permissions ?? []),
     permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
     pageAccess: computed<string[] | readonly ['*']>(() => (roleData.value?.is_managed ? MANAGED_PAGE_ACCESS : roleData.value?.page_access ?? [])),
-    pageAccessDataList: [] as PageAccessMenuItem[],
+    pageAccessDataList: computed<PageAccessMenuItem[]>(() => getPageAccessMenuListByRoleType(roleData.value?.role_type ?? ROLE_TYPE.DOMAIN_ADMIN, state.menuList)),
     readOnly: computed<boolean | undefined>(() => roleData.value?.page_access?.every((item) => {
         const accessType = item.split('.*')[0].split(':')[1];
         return accessType === PAGE_ACCESS.READONLY;
@@ -124,8 +124,6 @@ const handleUpdateForm = (value: PageAccessMenuItem) => {
 };
 
 watch(roleData, async () => {
-    state.pageAccessDataList = getPageAccessMenuListByRoleType(roleData.value?.role_type ?? ROLE_TYPE.DOMAIN_ADMIN, state.menuList);
-
     const pageAccessPermissionMap = getPageAccessMapFromRawData({
         pageAccessPermissions: state.pageAccess, menuList: state.menuList,
     });
