@@ -11,9 +11,7 @@ import { sortBy } from 'lodash';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useSharedConfigApi } from '@/api-clients/config/shared-config/composables/use-shared-config-api';
-import type { SharedConfigModel } from '@/api-clients/config/shared-config/schema/model';
 import { useUserConfigApi } from '@/api-clients/config/user-config/composables/use-user-config-api';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
@@ -76,7 +74,6 @@ export const useBookmarkListQuery = (): UseBookmarkListQueryReturn => {
     } = useScopedQuery({
         queryKey: sharedConfigQueryKey,
         queryFn: () => sharedConfigAPI.list(sharedConfigParams.value),
-        select: (data) => dataFormatter(data.results || []),
         enabled: computed(() => !!currentWorkspaceId.value && bookmarkState.bookmarkType === BOOKMARK_TYPE.WORKSPACE),
         gcTime: 1000 * 60 * 2,
         staleTime: 1000 * 60 * 2,
@@ -87,13 +84,12 @@ export const useBookmarkListQuery = (): UseBookmarkListQueryReturn => {
     } = useScopedQuery({
         queryKey: userConfigQueryKey,
         queryFn: () => userConfigAPI.list(userConfigParams.value),
-        select: (data) => dataFormatter(data.results || []),
         enabled: computed(() => !!currentWorkspaceId.value && bookmarkState.bookmarkType === BOOKMARK_TYPE.USER),
         gcTime: 1000 * 60 * 2,
         staleTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 
-    const dataFormatter = (items: UserConfigModel[] | SharedConfigModel[]) => items.map((item) => {
+    const dataFormatter = (items) => (items?.results || []).map((item) => {
         let baseURL = item.data.imgIcon;
         if (item.data.link && !item.data.imgIcon) {
             baseURL = extractBaseURL(item.data.link);
@@ -106,27 +102,26 @@ export const useBookmarkListQuery = (): UseBookmarkListQueryReturn => {
         };
     });
 
-    const bookmarkList = computed(() => {
-        const _bookmarkList = bookmarkState.bookmarkType === BOOKMARK_TYPE.WORKSPACE ? sharedBookmarkListData.value : userBookmarkListData.value;
-        const list = sortBy(_bookmarkList, [(i) => !i.isGlobal]) ?? [];
-        let filteredList: BookmarkItem[] = [];
-        if (bookmarkState.filterByFolder) {
-            filteredList = list.filter((i) => {
-                const bookmarkFolder = bookmarkFolderListData.value?.find((folder) => folder.name === bookmarkState.filterByFolder);
-                return i.folder === bookmarkFolder?.id;
-            }) ?? [];
-        } else {
-            filteredList = list.filter((i) => !i.folder) ?? [];
-        }
-        return filteredList;
-    });
-
     const refreshBookmarkList = () => {
-        queryClient.invalidateQueries({ queryKey: sharedConfigQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: bookmarkState.bookmarkType === BOOKMARK_TYPE.WORKSPACE ? sharedConfigQueryKey.value : userConfigQueryKey.value });
     };
 
     return {
-        bookmarkList,
+        bookmarkList: computed(() => {
+            const _bookmarkList = bookmarkState.bookmarkType === BOOKMARK_TYPE.WORKSPACE ? sharedBookmarkListData.value : userBookmarkListData.value;
+            const formattedList = dataFormatter(_bookmarkList);
+            const list = sortBy(formattedList, [(i) => !i.isGlobal]) ?? [];
+            let filteredList: BookmarkItem[] = [];
+            if (bookmarkState.filterByFolder) {
+                filteredList = list.filter((i) => {
+                    const bookmarkFolder = bookmarkFolderListData.value?.find((folder) => folder.name === bookmarkState.filterByFolder);
+                    return i.folder === bookmarkFolder?.id;
+                }) ?? [];
+            } else {
+                filteredList = list.filter((i) => !i.folder) ?? [];
+            }
+            return filteredList;
+        }),
         isFetchingConfig: computed(() => isFetchingSharedConfig.value || isFetchingUserConfig.value),
         refreshBookmarkList,
     };

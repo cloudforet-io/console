@@ -96,9 +96,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     if (state.accessUserMenu) {
         await workspaceHomePageStore.fetchWorkspaceUserList();
     }
-    // bookmark
-    await workspaceHomePageStore.fetchBookmarkFolderList();
-    await workspaceHomePageStore.fetchBookmarkList();
     // configs
     await workspaceHomePageStore.fetchFavoriteList();
 }, { immediate: true });

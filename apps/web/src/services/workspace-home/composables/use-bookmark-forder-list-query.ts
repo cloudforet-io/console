@@ -7,9 +7,7 @@ import { sortBy } from 'lodash';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useSharedConfigApi } from '@/api-clients/config/shared-config/composables/use-shared-config-api';
-import type { SharedConfigModel } from '@/api-clients/config/shared-config/schema/model';
 import { useUserConfigApi } from '@/api-clients/config/user-config/composables/use-user-config-api';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
@@ -61,7 +59,6 @@ export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn =
     const { data: sharedBookmarkFolderListData } = useScopedQuery({
         queryKey: sharedConfigQueryKey,
         queryFn: () => sharedConfigAPI.list(sharedConfigParams.value),
-        select: (data) => dataFormatter(data.results ?? []),
         enabled: computed(() => !!currentWorkspaceId.value && bookmarkType.value === BOOKMARK_TYPE.WORKSPACE),
         staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
@@ -69,28 +66,26 @@ export const useBookmarkFolderListQuery = (): UseBookmarkFolderListQueryReturn =
     const { data: userBookmarkFolderListData } = useScopedQuery({
         queryKey: userConfigQueryKey,
         queryFn: () => userConfigAPI.list(userConfigParams.value),
-        select: (data) => dataFormatter(data.results ?? []),
         enabled: computed(() => !!currentWorkspaceId.value && bookmarkType.value === BOOKMARK_TYPE.USER),
         staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
     }, ['WORKSPACE']);
 
-    const dataFormatter = (items: UserConfigModel[] | SharedConfigModel[]) => items.map((i) => ({
+    const dataFormatter = (items) => (items?.results || []).map((i) => ({
         ...i.data,
         id: i.name,
     } as BookmarkItem));
 
-    const bookmarkFolderListData = computed(() => {
-        const _bookmarkFolderList = bookmarkType.value === BOOKMARK_TYPE.WORKSPACE ? sharedBookmarkFolderListData.value : userBookmarkFolderListData.value;
-        return sortBy(_bookmarkFolderList, [(i) => !i.isGlobal]) ?? [];
-    });
-
     const refreshBookmarkFolderList = () => {
-        queryClient.invalidateQueries({ queryKey: sharedConfigQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: bookmarkType.value === BOOKMARK_TYPE.WORKSPACE ? sharedConfigQueryKey.value : userConfigQueryKey.value });
     };
 
     return {
-        bookmarkFolderListData,
+        bookmarkFolderListData: computed(() => {
+            const _bookmarkFolderList = bookmarkType.value === BOOKMARK_TYPE.WORKSPACE ? sharedBookmarkFolderListData.value : userBookmarkFolderListData.value;
+            const formattedList = dataFormatter(_bookmarkFolderList);
+            return sortBy(formattedList, [(i) => !i.isGlobal]) ?? [];
+        }),
         refreshBookmarkFolderList,
     };
 };
