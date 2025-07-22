@@ -178,8 +178,6 @@ const checkModalConfirm = async () => {
     const items = state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
     state.loading = true;
 
-    console.log(userPageState.modal.type);
-
     try {
         if (userPageState.modal.type === USER_MODAL_TYPE.DELETE) {
             responses = await Promise.all(map(items, (item) => deleteUser(item?.user_id)));
@@ -224,8 +222,8 @@ const queryClient = useQueryClient();
 const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
 
 const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });
@@ -234,8 +232,8 @@ const { mutateAsync: _deleteUser } = useMutation({
     mutationFn: (userId: string) => userAPI.delete({
         user_id: userId,
     }),
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
@@ -247,8 +245,8 @@ const { mutateAsync: _enableUser } = useMutation({
     mutationFn: (userId: string) => userAPI.enable({
         user_id: userId,
     }),
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
@@ -260,8 +258,8 @@ const { mutateAsync: _disableUser } = useMutation({
     mutationFn: (userId: string) => userAPI.disable({
         user_id: userId,
     }),
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
