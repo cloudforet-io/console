@@ -50,13 +50,12 @@ export const generateMenuQueryHandler = (
 
             // Set Input Text Filters
             if (inputText) {
-                searchTargets.forEach((key) => {
-                    _apiQueryHelper.addFilter({
-                        k: key,
-                        v: inputText ?? '',
-                        o: '' as ConsoleFilterOperator,
-                    });
-                });
+                const searchFilters = searchTargets.map((key) => ({
+                    k: key,
+                    v: inputText ?? '',
+                    o: '' as ConsoleFilterOperator,
+                }));
+                _apiQueryHelper.setOrFilters(searchFilters);
             }
 
             // Set API Params

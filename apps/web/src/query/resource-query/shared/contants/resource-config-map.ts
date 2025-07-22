@@ -149,6 +149,11 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'metric_id',
         nameKey: 'name',
     },
+    metricData: {
+        name: 'Metric Data',
+        resourceKey: 'metricData',
+        idKey: 'metric_id',
+    },
     namespace: {
         name: 'Namespace',
         resourceKey: 'namespace',

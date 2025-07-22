@@ -9,22 +9,13 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
+import { RESOURCE_CONFIG_MAP } from '@/query/resource-query/shared/contants/resource-config-map';
 
 import getRandomId from '@/lib/random-id-generator';
-import { VariableModelFactory } from '@/lib/variable-models';
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import {
-    MANAGED_VARIABLE_MODEL_KEY_MAP,
-    MANAGED_VARIABLE_MODELS,
-} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import type {
-    VariableModelMenuHandlerInfo,
-} from '@/lib/variable-models/variable-model-menu-handler';
-import {
-    getVariableModelMenuHandler,
-} from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -42,6 +33,9 @@ const props = defineProps<{
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
+
 const state = reactive({
     loading: true,
     randomId: getRandomId(),
@@ -61,7 +55,7 @@ const state = reactive({
     primaryMetricStatOptions: computed<Record<string, any>>(() => ({
         metric_id: route.params.metricId,
     })),
-    handlerMap: computed(() => {
+    handlerMap: computed<Record<string, AutocompleteHandler>>(() => {
         const handlerMaps = {};
         state.refinedMetricLabelKeysWithProjectGroup.forEach((labelKey: MetricLabelKey) => {
             handlerMaps[labelKey.key] = getMenuHandler(labelKey, state.primaryMetricStatOptions);
@@ -79,47 +73,23 @@ const { data: currentMetricExample } = useMetricExampleGetQuery({
 });
 
 /* Util */
-const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: Record<string, any>): AutocompleteHandler => {
+const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: Record<string, any>): MenuAttachHandler => {
     try {
-        let variableModelInfo: VariableModelMenuHandlerInfo;
-        let _queryOptions: Record<string, any> = {};
-        if (labelKey.key === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
-            _queryOptions.is_dormant = false;
+        const queryOptions: Record<string, any> = {};
+        if (labelKey.key === RESOURCE_CONFIG_MAP.workspace.idKey) {
+            queryOptions.is_dormant = false;
         }
         if (isEmpty(labelKey.reference)) {
-            const MetricVariableModel = new VariableModelFactory(
-                { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
-            );
-            MetricVariableModel[labelKey.key] = MetricVariableModel.generateProperty({ key: labelKey.key });
-            variableModelInfo = {
-                variableModel: MetricVariableModel,
+            return resourceMenuHandlerMap.metricData({
                 dataKey: labelKey.key,
-            };
-            _queryOptions = { ..._queryOptions, ...listQueryOptions };
-        } else {
-            const _resourceType = labelKey.reference?.resource_type;
-            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === _resourceType));
-            if (targetModelConfig) {
-                variableModelInfo = {
-                    variableModel: new VariableModelFactory(
-                        { type: 'MANAGED', managedModelKey: targetModelConfig.meta.key as ManagedVariableModelKey },
-                    ),
-                };
-            }
+                fixedFilters: listQueryOptions,
+            });
         }
-        if (!variableModelInfo) return async () => ({ results: [] });
-        const handler = getVariableModelMenuHandler([variableModelInfo], _queryOptions);
-        return async (...args) => {
-            try {
-                state.loading = true;
-                return await handler(...args);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return { results: [] };
-            } finally {
-                state.loading = false;
-            }
-        };
+        const resourceKey = Object.values(RESOURCE_CONFIG_MAP).find((d) => d.idKey === labelKey.reference?.reference_key)?.resourceKey;
+        if (!resourceKey) return async () => ({ results: [] });
+        return resourceMenuHandlerMap[resourceKey]?.({
+            fixedFilters: queryOptions,
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
         return async () => ({ results: [] });
@@ -172,7 +142,6 @@ watch(() => props.visible, (visible) => {
             is-filterable
             :handler="state.handlerMap[groupBy.name]"
             :selected="state.selectedItemsMap[groupBy.name] ?? []"
-            :loading="state.loading"
             multi-selectable
             style-type="rounded"
             appearance-type="badge"

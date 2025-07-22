@@ -47,6 +47,10 @@ describe('generateMenuQueryHandler', () => {
             expect(callArg.query.filter).toEqual(
                 expect.arrayContaining([
                     { k: 'project_id', v: [null, ''], o: 'not_in' },
+                ]),
+            );
+            expect(callArg.query.filter_or).toEqual(
+                expect.arrayContaining([
                     { k: 'name', v: 'test-input', o: 'contain' },
                     { k: 'project_id', v: 'test-input', o: 'contain' },
                 ]),
