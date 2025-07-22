@@ -85,7 +85,6 @@ const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: Record<strin
                 fixedFilters: listQueryOptions,
             });
         }
-        console.log('queryOptions', queryOptions);
         const resourceKey = Object.values(RESOURCE_CONFIG_MAP).find((d) => d.idKey === labelKey.reference?.reference_key)?.resourceKey;
         if (!resourceKey) return async () => ({ results: [] });
         return resourceMenuHandlerMap[resourceKey]?.({
