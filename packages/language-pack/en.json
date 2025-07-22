@@ -3283,9 +3283,10 @@
 					"MFA": {
 						"DELETE_MFA_SECRET_KEY_BUTTON_TEXT": "Delete MFA Secret Key",
 						"DELETE_MFA_SECRET_KEY_FAILED_MESSAGE": "",
-						"DELETE_MFA_SECRET_KEY_MODAL_DESC": "Deletes the Multi-factor Authentication(MFA) secret key for the [{selectedUsers}] selected users.",
 						"DELETE_MFA_SECRET_KEY_MODAL_TITLE": "Delete Multi-factor Authentication Secret Key",
 						"DELETE_MFA_SECRET_KEY_SUCCESS_MESSAGE": "MFA secret key successfully deleted for the selected users.",
+						"DELETE_MULTI_MFA_SECRET_KEY_MODAL_DESC": "Deletes the Multi-factor Authentication(MFA) secret key for the [{selectedUsers}] selected users.",
+						"DELETE_SINGLE_MFA_SECRET_KEY_MODAL_DESC": "Deletes the Multi-factor Authentication(MFA) secret key for the selected user.",
 						"MFA_TYPE_NO_ACTIVE_METHOD": "No active method",
 						"MFA_TYPE_SELECT_FIELD_TITLE": "Multi-factor Authentication Method",
 						"MFA_TYPE_SELECT_FIELD_TOOLTIP_TEXT": ".",
