@@ -12,6 +12,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
 import { i18n } from '@/translations';
 
 import { PAGE_ACCESS } from '@/lib/access-control/config';
@@ -29,6 +30,7 @@ import type { PageAccessMenuItem, RoleFormData, TableItem } from '@/services/iam
 interface Props {
     menuItems?: PageAccessMenuItem[]
     isPageAccessValid?: boolean;
+    roleType?: RoleType;
 }
 
 const props = defineProps<Props>();
@@ -39,7 +41,7 @@ const emit = defineEmits<{(e: 'update', value: string[]): void,
 }>();
 
 const router = useRouter();
-const roleId: string = router.currentRoute.params.id;
+const roleId = computed<string>(() => router.currentRoute.params.id);
 
 const { roleData } = useRoleGetQuery(roleId);
 
@@ -156,33 +158,45 @@ const handleUpdateForm = (value: PageAccessMenuItem, isInit?: boolean) => {
 };
 
 const setPageAccessPermissionsData = () => {
-    if (!roleData.value?.page_access) return;
-    const pageAccessPermissionMap = getPageAccessMapFromRawData({
-        pageAccessPermissions: roleData.value?.page_access, menuList: state.menuList,
-    });
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
-        if (!itemId) return;
-        let accessType = '';
-        if (accessible.read && accessible.write) {
-            accessType = PAGE_ACCESS.WRITABLE;
-        } else if (accessible.read && !accessible.write) {
-            accessType = PAGE_ACCESS.READONLY;
-        } else {
-            accessType = PAGE_ACCESS.RESTRICTED;
+    if (roleData.value?.page_access) {
+        const pageAccessPermissionMap = getPageAccessMapFromRawData({
+            pageAccessPermissions: roleData.value?.page_access,
+            menuList: state.menuList,
+        });
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
+            if (!itemId) return;
+            let accessType = '';
+            if (accessible.read && accessible.write) {
+                accessType = PAGE_ACCESS.WRITABLE;
+            } else if (accessible.read && !accessible.write) {
+                accessType = PAGE_ACCESS.READONLY;
+            } else {
+                accessType = PAGE_ACCESS.RESTRICTED;
+            }
+            handleUpdateForm({
+                id: itemId,
+                isAccessible: accessible.access,
+                accessType,
+            }, true);
         }
-        handleUpdateForm({
-            id: itemId,
-            isAccessible: accessible.access,
-            accessType,
-        }, true);
+    } else {
+        // CREATE mode: initialize default access values from menuItems
+        menuItems.value.forEach((menuItem) => {
+            handleUpdateForm({
+                id: menuItem.id,
+                isAccessible: true,
+                accessType: PAGE_ACCESS.WRITABLE,
+            }, true);
+        });
     }
 };
 
 /* Watcher */
-watch(() => roleData, () => {
-    if (!roleData.value?.role_type) return;
-    menuItems.value = getPageAccessMenuListByRoleType(roleData.value.role_type, state.menuList);
+watch(() => [roleData.value?.role_type, props.roleType], () => {
+    const roleType = props.roleType ?? roleData.value?.role_type;
+    if (!roleType) return;
+    menuItems.value = getPageAccessMenuListByRoleType(roleType, state.menuList);
     setPageAccessPermissionsData();
 }, { deep: true, immediate: true });
 
@@ -203,7 +217,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
                    heading-type="sub"
                    :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
         />
-        <div v-if="roleData?.role_type === ROLE_TYPE.DOMAIN_ADMIN">
+        <div v-if="roleData?.role_type === ROLE_TYPE.DOMAIN_ADMIN || props.roleType === ROLE_TYPE.DOMAIN_ADMIN">
             <div class="page-access-info-wrapper">
                 <p-i name="ic_settings"
                      width="2rem"

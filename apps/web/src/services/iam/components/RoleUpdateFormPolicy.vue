@@ -36,7 +36,7 @@ const emit = defineEmits<{(e: 'update', value: string): void,
 }>();
 
 const router = useRouter();
-const roleId: string = router.currentRoute.params.id;
+const roleId = computed<string>(() => router.currentRoute.params.id);
 
 const { roleData } = useRoleGetQuery(roleId);
 

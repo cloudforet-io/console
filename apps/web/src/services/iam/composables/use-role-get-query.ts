@@ -10,19 +10,19 @@ interface UseRoleGetQueryReturn {
     roleData: Ref<RoleModel | undefined>;
 }
 
-export const useRoleGetQuery = (roleId: string): UseRoleGetQueryReturn => {
+export const useRoleGetQuery = (roleId: Ref<string>): UseRoleGetQueryReturn => {
     const { roleAPI } = useRoleApi();
 
     const { key: roleGetQueryKey, params: roleGetQueryParams } = useServiceQueryKey('identity', 'role', 'get', {
         contextKey: roleId,
         params: computed(() => ({
-            role_id: roleId,
+            role_id: roleId.value,
         })),
     });
 
     const { data: roleData } = useScopedQuery({
         queryKey: roleGetQueryKey,
-        queryFn: async () => roleAPI.get(roleGetQueryParams.value),
+        queryFn: () => roleAPI.get(roleGetQueryParams.value),
         gcTime: 1000 * 60 * 2,
         staleTime: 1000 * 30,
         enabled: true,

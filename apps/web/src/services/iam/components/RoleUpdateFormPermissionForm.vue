@@ -5,6 +5,9 @@ import {
 
 import { PPaneLayout } from '@cloudforet/mirinae';
 
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import type { RoleType } from '@/api-clients/identity/role/type';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import RoleUpdateFormAccess from '@/services/iam/components/RoleUpdateFormAccess.vue';
@@ -15,12 +18,14 @@ import type { RoleFormData } from '@/services/iam/types/role-type';
 interface Props {
     isPageAccessValid?: boolean;
     formType?: string;
+    roleType?: RoleType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isPageAccessValid: true,
     isPolicyValid: true,
     formType: FORM_TYPE.CREATE,
+    roleType: ROLE_TYPE.DOMAIN_ADMIN,
 });
 
 
@@ -63,6 +68,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions) => {
 <template>
     <p-pane-layout class="role-create-page-permission-form">
         <role-update-form-access :is-page-access-valid.sync="state.proxyPageAccessValid"
+                                 :role-type="props.roleType"
                                  @update-form="handleUpdatePageAccess"
         />
         <role-update-form-policy

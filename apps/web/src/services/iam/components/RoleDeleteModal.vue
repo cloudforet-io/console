@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PDataTable } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingListParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/list';
-import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
-import type { RoleDeleteParameters } from '@/api-clients/identity/role/schema/api-verbs/delete';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
@@ -23,11 +22,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingListQuery } from '@/services/iam/composables/use-role-binding-list-query';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import {
     ROLE_MODAL_TABLE_FIELDS,
     ROLE_UN_DELETABLE_TABLE_FIELDS,
 } from '@/services/iam/constants/role-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
+
+
 
 interface UnDeletableRole {
     roleName: string;
@@ -45,6 +48,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
+
+const selectedRoleIds = computed<string[]>(() => rolePageState.selectedRoleIds);
+const { roleListData: selectedRoles } = useRoleListQuery(
+    computed(() => ({
+        query: {
+            filter: [{ k: 'role_id', v: selectedRoleIds.value, o: 'in' }],
+        },
+    })),
+);
+
 
 const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
@@ -59,66 +73,61 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    unDeletableRoles: [] as UnDeletableRole[],
+    unDeletableRoles: computed<UnDeletableRole[]>(() => selectedRoles.value.map((role) => roleBindingList.value.map((roleBinding) => ({
+        roleName: role.name,
+        roleId: role.role_id,
+        roleType: role.role_type,
+        assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
+    }))).flat()),
     isDeletable: computed(() => state.unDeletableRoles.length === 0),
     headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
 });
 
-/* API */
-const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
-    state.loading = true;
-    try {
-        const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
-            role_id: role.role_id,
-        });
-        const results = response.results || [];
-        const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
-            roleName: role.name,
-            roleId: role.role_id,
-            roleType: role.role_type,
-            assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
-        })) ?? [];
-        state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.unDeletableRoles = [];
-    } finally {
-        state.loading = false;
-    }
-}));
-const handleDelete = async () => {
-    let isAllSucceed = true;
-    await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
-        try {
-            await SpaceConnector.clientV2.identity.role.delete<RoleDeleteParameters>({ role_id: role.role_id });
-        } catch (e: any) {
-            isAllSucceed = false;
-            ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
-        }
-    }));
-    if (isAllSucceed) {
+const { roleAPI } = useRoleApi();
+
+const queryClient = useQueryClient();
+const { key: roleListKey } = useServiceQueryKey('identity', 'role', 'list');
+const { key: roleBindingListKey } = useServiceQueryKey('identity', 'role-binding', 'list');
+
+const { roleBindingListData: roleBindingList, roleBindingListIsLoading } = useRoleBindingListQuery(
+    computed(() => ({
+        query: {
+            filter: [{ k: 'role_id', v: selectedRoleIds.value, o: 'in' }],
+        },
+    })),
+);
+
+
+const { mutateAsync: deleteRole } = useMutation({
+    mutationFn: roleAPI.delete,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.ROLE.ALT_S_DELETE_ROLE'), '');
+        queryClient.invalidateQueries({ queryKey: roleListKey });
+        queryClient.invalidateQueries({ queryKey: roleBindingListKey });
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, error.message);
+    },
+    onSettled: () => {
+        rolePageStore.setSelectedRoleIds([]);
+        rolePageStore.setSelectedIndices([]);
         state.proxyVisible = false;
         emit('refresh');
-    }
-};
+    },
+});
 
-/* Watcher */
-watch(() => state.proxyVisible, async (after) => {
-    if (after) {
-        state.unDeletableRoles = [];
-        await getRoleBindingList();
-    }
-}, { immediate: true });
+const handleDelete = async () => {
+    await Promise.allSettled(selectedRoleIds.value.map((roleId) => deleteRole({ role_id: roleId })));
+};
 </script>
 
 <template>
-    <delete-modal v-if="state.proxyVisible && !state.loading"
+    <delete-modal v-if="state.proxyVisible && !roleBindingListIsLoading"
                   :visible.sync="state.proxyVisible"
                   size="md"
                   :header-title="state.headerTitle"
                   :hide-footer="!state.isDeletable"
-                  :loading="state.loading"
+                  :loading="roleBindingListIsLoading"
                   :enable-scroll="true"
                   class="role-delete-modal"
                   @confirm="handleDelete"
@@ -131,9 +140,9 @@ watch(() => state.proxyVisible, async (after) => {
             </div>
             <p-data-table v-if="state.isDeletable"
                           class="role-data-table"
-                          :items="rolePageStore.selectedRoles"
+                          :items="selectedRoles"
                           :fields="ROLE_MODAL_TABLE_FIELDS"
-                          :loading="state.loading"
+                          :loading="roleBindingListIsLoading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
             >
                 <template #col-role_type-format="{ value }">
@@ -152,7 +161,7 @@ watch(() => state.proxyVisible, async (after) => {
             <p-data-table v-else
                           :items="state.unDeletableRoles"
                           :fields="ROLE_UN_DELETABLE_TABLE_FIELDS"
-                          :loading="state.loading"
+                          :loading="roleBindingListIsLoading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 19.5rem)' }"
             >
                 <template #col-roleType-format="{ value }">

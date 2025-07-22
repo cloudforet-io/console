@@ -15,12 +15,24 @@ import { useUserStore } from '@/store/user/user-store';
 
 import RoleManagementTabDetail from '@/services/iam/components/RoleManagementTabDetail.vue';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import { ROLE_TAB_TABLE_FIELDS } from '@/services/iam/constants/role-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
+
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 const userStore = useUserStore();
+
+const selectedRoleIds = computed<string[]>(() => rolePageState.selectedRoleIds);
+
+const { roleListData } = useRoleListQuery(
+    computed(() => ({
+        query: {
+            filter: [{ k: 'role_id', v: selectedRoleIds.value, o: 'in' }],
+        },
+    })),
+);
 
 const storeState = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
@@ -57,7 +69,7 @@ const multiItemTabState = reactive({
                 <p-data-table :fields="ROLE_TAB_TABLE_FIELDS"
                               :sortable="false"
                               :selectable="false"
-                              :items="rolePageStore.selectedRoles"
+                              :items="roleListData"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -71,7 +83,7 @@ const multiItemTabState = reactive({
                         </span>
                     </template>
                     <template #col-created_at-format="{value}">
-                        {{ iso8601Formatter(value, storeState.timezone) }}
+                        {{ iso8601Formatter(value, storeState.timezone ?? '') }}
                     </template>
                 </p-data-table>
             </template>
