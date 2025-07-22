@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive, watch, type ComputedRef,
 } from 'vue';
 
 import dayjs from 'dayjs';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PI, PLink, PStatus, PToolboxTable, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
@@ -23,6 +24,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
+import { useWorkspaceGroupWorkspaceListPaginationQuery } from '@/services/advanced/composables/querys/use-workspace-group-workspace-list-pagination-query';
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -32,7 +34,6 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const userStore = useUserStore();
 
@@ -42,12 +43,35 @@ interface WorkspaceTableItem extends WorkspaceModel {
     remove_button: WorkspaceModel;
 }
 
-const state = reactive({
-    currency: computed<Currency|undefined>(() => workspaceGroupPageGetters.currency),
+interface TableState {
+    timezone: ComputedRef<string|undefined>;
+    sortBy: string;
+    sortDesc: boolean;
+    pageStart: number;
+    pageLimit: number;
+    thisPage: number;
+    searchText: string;
+    selectedIndices: number[];
+    tableItems: ComputedRef<WorkspaceTableItem[]>;
+    fields: ComputedRef<DataTableFieldType[]>;
+}
+
+const state = reactive<{
+    currency: ComputedRef<Currency|undefined>;
+}>({
+    currency: computed(() => workspaceGroupPageGetters.currency),
 });
-const tableState = reactive({
+
+const tableState = reactive<TableState>({
     timezone: computed(() => userStore.state.timezone),
-    tableItems: computed<WorkspaceTableItem[]>(() => workspaceTabState.workspacesInSelectedGroup?.map((workspace) => ({
+    sortBy: 'name',
+    sortDesc: false,
+    pageStart: 1,
+    pageLimit: 15,
+    thisPage: 1,
+    searchText: '',
+    selectedIndices: [],
+    tableItems: computed<WorkspaceTableItem[]>(() => workspaceList.value?.map((workspace) => ({
         ...workspace,
         remove_button: workspace,
     }))),
@@ -65,6 +89,23 @@ const tableState = reactive({
         }
         return defaultFields;
     }),
+});
+
+const workspaceListApiQueryHelper = new ApiQueryHelper();
+
+const {
+    data: workspaceList, isLoading: isWorkspaceListLoading, totalCount: workspaceListTotalCount, refresh: refreshWorkspaceList,
+} = useWorkspaceGroupWorkspaceListPaginationQuery({
+    params: computed(() => ({
+        query: workspaceListApiQueryHelper.setFilters([
+            { k: 'workspace_group_id', v: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id ?? '', o: '=' },
+            { k: 'name', v: tableState.searchText, o: '' },
+        ])
+            .setSort(tableState.sortBy, tableState.sortDesc)
+            .setPage(tableState.pageStart, tableState.pageLimit).data,
+    })),
+    thisPage: computed(() => tableState.thisPage),
+    pageSize: computed(() => tableState.pageLimit),
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
@@ -104,7 +145,7 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: workspaceGroupPageGetters.selectedWorkspaceGroup.name }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_WORKSPACES_TITLE', { name: workspaceGroupPageState.selectedWorkspaceGroup?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES,
     }); break;
     default:
@@ -113,23 +154,22 @@ const setupModal = (type) => {
 };
 
 const handleSelect = (index:number[]) => {
-    workspaceTabState.selectedWorkspaceIndices = index;
+    tableState.selectedIndices = index;
 };
 
 const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
-        workspaceTabState.pageStart = options.pageStart;
+        tableState.pageStart = options.pageStart;
     }
 
     if (options.pageLimit) {
-        workspaceTabState.pageStart = 1;
-        workspaceTabState.pageLimit = options.pageLimit;
-        workspaceTabState.thisPage = 1;
+        tableState.pageStart = 1;
+        tableState.pageLimit = options.pageLimit;
+        tableState.thisPage = 1;
     }
     if (options.searchText) {
-        workspaceTabState.thisPage = 1;
+        tableState.thisPage = 1;
     }
-    await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
 };
 
 const handleAddWorkspaceButtonClick = () => {
@@ -148,19 +188,18 @@ const handleSelectedWorkspaceRemoveButtonClick = (item:WorkspaceTableItem) => {
 };
 
 const handleRefresh = () => {
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
+    refreshWorkspaceList();
 };
 
 const handleChangeSort = (name:string, isDesc:boolean) => {
-    workspaceTabState.sortBy = name;
-    workspaceTabState.selectedWorkspaceIndices = [];
-    workspaceTabState.sortDesc = isDesc;
-    workspaceTabState.thisPage = 1;
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
+    tableState.sortBy = name;
+    tableState.selectedIndices = [];
+    tableState.sortDesc = isDesc;
+    tableState.thisPage = 1;
 };
 
-watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
-    workspaceGroupPageStore.listWorkspacesInSelectedGroup();
+watch(() => workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id, () => {
+    refreshWorkspaceList();
 }, { immediate: true });
 
 onMounted(async () => {
@@ -183,7 +222,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                 <p-heading class="workspace-group-tab-workspace-header"
                            :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                            use-total-count
-                           :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
+                           :total-count="workspaceListTotalCount"
                            heading-type="sub"
                 />
             </template>
@@ -191,7 +230,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                       #extra
             >
                 <p-button style-type="negative-primary"
-                          :disabled="!workspaceTabState.selectedWorkspaceIndices.length"
+                          :disabled="!tableState.selectedIndices.length"
                           @click="handleSelectedWorkspacesRemoveButtonClick"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -205,17 +244,17 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
             </template>
         </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-workspace-table"
-                         :loading="workspaceTabState.loading"
+                         :loading="isWorkspaceListLoading"
                          :fields="tableState.fields"
                          :items="tableState.tableItems"
-                         :select-index.sync="workspaceTabState.selectedWorkspaceIndices"
-                         :total-count="workspaceTabState.workspacesInSelectedGroupTotalCount"
+                         :select-index.sync="tableState.selectedIndices"
+                         :total-count="workspaceListTotalCount"
                          sort-by="name"
                          search-type="plain"
                          :show-footer="true"
-                         :sort-desc="workspaceTabState.sortDesc"
-                         :this-page.sync="workspaceTabState.thisPage"
-                         :search-text.sync="workspaceTabState.searchText"
+                         :sort-desc="tableState.sortDesc"
+                         :this-page.sync="tableState.thisPage"
+                         :search-text.sync="tableState.searchText"
                          :selectable="hasReadWriteAccess"
                          sortable
                          searchable
