@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, type ComputedRef,
+} from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PI } from '@cloudforet/mirinae';
 
+
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupDeleteParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/delete';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -18,31 +23,39 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
 
 const emit = defineEmits<{(e: 'confirm'): void,
 }>();
 
-const state = reactive({
-    sequence: 'first',
+const state = reactive<{
+    sequence: typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE[keyof typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE];
+    loading: boolean;
+    isDeleteAble: ComputedRef<boolean>;
+}>({
+    sequence: WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST,
     loading: false,
     isDeleteAble: computed(() => (workspaceGroupPageGetters.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageGetters.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
 });
 
-const deleteWorkspaceGroups = async () => {
-    state.loading = true;
 
-    try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
-        });
+const { key: workspaceGroupListQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const queryClient = useQueryClient();
+const { mutateAsync: deleteWorkspaceGroupMutation } = useMutation({
+    mutationFn: (params: WorkspaceGroupDeleteParameters) => workspaceGroupAPI.delete(params),
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACE_GROUP'), '');
-    } catch (e) {
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListQueryKey.value });
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e);
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACE_GROUP'));
-    } finally {
+    },
+    onSettled: () => {
         state.loading = false;
-    }
-};
+    },
+});
+
 
 const resetSequence = () => {
     state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST;
@@ -54,8 +67,10 @@ const handleConfirm = async () => {
         return;
     }
 
-    await deleteWorkspaceGroups();
-    workspaceGroupPageStore.closeModal();
+    await deleteWorkspaceGroupMutation({
+        workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
+    });
+    workspaceGroupPageStore.reset();
     resetSequence();
     emit('confirm');
 };
