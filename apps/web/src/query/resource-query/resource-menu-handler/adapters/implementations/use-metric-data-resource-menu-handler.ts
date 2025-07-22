@@ -9,7 +9,6 @@ export const useMetricDataResourceMenuHandler = (): UseResourceMenuHandlerReturn
     const { getResourceMenuHandler } = useBaseResourceMenuHandler({
         resourceType: 'metricData',
         fetchConfig: {
-            list: metricDataAPI.list,
             stat: metricDataAPI.stat,
         },
     });
