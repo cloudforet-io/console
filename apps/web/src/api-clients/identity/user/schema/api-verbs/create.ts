@@ -1,4 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
+import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
 import type { AuthType } from '@/api-clients/identity/user/schema/type';
 
 
@@ -12,4 +13,6 @@ export interface UserCreateParameters {
     timezone?: string;
     tags?: Tags;
     reset_password?: boolean;
+    enforce_mfa?: boolean;
+    enforce_mfa_type?: MultiFactorAuthType; // only when enforce_mfa is true, this field is required
 }

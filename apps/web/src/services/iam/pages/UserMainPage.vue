@@ -12,6 +12,8 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import UserMFASecretKeyDeleteModal from '@/services/iam/components/mfa/UserMFASecretKeyDeleteModal.vue';
+import UserMFASettingModal from '@/services/iam/components/mfa/UserMFASettingModal.vue';
 import UserAssignToGroupModal from '@/services/iam/components/UserAssignToGroupModal.vue';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
@@ -102,6 +104,12 @@ onUnmounted(() => {
         />
         <user-assign-to-group-modal v-if="hasReadWriteAccess"
                                     @confirm="refreshUserList"
+        />
+        <user-m-f-a-setting-modal v-if="hasReadWriteAccess"
+                                  @confirm="refreshUserList"
+        />
+        <user-m-f-a-secret-key-delete-modal v-if="hasReadWriteAccess"
+                                            @confirm="refreshUserList"
         />
     </section>
 </template>
