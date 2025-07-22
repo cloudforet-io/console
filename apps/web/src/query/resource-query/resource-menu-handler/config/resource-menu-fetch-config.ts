@@ -85,4 +85,6 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
     namespace: {
         searchTargets: ['name', 'namespace_id'],
     },
+    cost: {},
+    unifiedCost: {},
 };
