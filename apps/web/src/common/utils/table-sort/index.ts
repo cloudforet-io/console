@@ -8,10 +8,22 @@ export const sortTableItems = <ItemType>(items: Array<ItemType>, sortBy: string,
     if (aValue === undefined) return 1;
     if (bValue === undefined) return -1;
 
-    if (isDesc) {
-        return bValue.localeCompare(aValue);
+    // 타입에 따른 비교 처리
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+        if (isDesc) {
+            return bValue - aValue;
+        }
+        return aValue - bValue;
     }
 
-    return aValue.localeCompare(bValue);
+    // string 타입이거나 다른 타입의 경우 문자열로 변환 후 비교
+    const aString = String(aValue);
+    const bString = String(bValue);
+
+    if (isDesc) {
+        return bString.localeCompare(aString);
+    }
+
+    return aString.localeCompare(bString);
 });
 
