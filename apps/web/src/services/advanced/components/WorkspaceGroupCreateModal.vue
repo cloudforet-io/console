@@ -13,7 +13,6 @@ import {
 import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
@@ -28,6 +27,8 @@ import { useSelectDropDownList } from '@/services/advanced/composables/use-selec
 import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/use-workspace-group-name-list-query';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+
+import { useWorkspaceGroupChangeWorkspaceGroupMutation } from '../composables/querys/use-workspace-group-change-workspace-group-mutation';
 
 
 
@@ -88,12 +89,7 @@ const { mutateAsync: createWorkspaceGroupMutation } = useMutation({
     },
 });
 
-const { mutateAsync: changeWorkspaceGroupMutation } = useMutation({
-    mutationFn: (params: WorkspaceChangeWorkspaceGroupParameters) => workspaceAPI.changeWorkspaceGroup(params),
-    onError: (e) => {
-        ErrorHandler.handleError(e, true);
-    },
-});
+const { changeWorkspaceGroupMutation } = useWorkspaceGroupChangeWorkspaceGroupMutation();
 
 
 const handleConfirm = async () => {
