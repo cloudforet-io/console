@@ -25,7 +25,9 @@ import UserManagementRemoveMixedTypeModal
 import UserManagementStatusModal from '@/services/iam/components/UserManagementStatusModal.vue';
 import UserManagementTab from '@/services/iam/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/iam/components/UserManagementTable.vue';
+import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
@@ -111,6 +113,7 @@ onUnmounted(() => {
         <user-m-f-a-secret-key-delete-modal v-if="hasReadWriteAccess"
                                             @confirm="refreshUserList"
         />
+        <portal-target :name="USER_MODAL_MAP.DISABLE_MFA" />
     </section>
 </template>
 
