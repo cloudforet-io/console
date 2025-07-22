@@ -4,7 +4,7 @@ import {
     computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
@@ -20,9 +19,9 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceGroupChangeWorkspaceGroupMutation } from '@/services/advanced/composables/querys/use-workspace-group-change-workspace-group-mutation';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -69,12 +68,8 @@ const {
 const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
 const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
 const queryClient = useQueryClient();
-const { mutateAsync: changeWorkspaceGroupMutation } = useMutation({
-    mutationFn: (params: WorkspaceChangeWorkspaceGroupParameters) => workspaceAPI.changeWorkspaceGroup(params),
-    onError: (e) => {
-        ErrorHandler.handleError(e);
-    },
-});
+
+const { changeWorkspaceGroupMutation } = useWorkspaceGroupChangeWorkspaceGroupMutation();
 
 const addWorkspace = async () => {
     state.loading = true;

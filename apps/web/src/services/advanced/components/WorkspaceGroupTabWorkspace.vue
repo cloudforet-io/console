@@ -155,6 +155,9 @@ const setupModal = (type) => {
 
 const handleSelect = (index:number[]) => {
     tableState.selectedIndices = index;
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.workspaceTabState.selectedWorkspaces = workspaceList.value?.filter((_, i) => index.includes(i)) ?? [];
+    });
 };
 
 const handleChange = async (options: any = {}) => {
