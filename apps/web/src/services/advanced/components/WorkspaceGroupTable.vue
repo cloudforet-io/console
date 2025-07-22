@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const workspaceGroupListApiQueryHelper = new ApiQueryHelper().setPageStart(1).setPageLimit(15).setSort('name', true);
 
-const tableState = reactive<{
+interface TableState {
     thisPage: number;
     pageStart: number;
     pageLimit: number;
@@ -54,7 +54,9 @@ const tableState = reactive<{
         created_at: string;
     }[]>;
     valueHandlerMap: ComputedRef<ValueHandlerMap>;
-}>({
+}
+
+const tableState = reactive<TableState>({
     thisPage: 1,
     pageStart: 1,
     pageLimit: 15,
@@ -113,12 +115,6 @@ watch(totalCount, (newTotalCount) => {
     });
 });
 
-watch(data, (newData) => {
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.workspaceGroups = newData;
-    });
-});
-
 
 // const handleUpdateSelectIndices = (indices: number[]) => {
 //     workspaceGroupPageStore.$patch((_state) => {
@@ -130,7 +126,10 @@ watch(data, (newData) => {
 //     });
 // };
 const handleUpdateSelectIndices = (indices: number[]) => {
-    workspaceGroupPageState.selectedIndices = indices;
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.state.selectedIndices = indices;
+        _state.state.selectedWorkspaceGroup = data.value?.[indices[0]];
+    });
 };
 
 

@@ -22,7 +22,6 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const { workspaceGroupAPI } = useWorkspaceGroupApi();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
@@ -37,7 +36,7 @@ const {
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
         if (state.loading) return true;
-        if (workspaceGroupPageGetters.selectedWorkspaceGroup.name === value) {
+        if (workspaceGroupPageState.selectedWorkspaceGroup?.name === value) {
             return true;
         }
         if (!value?.length) {
@@ -70,8 +69,12 @@ const { mutateAsync: updateWorkspaceGroupMutation } = useMutation({
 
 const handleConfirm = async () => {
     state.loading = true;
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
     await updateWorkspaceGroupMutation({
-        workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
         name: groupName.value,
     });
     emit('confirm');
@@ -90,7 +93,7 @@ const handleClose = () => {
 
 watch(() => workspaceGroupPageState.modal.visible, () => {
     if (workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.EDIT) {
-        setForm('groupName', workspaceGroupPageGetters.selectedWorkspaceGroup.name);
+        setForm('groupName', workspaceGroupPageState.selectedWorkspaceGroup?.name);
     }
 });
 </script>
