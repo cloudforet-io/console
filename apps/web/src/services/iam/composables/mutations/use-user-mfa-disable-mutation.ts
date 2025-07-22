@@ -9,12 +9,16 @@ interface UseUserMfaDisableMutationOptions {
     onSuccess?: (data: UserModel, variables: UserDisableMfaParameters) => Promise<void> | void;
     onError?: (error: Error, variables: UserDisableMfaParameters) => Promise<void> | void;
     onSettled?: (data: UserModel | undefined, error: Error | null, variables: UserDisableMfaParameters) => Promise<void> | void;
+    mutationOptions?: {
+        manualInvalidate?: boolean;
+    };
 }
 
 export const useUserMfaDisableMutation = ({
     onSuccess,
     onError,
     onSettled,
+    mutationOptions = { manualInvalidate: false },
 }: UseUserMfaDisableMutationOptions = {}) => {
     const { userAPI } = useUserApi();
 
@@ -34,10 +38,12 @@ export const useUserMfaDisableMutation = ({
             return userAPI.disableMfa(params);
         },
         onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({ queryKey: userGetSuffix(variables.user_id) });
-            await queryClient.invalidateQueries({ queryKey: userListKey.value });
-            await queryClient.invalidateQueries({ queryKey: workspaceUserGetSuffix(variables.user_id) });
-            await queryClient.invalidateQueries({ queryKey: workspaceUserListKey.value });
+            if (!mutationOptions?.manualInvalidate) {
+                await queryClient.invalidateQueries({ queryKey: userGetSuffix(variables.user_id) });
+                await queryClient.invalidateQueries({ queryKey: userListKey.value });
+                await queryClient.invalidateQueries({ queryKey: workspaceUserGetSuffix(variables.user_id) });
+                await queryClient.invalidateQueries({ queryKey: workspaceUserListKey.value });
+            }
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: async (error, variables) => {
