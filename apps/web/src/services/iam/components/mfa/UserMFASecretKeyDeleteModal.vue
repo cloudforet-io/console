@@ -11,8 +11,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 import { useUserMfaDisableMutation } from '@/services/iam/composables/mutations/use-user-mfa-disable-mutation';
+import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
+
 
 
 /* Store */
@@ -36,18 +38,18 @@ const { mutateAsync: disableMfa, isPending: isDisableMfaPending } = useUserMfaDi
 });
 
 /* Utils */
-const closeModal = () => {
+const closeAndOpenMfaSettingModal = () => {
     userPageStore.updateModalSettings({
-        type: '',
+        type: USER_MODAL_TYPE.SET_MFA,
         title: '',
         themeColor: 'primary',
-        modalVisibleType: undefined,
+        modalVisibleType: 'setMfa',
     });
 };
 
 /* Events */
 const handleClose = () => {
-    closeModal();
+    closeAndOpenMfaSettingModal();
 };
 
 const handleDeleteMfaSecretKey = async () => {
@@ -68,7 +70,7 @@ const handleDeleteMfaSecretKey = async () => {
         const results = await Promise.allSettled(userMFADisablePromises);
         if (results.every((result) => result.status === 'fulfilled')) {
             showSuccessMessage(_i18n.t('IAM.USER.MAIN.MODAL.MFA.DELETE_MFA_SECRET_KEY_SUCCESS_MESSAGE'), '');
-            closeModal();
+            closeAndOpenMfaSettingModal();
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk disable MFA failed
             if (import.meta.env.DEV) {
                 const joinedFailedUserIds = Array.from(failedUserIds.keys()).join(', ');
