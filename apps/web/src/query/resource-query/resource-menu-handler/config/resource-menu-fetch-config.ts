@@ -81,6 +81,7 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
     metric: {
         searchTargets: ['name', 'metric_id'],
     },
+    metricData: {},
     namespace: {
         searchTargets: ['name', 'namespace_id'],
     },
