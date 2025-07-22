@@ -3,21 +3,11 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
-
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type { RoleInfo } from '@/store/authorization/type';
-
-import { MENU_ID } from '@/lib/menu/config';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -56,29 +46,9 @@ const { data: collectorList } = useWorkspaceHomeCollectorListQuery();
 
 const state = reactive({
     loading: false,
-    isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isWorkspaceMember: computed<boolean>(() => storeState.getCurrentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    accessUserMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]) && state.isWorkspaceOwner),
-    accessAppMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.APP]) && state.isWorkspaceOwner),
     isNoServiceAccounts: computed(() => !serviceAccountList.value?.length),
     isNoCollectors: computed<boolean>(() => !collectorList.value?.length),
 });
-
-const { appAPI } = useAppApi();
-const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
-const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey('identity', 'app', 'list', {
-    params: computed(() => ({
-        workspace_id: storeState.currentWorkspaceId,
-        query: listCountQueryHelper.data,
-    })),
-});
-const { data: appListData } = useScopedQuery({
-    queryKey: appListQueryKey,
-    queryFn: () => appAPI.list(appListQueryParams.value),
-    gcTime: 1000 * 60 * 2,
-    staleTime: 1000 * 30,
-    enabled: computed(() => state.accessAppMenu),
-}, ['DOMAIN', 'WORKSPACE']);
 
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.resetState();
@@ -91,11 +61,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     } finally {
         state.loading = false;
     }
-
-    // workspace info
-    if (state.accessUserMenu) {
-        await workspaceHomePageStore.fetchWorkspaceUserList();
-    }
     // configs
     await workspaceHomePageStore.fetchFavoriteList();
 }, { immediate: true });
@@ -107,10 +72,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                          is-centered
     >
         <div class="page-contents">
-            <workspace-info :access-user-menu="state.accessUserMenu"
-                            :access-app-menu="state.accessAppMenu"
-                            :app-total-count="appListData?.total_count || 0"
-            />
+            <workspace-info />
             <welcome
                 v-if="!state.loading
                     && (state.isNoCollectors || state.isNoServiceAccounts || (dataSource && dataSource.length === 0))"
