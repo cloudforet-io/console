@@ -1,4 +1,5 @@
 import { reactive, computed } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { defineStore } from 'pinia';
 
@@ -6,6 +7,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { ModalThemeColor } from '@cloudforet/mirinae/types/feedbacks/modals/button-modal/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/list';
@@ -24,8 +26,29 @@ import type { Currency } from '@/store/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { WorkspaceGroupModalType } from '../types/admin-workspace-group-type';
+
+interface WorkspaceGroupPageState {
+    loading: boolean;
+    workspaceGroups: WorkspaceGroupModel[];
+    selectedIndices: number[];
+    totalCount: number;
+    searchFilters: ConsoleFilter[];
+
+    // Group User Tab,
+    roles: RoleModel[];
+
+    modal: {
+        type: WorkspaceGroupModalType | '';
+        title: string | TranslateResult;
+        themeColor?: ModalThemeColor;
+        visible: WorkspaceGroupModalType | '';
+    };
+    modalAdditionalData: { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser };
+}
+
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
-    const state = reactive({
+    const state = reactive<WorkspaceGroupPageState>({
         loading: false,
         workspaceGroups: [] as WorkspaceGroupModel[],
         selectedIndices: [] as number[],
@@ -42,7 +65,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             visible: '',
         },
         // Additional data added for data transfer between modals
-        modalAdditionalData: {} as { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser },
+        modalAdditionalData: {},
     });
 
     const userTabState = reactive({
@@ -103,6 +126,12 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     const actions = {
         updateModalSettings: ({
             type, title, themeColor = 'primary', visible, additionalData = {},
+        }: {
+            type: WorkspaceGroupModalType;
+            title: string | TranslateResult;
+            themeColor?: ModalThemeColor;
+            visible: WorkspaceGroupModalType | '';
+            additionalData: { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser };
         }) => {
             state.modal = {
                 type,
