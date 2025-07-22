@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { ProjectGroupAddUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/add-users';
 import type { ProjectGroupChangeParentGroupParameters } from '@/api-clients/identity/project-group/schema/api-verbs/change-parent-group';
 import type { ProjectGroupCreateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/create';
@@ -8,6 +9,7 @@ import type { ProjectGroupDeleteParameters } from '@/api-clients/identity/projec
 import type { ProjectGroupGetParameters } from '@/api-clients/identity/project-group/schema/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/api-clients/identity/project-group/schema/api-verbs/list';
 import type { ProjectGroupRemoveUsersParameters } from '@/api-clients/identity/project-group/schema/api-verbs/remove-users';
+import type { ProjectGroupStatParameters } from '@/api-clients/identity/project-group/schema/api-verbs/stat';
 import type { ProjectGroupUpdateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/update';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
 
@@ -22,6 +24,7 @@ export const useProjectGroupApi = () => {
         addUsers: SpaceConnector.clientV2.identity.projectGroup.addUsers<ProjectGroupAddUsersParameters, ProjectGroupModel>,
         removeUsers: SpaceConnector.clientV2.identity.projectGroup.removeUsers<ProjectGroupRemoveUsersParameters, ProjectGroupModel>,
         changeParentGroup: SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters, ProjectGroupModel>,
+        stat: SpaceConnector.clientV2.identity.projectGroup.stat<ProjectGroupStatParameters, StatResponse>,
     };
 
     return {
