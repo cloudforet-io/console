@@ -63,7 +63,7 @@ const handleDeleteMfaSecretKey = async (onClose: () => void) => {
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk disable MFA failed
             if (import.meta.env.DEV) {
                 const joinedFailedUserIds = Array.from(failedUserIds.keys()).join(', ');
-                throw new Error(`[UserMFASecretKeyDeleteModal.vue] Bulk disable MFA failed user IDs: [${joinedFailedUserIds}]`);
+                throw new Error(`[UserMFASettingDisableButton.vue] Bulk disable MFA failed user IDs: [${joinedFailedUserIds}]`);
             } else throw new Error('[User MFA Secret Key Delete] Something went wrong! Try again later. If the problem persists, please contact support.');
         }
     } catch (error: any) {
