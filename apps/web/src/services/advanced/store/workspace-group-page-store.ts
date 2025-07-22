@@ -84,9 +84,11 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     });
 
     const workspaceTabState = reactive<{
+        selectedIndices: number[];
         selectedWorkspaces: WorkspaceModel[];
         costReportConfig: CostReportConfigModel|null|undefined;
     }>({
+        selectedIndices: [],
         selectedWorkspaces: [],
         costReportConfig: null,
     });
@@ -145,6 +147,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         },
         resetSelectedWorkspace: () => {
             workspaceTabState.selectedWorkspaces = [];
+            workspaceTabState.selectedIndices = [];
         },
         listRoles: async () => {
             try {

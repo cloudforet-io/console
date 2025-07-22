@@ -34,6 +34,8 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
+
 const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 const userStore = useUserStore();
 
@@ -51,7 +53,6 @@ interface TableState {
     pageLimit: number;
     thisPage: number;
     searchText: string;
-    selectedIndices: number[];
     tableItems: ComputedRef<WorkspaceTableItem[]>;
     fields: ComputedRef<DataTableFieldType[]>;
 }
@@ -70,7 +71,6 @@ const tableState = reactive<TableState>({
     pageLimit: 15,
     thisPage: 1,
     searchText: '',
-    selectedIndices: [],
     tableItems: computed<WorkspaceTableItem[]>(() => workspaceList.value?.map((workspace) => ({
         ...workspace,
         remove_button: workspace,
@@ -154,9 +154,9 @@ const setupModal = (type) => {
 };
 
 const handleSelect = (index:number[]) => {
-    tableState.selectedIndices = index;
     workspaceGroupPageStore.$patch((_state) => {
         _state.workspaceTabState.selectedWorkspaces = workspaceList.value?.filter((_, i) => index.includes(i)) ?? [];
+        _state.workspaceTabState.selectedIndices = index;
     });
 };
 
@@ -196,7 +196,9 @@ const handleRefresh = () => {
 
 const handleChangeSort = (name:string, isDesc:boolean) => {
     tableState.sortBy = name;
-    tableState.selectedIndices = [];
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.workspaceTabState.selectedIndices = [];
+    });
     tableState.sortDesc = isDesc;
     tableState.thisPage = 1;
 };
@@ -233,7 +235,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                       #extra
             >
                 <p-button style-type="negative-primary"
-                          :disabled="!tableState.selectedIndices.length"
+                          :disabled="!workspaceTabState.selectedIndices.length"
                           @click="handleSelectedWorkspacesRemoveButtonClick"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -250,7 +252,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :loading="isWorkspaceListLoading"
                          :fields="tableState.fields"
                          :items="tableState.tableItems"
-                         :select-index.sync="tableState.selectedIndices"
+                         :select-index.sync="workspaceTabState.selectedIndices"
                          :total-count="workspaceListTotalCount"
                          sort-by="name"
                          search-type="plain"
