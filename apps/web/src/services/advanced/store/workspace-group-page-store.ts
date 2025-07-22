@@ -83,27 +83,18 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         loading: false,
     });
 
-    const workspaceTabState = reactive({
-        selectedWorkspaceIndices: [],
-        workspacesInSelectedGroup: [],
-        workspacesInSelectedGroupTotalCount: 0,
-        searchText: '',
-        thisPage: 1,
-        sortBy: 'name',
-        sortDesc: false,
-        pageStart: 1,
-        pageLimit: 15,
-        loading: false,
-        costReportConfig: null as CostReportConfigModel|null|undefined,
+    const workspaceTabState = reactive<{
+        selectedWorkspaces: WorkspaceModel[];
+        costReportConfig: CostReportConfigModel|null|undefined;
+    }>({
+        selectedWorkspaces: [],
+        costReportConfig: null,
     });
 
     // The getters method using reactive will not work when using the store.$dispose method with the error
     //  "Write operation failed: computed value is readonly" error message when using the store.$dispose method,
     // so we change to a method that doesn't use the reactive API.
     const getters = reactive({
-        groupUserPage: computed(() => userTabState.pageStart / userTabState.pageLimit),
-        selectedWorkspaceIds: computed<string[]>(() => workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index].workspace_id)),
-        selectedGroupUsersByIndices: computed<WorkspaceGroupUser[]>(() => userTabState.selectedUserIndices.map((index: number) => userTabState.userInSelectedGroup[index])),
         currency: computed<Currency|undefined>(() => workspaceTabState.costReportConfig?.currency),
     });
 
@@ -143,15 +134,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             userTabState.pageStart = 1;
             userTabState.pageLimit = 15;
         },
-        resetWorkspaceTab: () => {
-            workspaceTabState.searchText = '';
-            workspaceTabState.thisPage = 1;
-            workspaceTabState.sortBy = 'name';
-            workspaceTabState.sortDesc = true;
-            workspaceTabState.pageStart = 1;
-            workspaceTabState.pageLimit = 15;
-            workspaceTabState.selectedWorkspaceIndices = [];
-        },
         reset: () => {
             state.loading = false;
             state.selectedWorkspaceGroup = null;
@@ -159,11 +141,10 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.totalCount = 0;
 
             actions.resetGroupUser();
-            actions.resetWorkspaceTab();
             actions.closeModal();
         },
         resetSelectedWorkspace: () => {
-            workspaceTabState.selectedWorkspaceIndices = [];
+            workspaceTabState.selectedWorkspaces = [];
         },
         listRoles: async () => {
             try {
