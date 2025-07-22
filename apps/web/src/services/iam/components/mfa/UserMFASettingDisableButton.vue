@@ -102,7 +102,7 @@ const handleDeleteMfaSecretKey = async (onClose: () => void) => {
                               @close="onClose"
                 >
                     <template v-if="isSingleTargetUser">
-                        {{ $t('IAM.USER.MAIN.MODAL.MFA.DELETE_SINGLE_MFA_SECRET_KEY_MODAL') }}
+                        {{ $t('IAM.USER.MAIN.MODAL.MFA.DELETE_SINGLE_MFA_SECRET_KEY_MODAL_DESC') }}
                     </template>
                     <i18n v-else
                           path="IAM.USER.MAIN.MODAL.MFA.DELETE_MULTI_MFA_SECRET_KEY_MODAL_DESC"
