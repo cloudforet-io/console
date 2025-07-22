@@ -84,6 +84,7 @@ const resetState = () => {
 
 const { workspaceGroupAPI } = useWorkspaceGroupApi();
 const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const { key: workspaceGroupListUserQueryKey } = useServiceQueryKey('identity', 'workspace-group-user', 'list');
 const queryClient = useQueryClient();
 
 const { mutateAsync: addUsersMutation } = useMutation({
@@ -114,13 +115,19 @@ const handleConfirm = async () => {
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
-        await workspaceGroupPageStore.reset();
+        if (workspaceGroupPageState.modalAdditionalData?.openBy === WORKSPACE_GROUP_MODAL_TYPE.CREATE) {
+            workspaceGroupPageStore.reset();
+        }
+        if (workspaceGroupPageState.modalAdditionalData?.openBy === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS) {
+            resetState();
+        }
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
         resetState();
         queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListUserQueryKey.value });
         workspaceGroupPageStore.closeModal();
         state.loading = false;
     }

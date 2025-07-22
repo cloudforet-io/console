@@ -114,7 +114,7 @@ const handleConfirm = async () => {
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: groupName.value }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        additionalData: { workspaceGroupId: workspace_group_id },
+        additionalData: { workspaceGroupId: workspace_group_id, openBy: WORKSPACE_GROUP_MODAL_TYPE.CREATE },
     });
 };
 

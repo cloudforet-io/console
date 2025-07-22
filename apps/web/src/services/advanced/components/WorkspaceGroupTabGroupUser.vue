@@ -170,6 +170,7 @@ const setupModal = (type) => {
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.selectedWorkspaceGroup?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+        additionalData: { openBy: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS },
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER,

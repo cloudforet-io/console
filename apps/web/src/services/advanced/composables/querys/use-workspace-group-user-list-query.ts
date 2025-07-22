@@ -25,13 +25,13 @@ interface UseWorkspaceGroupUserListQueryOptions {
 export const useWorkspaceGroupUserListQuery = ({ params, enabled }: UseWorkspaceGroupUserListQueryOptions): UseWorkspaceGroupUserListQueryReturn => {
     const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
 
-    const { key: workspaceGroupListQueryKey, params: workspaceGroupListQueryParams } = useServiceQueryKey('identity', 'workspace-group-user', 'list', {
+    const { key: workspaceGroupListUserQueryKey, params: workspaceGroupListUserQueryParams } = useServiceQueryKey('identity', 'workspace-group-user', 'list', {
         params,
     });
 
     const { data: queryData, isLoading, refetch } = useScopedQuery({
-        queryKey: workspaceGroupListQueryKey,
-        queryFn: async () => workspaceGroupUserAPI.list(workspaceGroupListQueryParams.value),
+        queryKey: workspaceGroupListUserQueryKey,
+        queryFn: async () => workspaceGroupUserAPI.list(workspaceGroupListUserQueryParams.value),
         gcTime: 1000 * 60 * 5,
         staleTime: 1000 * 60 * 5,
         enabled: computed(() => {

@@ -21,7 +21,15 @@ import type { Currency } from '@/store/display/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { WorkspaceGroupModalType } from '../types/admin-workspace-group-type';
+import type { WorkspaceGroupModalType } from '@/services/advanced/types/admin-workspace-group-type';
+
+
+interface ModalAdditionalData {
+    workspaceGroupId?: string;
+    selectedWorkspace?: WorkspaceModel;
+    selectedGroupUser?: WorkspaceGroupUser;
+    openBy?: WorkspaceGroupModalType;
+}
 
 interface WorkspaceGroupPageState {
     loading: boolean;
@@ -39,7 +47,7 @@ interface WorkspaceGroupPageState {
         themeColor?: ModalThemeColor;
         visible: WorkspaceGroupModalType | '';
     };
-    modalAdditionalData: { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser };
+    modalAdditionalData: ModalAdditionalData;
 }
 
 export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', () => {
@@ -107,7 +115,7 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             title: string | TranslateResult;
             themeColor?: ModalThemeColor;
             visible: WorkspaceGroupModalType | '';
-            additionalData?: { workspaceGroupId?: string, selectedWorkspace?: WorkspaceModel, selectedGroupUser?: WorkspaceGroupUser };
+            additionalData?: ModalAdditionalData;
         }) => {
             state.modal = {
                 type,
