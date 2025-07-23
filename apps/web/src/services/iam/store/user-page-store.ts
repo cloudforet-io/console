@@ -54,7 +54,7 @@ export const useUserPageStore = defineStore('page-user', () => {
     });
     const getters = reactive({
         isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-        selectedUsers: computed(():UserListItemType[] => {
+        selectedUsers: computed<UserListItemType[]>(() => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
