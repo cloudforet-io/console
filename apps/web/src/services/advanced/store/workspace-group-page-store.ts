@@ -28,7 +28,8 @@ interface ModalAdditionalData {
     workspaceGroupId?: string;
     selectedWorkspace?: WorkspaceModel;
     selectedGroupUser?: WorkspaceGroupUser;
-    openBy?: WorkspaceGroupModalType;
+    isOpenByWorkspaceGroupCreateModal?: boolean;
+    isOpenByWorkspaceGroupUsersTab?: boolean;
 }
 
 interface WorkspaceGroupPageState {
@@ -70,17 +71,12 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
         modalAdditionalData: {},
     });
 
-    const userTabState = reactive({
+    const userTabState = reactive<{
+        selectedUserIndices: number[];
+        selectedUser: WorkspaceGroupUser[];
+    }>({
         selectedUserIndices: [],
-        userInSelectedGroup: [],
-        userInSelectedGroupTotalCount: 0,
-        searchText: '',
-        thisPage: 1,
-        sortBy: 'name',
-        sortDesc: false,
-        pageStart: 1,
-        pageLimit: 15,
-        loading: false,
+        selectedUser: [],
     });
 
     const workspaceTabState = reactive<{
@@ -128,13 +124,8 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.modalAdditionalData = {};
         },
         resetGroupUser: () => {
-            userTabState.thisPage = 1;
-            userTabState.searchText = '';
-            userTabState.sortBy = 'user_id';
-            userTabState.sortDesc = false;
             userTabState.selectedUserIndices = [];
-            userTabState.pageStart = 1;
-            userTabState.pageLimit = 15;
+            userTabState.selectedUser = [];
         },
         reset: () => {
             state.loading = false;
