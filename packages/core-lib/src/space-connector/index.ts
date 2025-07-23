@@ -146,6 +146,10 @@ export class SpaceConnector {
         SpaceConnector.instance.tokenApi.flushToken();
     }
 
+    static removeRefreshToken(): void {
+        SpaceConnector.instance.tokenApi.removeRefreshToken();
+    }
+
     static setServiceConfig(serviceConfig: Record<string, any>): void {
         if (SpaceConnector.instance) {
             SpaceConnector.instance.serviceApi.updateServiceConfig(serviceConfig);

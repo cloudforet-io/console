@@ -10,3 +10,9 @@ export const languages = {
     ko: '한국어',
     ja: '日本語',
 };
+
+
+export const REQUIRED_ACTIONS = {
+    ENFORCE_MFA: 'ENFORCE_MFA',
+    UPDATE_PASSWORD: 'UPDATE_PASSWORD',
+};
