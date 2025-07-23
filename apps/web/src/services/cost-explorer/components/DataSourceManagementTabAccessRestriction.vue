@@ -2,13 +2,11 @@
 import { reactive, computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import { PHeading, PToggleButton, PButtonModal } from '@cloudforet/mirinae';
 
-
-import type {
-    CostDataSourceUpdatePermissionsParameters,
-} from '@/api-clients/cost-analysis/data-source/schema/api-verbs/update-permissions';
+import { useDataSourceApi } from '@/api-clients/cost-analysis/data-source/composables/use-data-source-api';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -32,6 +30,8 @@ const props = defineProps<Props>();
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
+
+const { dataSourceAPI } = useDataSourceApi();
 
 const state = reactive({
     loading: false,
@@ -67,6 +67,17 @@ const state = reactive({
 /* Query */
 const { dataSourceData } = useDataSourceGetQuery(computed(() => dataSourcesPageState.selectedDataSourceId));
 
+/* Mutation */
+const { mutateAsync: updatePermissions } = useMutation({
+    mutationFn: dataSourceAPI.updatePermissions,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
+
 const convertDataKey = (keys: string[]) => {
     const result = {};
     keys.forEach((key) => {
@@ -80,21 +91,12 @@ const handleChangeToggle = async (item: string, value: boolean) => {
     if (value) {
         state.modalVisible = true;
     } else {
-        try {
-            const permissions = [
-                ...dataSourceData.value?.permissions?.deny || [],
-                `data.${state.selectedDataType}`,
-            ];
-            await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
-                data_source_id: dataSourcesPageState.selectedDataSourceId || '',
-                permissions: {
-                    deny: permissions,
-                },
-            });
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+        updatePermissions({
+            data_source_id: dataSourcesPageState.selectedDataSourceId || '',
+            permissions: {
+                deny: [...dataSourceData.value?.permissions?.deny || [], `data.${state.selectedDataType}`],
+            },
+        });
     }
 };
 
@@ -111,14 +113,13 @@ const handleConfirm = async () => {
             const key = denyItem.replace('data.', '');
             return !costDataKeys.includes(key);
         });
-        await SpaceConnector.clientV2.costAnalysis.dataSource.updatePermissions<CostDataSourceUpdatePermissionsParameters>({
+        await updatePermissions({
             data_source_id: dataSourcesPageState.selectedDataSourceId || '',
             permissions: {
                 deny: updatedDenyList,
             },
         });
         state.modalVisible = false;
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_CHANGE_TOGGLE'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

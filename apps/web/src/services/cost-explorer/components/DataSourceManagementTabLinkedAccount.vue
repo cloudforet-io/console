@@ -7,28 +7,25 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PButton, PHeading, PHeadingLayout, PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus, PStatus,
 } from '@cloudforet/mirinae';
 import type {
-    AutocompleteHandler, SelectDropdownMenuItem,
+    SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useDataSourceAccountApi } from '@/api-clients/cost-analysis/data-source-account/composables/use-data-source-account-api';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -55,6 +52,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
+
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -106,41 +105,12 @@ const tableState = reactive({
     selectedIndices: [] as number[],
 });
 
-const workspaceListApiQueryHelper = new ApiQueryHelper();
-const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
-    dropdownState.loading = true;
-
-    workspaceListApiQueryHelper.setFilters([
-        { k: 'name', v: inputText, o: '' },
-        { k: 'state', v: 'ENABLED', o: '=' },
-        { k: 'is_dormant', v: false, o: '' },
-    ]);
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-            query: workspaceListApiQueryHelper.data,
-        });
-        const refinedMenuItems = (results ?? []).map((i) => ({
-            label: i.name,
-            name: i.workspace_id,
-            is_dormant: i.is_dormant,
-        }));
-        const totalCount = pageStart - 1 + Number(pageLimit);
-        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
-
-        return {
-            results: slicedResults,
-            more: totalCount < refinedMenuItems.length,
-        };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return {
-            results: [],
-            more: false,
-        };
-    } finally {
-        dropdownState.loading = false;
-    }
-};
+const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
+    fixedFilters: {
+        state: 'ENABLED',
+        is_dormant: false,
+    },
+});
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
@@ -296,7 +266,6 @@ watch(() => tableState.selectedIndices, (indices) => {
                                    style-type="transparent"
                                    :page-size="10"
                                    :visible-menu="dropdownState.visible"
-                                   :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
                                    :disabled="!props.hasReadWriteAccess"
                                    show-select-marker
