@@ -1,9 +1,7 @@
 import camelCase from 'lodash/camelCase';
-import kebabCase from 'lodash/kebabCase';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { DEFAULT_VERSION } from '@/lib/config/global-config/constants/constants';
 import { ApiClientEndpoint } from '@/lib/config/global-config/schema/api-client-schema';
 import type { ApiClientsSchemaType, GlobalServiceConfig } from '@/lib/config/global-config/types/type';
 
@@ -40,27 +38,6 @@ class APIClientManager {
         if (!this.config || !this.apiClientsSchema) {
             throw new APIClientManagerError('Configuration or schema is not initialized');
         }
-
-        const serviceConfig: Record<string, { enabled: boolean }> = {};
-
-        Object.entries(this.config).forEach(([serviceName, config]) => {
-            if (this.apiClientsSchema?.[serviceName]) {
-                const version = config.VERSION || DEFAULT_VERSION;
-                const endpoint = this.apiClientsSchema[serviceName][version];
-                if (endpoint) {
-                    const formattedEndpoint = APIClientManager.formatEndpoint(endpoint);
-                    serviceConfig[formattedEndpoint] = {
-                        enabled: config.ENABLED,
-                    };
-                }
-            }
-        });
-
-        SpaceConnector.setServiceConfig(serviceConfig);
-    }
-
-    private static formatEndpoint(endpoint: string): string {
-        return kebabCase(endpoint);
     }
 
     private defineDynamicServices(): void {
