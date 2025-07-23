@@ -1,72 +1,29 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { useQRCode } from '@vueuse/integrations/useQRCode';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 import {
     PTextInput, PIconButton, PSpinner, screens, PTextarea,
 } from '@cloudforet/mirinae';
 
-import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
-
-import { postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
-
-const multiFactorAuthStore = useMultiFactorAuthStore();
-const multiFactorAuthState = multiFactorAuthStore.state;
+import { useUserMfaQrInfo } from '@/common/components/mfa/composables/use-user-mfa-qr-info';
 
 const { width } = useWindowSize();
+const isMobileSize = computed<boolean>(() => width.value < screens.mobile.max);
 
-const storeState = reactive({
-    modalInitLoading: computed<boolean>(() => multiFactorAuthState.modalInitLoading),
-});
+/* QR Code Data */
+const {
+    qrCode,
+    passKey,
+    isLoading,
+    refetchQrInfo,
+} = useUserMfaQrInfo();
 
-const state = reactive({
-    passkey: '',
-    qrUri: '',
-    qrcode: '',
-    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-});
-
-const initState = () => {
-    state.passkey = '';
-    state.qrUri = '';
-    state.qrcode = '';
-};
+/* Event */
 const handleClickRefreshButton = () => {
-    initState();
-    initQrCodeInfo();
+    refetchQrInfo();
 };
 
-const initQrCodeInfo = async () => {
-    multiFactorAuthStore.setModalInitLoading(true);
-    try {
-        const userInfo = await postEnableMfa({
-            mfa_type: MULTI_FACTOR_AUTH_TYPE.OTP,
-            options: {},
-        });
-        if (!userInfo) return;
-        state.qrUri = userInfo?.mfa?.options.otp_qrcode_uri;
-        state.passkey = state.qrUri.match(/secret=([^&]*)/)?.[1] || '';
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        multiFactorAuthStore.setModalInitLoading(false);
-    }
-};
-
-watch(() => state.qrUri, (qrUri) => {
-    state.qrcode = useQRCode(qrUri, {
-        margin: 0,
-    });
-});
-
-(() => {
-    initQrCodeInfo();
-})();
 </script>
 
 <template>
@@ -89,24 +46,24 @@ watch(() => state.qrUri, (qrUri) => {
             <li>{{ $t('MY_PAGE.MFA.STEP1') }}</li>
             <li>{{ $t('MY_PAGE.MFA.STEP2') }}</li>
         </ol>
-        <p-spinner v-if="storeState.modalInitLoading"
+        <p-spinner v-if="isLoading"
                    size="md"
                    class="loading qrcode"
         />
         <img v-else
-             :src="state.qrcode"
+             :src="qrCode"
              alt="QR Code"
              class="qrcode"
         >
         <div class="passkey-wrapper">
-            <p-text-input v-if="!state.isMobileSize"
-                          :value="state.passkey"
+            <p-text-input v-if="!isMobileSize"
+                          :value="passKey"
                           class="passkey"
                           disabled
                           block
             />
             <p-textarea v-else
-                        :value="state.passkey"
+                        :value="passKey"
                         class="passkey"
                         disabled
                         block
