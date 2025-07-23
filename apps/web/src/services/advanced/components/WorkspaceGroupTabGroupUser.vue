@@ -10,6 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -34,6 +35,7 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
+const userTabState = workspaceGroupPageStore.userTabState;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
@@ -61,7 +63,6 @@ interface TableState {
     searchText: string;
     sortBy: string;
     sortDesc: boolean;
-    selectedUserIndices: number[];
 }
 
 const tableState = reactive<TableState>({
@@ -90,7 +91,6 @@ const tableState = reactive<TableState>({
     searchText: '',
     sortBy: 'user_id',
     sortDesc: false,
-    selectedUserIndices: [],
 });
 
 const {
@@ -170,7 +170,7 @@ const setupModal = (type) => {
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
         title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.selectedWorkspaceGroup?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        additionalData: { openBy: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS },
+        additionalData: { isOpenByWorkspaceGroupUsersTab: true },
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER,
@@ -184,10 +184,13 @@ const setupModal = (type) => {
 };
 
 const handleSelect = (index:number[]) => {
-    tableState.selectedUserIndices = index;
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.userTabState.selectedUser = workspaceGroupUserListData.value.filter((_, i) => index.includes(i));
+        _state.userTabState.selectedUserIndices = index;
+    });
 };
 
-const handleChange = async (options: any = {}) => {
+const handleChange = async (options:ToolboxTableOptions = {}) => {
     if (options.pageStart) {
         tableState.pageStart = options.pageStart;
     }
@@ -209,7 +212,9 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
         tableState.sortBy = name;
     }
 
-    tableState.selectedUserIndices = [];
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.userTabState.selectedUserIndices = [];
+    });
     tableState.sortDesc = isDesc;
 };
 
@@ -283,7 +288,7 @@ onUnmounted(() => {
                       #extra
             >
                 <p-button style-type="negative-primary"
-                          :disabled="!tableState.selectedUserIndices.length"
+                          :disabled="!userTabState.selectedUserIndices.length"
                           @click="handleSelectedGroupUsersRemoveButtonClick"
                 >
                     {{ $t('IAM.WORKSPACE_GROUP.TAB.REMOVE') }}
@@ -300,7 +305,7 @@ onUnmounted(() => {
                          :loading="roleListLoading || workspaceGroupUserListLoading"
                          :fields="tableState.fields"
                          :items="filteredWorkspaceGroupUserListData"
-                         :select-index="tableState.selectedUserIndices"
+                         :select-index="userTabState.selectedUserIndices"
                          :total-count="workspaceGroupUserTotalCount"
                          sort-by="user_id"
                          search-type="plain"

@@ -36,11 +36,17 @@ const { hasReadWriteAccess } = usePageEditableStatus();
         </p-horizontal-layout>
         <workspace-group-tab v-if="workspaceGroupPageState.selectedIndices.length" />
         <workspace-group-create-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE" />
-        <workspace-group-edit-modal />
-        <workspace-group-delete-modal />
-        <workspace-group-workspace-delete-modal />
-        <workspace-group-user-delete-modal />
-        <workspace-group-add-workspaces-modal />
-        <workspace-group-add-users-modal />
+        <workspace-group-edit-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.EDIT" />
+        <workspace-group-delete-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.DELETE" />
+        <workspace-group-workspace-delete-modal
+            v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES ||
+                workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE"
+        />
+        <workspace-group-user-delete-modal
+            v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_GROUP_USER ||
+                workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER"
+        />
+        <workspace-group-add-workspaces-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_WORKSPACES" />
+        <workspace-group-add-users-modal v-if="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS" />
     </section>
 </template>
