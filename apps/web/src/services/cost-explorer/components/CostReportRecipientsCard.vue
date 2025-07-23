@@ -3,14 +3,11 @@ import { computed, reactive } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PTooltip, PI, PToggleButton, PLink,
 } from '@cloudforet/mirinae';
 
-import type {
-    CostReportConfigUpdateRecipientsParameters,
-} from '@/api-clients/cost-analysis/cost-report-config/schema/api-verbs/update-recipients';
+import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
 import type { CostReportConfigModel } from '@/api-clients/cost-analysis/cost-report-config/schema/model';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { i18n } from '@/translations';
@@ -35,6 +32,7 @@ const props = defineProps<Props>();
 
 const appContextStore = useAppContextStore();
 const queryClient = useQueryClient();
+const { costReportConfigAPI } = useCostReportConfigApi();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -44,7 +42,7 @@ const enableWorkspaceOwnerRecipients = computed<boolean>(() => costReportConfig.
 /* Api */
 const { costReportConfig, key: costReportConfigQueryKey } = useCostReportConfigQuery();
 const { mutate: updateRecipients } = useMutation<CostReportConfigModel, Error, boolean>({
-    mutationFn: async (val: boolean) => SpaceConnector.clientV2.costAnalysis.costReportConfig.updateRecipients<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
+    mutationFn: async (val: boolean) => costReportConfigAPI.updateRecipients({
         cost_report_config_id: costReportConfig.value?.cost_report_config_id ?? '',
         recipients: {
             role_types: val ? ['WORKSPACE_OWNER'] : [],

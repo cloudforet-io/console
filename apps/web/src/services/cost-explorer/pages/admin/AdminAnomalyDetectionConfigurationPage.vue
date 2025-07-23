@@ -5,15 +5,15 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useMutation } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PToggleButton, PFieldTitle, PTextInput, PSelectDropdown, PI, PButton, PIconButton, PCheckbox, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { DomainConfigGetParameters } from '@/api-clients/config/domain-config/schema/api-verbs/get';
+import { useDomainConfigApi } from '@/api-clients/config/domain-config/composables/use-domain-config-api';
 import type { DomainConfigSetParameters } from '@/api-clients/config/domain-config/schema/api-verbs/set';
 import { DOMAIN_CONFIG_NAMES } from '@/api-clients/config/domain-config/schema/constant';
 import type { DomainConfigModel } from '@/api-clients/config/domain-config/schema/model';
@@ -27,6 +27,7 @@ import { usePublicConfigStore } from '@/store/config/public-config-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import { useDomainConfigGetQuery } from '@/services/cost-explorer/composables/use-domain-config-get-query';
 import { NOTIFY_LEVEL_MAP } from '@/services/cost-explorer/constants/anomaly-detection-constant';
 import type {
     NotificationRule,
@@ -34,6 +35,7 @@ import type {
     NotificationVariation,
     NotifyLevel,
 } from '@/services/cost-explorer/types/anomaly-detection-type';
+
 
 interface State {
     statusToggle: boolean;
@@ -50,6 +52,8 @@ const ALL_VALUE: NotificationVariation[] = ['gte', 'lte'];
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 const publicConfigStore = usePublicConfigStore();
+
+const { domainConfigAPI } = useDomainConfigApi();
 
 const router = useRouter();
 
@@ -76,6 +80,17 @@ const state = reactive<State>({
         const extraMenu = publicConfigStore.getters[PUBLIC_CONFIG_NAMES.EXTRA_MENU].data;
         return extraMenu?.anomaly_detection?.enabled ?? false;
     }),
+});
+
+/* Query */
+const { domainConfigData, isLoading: isDomainConfigLoading } = useDomainConfigGetQuery(DOMAIN_CONFIG_NAMES.ANOMALY_DETECTION_CONFIGURATION);
+
+/* Mutation */
+const { mutate: setDomainConfig } = useMutation<DomainConfigModel, Error, DomainConfigSetParameters<AnomalyDetectionConfig>>({
+    mutationFn: domainConfigAPI.set,
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
 });
 
 
@@ -118,17 +133,6 @@ interface AnomalyDetectionConfig {
     };
 }
 
-const fetchConfig = async ():Promise<AnomalyDetectionConfig|undefined> => {
-    try {
-        const data = await SpaceConnector.clientV2.config.domainConfig.get<DomainConfigGetParameters, DomainConfigModel<AnomalyDetectionConfig>>({
-            name: DOMAIN_CONFIG_NAMES.ANOMALY_DETECTION_CONFIGURATION,
-        });
-        return data.data;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
 const filterNotificationRulesAndRemovedUnSelectedItem = (notificationRules: Partial<NotificationRule>[]):NotificationRuleConfig[] => notificationRules.map((rule) => ({
     threshold: rule.threshold,
     unit_type: rule.unit,
@@ -145,33 +149,34 @@ const setConfig = async () => {
             recipients: { role_types: state.recipients ? ['WORKSPACE_OWNER'] : [] },
         },
     };
-    try {
-        await SpaceConnector.clientV2.config.domainConfig.set<DomainConfigSetParameters<AnomalyDetectionConfig>, DomainConfigModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    setDomainConfig(params);
+};
+
+const initDomainConfig = (data: DomainConfigModel) => {
+    state.statusToggle = data.data.enabled;
+    state.notificationRules = data.data.notification_rules.map((rule) => ({
+        threshold: rule.threshold,
+        unit: rule.unit_type,
+        variation: rule.variations,
+        notifyLevel: rule.severity,
+    }));
+    if (!state.notificationRules.length) {
+        state.notificationRules = [{ variation: ALL_VALUE }];
     }
+    state.recipients = data.data.recipients?.role_types.includes('WORKSPACE_OWNER') ?? false;
 };
 
 watch([() => state.statusToggle, () => state.notificationRules, () => state.recipients], async () => {
     await setConfig();
 });
 
-onMounted(async () => {
-    const savedConfig = await fetchConfig();
-    if (savedConfig) {
-        state.statusToggle = savedConfig.enabled;
-        state.notificationRules = savedConfig.notification_rules.map((rule) => ({
-            threshold: rule.threshold,
-            unit: rule.unit_type,
-            variation: rule.variations,
-            notifyLevel: rule.severity,
-        }));
-        if (!state.notificationRules.length) {
-            state.notificationRules = [{ variation: ALL_VALUE }];
-        }
-        state.recipients = savedConfig.recipients?.role_types.includes('WORKSPACE_OWNER') ?? false;
+watch(isDomainConfigLoading, (newVal) => {
+    if (!newVal && domainConfigData.value) {
+        initDomainConfig(domainConfigData.value);
     }
+});
 
+onMounted(async () => {
     if (!state.isSupportDomainConfig) {
         router.push({ name: ERROR_ROUTE._NAME, params: { errorCode: '404' } });
     }
