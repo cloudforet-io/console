@@ -63,6 +63,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 type: undefined,
             };
             state.bookmarkType = BOOKMARK_TYPE.WORKSPACE;
+            state.filterByFolder = undefined;
             state.selectedBookmark = undefined;
             state.selectedBookmarks = [];
         },

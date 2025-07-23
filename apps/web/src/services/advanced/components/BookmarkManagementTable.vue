@@ -4,7 +4,13 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink, PSelectStatus,
+    PDataLoader,
+    PI,
+    PLazyImg,
+    PLink,
+    PSelectDropdown,
+    PSelectStatus,
+    PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
@@ -26,7 +32,7 @@ import {
 import {
     getWorkspaceInfo,
 } from '@/services/advanced/composables/refined-table-data';
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';

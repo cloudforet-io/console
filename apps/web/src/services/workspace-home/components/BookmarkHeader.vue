@@ -10,20 +10,21 @@ import { sumBy } from 'lodash';
 
 import {
     PButton,
+    PContextMenu,
     PFieldTitle,
     PI,
     PIconButton,
+    PSelectButtonGroup,
     PTextButton,
     screens,
-    PContextMenu,
     useContextMenuController,
-    PSelectButtonGroup,
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import { i18n } from '@/translations';
 
+import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -32,9 +33,11 @@ import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookma
 
 import { gray } from '@/styles/colors';
 
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
+import { useBookmarkListQuery } from '@/services/workspace-home/composables/use-bookmark-list-query';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-import type { MoreMenuItem, BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -47,6 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 const FOLDER_DEFAULT_GAP = 4;
 
 const userStore = useUserStore();
+const authorizationStore = useAuthorizationStore();
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
@@ -63,8 +67,11 @@ const moreContextMenuRef = ref<any|null>(null);
 const { width: containerWidth } = useElementSize(componentRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
+const { bookmarkFolderListData, refreshBookmarkFolderList } = useBookmarkFolderListQuery();
+const { refreshBookmarkList } = useBookmarkListQuery();
+
 const storeState = reactive({
-    isWorkspaceMember: computed(() => userStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
+    isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     language: computed<string|undefined>(() => userStore.state.language),
 
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
@@ -120,8 +127,13 @@ const {
 
 const handleClickFullModeButton = () => {
     workspaceHomePageStore.setFullMode(!storeState.isFullMode);
+    refreshBookmarkList();
 };
 const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
+    if (type === BOOKMARK_MODAL_TYPE.FOLDER) {
+        const selectedBookmark = bookmarkFolderListData.value?.find((i) => i.name === storeState.filterByFolder);
+        bookmarkStore.setSelectedBookmark(selectedBookmark);
+    }
     bookmarkStore.setModalType(type, isEdit, isNew);
 };
 const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
@@ -137,7 +149,7 @@ const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
 };
 const handleGoBackButton = () => {
     workspaceHomePageStore.setFileFullMode(false);
-    workspaceHomePageStore.fetchBookmarkList();
+    refreshBookmarkList();
 };
 
 const handleClickAddMore = () => {
@@ -170,8 +182,8 @@ const handleSelectTool = async (value: BookmarkType) => {
     bookmarkStore.setBookmarkType(value);
     bookmarkStore.setSelectedBookmarks([]);
 
-    await workspaceHomePageStore.fetchBookmarkFolderList();
-    await workspaceHomePageStore.fetchBookmarkList();
+    await refreshBookmarkFolderList();
+    await refreshBookmarkList();
     await bookmarkStore.setSelectedBookmark(undefined);
 };
 
@@ -343,10 +355,10 @@ watch(() => storeState.filterByFolder, (filterByFolder) => {
                     />
                 </div>
             </div>
-            <div v-if="!storeState.isFullMode && !storeState.isFileFullMode && props.bookmarkFolderList.length > 0"
+            <div v-if="!storeState.isFullMode && !storeState.isFileFullMode && props.bookmarkFolderList?.length > 0"
                  class="bookmark-folders-wrapper"
             >
-                <div v-if="props.bookmarkFolderList.length > 0"
+                <div v-if="props.bookmarkFolderList?.length > 0"
                      class="bookmark-folders-container"
                      :style="{ maxWidth: `${state.folderListMaxWidth}px`}"
                 >

@@ -9,7 +9,7 @@ import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
-import { useWorkspaceListQuery } from './use-workspace-list-query';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 
 interface UseBookmarkFolderListQueryReturn {
     bookmarkFolderListData: Ref<BookmarkItem[]>;

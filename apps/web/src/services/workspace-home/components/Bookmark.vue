@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -19,6 +19,8 @@ import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookma
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
+import { useBookmarkListQuery } from '@/services/workspace-home/composables/use-bookmark-list-query';
 import {
     MAX_BOARD_SETS,
     MAX_BOARD_SETS_TABLET,
@@ -30,16 +32,16 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomeState = workspaceHomePageStore.state;
-const workspaceHomeGetters = workspaceHomePageStore.getters;
 const { width } = useWindowSize();
+
+const { bookmarkFolderListData, refreshBookmarkFolderList } = useBookmarkFolderListQuery();
+const { bookmarkList, refreshBookmarkList } = useBookmarkListQuery();
 
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     filterByFolder: computed<undefined|TranslateResult>(() => bookmarkState.filterByFolder),
 
-    bookmarkFolderList: computed<BookmarkItem[]>(() => workspaceHomeState.bookmarkFolderData),
-    bookmarkList: computed<BookmarkItem[]>(() => workspaceHomeGetters.bookmarkList),
     isFullMode: computed<boolean>(() => workspaceHomeState.isFullMode),
     isFileFullMode: computed<boolean|undefined>(() => workspaceHomeState.isFileFullMode),
 });
@@ -48,8 +50,8 @@ const state = reactive({
     maxBoardSets: computed<number>(() => (state.isTabletSize ? MAX_BOARD_SETS_TABLET : MAX_BOARD_SETS)),
     boardList: computed<BookmarkItem[]>(() => {
         let _bookmarkList: BookmarkItem[] = [];
-        if (storeState.isFullMode) return storeState.bookmarkList;
-        _bookmarkList = storeState.bookmarkList.slice(0, state.maxBoardSets);
+        if (storeState.isFullMode) return bookmarkList.value ?? [];
+        _bookmarkList = (bookmarkList.value ?? []).slice(0, state.maxBoardSets);
         if (_bookmarkList.length === state.maxBoardSets) {
             _bookmarkList.push({
                 name: i18n.t('HOME.TOGGLE_MORE') as string,
@@ -62,7 +64,7 @@ const state = reactive({
 });
 
 const handleCreateFolder = async (_, name?: string) => {
-    await workspaceHomePageStore.fetchBookmarkFolderList();
+    await refreshBookmarkFolderList();
     if (storeState.isFileFullMode) {
         await bookmarkStore.setSelectedBookmark({
             ...storeState.selectedBookmark,
@@ -73,32 +75,36 @@ const handleCreateFolder = async (_, name?: string) => {
 const handleCreateLink = async (selectedFolder?: BookmarkItem, scope?: BookmarkType) => {
     await bookmarkStore.setBookmarkType(scope);
     await bookmarkStore.setSelectedBookmark(selectedFolder);
-    await workspaceHomePageStore.fetchBookmarkList();
-    await workspaceHomePageStore.fetchBookmarkList();
+    await refreshBookmarkList();
     if (storeState.isFullMode && selectedFolder) {
         if (selectedFolder?.id) {
             await workspaceHomePageStore.setFileFullMode(true, selectedFolder);
         } else {
             await workspaceHomePageStore.setFullMode(true);
         }
+        await refreshBookmarkList();
     }
 };
-const handleConfirmDelete = () => {
+const handleConfirmDelete = async () => {
     if (storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER) {
         if (storeState.isFileFullMode) {
-            workspaceHomePageStore.setFullMode(true);
-            bookmarkStore.setSelectedBookmark(undefined);
+            await workspaceHomePageStore.setFullMode(true);
+            await refreshBookmarkList();
+            await bookmarkStore.setSelectedBookmark(undefined);
         }
     } else if (storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK) {
         if (storeState.isFileFullMode) {
-            const folder = storeState.bookmarkFolderList?.find((i) => i.id === storeState.selectedBookmark?.folder);
+            const folder = bookmarkFolderListData.value?.find((i) => i.id === storeState.selectedBookmark?.folder);
             bookmarkStore.setSelectedBookmark(folder);
         }
     }
-    workspaceHomePageStore.fetchBookmarkFolderList();
-    workspaceHomePageStore.fetchBookmarkList();
+    await refreshBookmarkFolderList();
+    await refreshBookmarkList();
 };
 
+onMounted(() => {
+    bookmarkStore.resetState();
+});
 onUnmounted(() => {
     bookmarkStore.resetState();
 });
@@ -108,28 +114,31 @@ onUnmounted(() => {
     <div class="bookmark"
          :class="{ 'full-mode': storeState.isFullMode }"
     >
-        <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
+        <bookmark-header :bookmark-folder-list="bookmarkFolderListData" />
         <bookmark-full-mode v-if="storeState.isFullMode"
-                            :bookmark-folder-list="storeState.bookmarkFolderList"
-                            :bookmark-list="storeState.bookmarkList"
+                            :bookmark-folder-list="bookmarkFolderListData"
+                            :bookmark-list="bookmarkList"
         />
         <bookmark-board v-else
                         :board-list="state.boardList"
                         :is-max-board-list="state.boardList.length === state.maxBoardSets + 1"
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
-                                    :bookmark-folder-list="storeState.bookmarkFolderList"
+                                    :bookmark-folder-list="bookmarkFolderListData"
+                                    :bookmark-list="bookmarkList"
                                     :filter-by-folder="storeState.filterByFolder"
                                     :selected-bookmark="storeState.selectedBookmark"
                                     @confirm="handleCreateFolder"
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
+                                  :bookmark-folder-list="bookmarkFolderListData"
                                   @confirm="handleCreateLink"
         />
         <bookmark-delete-modal
             v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK
                 || storeState.modalType === BOOKMARK_MODAL_TYPE.MULTI_DELETE"
+            :bookmark-list="bookmarkList"
             @confirm="handleConfirmDelete"
         />
     </div>
