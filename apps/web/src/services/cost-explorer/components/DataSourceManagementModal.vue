@@ -4,17 +4,13 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal, PSelectDropdown, PFieldTitle } from '@cloudforet/mirinae';
-import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useDataSourceAccountApi } from '@/api-clients/cost-analysis/data-source-account/composables/use-data-source-account-api';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -34,8 +30,7 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 
 const { dataSourceAccountAPI } = useDataSourceAccountApi();
-
-const workspaceListApiQueryHelper = new ApiQueryHelper();
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -57,6 +52,13 @@ const dropdownState = reactive({
     searchText: '',
     selectedMenuId: '',
     menu: computed(() => storeState.workspaceList.map((i) => ({ label: i.name, name: i.workspace_id }))),
+});
+
+const workspaceMenuHandler = () => resourceMenuHandlerMap.workspace({
+    fixedFilters: {
+        state: 'ENABLED',
+        is_dormant: false,
+    },
 });
 
 /* Query */
@@ -137,39 +139,6 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
 };
 const handleSelectDropdownItem = (item: string) => {
     dropdownState.selectedMenuId = item;
-};
-
-const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
-    dropdownState.loading = true;
-
-    workspaceListApiQueryHelper.setFilters([
-        { k: 'name', v: inputText, o: '' },
-        { k: 'state', v: 'ENABLED', o: '=' },
-    ]);
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-            query: workspaceListApiQueryHelper.data,
-        });
-        const refinedMenuItems = (results ?? []).map((i) => ({
-            label: i.name,
-            name: i.workspace_id,
-        }));
-        const totalCount = pageStart - 1 + Number(pageLimit);
-        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
-
-        return {
-            results: slicedResults,
-            more: totalCount < refinedMenuItems.length,
-        };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return {
-            results: [],
-            more: false,
-        };
-    } finally {
-        dropdownState.loading = false;
-    }
 };
 </script>
 
