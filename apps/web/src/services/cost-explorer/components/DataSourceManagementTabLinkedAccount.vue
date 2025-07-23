@@ -105,7 +105,7 @@ const tableState = reactive({
     selectedIndices: [] as number[],
 });
 
-const workspaceMenuHandler = () => resourceMenuHandlerMap.workspace({
+const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
     fixedFilters: {
         state: 'ENABLED',
         is_dormant: false,
@@ -266,7 +266,6 @@ watch(() => tableState.selectedIndices, (indices) => {
                                    style-type="transparent"
                                    :page-size="10"
                                    :visible-menu="dropdownState.visible"
-                                   :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
                                    :disabled="!props.hasReadWriteAccess"
                                    show-select-marker

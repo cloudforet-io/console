@@ -54,7 +54,7 @@ const dropdownState = reactive({
     menu: computed(() => storeState.workspaceList.map((i) => ({ label: i.name, name: i.workspace_id }))),
 });
 
-const workspaceMenuHandler = () => resourceMenuHandlerMap.workspace({
+const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
     fixedFilters: {
         state: 'ENABLED',
         is_dormant: false,
@@ -164,7 +164,6 @@ const handleSelectDropdownItem = (item: string) => {
                 <p-select-dropdown use-fixed-menu-style
                                    :page-size="10"
                                    :visible-menu.sync="dropdownState.visible"
-                                   :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
                                    show-select-marker
                                    is-filterable
