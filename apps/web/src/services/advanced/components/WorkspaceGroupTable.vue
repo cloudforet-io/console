@@ -132,6 +132,14 @@ const handleUpdateSelectIndices = (indices: number[]) => {
     });
 };
 
+watch(() => tableState.items, () => {
+    if (workspaceGroupPageState.selectedIndices.length) {
+        workspaceGroupPageStore.$patch((_state) => {
+            _state.state.selectedWorkspaceGroup = data.value?.[workspaceGroupPageState.selectedIndices[0]];
+        });
+    }
+});
+
 
 const handleChange = async (options: ToolboxTableOptions = {}) => {
     if (options.pageStart !== undefined) { tableState.pageStart = options.pageStart; }

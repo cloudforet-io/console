@@ -79,7 +79,7 @@ const userDropdownState = reactive({
 const resetState = () => {
     roleSelectedItems.value = [];
     userDropdownState.searchText = '';
-    userDropdownState.menuList = [];
+    userDropdownState.userList = [];
 };
 
 const { workspaceGroupAPI } = useWorkspaceGroupApi();
@@ -115,10 +115,10 @@ const handleConfirm = async () => {
             })),
         });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
-        if (workspaceGroupPageState.modalAdditionalData?.openBy === WORKSPACE_GROUP_MODAL_TYPE.CREATE) {
+        if (workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupCreateModal) {
             workspaceGroupPageStore.reset();
         }
-        if (workspaceGroupPageState.modalAdditionalData?.openBy === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS) {
+        if (workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupUsersTab) {
             resetState();
         }
         emit('confirm');
@@ -136,7 +136,10 @@ const handleConfirm = async () => {
 const handleCloseModal = async () => {
     resetState();
     queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
-    await workspaceGroupPageStore.reset();
+    if (!workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupUsersTab) {
+        await workspaceGroupPageStore.reset();
+    }
+    workspaceGroupPageStore.closeModal();
 };
 
 const handleRemoveUser = (item: string) => {
