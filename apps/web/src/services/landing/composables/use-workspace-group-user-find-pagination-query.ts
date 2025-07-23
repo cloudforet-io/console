@@ -13,7 +13,7 @@ interface UseWorkspaceGroupUserFindQueryOptions {
     pageSize: ComputedRef<number>;
 }
 
-export const useWorkspaceGroupUserFindQuery = ({ params, thisPage, pageSize }: UseWorkspaceGroupUserFindQueryOptions) => {
+export const useWorkspaceGroupUserFindPaginationQuery = ({ params, thisPage, pageSize }: UseWorkspaceGroupUserFindQueryOptions) => {
     const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
 
 

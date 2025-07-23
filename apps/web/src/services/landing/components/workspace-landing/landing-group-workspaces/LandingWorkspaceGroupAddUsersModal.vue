@@ -24,7 +24,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { USER_STATE } from '@/services/iam/constants/user-constant';
-import { useWorkspaceGroupUserFindQuery } from '@/services/landing/composables/use-workspace-group-user-find-query';
+import { useWorkspaceGroupUserFindPaginationQuery } from '@/services/landing/composables/use-workspace-group-user-find-pagination-query';
 
 
 const emit = defineEmits<{(e: 'confirm'): void;
@@ -111,7 +111,7 @@ const handleRemoveUser = (item: string) => {
 };
 // userFind logic
 const userDropdownState = reactive({
-    menuList: computed(() => userList.value?.results?.map((user) => ({
+    menuList: computed<MenuItem[]>(() => userList.value?.results?.map((user) => ({
         label: user.user_id,
         name: user.user_id,
         disabled: userDropdownState.selectedItems.includes(user.user_id),
@@ -119,18 +119,17 @@ const userDropdownState = reactive({
     inputSelectedItem: [] as MenuItem[],
     selectedItems: [] as string[],
     searchText: '',
-    pageLimit: 10,
 });
 
 /* Query */
-const { data: userList } = useWorkspaceGroupUserFindQuery({
+const { data: userList } = useWorkspaceGroupUserFindPaginationQuery({
     params: computed(() => ({
         workspace_group_id: props.workspaceGroup?.workspace_group_id || '',
         keyword: userDropdownState.searchText,
         state: USER_STATE.ENABLE,
     })),
     thisPage: computed(() => 1),
-    pageSize: computed(() => userDropdownState.pageLimit),
+    pageSize: computed(() => 10),
 });
 
 /* Handlers */
