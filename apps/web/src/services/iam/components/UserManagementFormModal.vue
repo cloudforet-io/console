@@ -36,9 +36,11 @@ import UserManagementFormInfoForm from '@/services/iam/components/UserManagement
 import UserManagementFormNotificationEmailForm
     from '@/services/iam/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/iam/components/UserManagementFormPasswordForm.vue';
+import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 import { MULTI_FACTOR_AUTH_ITEMS, PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
+
 
 interface UserMFASettingFormState {
     isRequiredMfa: boolean;
@@ -94,11 +96,14 @@ const formState = reactive({
 });
 
 /* Components */
-const handleClose = () => {
+const closeModal = () => {
     userPageStore.$patch((_state) => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
+};
+const handleClose = () => {
+    closeModal();
 };
 const setForm = () => {
     formState.name = state.data.name || '';
@@ -120,6 +125,12 @@ const buildUserInfoParams = (): UserUpdateParameters => ({
     password: formState.password || '',
     reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
 });
+
+const handleOpenDisableMfaModal = () => {
+    closeModal();
+    userPageStore.setMfaSecretKeyDeleteModalVisible(true);
+    userPageStore.setPreviousModalType(USER_MODAL_MAP.UPDATE);
+};
 
 /* API */
 const handleConfirm = async () => {
@@ -152,7 +163,7 @@ const handleConfirm = async () => {
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
 
         showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_UPDATE_USER'), '');
-        handleClose();
+        closeModal();
         emit('confirm');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.USER.MAIN.MODAL.ALT_E_UPDATE_USER'));
@@ -245,6 +256,13 @@ watch(() => userPageState.modal.visible, async (visible) => {
         formState.role = {} as AddModalMenuItem;
     }
 });
+
+watch(() => state.data?.mfa, (mfa) => {
+    if (mfa) {
+        mfaSettingFormState.isRequiredMfa = !!mfa.options?.enforce;
+        mfaSettingFormState.selectedMfaType = mfa.mfa_type || MULTI_FACTOR_AUTH_ITEMS[0].type;
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -274,6 +292,7 @@ watch(() => userPageState.modal.visible, async (visible) => {
                                                 :selected-mfa-controllable-target="state.data"
                                                 :is-required-mfa.sync="mfaSettingFormState.isRequiredMfa"
                                                 :selected-mfa-type.sync="mfaSettingFormState.selectedMfaType"
+                                                @click-disable-mfa="handleOpenDisableMfaModal"
                 />
                 <user-management-form-admin-role v-if="userPageState.isAdminMode"
                                                  :role.sync="formState.role"

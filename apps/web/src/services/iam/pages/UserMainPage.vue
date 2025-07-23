@@ -13,6 +13,7 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import UserBulkMFASettingModal from '@/services/iam/components/mfa/UserBulkMFASettingModal.vue';
+import UserMFASecretKeyDeleteModal from '@/services/iam/components/mfa/UserMFASecretKeyDeleteModal.vue';
 import UserAssignToGroupModal from '@/services/iam/components/UserAssignToGroupModal.vue';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
@@ -24,7 +25,6 @@ import UserManagementRemoveMixedTypeModal
 import UserManagementStatusModal from '@/services/iam/components/UserManagementStatusModal.vue';
 import UserManagementTab from '@/services/iam/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/iam/components/UserManagementTable.vue';
-import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 
@@ -109,10 +109,9 @@ onUnmounted(() => {
         <user-bulk-m-f-a-setting-modal v-if="hasReadWriteAccess"
                                        @confirm="refreshUserList"
         />
-        <!-- <user-m-f-a-secret-key-delete-modal v-if="hasReadWriteAccess"
+        <user-m-f-a-secret-key-delete-modal v-if="hasReadWriteAccess"
                                             @confirm="refreshUserList"
-        /> -->
-        <portal-target :name="USER_MODAL_MAP.DISABLE_MFA" />
+        />
     </section>
 </template>
 

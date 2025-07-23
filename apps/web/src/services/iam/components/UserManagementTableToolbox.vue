@@ -75,12 +75,7 @@ const handleSelectDropdown = (name: typeof USER_MODAL_TYPE[keyof typeof USER_MOD
         themeColor: 'primary',
         modalVisibleType: 'form',
     }); break;
-    case USER_MODAL_TYPE.SET_MFA: userPageStore.updateModalSettings({
-        type: name,
-        title: '',
-        themeColor: 'primary',
-        modalVisibleType: 'setMfa',
-    }); break;
+    case USER_MODAL_TYPE.SET_MFA: userPageStore.setBulkMfaSettingModalVisible(true); break;
     default: break;
     }
 };

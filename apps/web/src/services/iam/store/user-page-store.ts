@@ -26,7 +26,14 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { UserModalType } from '@/services/iam/types/modal.type';
 import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
+
+interface UserPageModalState {
+    previousModalType: UserModalType | undefined;
+    bulkMfaSettingModalVisible: boolean;
+    mfaSecretKeyDeleteModalVisible: boolean;
+}
 
 export const useUserPageStore = defineStore('page-user', () => {
     const authorizationStore = useAuthorizationStore();
@@ -52,6 +59,13 @@ export const useUserPageStore = defineStore('page-user', () => {
             visible: undefined,
         } as ModalState,
     });
+
+    const modalState = reactive<UserPageModalState>({
+        previousModalType: undefined,
+        bulkMfaSettingModalVisible: false,
+        mfaSecretKeyDeleteModalVisible: false,
+    });
+
     const getters = reactive({
         isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
         selectedUsers: computed<UserListItemType[]>(() => {
@@ -71,6 +85,19 @@ export const useUserPageStore = defineStore('page-user', () => {
             return map;
         }),
     });
+
+    const mutations = {
+        setPreviousModalType(type: UserModalType | undefined) {
+            modalState.previousModalType = type;
+        },
+        setBulkMfaSettingModalVisible(visible: boolean) {
+            modalState.bulkMfaSettingModalVisible = visible;
+        },
+        setMfaSecretKeyDeleteModalVisible(visible: boolean) {
+            modalState.mfaSecretKeyDeleteModalVisible = visible;
+        },
+    };
+
     const actions = {
         // User
         reset() {
@@ -213,7 +240,9 @@ export const useUserPageStore = defineStore('page-user', () => {
     };
     return {
         state,
+        modalState,
         getters,
+        ...mutations,
         ...actions,
     };
 });
