@@ -16,12 +16,6 @@ import {
 } from '@/styles/colors';
 
 import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
-
-
-const budgetpageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetpageStore.$state;
 
 
 interface Props {
@@ -226,7 +220,7 @@ const drawChart = (rawData: {
     }, true);
 };
 
-watch([() => state.data, () => budgetPageState], () => {
+watch([() => state.data], () => {
     drawChart(state.data);
 }, { deep: true, immediate: true });
 </script>

@@ -1,25 +1,20 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch, watchEffect,
+    computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PSelectDropdown, PRadio,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
-import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useBudgetListQuery } from '@/services/cost-explorer/composables/use-budget-list-query';
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+import { useServiceAccountListQuery } from '@/services/service-account/composables/queries/use-service-account-list-query';
+
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -34,8 +29,8 @@ const state = reactive({
         { name: 'serviceAccount', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SERVICE_ACCOUNT') },
     ],
     selectedScope: 0,
-    serviceAccountList: [] as string[],
-    existingServiceAccountIds: [],
+    serviceAccountList: computed<string[]>(() => serviceAccountListData.value?.map((result) => result.service_account_id) ?? []),
+    existingServiceAccountIds: computed<string[]>(() => budgetListData.value?.map((result) => result.service_account_id) ?? []),
     refinedServiceAccountList: computed<SelectDropdownMenuItem[]>(() => state.serviceAccountList
         .map((serviceAccountId) => ({
             name: serviceAccountId,
@@ -44,25 +39,12 @@ const state = reactive({
     selectedServiceAccount: '',
 });
 
-const fetchBudget = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
-        state.existingServiceAccountIds = results?.map((result) => result.service_account_id) ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
-
-watchEffect(async () => {
-    await fetchBudget();
-});
-
-watch(() => budgetCreatePageState.project, async () => {
-    const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+const { budgetListData } = useBudgetListQuery();
+const { data: serviceAccountListData } = useServiceAccountListQuery({
+    params: computed(() => ({
         project_id: budgetCreatePageState.project,
-    });
-    state.serviceAccountList = results?.map((result) => result.service_account_id) ?? [];
-}, { deep: true, immediate: true });
+    })),
+});
 
 watch(() => budgetCreatePageState.scope, () => {
     state.isSelectable = budgetCreatePageState.scope.type === 'serviceAccount';
