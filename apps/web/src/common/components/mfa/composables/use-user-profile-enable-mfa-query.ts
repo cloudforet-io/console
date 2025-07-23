@@ -1,8 +1,9 @@
 import type { ComputedRef } from 'vue';
 
+import { useQuery } from '@tanstack/vue-query';
+
 import { useUserProfileApi } from '@/api-clients/identity/user-profile/composables/use-user-profile-api';
 import type { UserProfileEnableMfaParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/enable-mfa';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
 import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
 
 interface UserUserProfileEnableMfaQueryOptions {
@@ -17,8 +18,9 @@ export const useUserProfileEnableMfaQuery = ({
         params,
     });
 
-    return useScopedQuery({
+    return useQuery({
         queryKey: key,
         queryFn: () => userProfileAPI.enableMfa(queryParams.value),
-    }, ['USER']);
+        enabled: true,
+    });
 };

@@ -14,7 +14,7 @@ export const useUserMfaQrInfo = () => {
         })),
     });
 
-    const qrUri = computed(() => userInfo.value?.mfa?.options?.otp_qrcode_uri);
+    const qrUri = computed<string>(() => userInfo.value?.mfa?.options?.otp_qrcode_uri || '');
 
     return {
         isLoading: isFetching,
