@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
+import type { MfaState, MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
 
 
 export interface UserUpdateParameters {
@@ -11,6 +11,6 @@ export interface UserUpdateParameters {
     timezone?: string;
     tags?: Tags;
     reset_password?: boolean;
-    enforce_mfa?: boolean;
+    enforce_mfa_state?: MfaState;
     enforce_mfa_type?: MultiFactorAuthType; // only when enforce_mfa is true, this field is required
 }
