@@ -12,10 +12,12 @@ import {
 import { i18n } from '@/translations';
 
 import { useDisplayStore } from '@/store/display/display-store';
+import { REQUIRED_ACTIONS } from '@/store/user/constant';
 import { useUserStore } from '@/store/user/user-store';
 
 import config from '@/lib/config';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -82,7 +84,23 @@ const signIn = async () => {
     try {
         await loadAuth().signIn(credentials, 'LOCAL');
         displayStore.setIsSignInFailed(false);
-        if (userStore.state.requiredActions?.includes('UPDATE_PASSWORD')) {
+
+        // console.log('userStore.state.requiredActions', userStore.state.requiredActions, userStore.state.mfa);
+        if (userStore.state.requiredActions?.includes(REQUIRED_ACTIONS.ENFORCE_MFA)) {
+            const MFA_TYPE = userStore.state.mfa?.mfa_type;
+            const isMFAEnforced = !!userStore.state.mfa?.options?.enforce && !!MFA_TYPE;
+            const needToEnableMFA = isMFAEnforced && userStore.state.mfa?.state !== 'ENABLED';
+            if (needToEnableMFA) { // Enforced MFA by admin. Always has both `options.enforce` and `mfa_type`.
+                if (import.meta.env.DEV) console.debug(`[ID_PW.vue] MFA_TYPE: ${MFA_TYPE}`);
+                await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME, params: { mfaType: MFA_TYPE } });
+            } else {
+                showErrorMessage('Something went wrong! Contact support.', 'MFA_NOT_SETUP');
+                await router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
+            }
+            return;
+        }
+
+        if (userStore.state.requiredActions?.includes(REQUIRED_ACTIONS.UPDATE_PASSWORD)) {
             await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             emit('sign-in', state.userId);

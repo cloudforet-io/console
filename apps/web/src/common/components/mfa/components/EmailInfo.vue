@@ -23,6 +23,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     isSentCode: false,
+    isForm: false,
 });
 
 const userStore = useUserStore();

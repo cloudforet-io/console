@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
@@ -71,7 +72,7 @@ const passwordFormState = reactive({
     loading: false,
     userId: computed<string|undefined>(() => userStore.state.userId),
     isTokenChecked: undefined as boolean|undefined,
-    invalidText: '',
+    invalidText: '' as string|TranslateResult,
 });
 
 const passwordCheckFecher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.issue);

@@ -9,6 +9,7 @@ const KeycloakPage = () => import('@/services/auth/pages/KeycloakPage.vue');
 const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
 const ValidationEmailPage = () => import('@/services/auth/pages/ValidationEmailPage.vue');
 const MultiFactorAuthPage = () => import('@/services/auth/pages/MultiFactorAuthPage.vue');
+const MultiFactorAuthSetUpPage = () => import('@/services/auth/pages/MultiFactorAuthSetUpPage.vue');
 
 const SamlRedirectPage = () => import('@/services/auth/pages/SamlRedirectPage.vue');
 
@@ -64,6 +65,19 @@ export default [
                     redirectPath: route.query.redirectPath,
                 }),
                 component: MultiFactorAuthPage,
+            },
+            {
+                path: 'mfa-setup/:mfaType',
+                name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME,
+                meta: {
+                    isSignInPage: true,
+                    isCentered: true,
+                },
+                props: (route) => ({
+                    previousPath: route.query.previousPath,
+                    redirectPath: route.query.redirectPath,
+                }),
+                component: MultiFactorAuthSetUpPage,
             },
         ],
     },

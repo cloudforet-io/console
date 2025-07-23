@@ -81,6 +81,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
         AUTH_ROUTE.SIGN_OUT._NAME,
         ERROR_ROUTE._NAME,
         AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
+        AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME,
         ERROR_ROUTE.EXPIRED_LINK._NAME,
         ...EXTERNAL_PAGES,
     ];
