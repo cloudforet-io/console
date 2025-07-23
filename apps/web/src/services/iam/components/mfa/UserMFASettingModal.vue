@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PScopedNotification, PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio, PButton, PCollapsibleToggle, PStatus,
+    PButtonModal, PScopedNotification, PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio, PCollapsibleToggle, PStatus,
 } from '@cloudforet/mirinae';
 import type { StatusTheme } from '@cloudforet/mirinae/types/data-display/status/type';
 
@@ -19,11 +19,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, green, red } from '@/styles/colors';
 
+import UserMFASettingDisableButton from '@/services/iam/components/mfa/UserMFASettingDisableButton.vue';
 import { useUserUpdateMutation } from '@/services/iam/composables/mutations/use-user-update-mutation';
-import { MULTI_FACTOR_AUTH_ITEMS, USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
+import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
-
 
 
 /* Store */
@@ -64,9 +64,12 @@ const singleUserMfaTypeStatusTheme = computed<StatusTheme|undefined>(() => {
     return selectedUserMFAState === 'ENABLED' ? green[600] : red[500];
 });
 
+// MFA Disable Target
+const selectedMFAEnabledUsers = computed<UserListItemType[]>(() => userPageGetters.selectedUsers.filter((user) => user.auth_type === 'LOCAL' && user.mfa?.state === 'ENABLED') || []);
+
+
 // UI Conditions
 const isIncludedExternalAuthTypeUser = computed<boolean>(() => userPageGetters.selectedUsers.some((user) => user.auth_type !== 'LOCAL'));
-const isDisableButtonEnabled = computed<boolean>(() => userPageGetters.selectedUsers.some((user) => user.mfa?.state === 'ENABLED'));
 
 
 /* API */
@@ -106,16 +109,6 @@ const handleChangeRequiredMfa = (value: boolean) => {
 
 const handleChangeMfaType = (value: MultiFactorAuthType) => {
     selectedMfaType.value = value;
-};
-
-const handleDeleteMfaSecretKey = () => {
-    if (!isDisableButtonEnabled.value) return;
-    userPageStore.updateModalSettings({
-        type: USER_MODAL_TYPE.DELETE_MFA_SECRET_KEY,
-        title: '',
-        themeColor: 'alert',
-        modalVisibleType: 'deleteMfaSecretKey',
-    });
 };
 
 const handleConfirm = async () => {
@@ -250,15 +243,7 @@ const handleConfirm = async () => {
 
                     <p-divider horizontal />
 
-                    <p-button style-type="negative-secondary"
-                              class="mt-4"
-                              size="md"
-                              :disabled="!isDisableButtonEnabled"
-                              icon-left="ic_delete"
-                              @click="handleDeleteMfaSecretKey"
-                    >
-                        {{ $t('IAM.USER.MAIN.MODAL.MFA.DELETE_MFA_SECRET_KEY_BUTTON_TEXT') }}
-                    </p-button>
+                    <user-m-f-a-setting-disable-button :selected-target="selectedMFAEnabledUsers" />
                 </div>
             </div>
         </template>
