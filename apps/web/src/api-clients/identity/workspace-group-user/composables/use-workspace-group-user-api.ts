@@ -8,7 +8,7 @@ import type { WorkspaceGroupUserGetParameters } from '@/api-clients/identity/wor
 import type { WorkspaceGroupUserListParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/list';
 import type { WorkspaceGroupUserRemoveParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/remove';
 import type { WorkspaceGroupUserUpdateRoleParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/update-role';
-import type { WorkspaceGroupUserModel } from '@/api-clients/identity/workspace-group-user/schema/model';
+import type { WorkspaceGroupUser, WorkspaceGroupUserModel } from '@/api-clients/identity/workspace-group-user/schema/model';
 
 export const useWorkspaceGroupUserApi = () => {
     const actions = {
@@ -16,7 +16,7 @@ export const useWorkspaceGroupUserApi = () => {
         remove: SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>,
         get: SpaceConnector.clientV2.identity.workspaceGroupUser.get<WorkspaceGroupUserGetParameters, WorkspaceGroupUserModel>,
         list: SpaceConnector.clientV2.identity.workspaceGroupUser.list<WorkspaceGroupUserListParameters, ListResponse<WorkspaceGroupUserModel>>,
-        find: SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, WorkspaceGroupUserModel>,
+        find: SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUser>>,
         updateRole: SpaceConnector.clientV2.identity.workspaceGroupUser.updateRole<WorkspaceGroupUserUpdateRoleParameters, WorkspaceGroupUserModel>,
         stat: SpaceConnector.clientV2.identity.workspaceGroupUser.stat<WorkspaceGroupUserListParameters, StatResponse>,
     };
