@@ -27,6 +27,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
@@ -40,17 +41,18 @@ import { gray } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { useCostReportDataAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-report-data-analyze-query';
 import {
     COST_REPORT_GROUP_BY_ITEM_MAP,
     GROUP_BY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 type RefinedCostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
@@ -60,9 +62,6 @@ type RefinedCostReportDataAnalyzeResult = {
 
 const OTHER_CATEGORY = 'Others';
 const chartContext = ref<HTMLElement|null>(null);
-const costReportPageStore = useCostReportPageStore();
-const costReportPageState = costReportPageStore.state;
-const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
@@ -81,8 +80,10 @@ const state = reactive({
     chart: null as EChartsType | null,
     chartData: [] as PieSeriesOption['data'],
 });
+const currency = computed<Currency>(() => costReportConfig.value?.currency || 'USD');
 
 /* Query */
+const { costReportConfig } = useCostReportConfigQuery();
 const queryParams = computed<AnalyzeQuery|null>(() => {
     if (!state.currentDate) return null;
 
@@ -92,7 +93,7 @@ const queryParams = computed<AnalyzeQuery|null>(() => {
         end: state.currentDate.format('YYYY-MM'),
         fields: {
             value_sum: {
-                key: `cost.${costReportPageGetters.currency}`,
+                key: `cost.${currency.value}`,
                 operator: 'sum',
             },
         },
@@ -105,12 +106,22 @@ const queryParams = computed<AnalyzeQuery|null>(() => {
 });
 
 const { costReportDataAnalyzeData, isLoading } = useCostReportDataAnalyzeQuery({
-    cost_report_config_id: computed(() => costReportPageState.costReportConfig?.cost_report_config_id || ''),
+    cost_report_config_id: computed(() => costReportConfig.value?.cost_report_config_id || ''),
     is_confirmed: true,
     query: queryParams,
 });
 
+
 /* Computed */
+const recentReportMonth = computed<string>(() => {
+    if (!costReportConfig.value?.issue_day) return dayjs.utc().subtract(1, 'month').format('YYYY-MM');
+
+    const today = dayjs.utc();
+    const issueDay = costReportConfig.value.issue_day;
+
+    if (today.date() >= issueDay) return today.subtract(1, 'month').format('YYYY-MM');
+    return today.subtract(2, 'month').format('YYYY-MM');
+});
 const refinedData = computed<RefinedCostReportDataAnalyzeResult[]>(() => {
     if (!costReportDataAnalyzeData.value) return [];
     return getRefinedAnalyzeData(costReportDataAnalyzeData.value);
@@ -254,7 +265,7 @@ watch([() => chartContext.value, () => isLoading.value, () => costReportDataAnal
     }
 });
 
-watch(() => costReportPageState.recentReportMonth, async (after) => {
+watch(() => recentReportMonth.value, async (after) => {
     if (!after) return;
     state.currentDate = dayjs.utc(after);
 }, { immediate: true });
@@ -299,7 +310,7 @@ useResizeObserver(chartContext, throttle(() => {
                 <div class="grid grid-cols-12 gap-4">
                     <div class="left-part">
                         <p-date-pagination :date="state.currentDate"
-                                           :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
+                                           :disable-next-button="state.currentDate?.isSame(dayjs.utc(recentReportMonth), 'month')"
                                            @update:date="handleChangeDate"
                         />
                         <div class="date-range-text">
@@ -310,8 +321,8 @@ useResizeObserver(chartContext, throttle(() => {
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
                             </div>
                             <div class="summary-value">
-                                <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                                <span class="value">{{ currencyMoneyFormatter(totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
+                                <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[currency] }}</span>
+                                <span class="value">{{ currencyMoneyFormatter(totalAmount, { currency, style: 'decimal' }) }}</span>
                             </div>
                         </div>
                         <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
@@ -364,24 +375,24 @@ useResizeObserver(chartContext, throttle(() => {
                                 </span>
                             </template>
                             <template #col-amount-format="{ value }">
-                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? ''"
+                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency }) ?? ''"
                                            position="bottom"
                                 >
-                                    <span v-if="costReportPageGetters.currency"
+                                    <span v-if="currency"
                                           class="amount-col"
                                     >
-                                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
+                                        {{ currencyMoneyFormatter(value, { currency }) }}
                                     </span>
                                 </p-tooltip>
                             </template>
                             <template #col-adjusted_amount-format="{ value }">
-                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency })"
+                                <p-tooltip :contents="currencyMoneyFormatter(value, { currency })"
                                            position="bottom"
                                 >
-                                    <span v-if="costReportPageGetters.currency"
+                                    <span v-if="currency"
                                           class="amount-col"
                                     >
-                                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? '-' }}
+                                        {{ currencyMoneyFormatter(value, { currency }) ?? '-' }}
                                     </span>
                                 </p-tooltip>
                             </template>

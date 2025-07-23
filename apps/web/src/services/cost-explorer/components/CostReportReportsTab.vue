@@ -36,13 +36,13 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import { green, gray } from '@/styles/colors';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { useCostReportListQuery } from '@/services/cost-explorer/composables/use-cost-report-list-query';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
 const allReferenceStore = useAllReferenceStore();
 const costReportPageStore = useCostReportPageStore();
-const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
 const { costReportAPI } = useCostReportApi();
 
@@ -50,7 +50,7 @@ const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode)
 const workspaces = computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace);
 
 const state = reactive({
-    currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
+    currency: computed(() => costReportConfig.value?.currency || 'KRW' as Currency),
     periodMenuItems: computed<MenuItem[]>(() => {
         const locale = i18n.locale;
         const thisMonth = dayjs.utc();
@@ -100,6 +100,9 @@ const costReportListApiQueryHelper = new ApiQueryHelper().setSort('issue_date', 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+/* Query */
+const { costReportConfig } = useCostReportConfigQuery();
+
 /* Util */
 const getDateRangeText = (date: string): string => {
     const _date = dayjs.utc(date).subtract(1, 'month');
@@ -147,7 +150,7 @@ const handleClickCopyButton = async (id: string) => {
     }
 };
 const handleClickResendButton = async (id: string): Promise<void> => {
-    if ((costReportPageState.costReportConfig?.recipients?.role_types.length || 0) === 0) {
+    if ((costReportConfig.value?.recipients?.role_types.length || 0) === 0) {
         showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_RESEND_REPORT'), '');
         return;
     }
@@ -180,7 +183,7 @@ const { costReportListData, isLoading: isCostReportListLoading, totalCount } = u
     pageSize: computed(() => tableState.pageSize),
     params: computed<CostReportListParameters>(() => {
         costReportListApiQueryHelper.setFilters(queryTagHelper.filters.value);
-        costReportListApiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportPageState.costReportConfig?.cost_report_config_id || '', o: '=' });
+        costReportListApiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportConfig.value?.cost_report_config_id || '', o: '=' });
         if (!isAdminMode.value) {
             costReportListApiQueryHelper.setFilters([
                 { k: 'status', v: ['DONE'], o: '' },
@@ -207,15 +210,6 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
     }
     costReportListApiQueryHelper.setFilters(filters);
 });
-watch(() => costReportPageState.activeTab, (activeTab) => {
-    if (activeTab === 'reports') {
-        queryTagHelper.setQueryTags([]);
-        tableState.searchFilters = [];
-        state.selectedPeriod = 'all';
-        state.customPeriod = undefined;
-        costReportListApiQueryHelper.setFilters([]);
-    }
-}, { immediate: true });
 </script>
 
 <template>

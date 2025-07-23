@@ -6,20 +6,17 @@ import { useRoute } from 'vue-router/composables';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
+import { useDataSourceListQuery } from '@/services/cost-explorer/composables/use-data-source-list-query';
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -36,32 +33,27 @@ const queryClient = useQueryClient();
 
 const route = useRoute();
 
-// Service Query Key for invalidation - target specific data source
+/* Query */
 const { key: costQuerySetListKey } = useServiceQueryKey('cost-analysis', 'cost-query-set', 'list', {
     params: computed(() => ({
         data_source_id: costQuerySetGetters.dataSourceId,
     })),
 });
+const { dataSourceListData } = useDataSourceListQuery({
+    params: computed(() => ({
+        query: {
+            only: ['data_source_id'],
+            sort: [{ key: 'workspace_id', desc: appContextStore.getters.isAdminMode }],
+        },
+    })),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
+});
 
 const setCostParams = async () => {
     // Case - Directly access Budget Page
     if (!costQuerySetState.selectedDataSourceId) {
-        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
-        try {
-            const { status, response } = await fetcher({
-                query: {
-                    only: ['data_source_id'],
-                    sort: [{ key: 'workspace_id', desc: appContextStore.getters.isAdminMode }],
-                },
-            });
-
-            if (status === 'succeed') {
-                const dataSourceId = response.results[0].data_source_id;
-                costQuerySetStore.setSelectedDataSourceId(dataSourceId);
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+        costQuerySetStore.setSelectedDataSourceId(dataSourceListData.value?.results?.[0]?.data_source_id ?? '');
     }
     const { dataSourceId, costQuerySetId } = route.params;
     /*
