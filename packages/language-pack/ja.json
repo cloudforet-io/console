@@ -427,9 +427,12 @@
 			"ENFORCE_INFO_TEXT": "",
 			"ENTER_CODE": "コードを入力",
 			"GO_BACK": "ログインする",
+			"MFA_CONFIGURED": "",
+			"MFA_CONFIGURED_DESC": "",
 			"OTP_INFO": "アカウントログインに多要素認証（MFA）を許可します。アプリに表示されているコードを入力してください。",
 			"PROBLEM_TITLE": "まだ問題がありますか？",
 			"REQUIRED_BY_ADMIN": "",
+			"SETUP_VERIFY": "認証",
 			"SUB_TITLE": "アカウント確認のためにメール認証が必要です。",
 			"TITLE": "マルチファクタ\n認証"
 		},
