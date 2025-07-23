@@ -424,10 +424,12 @@
 			"AUTHENTICATION_CODE_LOWER": "authentication code",
 			"CONFIRM": "Confirm",
 			"EMAIL_INFO": "Allows multi-factor authentication(MFA) for account logins. A MFA code has been sent to an email address:",
+			"ENFORCE_INFO_TEXT": "Multi-factor authentication (MFA) is required for\nyour account by your administrator.\nTo disable this feature, please contact your admin.",
 			"ENTER_CODE": "Enter Code",
 			"GO_BACK": "Back to Sign in",
 			"OTP_INFO": "Allows multi-factor authentication(MFA) for account logins. Enter the code that you see in the app.",
 			"PROBLEM_TITLE": "Having problems?",
+			"REQUIRED_BY_ADMIN": "Required by admin",
 			"SUB_TITLE": "Your account required to verify with email MFA.",
 			"TITLE": "Multi-factor\nauthentication"
 		},

@@ -93,7 +93,7 @@ const handleConfirmPasswordCheckModal = async () => {
                 passwordFormState.isTokenChecked = true;
                 passwordFormState.invalidText = '';
                 passwordFormState.passwordCheckModalVisible = false;
-                showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'));
+                showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'), '');
             } else {
                 passwordFormState.isTokenChecked = false;
                 passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');
@@ -105,7 +105,7 @@ const handleConfirmPasswordCheckModal = async () => {
             passwordFormState.isTokenChecked = true;
             passwordFormState.invalidText = '';
             passwordFormState.passwordCheckModalVisible = false;
-            showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'));
+            showSuccessMessage(i18n.t('COMMON.PROFILE.SUCCESS_PASSWORD_CHECK'), '');
         } else {
             passwordFormState.isTokenChecked = false;
             passwordFormState.invalidText = i18n.t('COMMON.PROFILE.CURRENT_PASSWORD_INVALID');

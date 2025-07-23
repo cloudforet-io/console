@@ -424,10 +424,12 @@
 			"AUTHENTICATION_CODE_LOWER": "認証コード",
 			"CONFIRM": "確認",
 			"EMAIL_INFO": "アカウントログインのためのマルチファクタ認証(MFA)をサポートします。認証コードがメールアドレスに送信されました:",
+			"ENFORCE_INFO_TEXT": "",
 			"ENTER_CODE": "コードを入力",
 			"GO_BACK": "ログインする",
 			"OTP_INFO": "アカウントログインに多要素認証（MFA）を許可します。アプリに表示されているコードを入力してください。",
 			"PROBLEM_TITLE": "まだ問題がありますか？",
+			"REQUIRED_BY_ADMIN": "",
 			"SUB_TITLE": "アカウント確認のためにメール認証が必要です。",
 			"TITLE": "マルチファクタ\n認証"
 		},

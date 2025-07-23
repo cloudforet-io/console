@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
-    PI, PToggleButton, PBadge, PButton,
+    PI, PBadge, PButton, PSelectCard,
 } from '@cloudforet/mirinae';
 
+import { useUserProfileApi } from '@/api-clients/identity/user-profile/composables/use-user-profile-api';
 import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/schema/constant';
+import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
 import type { UserMfa } from '@/api-clients/identity/user/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
-
-import { postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
@@ -27,6 +27,8 @@ const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.state;
 const userStore = useUserStore();
 
+const { userProfileAPI } = useUserProfileApi();
+
 const storeState = reactive({
     mfa: computed<UserMfa|undefined>(() => userStore.state.mfa),
     selectedType: computed<string>(() => multiFactorAuthState.selectedType),
@@ -34,102 +36,98 @@ const storeState = reactive({
 });
 const state = reactive({
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
-    type: computed<string|undefined>(() => storeState.mfa?.mfa_type || undefined),
+    currentType: computed<string|undefined>(() => userStore.state.mfa?.mfa_type || undefined),
+    isEnforced: computed<boolean>(() => !!userStore.state.mfa?.options?.enforce),
 });
 
-const handleChangeToggle = async (type: string, value: boolean) => {
-    storeState.enableMfaMap[type] = value;
-    multiFactorAuthStore.setModalVisible(true);
-
-    if (state.isVerified && state.type !== type) {
-        const otherType = Object.keys(storeState.enableMfaMap).find((key) => key !== type && key !== '');
-        multiFactorAuthStore.setModalType('SWITCH');
-
-        if (otherType) {
-            multiFactorAuthStore.setSelectedType(otherType);
-
-            if (otherType === MULTI_FACTOR_AUTH_TYPE.OTP) {
-                await postUserProfileDisableMfa();
-            }
+const handleChange = async (selected: MultiFactorAuthType) => {
+    if (props.readonlyMode) return;
+    if (state.isVerified && state.currentType !== selected) {
+        if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
+            multiFactorAuthStore.setEmailSwitchModalVisible(true);
+        } else {
+            multiFactorAuthStore.setOTPSwitchModalVisible(true);
+            await userProfileAPI.disableMfa({});
         }
+        return;
+    }
+
+    if (state.currentType !== selected) {
+        if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
+            multiFactorAuthStore.setOTPEnableModalVisible(true);
+        } else {
+            multiFactorAuthStore.setEmailEnableModalVisible(true);
+        }
+    } else if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
+        multiFactorAuthStore.setOTPDisableModalVisible(true);
+        await userProfileAPI.disableMfa({});
     } else {
-        multiFactorAuthStore.setModalType(value ? 'FORM' : 'DISABLED');
-        multiFactorAuthStore.setSelectedType(type);
-        if (!value && type === MULTI_FACTOR_AUTH_TYPE.OTP) {
-            await postUserProfileDisableMfa();
-        }
-    }
-};
-const handleClickReSyncButton = async (type: string) => {
-    multiFactorAuthStore.setSelectedType(type);
-    multiFactorAuthStore.setModalVisible(true);
-    multiFactorAuthStore.setModalType('RE_SYNC');
-    if (type === MULTI_FACTOR_AUTH_TYPE.OTP) {
-        await postUserProfileDisableMfa();
+        multiFactorAuthStore.setEmailDisableModalVisible(true);
     }
 };
 
-watch(() => storeState.mfa, (mfa) => {
-    if (mfa?.mfa_type) {
-        multiFactorAuthStore.setEnableMfaMapType(mfa.mfa_type, storeState.mfa?.state === 'ENABLED');
+const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEvent) => {
+    if (props.readonlyMode) return;
+    event.stopPropagation();
+    if (type === MULTI_FACTOR_AUTH_TYPE.OTP) {
+        multiFactorAuthStore.setOTPReSyncModalVisible(true);
+        await userProfileAPI.disableMfa({});
+    } else {
+        multiFactorAuthStore.setEmailReSyncModalVisible(true);
     }
-}, { immediate: true });
-watch(() => multiFactorAuthState.modalVisible, (modalVisible) => {
-    if (!modalVisible) {
-        multiFactorAuthStore.setEnableMfaMapType(storeState.selectedType, state.type === storeState.selectedType ? state.isVerified : false);
-        multiFactorAuthStore.setSelectedType('');
-    }
-}, { immediate: true });
+};
 </script>
 
 <template>
     <div class="user-account-multi-factor-auth-items">
-        <div v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
-             :key="`${item.type} - ${idx}`"
-             class="user-account-multi-factor-auth-item"
+        <p-select-card v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
+                       :key="`${item.type} - ${idx}`"
+                       block
+                       :readonly="props.readonlyMode"
+                       :selected="state.currentType"
+                       :disabled="state.isEnforced && state.currentType !== item.type"
+                       :value="item.type"
+                       @change="handleChange"
         >
-            <div class="user-account-multi-factor-auth-item-inner">
-                <p-i class="icon"
-                     :name="item.icon"
-                     height="2rem"
-                     width="2rem"
-                />
-                <div class="title-wrapper">
-                    <div class="toggle-wrapper">
-                        <div class="toggle-inner">
-                            <p-toggle-button :value="storeState.enableMfaMap[item.type]"
-                                             :read-only="props.readonlyMode"
-                                             :show-state-text="props.readonlyMode"
-                                             @change-toggle="handleChangeToggle(item.type, $event)"
-                            />
-                            <p class="title">
-                                {{ item.title }}
-                            </p>
-                        </div>
-                        <p-badge v-if="state.type === item.type && state.isVerified"
-                                 style-type="green200"
-                                 badge-type="subtle"
-                                 class="badge"
+            <div class="flex w-full justify-between px-4 items-center ">
+                <div class="flex items-center gap-3">
+                    <p-i class="icon"
+                         :class="{'opacity-20': state.isEnforced && state.currentType !== item.type}"
+                         :name="item.icon"
+                         height="2.5rem"
+                         width="2.5rem"
+                    />
+                    <div class="flex flex-col justify-center gap-1">
+                        <span class="text-label-md font-bold">
+                            {{ item.title }}
+                        </span>
+                        <span class="text-label-md text-gray-600"
+                              :class="{'opacity-20': state.isEnforced && state.currentType !== item.type}"
                         >
-                            {{ $t('MY_PAGE.MFA.SYNC') }}
-                        </p-badge>
+                            {{ item.type === MULTI_FACTOR_AUTH_TYPE.OTP ? $t('MY_PAGE.MFA.MS_DESC') : $t('MY_PAGE.MFA.EMAIL_DESC') }}
+                        </span>
                     </div>
-                    <p class="desc">
-                        <span v-if="item.type === MULTI_FACTOR_AUTH_TYPE.OTP">{{ $t('MY_PAGE.MFA.MS_DESC') }}</span>
-                        <span v-else>{{ $t('MY_PAGE.MFA.EMAIL_DESC') }}</span>
-                    </p>
+                </div>
+                <div v-if="state.currentType === item.type && state.isVerified"
+                     class="inline-flex items-center gap-2"
+                >
+                    <p-badge class="badge"
+                             style-type="green200"
+                             badge-type="subtle"
+                    >
+                        {{ $t('MY_PAGE.MFA.SYNC') }}
+                    </p-badge>
+                    <p-button class="re-sync-button"
+                              style-type="tertiary"
+                              size="sm"
+                              :readonly="props.readonlyMode"
+                              @click="handleClickReSyncButton(item.type, $event)"
+                    >
+                        {{ $t('MY_PAGE.MFA.RESYNC') }}
+                    </p-button>
                 </div>
             </div>
-            <p-button v-if="state.type === item.type && state.isVerified"
-                      class="re-sync-button"
-                      style-type="tertiary"
-                      size="sm"
-                      :readonly="props.readonlyMode"
-                      @click="handleClickReSyncButton(item.type)"
-            >
-                {{ $t('MY_PAGE.MFA.RESYNC') }}
-            </p-button>
-        </div>
+        </p-select-card>
     </div>
 </template>
 
