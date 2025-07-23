@@ -12,5 +12,5 @@ export interface UserUpdateParameters {
     tags?: Tags;
     reset_password?: boolean;
     enforce_mfa_state?: MfaState;
-    enforce_mfa_type?: MultiFactorAuthType; // only when enforce_mfa is true, this field is required
+    enforce_mfa_type?: MultiFactorAuthType; // only when enforce_mfa_state is ENABLED, this field is required
 }

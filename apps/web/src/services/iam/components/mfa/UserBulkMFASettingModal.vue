@@ -74,7 +74,7 @@ const handleConfirm = async () => {
             else throw new Error('[User MFA Setting] Something went wrong! Try again later. If the problem persists, please contact support.');
         }
 
-        // API Policy: enforce_mfa_type is required when enforce_mfa is true
+        // API Policy: enforce_mfa_type is required when enforce_mfa_state is ENABLED
         if (isRequiredMfa.value && !selectedMfaType.value) {
             if (import.meta.env.DEV) throw new Error('[UserMFASettingModal.vue] MFA type is required when required MFA is true.');
             else throw new Error('[User MFA Setting] Something went wrong! Try again later. If the problem persists, please contact support.');
