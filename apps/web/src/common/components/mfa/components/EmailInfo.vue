@@ -16,25 +16,21 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
-
 interface Props {
-    isSentCode?: boolean
+    isSentCode?: boolean;
+    isForm?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isSentCode: false,
 });
 
-const multiFactorAuthStore = useMultiFactorAuthStore();
-const multiFactorAuthState = multiFactorAuthStore.state;
 const userStore = useUserStore();
 
 const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
 const storeState = reactive({
     email: computed<string|undefined>(() => userStore.state.mfa?.options?.email),
-    isFormModal: computed(() => multiFactorAuthState.modalType === 'FORM'),
 });
 const state = reactive({
     loading: false,
@@ -58,7 +54,7 @@ const {
 const handleClickSendCodeButton = async () => {
     state.loading = true;
     try {
-        if (storeState.isFormModal) {
+        if (props.isForm) {
             await postEnableMfa({
                 mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
                 options: {
@@ -82,9 +78,9 @@ const handleClickSendCodeButton = async () => {
 
 <template>
     <div class="email-info-wrapper"
-         :class="{'form-modal': storeState.isFormModal}"
+         :class="{'form-modal': props.isForm}"
     >
-        <div v-if="storeState.isFormModal"
+        <div v-if="props.isForm"
              class="email-form-wrapper"
         >
             <p-field-group

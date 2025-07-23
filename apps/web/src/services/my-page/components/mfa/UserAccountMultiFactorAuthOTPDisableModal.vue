@@ -24,7 +24,9 @@ interface Props {
     switch?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    switch: false,
+});
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
@@ -68,6 +70,7 @@ const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileCo
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_DISABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
+        if (props.switch) multiFactorAuthStore.setEmailEnableModalVisible(true);
     },
     onError: (error: Error) => {
         ErrorHandler.handleError(error);

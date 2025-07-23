@@ -12,9 +12,9 @@ import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-fac
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    isDisabledModal: boolean
-    isReSyncModal: boolean
-    isSentCode: boolean
+    isDisabledModal?: boolean
+    isReSyncModal?: boolean
+    isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

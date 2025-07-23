@@ -13,19 +13,22 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import EmailFoldingInfo from '@/common/components/mfa/components/EmailFoldingInfo.vue';
+import EmailInfo from '@/common/components/mfa/components/EmailInfo.vue';
 import VerificationCodeForm from '@/common/components/mfa/components/VerificationCodeForm.vue';
 import { useUserProfileConfirmMfaMutation } from '@/common/components/mfa/composables/use-user-profile-confirm-mfa-mutation';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
-import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
+
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 interface Props {
     reSync?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    reSync: false,
+});
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
@@ -70,6 +73,7 @@ const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileCo
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
+        if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
     },
     onError: (error: Error) => {
         ErrorHandler.handleError(error);
@@ -110,15 +114,15 @@ const handleClickVerifyButton = async () => {
                 <p class="re-sync-desc">
                     {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
                 </p>
-                <user-account-multi-factor-auth-modal-email-info :is-sent-code.sync="isSentCode"
-                                                                 is-form
+                <email-info :is-sent-code.sync="isSentCode"
+                            :is-form="!props.reSync"
                 />
                 <verification-code-form :invalid.sync="validationState.isInvalidationCodeValid"
                                         :code-value.sync="validationState.verificationCode"
                                         :invalid-text="$t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL')"
                 />
-                <user-account-multi-factor-auth-modal-folding :is-re-sync-modal="props.reSync"
-                                                              :is-sent-code.sync="isSentCode"
+                <email-folding-info :is-re-sync-modal="props.reSync"
+                                    :is-sent-code.sync="isSentCode"
                 />
             </div>
         </template>

@@ -25,7 +25,9 @@ interface Props {
     reSync?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    reSync: false,
+});
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
@@ -69,6 +71,7 @@ const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileCo
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
+        if (props.reSync) multiFactorAuthStore.setOTPEnableModalVisible(true);
     },
     onError: (error: Error) => {
         ErrorHandler.handleError(error);
