@@ -166,4 +166,14 @@ export const RESOURCE_CONFIG_MAP = {
         idKey: 'plugin_id',
         nameKey: 'name',
     },
+    cost: {
+        name: 'Cost',
+        resourceKey: 'cost',
+        idKey: 'cost_id',
+    },
+    unifiedCost: {
+        name: 'Unified Cost',
+        resourceKey: 'unifiedCost',
+        idKey: 'unified_cost_id',
+    },
 } as const;
