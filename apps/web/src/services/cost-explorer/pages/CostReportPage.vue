@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -20,15 +20,12 @@ import CostReportOverviewCostTrendCard from '@/services/cost-explorer/components
 import CostReportRecipientsCard from '@/services/cost-explorer/components/CostReportRecipientsCard.vue';
 import CostReportReportsTab from '@/services/cost-explorer/components/CostReportReportsTab.vue';
 import CostReportUpcomingReportCard from '@/services/cost-explorer/components/CostReportUpcomingReportCard.vue';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { useCostReportListQuery } from '@/services/cost-explorer/composables/use-cost-report-list-query';
 
-const costReportPageStore = useCostReportPageStore();
-const costReportPageState = costReportPageStore.state;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const state = reactive({
-    loading: true,
     tabs: computed<TabItem[]>(() => [
         {
             name: 'overview',
@@ -45,16 +42,13 @@ const state = reactive({
     currency: 'KRW' as Currency,
 });
 
-/* Watcher */
-watch(() => state.activeTab, (activeTab) => {
-    costReportPageState.activeTab = activeTab;
-});
-
-onMounted(async () => {
-    state.loading = true;
-    await costReportPageStore.fetchCostReportConfig();
-    await costReportPageStore.fetchRecentReportData(costReportPageState.costReportConfig?.cost_report_config_id);
-    state.loading = false;
+/* Query */
+const { totalCount, isLoading } = useCostReportListQuery({
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
+    params: computed(() => ({
+        status: 'DONE',
+    })),
 });
 </script>
 
@@ -67,18 +61,20 @@ onMounted(async () => {
                :active-tab.sync="state.activeTab"
         >
             <template #overview>
-                <p-data-loader :loading="state.loading"
+                <p-data-loader :loading="isLoading"
                                :data="true"
                                class="data-loader"
                 >
                     <div class="overview-tab-pane">
-                        <cost-report-overview-cost-trend-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
-                                                              class="col-span-12"
+                        <cost-report-overview-cost-trend-card
+                            v-if="totalCount > 0"
+                            class="col-span-12"
                         />
-                        <cost-report-monthly-total-amount-summary-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
-                                                                       class="xl:col-span-8 lg:col-span-6 col-span-12"
+                        <cost-report-monthly-total-amount-summary-card
+                            v-if="totalCount > 0"
+                            class="xl:col-span-8 lg:col-span-6 col-span-12"
                         />
-                        <p-empty v-if="!costReportPageState.recentReportDataLoading && !costReportPageState.hasReport"
+                        <p-empty v-if="!totalCount"
                                  class="xl:col-span-8 lg:col-span-6 col-span-12 empty-card"
                                  show-image
                                  :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.NO_REPORT')"

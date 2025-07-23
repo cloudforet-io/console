@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
+
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PTooltip, PI, PToggleButton, PLink,
 } from '@cloudforet/mirinae';
-
-
 
 import type {
     CostReportConfigUpdateRecipientsParameters,
@@ -23,8 +23,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
+
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -32,45 +33,36 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const costReportPageStore = useCostReportPageStore();
-const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
+const queryClient = useQueryClient();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
-const state = reactive({
-    enableWorkspaceOwnerRecipients: false,
-});
+const enableWorkspaceOwnerRecipients = computed<boolean>(() => costReportConfig.value?.recipients?.role_types?.includes('WORKSPACE_OWNER') ?? false);
 
 /* Api */
-const updateRecipients = async (val: boolean): Promise<boolean> => {
-    try {
-        const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.updateRecipients<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
-            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
-            recipients: {
-                role_types: val ? ['WORKSPACE_OWNER'] : [],
-            },
-        });
-        costReportPageStore.setCostReportConfig(updatedConfig);
+const { costReportConfig, key: costReportConfigQueryKey } = useCostReportConfigQuery();
+const { mutate: updateRecipients } = useMutation<CostReportConfigModel, Error, boolean>({
+    mutationFn: async (val: boolean) => SpaceConnector.clientV2.costAnalysis.costReportConfig.updateRecipients<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
+        cost_report_config_id: costReportConfig.value?.cost_report_config_id ?? '',
+        recipients: {
+            role_types: val ? ['WORKSPACE_OWNER'] : [],
+        },
+    }),
+    onSuccess: () => {
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_UPDATE_RECIPIENTS'), '');
-        return true;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_UPDATE_RECIPIENTS'));
-        return false;
-    }
-};
+        queryClient.invalidateQueries({ queryKey: costReportConfigQueryKey.value });
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_UPDATE_RECIPIENTS'));
+    },
+});
 
 /* Event */
 const handleToggleRecipients = async (val: boolean) => {
-    const result = await updateRecipients(val);
-    if (result) state.enableWorkspaceOwnerRecipients = val;
+    updateRecipients(val);
 };
-
-/* Watcher */
-watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
-    state.enableWorkspaceOwnerRecipients = costReportConfig?.recipients?.role_types?.includes('WORKSPACE_OWNER') ?? false;
-}, { immediate: true });
 </script>
 
 <template>
@@ -112,14 +104,14 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
                     </p-tooltip>
                 </div>
                 <p-toggle-button v-if="props.hasReadWriteAccess && storeState.isAdminMode"
-                                 :value="state.enableWorkspaceOwnerRecipients"
+                                 :value="enableWorkspaceOwnerRecipients"
                                  @change-toggle="handleToggleRecipients"
                 />
                 <span v-else
                       class="on-off-text"
-                      :class="{ 'on': state.enableWorkspaceOwnerRecipients }"
+                      :class="{ 'on': enableWorkspaceOwnerRecipients }"
                 >
-                    {{ state.enableWorkspaceOwnerRecipients ? 'ON' : 'OFF' }}
+                    {{ enableWorkspaceOwnerRecipients ? 'ON' : 'OFF' }}
                 </span>
             </div>
         </template>

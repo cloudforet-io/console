@@ -16,14 +16,16 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
+import type { Currency } from '@/store/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { useCostReportDataAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-report-data-analyze-query';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+
 
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
@@ -34,9 +36,6 @@ type CostReportDataAnalyzeResult = {
     _total_value_sum?: number;
 };
 
-const costReportPageStore = useCostReportPageStore();
-const costReportPageGetters = costReportPageStore.getters;
-const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -44,8 +43,8 @@ const storeState = reactive({
 
 const state = reactive({
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
-        const _defaultStart = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
-        const _defaultEnd = costReportPageState.recentReportMonth;
+        const _defaultStart = dayjs.utc(recentReportMonth.value).subtract(11, 'month').format('YYYY-MM');
+        const _defaultEnd = recentReportMonth.value;
         const _default: SelectDropdownMenuItem = {
             name: 'last12Months', label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS')} (${_defaultStart} ~ ${_defaultEnd})`,
         };
@@ -65,14 +64,14 @@ const state = reactive({
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     previousTotalAmount: computed<number>(() => {
-        if (!costReportPageState.recentReportMonth) return 0;
-        return getPreviousTotalAmount(costReportPageState.recentReportMonth, costReportDataAnalyzeData.value?.results);
+        if (!recentReportMonth.value) return 0;
+        return getPreviousTotalAmount(recentReportMonth.value, costReportDataAnalyzeData.value?.results);
     }),
     last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(costReportDataAnalyzeData.value?.results)),
     period: computed(() => {
         if (state.selectedDate === 'last12Months') {
-            const start = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
-            const end = costReportPageState.recentReportMonth;
+            const start = dayjs.utc(recentReportMonth.value).subtract(11, 'month').format('YYYY-MM');
+            const end = recentReportMonth.value;
             return { start, end };
         }
         const start = `${state.selectedDate}-01`;
@@ -86,9 +85,20 @@ const state = reactive({
         return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: dayjs.utc(state.selectedDate).year() });
     }),
 });
-const currencySymbol = computed<string>(() => CURRENCY_SYMBOL?.[costReportPageGetters.currency || 'USD']);
+const currency = computed<Currency>(() => costReportConfig.value?.currency || 'USD');
+const currencySymbol = computed<string>(() => CURRENCY_SYMBOL?.[currency.value || 'USD']);
+const recentReportMonth = computed<string>(() => {
+    if (!costReportConfig.value?.issue_day) return dayjs.utc().subtract(1, 'month').format('YYYY-MM');
+
+    const today = dayjs.utc();
+    const issueDay = costReportConfig.value.issue_day;
+
+    if (today.date() >= issueDay) return today.subtract(1, 'month').format('YYYY-MM');
+    return today.subtract(2, 'month').format('YYYY-MM');
+});
 
 /* Query */
+const { costReportConfig } = useCostReportConfigQuery();
 const queryParams = computed<AnalyzeQuery|null>(() => ({
     granularity: GRANULARITY.MONTHLY,
     group_by: [state.selectedTarget, 'is_adjusted'],
@@ -97,7 +107,7 @@ const queryParams = computed<AnalyzeQuery|null>(() => ({
     end: state.period.end,
     fields: {
         value_sum: {
-            key: `cost.${costReportPageGetters.currency}`,
+            key: `cost.${currency.value}`,
             operator: 'sum',
         },
     },
@@ -108,17 +118,17 @@ const queryParams = computed<AnalyzeQuery|null>(() => ({
 }));
 
 const { costReportDataAnalyzeData, isLoading } = useCostReportDataAnalyzeQuery({
-    cost_report_config_id: computed(() => costReportPageState.costReportConfig?.cost_report_config_id || ''),
+    cost_report_config_id: computed(() => costReportConfig.value?.cost_report_config_id || ''),
     is_confirmed: true,
     query: queryParams,
 });
 
 /* Util */
-const getPreviousTotalAmount = (recentReportMonth: string, results?: CostReportDataAnalyzeResult[]): number => {
+const getPreviousTotalAmount = (_recentReportMonth: string, results?: CostReportDataAnalyzeResult[]): number => {
     if (!results) return 0;
     let _totalAmount = 0;
     results.forEach((item) => {
-        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === recentReportMonth);
+        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === _recentReportMonth);
         if (_valueSum) {
             _totalAmount += _valueSum.value;
         }
@@ -184,7 +194,7 @@ const handleChangeTarget = (target: string) => {
                         </div>
                         <div class="summary-value">
                             <span class="currency-symbol">{{ currencySymbol }}</span>
-                            <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency, style: 'decimal'}) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -193,7 +203,7 @@ const handleChangeTarget = (target: string) => {
                         </div>
                         <div class="summary-value">
                             <span class="currency-symbol">{{ currencySymbol }}</span>
-                            <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency || 'USD', style: 'decimal'}) }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency, style: 'decimal'}) }}</span>
                         </div>
                     </div>
                 </div>
