@@ -219,8 +219,8 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
     }).then((response) => {
         const roleName = roleMap.value[response.role_id]?.name ?? '';
         const originTableIndex = userPageState.selectedIndices[rowIndex];
-        userPageState.selectedUsers[originTableIndex] = {
-            ...userPageState.selectedUsers[originTableIndex],
+        selectedUsers.value[originTableIndex] = {
+            ...selectedUsers.value[originTableIndex],
             role_binding: {
                 name: roleName,
                 type: response.role_type,
@@ -230,7 +230,7 @@ const handleSelectDropdownItem = async (value, rowIndex:number) => {
 };
 
 /* Watch */
-watch(() => userPageState.selectedUsers, (val) => {
+watch(() => selectedUsers.value, (val) => {
     selectedUsers.value = val;
 }, { immediate: true });
 </script>
@@ -242,9 +242,7 @@ watch(() => userPageState.selectedUsers, (val) => {
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess"
-                                            :selected-user="selectedUsers[0]"
-                />
+                <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess" />
             </template>
             <template #workspace>
                 <user-management-tab-workspace :active-tab="singleItemTabState.activeTab"

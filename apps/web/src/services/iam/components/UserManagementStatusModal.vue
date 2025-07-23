@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PDataTable, PBadge, PStatus,
 } from '@cloudforet/mirinae';
 
-import type { UserDeleteParameters } from '@/api-clients/identity/user/schema/api-verbs/delete';
-import type { UserDisableParameters } from '@/api-clients/identity/user/schema/api-verbs/disable';
-import type { UserEnableParameters } from '@/api-clients/identity/user/schema/api-verbs/enable';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -21,20 +19,41 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { useRoleBindingDeleteMutation } from '@/services/iam/composables/use-role-binding-delete-mutation';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
 import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useWorkspaceUserListQuery } from '@/services/iam/composables/use-workspace-user-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 
+
+
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
+const { userAPI } = useUserApi();
+
 const { data: workspaceUserList } = useWorkspaceUserListQuery();
+const serviceListQuery = useServiceListQuery();
+const { roleListData } = useRoleListQuery();
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+
+
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: selectedUsers.value?.map((user) => user.user_id), o: 'in' },
+            ],
+        },
+    })),
+});
 
 const state = reactive({
     loading: false,
@@ -60,13 +79,12 @@ const state = reactive({
     filteredUniqueItems: computed(() => {
         const serviceList = serviceListQuery.data.value;
         const userGroups = userGroupListData.value;
-        const selectedUsers = userPageState.selectedUsers;
 
-        if (!serviceList || !userGroups || !selectedUsers?.length) return [];
+        if (!serviceList || !userGroups || !selectedUsers.value?.length) return [];
 
         const list: any[] = [];
 
-        selectedUsers.forEach((selectedUser) => {
+        selectedUsers.value?.forEach((selectedUser) => {
             Object.values(serviceList).forEach((service) => {
                 if (service && service.members) {
                     if (Object.keys(service.members).includes('USER')) {
@@ -142,6 +160,13 @@ const state = reactive({
                 };
             });
     }),
+    roleMap: computed<Record<string, RoleModel>>(() => {
+        const _map: Record<string, RoleModel> = {};
+        roleListData.value?.forEach((role) => {
+            _map[role.role_id] = role;
+        });
+        return _map;
+    }),
 });
 
 
@@ -196,19 +221,57 @@ const handleClose = () => {
 const queryClient = useQueryClient();
 const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
 
-const { mutate: deleteRoleBinding } = useRoleBindingDeleteMutation({
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });
 
+const { mutateAsync: _deleteUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.delete({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const { mutateAsync: _enableUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.enable({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const { mutateAsync: _disableUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.disable({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 /* API */
-// TODO: need to refactor
 const removeUser = async (role_binding_id?: string): Promise<boolean> => {
     try {
         if (!role_binding_id) return false;
-        deleteRoleBinding({
+        await deleteRoleBinding({
             role_binding_id,
         });
         return true;
@@ -220,9 +283,7 @@ const removeUser = async (role_binding_id?: string): Promise<boolean> => {
 const deleteUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>({
-            user_id: userId,
-        });
+        await _deleteUser(userId);
         return true;
     } catch (e) {
         return false;
@@ -231,9 +292,7 @@ const deleteUser = async (userId?: string): Promise<boolean> => {
 const enableUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.enable<UserEnableParameters>({
-            user_id: userId,
-        });
+        await _enableUser(userId);
         return true;
     } catch (e) {
         return false;
@@ -242,27 +301,12 @@ const enableUser = async (userId?: string): Promise<boolean> => {
 const disableUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.disable<UserDisableParameters>({
-            user_id: userId,
-        });
+        await _disableUser(userId);
         return true;
     } catch (e) {
         return false;
     }
 };
-
-const serviceListQuery = useServiceListQuery();
-
-const { userGroupListData } = useUserGroupListQuery({
-    params: computed(() => ({
-        query: {
-            filter: [
-                { k: 'user_id', v: userPageState.selectedUsers.map((user) => user.user_id), o: 'in' },
-            ],
-        },
-    })),
-});
-
 </script>
 
 <template>
@@ -277,10 +321,10 @@ const { userGroupListData } = useUserGroupListQuery({
     >
         <template #body>
             <p-data-table
+                v-if="!userPageState.isAdminMode"
                 :fields="state.fields"
                 :items="state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
             >
-                {{ state.selectedOnlyWorkspaceUsers.length }}
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
                               class="capitalize"
@@ -309,7 +353,9 @@ const { userGroupListData } = useUserGroupListQuery({
                     </div>
                     <div v-else />
                 </template>
-                <template #col-user_group-format="{value}">
+                <template v-if="!userPageState.isAdminMode"
+                          #col-user_group-format="{value}"
+                >
                     <div v-if="value.length > 0">
                         <span v-for="(userGroup, i) in value"
                               :key="i"
@@ -333,7 +379,7 @@ const { userGroupListData } = useUserGroupListQuery({
                 </template>
                 <template #col-role_id-format="{value}">
                     <span v-if="!value">--</span>
-                    <span v-else> {{ userPageGetters.roleMap[value]?.name }}</span>
+                    <span v-else> {{ state.roleMap[value]?.name }}</span>
                 </template>
                 <template #col-role_type-format="{value}">
                     <span> {{ useRoleFormatter(value, true).name }}</span>
