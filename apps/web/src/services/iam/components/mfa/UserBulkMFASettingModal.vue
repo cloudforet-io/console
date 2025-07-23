@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import {
     PButtonModal, PScopedNotification,
@@ -10,21 +10,31 @@ import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/sc
 import type { UserUpdateParameters } from '@/api-clients/identity/user/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
+import { useUserStore } from '@/store/user/user-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserMFASettingFormLayout from '@/services/iam/components/mfa/UserMFASettingFormLayout.vue';
 import { useUserUpdateMutation } from '@/services/iam/composables/mutations/use-user-update-mutation';
+import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
 
+interface UserBulkMFASettingModalEmits {
+    (e: 'confirm'): void;
+}
+const emit = defineEmits<UserBulkMFASettingModalEmits>();
+
 /* Store */
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
+const userPageModalState = userPageStore.modalState;
 const userPageGetters = userPageStore.getters;
+const userStore = useUserStore();
 
 /* State */
 const selectedMfaType = ref<MultiFactorAuthType>(MULTI_FACTOR_AUTH_ITEMS[0].type);
@@ -51,15 +61,15 @@ const { mutateAsync: updateUser, isPending: isUpdateUserPending } = useUserUpdat
 
 /* Utils */
 const closeModal = () => {
-    userPageStore.updateModalSettings({
-        type: '',
-        title: '',
-        themeColor: 'primary',
-        modalVisibleType: undefined,
-    });
+    userPageStore.setBulkMfaSettingModalVisible(false);
 };
 
 /* Events */
+const handleOpenDisableMfaModal = () => {
+    closeModal();
+    userPageStore.setMfaSecretKeyDeleteModalVisible(true);
+    userPageStore.setPreviousModalType(USER_MODAL_MAP.SET_MFA);
+};
 const handleClose = () => {
     closeModal();
 };
@@ -97,6 +107,7 @@ const handleConfirm = async () => {
         if (results.every((result) => result.status === 'fulfilled')) {
             showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_SUCCESS_MESSAGE'), '');
             closeModal();
+            emit('confirm');
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk update MFA failed
             if (import.meta.env.DEV) {
                 const joinedFailedUserIds = Array.from(failedUserIds.keys()).join(', ');
@@ -112,12 +123,18 @@ const handleConfirm = async () => {
     }
 };
 
+watch(() => userStore.state.mfa, (mfa) => {
+    if (mfa) {
+        isRequiredMfa.value = !!mfa.options?.enforce;
+        selectedMfaType.value = mfa.mfa_type || MULTI_FACTOR_AUTH_ITEMS[0].type;
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <p-button-modal class="user-bulk-mfa-setting-modal"
                     size="sm"
-                    :visible="userPageState.modal.visible === 'setMfa'"
+                    :visible="userPageModalState.bulkMfaSettingModalVisible"
                     :header-title="$t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_MODAL_TITLE')"
                     :theme-color="userPageState.modal.themeColor"
                     :loading="isUpdateUserPending"
@@ -140,6 +157,7 @@ const handleConfirm = async () => {
                 <user-m-f-a-setting-form-layout :selected-mfa-controllable-target="selectedMFAControllableUsers"
                                                 :is-required-mfa.sync="isRequiredMfa"
                                                 :selected-mfa-type.sync="selectedMfaType"
+                                                @click-disable-mfa="handleOpenDisableMfaModal"
                 />
             </div>
         </template>

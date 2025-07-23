@@ -28,6 +28,7 @@ interface UserMFASettingFormLayoutProps {
 interface UserMFASettingFormLayoutEmits {
     (e: 'update:is-required-mfa', value: boolean): void;
     (e: 'update:selected-mfa-type', value: MultiFactorAuthType): void;
+    (e: 'click-disable-mfa'): void;
 }
 
 interface UserMFASettingFormState {
@@ -118,7 +119,9 @@ const selectedMFAEnabledTarget = computed<UserModel | UserModel[] | undefined>((
 
         <p-divider horizontal />
 
-        <user-m-f-a-setting-disable-button :selected-target="selectedMFAEnabledTarget" />
+        <user-m-f-a-setting-disable-button :selected-target="selectedMFAEnabledTarget"
+                                           @click="emit('click-disable-mfa')"
+        />
     </div>
 </template>
 
