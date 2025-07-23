@@ -17,17 +17,19 @@ import { useUserMfaDisableMutation } from '@/services/iam/composables/mutations/
 import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 
 interface UserMFASettingDisableButtonProps {
-    selectedTarget: UserModel | UserModel[];
+    selectedTarget?: UserModel | UserModel[];
 }
 
 const props = defineProps<UserMFASettingDisableButtonProps>();
 
 /* Computed */
 const selectedTargetUsers = computed<UserModel[]>(() => {
+    if (!props.selectedTarget) return [];
     if (Array.isArray(props.selectedTarget)) return props.selectedTarget;
     return [props.selectedTarget];
 });
-const isSingleTargetUser = computed<boolean>(() => !Array.isArray(props.selectedTarget));
+const isSingleTargetUser = computed<boolean>(() => !!props.selectedTarget && !Array.isArray(props.selectedTarget));
+const buttonDisabled = computed<boolean>(() => !props.selectedTarget || selectedTargetUsers.value.length === 0);
 
 /* API */
 // Store failed user IDs
@@ -84,7 +86,7 @@ const handleDeleteMfaSecretKey = async (onClose: () => void) => {
                 <p-button style-type="negative-secondary"
                           class="mt-4"
                           size="md"
-                          :disabled="selectedTargetUsers.length === 0"
+                          :disabled="buttonDisabled"
                           icon-left="ic_delete"
                           @click="trigger"
                 >
