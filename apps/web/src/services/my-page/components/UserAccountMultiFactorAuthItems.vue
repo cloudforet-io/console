@@ -40,8 +40,9 @@ const state = reactive({
     isEnforced: computed<boolean>(() => !!userStore.state.mfa?.options?.enforce),
 });
 
-const handleChange = async (selected: MultiFactorAuthType) => {
+const handleChange = async (isSelected: boolean, selected: MultiFactorAuthType) => {
     if (props.readonlyMode) return;
+    if (state.isEnforced && state.currentType !== selected) return;
     if (state.isVerified && state.currentType !== selected) {
         if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
             multiFactorAuthStore.setEmailSwitchModalVisible(true);
@@ -52,7 +53,7 @@ const handleChange = async (selected: MultiFactorAuthType) => {
         return;
     }
 
-    if (state.currentType !== selected) {
+    if (!isSelected) {
         if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
             multiFactorAuthStore.setOTPEnableModalVisible(true);
         } else {
@@ -68,6 +69,7 @@ const handleChange = async (selected: MultiFactorAuthType) => {
 
 const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEvent) => {
     if (props.readonlyMode) return;
+    if (state.isEnforced && state.currentType !== type) return;
     event.stopPropagation();
     if (type === MULTI_FACTOR_AUTH_TYPE.OTP) {
         multiFactorAuthStore.setOTPReSyncModalVisible(true);
@@ -84,10 +86,10 @@ const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEv
                        :key="`${item.type} - ${idx}`"
                        block
                        :readonly="props.readonlyMode"
-                       :selected="state.currentType"
+                       :selected="state.isVerified ? state.currentType : undefined"
                        :disabled="state.isEnforced && state.currentType !== item.type"
                        :value="item.type"
-                       @change="handleChange"
+                       @change="handleChange(state.isVerified && state.currentType === item.type, $event)"
         >
             <div class="flex w-full justify-between px-4 items-center ">
                 <div class="flex items-center gap-3">
