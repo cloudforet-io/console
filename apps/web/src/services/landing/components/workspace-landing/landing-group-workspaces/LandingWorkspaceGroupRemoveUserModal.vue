@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { MyWorkspaceGroupModel } from '@/api-clients/identity/user-profile/schema/model';
-import type { WorkspaceGroupUserRemoveParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/remove';
+import { useWorkspaceGroupUserApi } from '@/api-clients/identity/workspace-group-user/composables/use-workspace-group-user-api';
 import type { WorkspaceUser, WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
@@ -37,9 +36,9 @@ const props = defineProps<Props>();
 
 const landingPageStore = useLandingPageStore();
 const landingPageState = landingPageStore.state;
+const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
 
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const userTableFields = [{ name: 'user_id', label: 'User ID' },
@@ -65,25 +64,24 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-
-const deleteGroupUsers = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>({
-            workspace_group_id: landingPageState.selectedWorkspaceGroupId,
-            users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
-        });
+/* Mutation */
+const { mutate: removeWorkspaceGroupUser, isPending: isLoading } = useMutation({
+    mutationFn: workspaceGroupUserAPI.remove,
+    onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: workspaceGroupsQueryKey.value });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_USERS'), '');
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_USERS'));
-    } finally {
-        state.loading = false;
-    }
-};
+    },
+});
 
+/* Handlers */
 const handleConfirm = async () => {
-    await deleteGroupUsers();
+    await removeWorkspaceGroupUser({
+        workspace_group_id: landingPageState.selectedWorkspaceGroupId,
+        users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
+    });
     state.proxyVisible = false;
     emit('confirm');
 };
@@ -101,7 +99,7 @@ const handleCloseModal = () => {
                          :fields="userTableFields"
                          :items="props.removeUserList || []"
                          size="sm"
-                         :loading="state.loading"
+                         :loading="isLoading"
                          @confirm="handleConfirm"
                          @cancel="handleCloseModal"
                          @close="handleCloseModal"

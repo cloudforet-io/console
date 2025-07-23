@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PToolboxTable, PLink, PStatus, PTooltip, PI,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserProfileGetWorkspacesParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/get-workspaces';
 import type { MyWorkspaceModel } from '@/api-clients/identity/user-profile/schema/model';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 
@@ -21,8 +19,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
+
 
 const fields = [
     { name: 'name', label: 'Name' },
@@ -34,10 +34,8 @@ const landingPageState = landingPageStore.state;
 const userStore = useUserStore();
 
 const tableState = reactive({
-    loading: false,
-    items: [] as MyWorkspaceModel[],
     convertedItems: computed<MyWorkspaceModel[]>(() => {
-        const filteredWorkspaces = tableState.items.filter((workspace: MyWorkspaceModel) => {
+        const filteredWorkspaces = workspaces.value?.filter((workspace: WorkspaceModel) => {
             const searchText = tableState.searchText.trim();
 
             if (searchText === '') {
@@ -69,13 +67,12 @@ const tableState = reactive({
             return aValue.localeCompare(bValue);
         });
 
-        if (tableState.totalCount < tableState.pageStart - 1 + tableState.pageLimit) {
+        if (totalCount.value < tableState.pageStart - 1 + tableState.pageLimit) {
             return sortedWorkspacesInSelectedGroup.slice(tableState.pageStart - 1);
         }
 
         return sortedWorkspacesInSelectedGroup?.slice(tableState.pageStart - 1, tableState.pageStart - 1 + tableState.pageLimit);
     }),
-    totalCount: computed(() => tableState.items.length),
     pageStart: 1,
     thisPage: 1,
     pageLimit: 15,
@@ -92,20 +89,12 @@ const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-const fetchWorkspaces = async () => {
-    tableState.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, ListResponse<MyWorkspaceModel>>({
-            workspace_group_id: landingPageState.selectedWorkspaceGroupId,
-        });
-        tableState.items = results ?? [];
-    } catch (e) {
-        // ErrorHandler.handleError(e);
-    } finally {
-        tableState.loading = false;
-    }
-};
+/* Query */
+const { data: workspaces, isLoading: isLoadingWorkspaces, totalCount } = useUserProfileGetWorkspacesQuery(computed(() => ({
+    workspace_group_id: landingPageState.selectedWorkspaceGroupId,
+})));
 
+/* Handlers */
 const handleChange = async (options: any = {}) => {
     if (options.pageStart) {
         tableState.pageStart = options.pageStart;
@@ -126,15 +115,10 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
 const handleRefresh = () => {
     tableState.thisPage = 1;
     tableState.searchText = '';
-    fetchWorkspaces();
 };
 
 watch(() => tableState.searchText, () => {
     tableState.thisPage = 1;
-});
-
-onMounted(() => {
-    fetchWorkspaces();
 });
 </script>
 
@@ -143,14 +127,14 @@ onMounted(() => {
         <p-heading class="pt-8 px-4 pb-4"
                    :title="$t('IAM.WORKSPACE_GROUP.TAB.WORKSPACE')"
                    use-total-count
-                   :total-count="tableState.totalCount"
+                   :total-count="totalCount"
                    heading-type="sub"
         />
         <p-toolbox-table class="workspace-group-tab-workspace-table"
-                         :loading="tableState.loading"
+                         :loading="isLoadingWorkspaces"
                          :fields="fields"
                          :items="tableState.convertedItems"
-                         :total-count="tableState.totalCount"
+                         :total-count="totalCount"
                          sort-by="name"
                          search-type="plain"
                          :sort-desc="true"
