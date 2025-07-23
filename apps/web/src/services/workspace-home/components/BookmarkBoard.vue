@@ -28,7 +28,7 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { blue, gray } from '@/styles/colors';
 
-import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
 import { useBookmarkListQuery } from '@/services/workspace-home/composables/use-bookmark-list-query';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';

@@ -21,10 +21,9 @@ import { extractBaseURL } from '@/common/components/bookmark/composables/use-boo
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
-
-import { useBookmarkFolderListQuery } from './use-bookmark-forder-list-query';
 
 interface UseBookmarkListQueryReturn {
     bookmarkList: ComputedRef<BookmarkItem[]>;

@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { BOOKMARK_TYPE } from '@/services/advanced/constants/bookmark-constant';
 
 interface BookmarkPageState {

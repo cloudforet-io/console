@@ -19,7 +19,7 @@ import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookma
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
-import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
 import { useBookmarkListQuery } from '@/services/workspace-home/composables/use-bookmark-list-query';
 import {
     MAX_BOARD_SETS,

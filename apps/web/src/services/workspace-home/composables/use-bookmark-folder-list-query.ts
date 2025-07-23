@@ -19,7 +19,6 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
 
-
 interface UseBookmarkFolderListQueryReturn {
     bookmarkFolderListData: ComputedRef<BookmarkItem[]>;
     refreshBookmarkFolderList: () => void;

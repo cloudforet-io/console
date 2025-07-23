@@ -9,7 +9,10 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { at } from 'lodash';
 
 import {
-    PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,
+    PButton, PContextMenu,
+    PHeading,
+    PHeadingLayout,
+    PI, PIconButton, PStatus,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -18,14 +21,14 @@ import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
+import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';

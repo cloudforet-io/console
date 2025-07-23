@@ -11,9 +11,9 @@ import BookmarkFolderFormModal from '@/common/components/bookmark/BookmarkFolder
 import BookmarkLinkFormModal from '@/common/components/bookmark/BookmarkLinkFormModal.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
+import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 

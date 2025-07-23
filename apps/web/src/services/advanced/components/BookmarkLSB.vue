@@ -5,7 +5,9 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PTextInput, PTextHighlighting, PEmpty,
+    PEmpty,
+    PTextHighlighting,
+    PTextInput,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -18,7 +20,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import BookmarkTree from '@/services/advanced/components/BookmarkTree.vue';
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 
 const route = useRoute();

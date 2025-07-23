@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
+import { PI, PTextButton, PTreeView } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
@@ -16,7 +16,7 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
-import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-forder-list-query';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import type { TreeNode } from '@/services/project/v-shared/tree/type';
