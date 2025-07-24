@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import {
-    reactive, onActivated,
+    reactive, onActivated, computed,
 } from 'vue';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHorizontalLayout, PHeading,
 } from '@cloudforet/mirinae';
 
 import type { JobTaskModel } from '@/api-clients/inventory/job-task/schema/model';
-import type { JobModel } from '@/api-clients/inventory/job/schema/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import JobBasicInformation from '@/services/asset-inventory/components/CollectorHistoryJobBasicInformation.vue';
 import JobStatusChart from '@/services/asset-inventory/components/CollectorHistoryJobStatusChart.vue';
 import JobTaskDetails from '@/services/asset-inventory/components/CollectorHistoryJobTaskDetails.vue';
 import JobTable from '@/services/asset-inventory/components/CollectorHistoryJobTaskTable.vue';
+import { useInventoryJobGetQuery } from '@/services/asset-inventory/composables/use-inventory-job-get-query';
 
 
 interface Props {
@@ -30,28 +25,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    job: {} as JobModel,
     selectedItem: null as null|JobTaskModel,
 });
 
-/* API */
-const apiQuery = new ApiQueryHelper();
-const getJob = async () => {
-    try {
-        apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
-        const { results } = await SpaceConnector.clientV2.inventory.job.list({
-            query: apiQuery.data,
-        });
-        state.job = results[0] || {};
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
+/* Query */
+const { data: jobData } = useInventoryJobGetQuery(computed(() => props.jobId));
 
 /* Init */
 onActivated(() => {
     state.selectedItem = null;
-    getJob();
 });
 </script>
 
@@ -62,9 +44,11 @@ onActivated(() => {
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
-        <div class="top-wrapper">
-            <job-status-chart :job="state.job" />
-            <job-basic-information :job="state.job" />
+        <div v-if="jobData"
+             class="top-wrapper"
+        >
+            <job-status-chart :job="jobData" />
+            <job-basic-information :job="jobData" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper"
                              :min-height="350"
