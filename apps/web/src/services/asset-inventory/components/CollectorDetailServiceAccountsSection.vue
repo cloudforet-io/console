@@ -129,7 +129,6 @@ const handleClickEdit = () => {
             _state.state.selectedServiceAccountFilterOption = 'include';
         });
     }
-    console.log('edit!', originCollectorData.value);
     collectorFormStore.initForm(originCollectorData.value);
     state.isEditMode = true;
 };
