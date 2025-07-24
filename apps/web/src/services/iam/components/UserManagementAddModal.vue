@@ -160,7 +160,7 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     };
 
     if (userPageState.isAdminMode && userInfoParams.auth_type === 'LOCAL') {
-        userInfoParams.enforce_mfa_state = mfaSettingState.isRequiredMfa ? MFA_STATE.ENABLED : MFA_STATE.DISABLED;
+        userInfoParams.enforce_mfa_state = mfaSettingState.isRequiredMfa ? MFA_STATE.ENABLED : undefined;
         userInfoParams.enforce_mfa_type = mfaSettingState.isRequiredMfa ? mfaSettingState.selectedMfaType : undefined;
     }
 

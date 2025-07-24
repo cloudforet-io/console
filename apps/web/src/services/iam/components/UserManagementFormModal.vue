@@ -157,8 +157,13 @@ const handleConfirm = async () => {
 
         const userInfoParams = buildUserInfoParams();
         if (state.data.auth_type === 'LOCAL') { // Only Local Auth Type Users can be updated
-            userInfoParams.enforce_mfa_state = mfaSettingFormState.isRequiredMfa ? MFA_STATE.ENABLED : MFA_STATE.DISABLED;
-            userInfoParams.enforce_mfa_type = mfaSettingFormState.isRequiredMfa ? mfaSettingFormState.selectedMfaType : undefined;
+            const existingMfa = state.data.mfa;
+            if (!!existingMfa?.options?.enforce !== mfaSettingFormState.isRequiredMfa) {
+                userInfoParams.enforce_mfa_state = mfaSettingFormState.isRequiredMfa ? MFA_STATE.ENABLED : MFA_STATE.DISABLED;
+            }
+            if (userInfoParams.enforce_mfa_state === MFA_STATE.ENABLED) {
+                userInfoParams.enforce_mfa_type = mfaSettingFormState.isRequiredMfa ? mfaSettingFormState.selectedMfaType : undefined;
+            }
         }
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
 
