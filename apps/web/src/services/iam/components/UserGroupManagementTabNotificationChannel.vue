@@ -99,7 +99,7 @@ const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCou
     params: userGroupChannelListQueryParams,
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 60 * 2,
-    enabled: computed(() => userGroupPageGetters.selectedUserGroups.length > 0 && !!userGroupPageGetters.selectedUserGroups[0]?.user_group_id),
+    enabled: computed(() => !!userGroupPageGetters.selectedUserGroups[0].user_group_id),
 }, {
     thisPage: computed(() => paginationState.thisPage),
     pageSize: computed(() => paginationState.pageSize),
@@ -109,7 +109,6 @@ const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCou
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
-
 
 const tableState = reactive({
     fields: computed(() => [
@@ -317,12 +316,10 @@ watch(isScheduleTagged, (nv_scheduled_tag) => {
     }
 }, { immediate: true });
 
-watch(() => userGroupPageGetters.selectedUserGroups, () => {
-    if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel) {
-        return userGroupPageGetters.selectedUserGroups[0].notification_channel.length;
-    }
-    return 0;
-}, { deep: true, immediate: true });
+watch(() => userGroupPageGetters.selectedUserGroups[0].user_group_id, () => {
+    refreshUserGroupChannelList();
+}, { immediate: true });
+
 watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChannel], ([nv_items, nv_selected_item]) => {
     if (nv_items.length > 0 && nv_selected_item.length === 1) {
         isDeleteAble.value = true;
@@ -335,6 +332,8 @@ watch(() => userGroupChannelListData.value?.results, (data) => {
         userGroupPageStore.setSelectedUserGroupChannel(data);
     }
 }, { immediate: true });
+
+
 </script>
 
 <template>

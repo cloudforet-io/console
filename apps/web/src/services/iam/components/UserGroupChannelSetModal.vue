@@ -27,6 +27,7 @@ import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-const
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
+
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
@@ -113,7 +114,7 @@ const handleConfirm = async () => {
             ...notificationChannelCreateFormState.protocolSchemaForm,
         },
         tags: {},
-        user_group_id: userGroupPageGetters.selectedUserGroups[0]?.user_group_id,
+        user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
     } as UserGroupChannelCreateParameters : {
         channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
         name: state.channelName,
