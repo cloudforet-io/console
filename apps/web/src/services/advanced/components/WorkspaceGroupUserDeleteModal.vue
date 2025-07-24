@@ -51,7 +51,7 @@ const state = reactive({
     }),
 });
 const selectedWorkspaceGroupId = computed<string | undefined>(() => workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id);
-const { workspacesInWorkspaceGroup, isLoading: isLoadingWorkspacesInWorkspaceGroup } = useWorkspaceGroupWorkspaceListQuery(selectedWorkspaceGroupId);
+const { data: workspacesInWorkspaceGroup, isFetching: isFetchingWorkspacesInWorkspaceGroup } = useWorkspaceGroupWorkspaceListQuery(selectedWorkspaceGroupId);
 
 const userTableFields = [{ name: 'user_id', label: 'User ID' },
     { name: 'name', label: 'Name' },
@@ -158,8 +158,8 @@ const handleCloseModal = () => {
                            :label="$t('IAM.WORKSPACE_GROUP.MODAL.ASSOCIATED_WORKSPACES')"
             />
             <p-data-table :fields="workspaceTableField"
-                          :items="workspacesInWorkspaceGroup"
-                          :loading="isLoadingWorkspacesInWorkspaceGroup"
+                          :items="workspacesInWorkspaceGroup?.results ?? []"
+                          :loading="isFetchingWorkspacesInWorkspaceGroup"
                           class="table-max-height"
                           bordered
             >

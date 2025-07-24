@@ -17,11 +17,11 @@ export const useWorkspaceGroupChangeWorkspaceGroupMutation = (options?: UseWorks
 
     const { onSuccess, onError, onSettled } = options || {};
 
-    const { mutateAsync: changeWorkspaceGroupMutation, isPending } = useMutation({
+    const { mutateAsync: changeWorkspaceGroupMutation } = useMutation({
         mutationFn: (params: WorkspaceChangeWorkspaceGroupParameters) => workspaceAPI.changeWorkspaceGroup(params),
-        onError: (e) => {
-            if (onError) onError(e);
-            else ErrorHandler.handleError(e, true);
+        onError: async (e) => {
+            ErrorHandler.handleError(e, true);
+            if (onError) await onError(e);
         },
         onSuccess: async (data) => {
             if (onSuccess) await onSuccess(data);
@@ -33,7 +33,6 @@ export const useWorkspaceGroupChangeWorkspaceGroupMutation = (options?: UseWorks
 
     return {
         changeWorkspaceGroupMutation,
-        isPending,
     };
 };
 

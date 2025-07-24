@@ -155,22 +155,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
                 state.roles = [];
             }
         },
-        // listWorkspacesInSelectedGroup: async () => {
-        //     workspaceTabState.loading = true;
-        //     try {
-        //         const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-        //             query: getWorkspacesInSelectedGroupApiQuery(),
-        //         });
-        //         workspaceTabState.workspacesInSelectedGroup = results || [];
-        //         workspaceTabState.workspacesInSelectedGroupTotalCount = total_count || 0;
-        //     } catch (e) {
-        //         ErrorHandler.handleError(e);
-        //         workspaceTabState.workspacesInSelectedGroup = [];
-        //         workspaceTabState.workspacesInSelectedGroupTotalCount = 0;
-        //     } finally {
-        //         workspaceTabState.loading = false;
-        //     }
-        // },
         fetchCostReportConfig: async () => {
             if (workspaceTabState.costReportConfig !== null) return;
             try {

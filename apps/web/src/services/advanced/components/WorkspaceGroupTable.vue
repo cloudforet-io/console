@@ -36,12 +36,11 @@ const props = withDefaults(defineProps<Props>(), {
     hasReadWriteAccess: true,
 });
 
-const workspaceGroupListApiQueryHelper = new ApiQueryHelper().setPageStart(1).setPageLimit(15).setSort('name', true);
+const workspaceGroupListApiQueryHelper = new ApiQueryHelper();
 
 interface TableState {
     thisPage: number;
-    pageStart: number;
-    pageLimit: number;
+    pageSize: number;
     totalCount: number;
     sortBy: string;
     sortDesc: boolean;
@@ -58,8 +57,7 @@ interface TableState {
 
 const tableState = reactive<TableState>({
     thisPage: 1,
-    pageStart: 1,
-    pageLimit: 15,
+    pageSize: 15,
     totalCount: 0,
     sortBy: 'name',
     sortDesc: true,
@@ -68,7 +66,7 @@ const tableState = reactive<TableState>({
     fields: [
         { name: 'name', label: 'Name' },
         { name: 'workspaces', label: 'Workspace' },
-        { name: 'users', label: 'Group User' },
+        { name: 'users', label: 'Group User', sortable: false },
         { name: 'created_at', label: 'Created At' },
     ],
     items: computed(() => (data.value ?? []).map(({
@@ -94,13 +92,13 @@ const {
     data, isLoading, totalCount, refresh,
 } = useWorkspaceGroupListPaginationQuery({
     thisPage: computed(() => tableState.thisPage),
-    pageSize: computed(() => tableState.pageLimit),
+    pageSize: computed(() => tableState.pageSize),
     params: computed(() => {
         const query = getApiQueryWithToolboxOptions(workspaceGroupListApiQueryHelper, {
             queryTags: queryTags.value,
-            sortBy: tableState.sortBy,
+            sortBy: tableState.sortBy === 'workspaces' ? 'workspace_count' : tableState.sortBy,
             sortDesc: tableState.sortDesc,
-        }) || workspaceGroupListApiQueryHelper.data;
+        });
         return {
             query,
         };
@@ -115,16 +113,6 @@ watch(totalCount, (newTotalCount) => {
     });
 });
 
-
-// const handleUpdateSelectIndices = (indices: number[]) => {
-//     workspaceGroupPageStore.$patch((_state) => {
-//         _state.state.selectedIndices = indices;
-//         _state.userTabState.selectedUserIndices = [];
-//         _state.userTabState.searchText = '';
-//         _state.workspaceTabState.selectedWorkspaceIndices = [];
-//         _state.workspaceTabState.searchText = '';
-//     });
-// };
 const handleUpdateSelectIndices = (indices: number[]) => {
     workspaceGroupPageStore.$patch((_state) => {
         _state.state.selectedIndices = indices;
@@ -142,8 +130,6 @@ watch(() => tableState.items, () => {
 
 
 const handleChange = async (options: ToolboxTableOptions = {}) => {
-    if (options.pageStart !== undefined) { tableState.pageStart = options.pageStart; }
-    if (options.pageLimit !== undefined) { tableState.pageLimit = options.pageLimit; }
     if (options.queryTags !== undefined) { queryTagHelper.setQueryTags(options.queryTags); }
     if (options.sortBy !== undefined) { tableState.sortBy = options.sortBy; }
     if (options.sortDesc !== undefined) { tableState.sortDesc = options.sortDesc; }
@@ -167,8 +153,7 @@ const handleChange = async (options: ToolboxTableOptions = {}) => {
             :value-handler-map="tableState.valueHandlerMap"
             :total-count="tableState.totalCount"
             :this-page.sync="tableState.thisPage"
-            :page-start="tableState.pageStart"
-            :page-size="tableState.pageLimit"
+            :page-size.sync="tableState.pageSize"
             :sort-by="tableState.sortBy"
             :sort-desc="tableState.sortDesc"
             :query-tags="queryTags"
