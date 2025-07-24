@@ -71,22 +71,17 @@ import {
     onMounted, reactive, watch, ref,
 } from 'vue';
 
-
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
 } from '@cloudforet/mirinae';
 
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
+import { usePluginApi } from '@/api-clients/repository/plugin/composables/use-plugin-api';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useLastItemObserver } from '@/common/composables/last-item-observer';
-
 
 import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -103,6 +98,8 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+
+const { pluginAPI } = usePluginApi();
 
 
 const state = reactive({
@@ -123,7 +120,7 @@ const getPlugins = async (): Promise<PluginModel[]> => {
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
             .setFilters([{ v: state.inputValue }]);
 
-        const res = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
+        const res = await pluginAPI.list({
             resource_type: 'inventory.Collector',
             repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
             provider: collectorFormState.provider === 'all' ? undefined : collectorFormState.provider,

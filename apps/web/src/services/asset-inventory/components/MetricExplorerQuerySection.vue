@@ -9,13 +9,11 @@ import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPopover, PBadge, PTooltip, PIconButton,
 } from '@cloudforet/mirinae';
 
-
-import type { MetricRunParameters } from '@/api-clients/inventory/metric/schema/api-verbs/run';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -31,6 +29,7 @@ const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const { metricAPI } = useMetricApi();
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -59,7 +58,7 @@ const periodText = computed<string>(() => {
 
 /* Api */
 const runMetric = async () => {
-    await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
+    await metricAPI.run({
         metric_id: state.currentMetricId,
     });
 };
