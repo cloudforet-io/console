@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import {
+    computed, ref, watch,
+} from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PLink, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceListParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/list';
 import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
 import type { OtherTaskField } from '@/api-clients/opsflow/_types/task-field-type';
 import { i18n } from '@/translations';
@@ -27,14 +26,15 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import DataSelector from '@/common/components/select/DataSelector.vue';
 import type { DataSelectorItem } from '@/common/components/select/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceListQuery } from '@/services/ops-flow/composables/use-cloud-service-list-query';
 import { useTaskFieldValidation } from '@/services/ops-flow/task-fields-form/composables/use-task-field-validation';
 import type {
     TaskFieldFormEmits,
     TaskFieldFormProps,
 } from '@/services/ops-flow/task-fields-form/types/task-field-form-type';
+
 
 const props = defineProps<TaskFieldFormProps<OtherTaskField, string[]>>();
 const emit = defineEmits<TaskFieldFormEmits<string[]>>();
@@ -143,31 +143,28 @@ const relatedAssetInfo = computed<RelatedAssetInfo|undefined>(() => {
         icon: item.icon,
     };
 });
+
+const {
+    data: cloudServiceListData, isLoading, error: cloudServiceListError, isSuccess,
+} = useCloudServiceListQuery(computed(() => ({
+    query: {
+        only: ['cloud_service_id', 'cloud_service_type', 'cloud_service_group', 'provider', 'name', 'reference.resource_id'],
+        filter: [{
+            k: 'cloud_service_id', v: props.value, o: 'in',
+        }],
+    },
+})), computed(() => !!props.readonly && !!props.value));
 const relatedAssets = ref<RelatedAsset[]>([]);
-const loading = ref(false);
-const error = ref<unknown|null>(null);
-onMounted(async () => {
-    if (props.readonly && props.value) {
-        try {
-            loading.value = true;
-            const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
-                query: {
-                    only: ['cloud_service_id', 'cloud_service_type', 'cloud_service_group', 'provider', 'name', 'reference.resource_id'],
-                    filter: [{
-                        k: 'cloud_service_id', v: props.value, o: 'in',
-                    }],
-                },
-            });
-            relatedAssets.value = res.results ?? [];
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            error.value = e;
+
+watch(isSuccess, (val) => {
+    if (val) {
+        if (cloudServiceListError.value) {
             relatedAssets.value = props.value.map((cloudServiceId) => ({ cloud_service_id: cloudServiceId }));
-        } finally {
-            loading.value = false;
+        } else {
+            relatedAssets.value = cloudServiceListData.value ?? [];
         }
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -202,7 +199,7 @@ onMounted(async () => {
         >
             <div class="flex items-center gap-1">
                 <p-lazy-img :src="getIcon(relatedAssetInfo)"
-                            :loading="loading"
+                            :loading="isLoading"
                             width="1.25rem"
                             height="1.25rem"
                 />
@@ -212,7 +209,7 @@ onMounted(async () => {
                 <div v-for="asset in relatedAssets"
                      :key="asset.cloud_service_id"
                 >
-                    <p-link v-if="!error"
+                    <p-link v-if="!cloudServiceListError"
                             new-tab
                             highlight
                             action-icon="internal-link"
@@ -229,7 +226,7 @@ onMounted(async () => {
                                 },
                             }"
                     >
-                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.reference.resource_id }})</span>
+                        <span class="pl-1 text-label-md">{{ asset.name }} ({{ asset.reference?.resource_id }})</span>
                     </p-link>
                     <span v-else
                           class="pl-1 text-label-md"
