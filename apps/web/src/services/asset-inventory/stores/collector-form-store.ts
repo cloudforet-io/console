@@ -109,6 +109,7 @@ export const useCollectorFormStore = defineStore('collector-form', () => {
             state.options = options;
         },
         resetState() {
+            state.collectorId = undefined;
             state.repositoryPlugin = null;
             state.provider = undefined;
             state.tags = {};
