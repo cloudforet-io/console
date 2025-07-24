@@ -10,7 +10,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-
 import { i18n } from '@/translations';
 
 import SelectBox from '@/common/components/select/SelectBox.vue';
@@ -162,11 +161,6 @@ const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOpt
 
 watch(() => isAllValid.value, (value) => {
     emit('update:isAttachedServiceAccountValid', value);
-}, { immediate: true });
-
-watch(() => collectorFormState.collectorId, (collectorId) => {
-    if (props.resetOnCollectorIdChange && !collectorId) return;
-    collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 watch(() => collectorFormState.provider, () => {

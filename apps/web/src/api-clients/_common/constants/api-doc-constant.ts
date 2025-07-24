@@ -710,6 +710,9 @@ export const API_DOC = {
             'stat',
             'update',
         ],
+        repository: [
+            'list',
+        ],
     },
     secret: {
         secret: [
@@ -724,6 +727,11 @@ export const API_DOC = {
             'list',
             'update-data',
             'update',
+        ],
+    },
+    plugin: {
+        plugin: [
+            'get-plugin-metadata',
         ],
     },
 } as const;

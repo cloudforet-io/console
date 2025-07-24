@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
@@ -13,8 +12,6 @@ import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tab
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
 import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
@@ -24,15 +21,16 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useSecretPaginationQuery } from '@/services/asset-inventory/composables/use-secret-pagination-query';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
 
 const props = defineProps<{
     manageDisabled?: boolean;
@@ -72,14 +70,10 @@ const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    loading: true,
-    secrets: null as null|SecretModel[],
-    // query states
-    pageLimit: 15,
-    pageStart: 1,
+    thisPage: 1,
+    pageSize: 15,
     sortBy: 'name',
     sortDesc: true,
-    totalCount: 0,
     secretFilter: computed(() => originCollectorData.value?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
     serviceAccountsFilter: computed<string[]>(() => {
@@ -117,56 +111,36 @@ const { data: originCollectorData } = useCollectorGetQuery({
 const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-/* api fetchers */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promise<ListResponse<SecretModel>> => {
-    try {
-        apiQueryHelper.setPage(state.pageStart, state.pageLimit)
+const {
+    data: secretListData, refetch, totalCount, isLoading,
+} = useSecretPaginationQuery({
+    params: computed(() => {
+        apiQueryHelper
             .setSort(state.sortBy, state.sortDesc)
             .setFilters(queryTagHelper.filters.value)
-            .addFilter({ k: 'provider', v: provider, o: '=' });
+            .addFilter({ k: 'provider', v: originCollectorData.value?.provider ?? '', o: '=' });
 
-        if (serviceAccounts?.length) {
-            if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '!=' });
-            else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
+        if (state.serviceAccountsFilter?.length) {
+            if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: state.serviceAccountsFilter, o: '!=' });
+            else apiQueryHelper.addFilter({ k: 'service_account_id', v: state.serviceAccountsFilter, o: '=' });
         }
 
-        const results = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
+        return {
             query: apiQueryHelper.data,
-        });
-        return results ?? { results: [], total_count: 0 };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return { results: [], total_count: 0 };
-    }
-};
+        };
+    }),
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
+    enabled: computed(() => !!originCollectorData.value?.provider),
+});
 
-/* reused functions */
-const getSecrets = async (provider: string, serviceAccounts?: string[]) => {
-    state.loading = true;
-
-    const { results, total_count } = await fetchSecrets(provider, serviceAccounts);
-    state.secrets = results;
-    state.totalCount = total_count;
-    emit('update:totalCount', total_count ?? 0);
-
-    state.loading = false;
-};
-
-/* event handlers */
+/* Event Handlers */
 const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
-    if (options.sortBy !== undefined) {
-        state.sortBy = options.sortBy;
-        state.sortDesc = options.sortDesc as boolean;
-    }
-    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
-
-    if (originCollectorData.value?.provider) await getSecrets(originCollectorData.value.provider, state.serviceAccountsFilter);
 };
 const handleToolboxTableRefresh = async () => {
-    if (originCollectorData.value?.provider) await getSecrets(originCollectorData.value.provider, state.serviceAccountsFilter);
+    refetch();
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.setVisible(true);
@@ -175,10 +149,10 @@ const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.setSelectedSecret(secret);
 };
 
-watch([() => originCollectorData.value?.provider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
-    if (!provider) return;
-    await getSecrets(provider, serviceAccounts);
-}, { immediate: true });
+/* Watcher */
+watch(totalCount, (newTotalCount) => {
+    emit('update:totalCount', newTotalCount ?? 0);
+});
 </script>
 
 <template>
@@ -194,15 +168,16 @@ watch([() => originCollectorData.value?.provider, () => state.serviceAccountsFil
             </p-radio>
         </p-radio-group>
         <p-toolbox-table :fields="fields"
-                         :items="state.secrets"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
+                         :items="secretListData?.results ?? []"
+                         :loading="isLoading"
+                         :total-count="totalCount"
                          :query-tags="queryTags"
                          :key-item-sets="querySearchHandlers.keyItemSets"
                          :value-handler-map="querySearchHandlers.valueHandlerMap"
                          :sort-by.sync="state.sortBy"
                          :sort-desc.sync="state.sortDesc"
-                         :page-size.sync="state.pageLimit"
+                         :page-size.sync="state.pageSize"
+                         :this-page.sync="state.thisPage"
                          search-type="query"
                          searchable
                          use-cursor-loading

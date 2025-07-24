@@ -208,7 +208,7 @@ const handleSaveRule = (data: CollectorRuleModel | CollectorRuleForm) => {
                    :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE')"
                    heading-type="sub"
         />
-        <div v-if="noCollectorRules">
+        <div v-if="noCollectorRules && !isEditing">
             <collector-additional-rule-empty-case :is-editable="isEditable && !isEditing"
                                                   @add-rule="handleClickAddEventRule"
             />

@@ -5,11 +5,11 @@
                        :label="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
         />
         <p-data-loader class="collector-options-form-contents"
-                       :loading="state.loading"
-                       :data="state.schema"
+                       :loading="isLoadingPluginMetadata"
+                       :data="schema"
                        loader-backdrop-color="0"
         >
-            <p-json-schema-form :schema="state.schema"
+            <p-json-schema-form :schema="schema"
                                 :form-data="collectorFormState.options"
                                 :language="state.language"
                                 use-fixed-menu-style
@@ -18,7 +18,7 @@
                                 @change="handleUpdateSchemaForm"
             />
             <template #no-data>
-                <div v-if="state.isLoadFailed"
+                <div v-if="pluginMetadataError"
                      class="error-box"
                 >
                     <div class="error-message">
@@ -61,26 +61,20 @@ import {
     defineProps, computed, reactive, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PSpinner,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-import type {
-    GetPluginMetadataParameters,
-    GetPluginMetadataResponse,
-} from '@/api-clients/plugin/plugin/api-verbs/get-plugin-metadata';
-
 import { useUserStore } from '@/store/user/user-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
 
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { usePluginMetadataGetQuery } from '@/services/asset-inventory/composables/use-plugin-metadata-get-query';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -89,6 +83,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const userStore = useUserStore();
+const queryClient = useQueryClient();
 
 const props = defineProps<{
     hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of originCollectorData. And if false, call api for get metadata(state.schema).
@@ -98,55 +93,36 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    isSchemaEmpty: computed<boolean>(() => isEmpty(state.schema) && !state.isLoadFailed),
-    loading: false,
-    isLoadFailed: false,
-    pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
-    schema: null as null|JsonSchema|object,
+    isSchemaEmpty: computed<boolean>(() => isEmpty(schema.value) && !pluginMetadataError.value),
     language: computed<string|undefined>(() => userStore.state.language),
+});
+const schema = computed<JsonSchema|object>(() => {
+    if (props.hasMetadata) {
+        return originCollectorData.value?.plugin_info?.metadata?.options_schema ?? {};
+    }
+    return pluginMetadataData.value?.metadata?.options_schema ?? {};
 });
 
 /* Query */
 const { data: originCollectorData } = useCollectorGetQuery({
     collectorId: computed(() => collectorFormState.collectorId),
 });
-
-const fetchGetPluginMetadata = (provider: string|undefined): Promise<GetPluginMetadataResponse> => {
-    const options = provider ? {
-        provider,
-    } : {};
-    return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata<GetPluginMetadataParameters, GetPluginMetadataResponse>({
-        plugin_id: state.pluginId,
-        version: collectorFormState.version,
-        options,
-    });
-};
-
-const getPluginMetadata = async (provider: string|undefined) => {
-    try {
-        state.loading = true;
-        state.isLoadFailed = false;
-        if (!props.hasMetadata) {
-            const res = await fetchGetPluginMetadata(provider);
-            state.schema = res.metadata?.options_schema ?? {};
-            if (state.isSchemaEmpty) {
-                emit('update:isValid', true);
-            }
-        } else {
-            state.schema = originCollectorData.value?.plugin_info?.metadata?.options_schema ?? {};
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.schema = {};
-        state.isLoadFailed = true;
-        emit('update:isValid', false);
-    } finally {
-        state.loading = false;
-    }
-};
+const {
+    data: pluginMetadataData,
+    isLoading: isLoadingPluginMetadata,
+    refetch: refetchPluginMetadata,
+    error: pluginMetadataError,
+    key: pluginMetadataQueryKey,
+} = usePluginMetadataGetQuery(computed(() => ({
+    plugin_id: collectorFormState.repositoryPlugin?.plugin_id ?? '',
+    version: collectorFormState.version,
+    options: collectorFormState.provider ? {
+        provider: collectorFormState.provider,
+    } : {},
+})));
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    if (state.isSchemaEmpty && !state.loading) {
+    if (state.isSchemaEmpty && !isLoadingPluginMetadata.value) {
         emit('update:isValid', true);
     } else {
         emit('update:isValid', isValid);
@@ -155,19 +131,18 @@ const handleUpdateSchemaForm = (isValid:boolean, value) => {
 };
 
 const handleClickReloadButton = () => {
-    getPluginMetadata(collectorFormState.provider);
+    refetchPluginMetadata();
 };
 
 
 watch(() => collectorFormState.collectorId, async (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
-    await getPluginMetadata(collectorFormState.provider);
+    queryClient.invalidateQueries({ queryKey: pluginMetadataQueryKey.value });
 }, { immediate: true });
 
-watch(() => collectorFormState.provider, async (provider) => {
-    // CAUTION: Do not change the order of the following two lines. The form data(options) must be reset after the schema has been updated.
-    await getPluginMetadata(provider);
+watch(pluginMetadataData, async (_data) => {
+    if (!_data) return;
     collectorFormStore.setOptions(originCollectorData.value?.plugin_info?.options ?? {});
 });
 

@@ -3,15 +3,11 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
-import type { SecretListParameters } from '@/api-clients/secret/secret/schema/api-verbs/list';
-import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
@@ -25,6 +21,7 @@ import CollectorDataModalDuplicationInner
     from '@/services/asset-inventory/components/CollectorDataModalDuplicationInner.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
+import { useSecretListQuery } from '@/services/asset-inventory/composables/use-secret-list-query';
 import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
@@ -90,6 +87,19 @@ const { data: jobListData, isLoading: isJobListLoading } = useInventoryJobListQu
         collector_id: selectedCollectorData.value?.collector_id,
     })),
 });
+const apiQueryHelper = new ApiQueryHelper().setCountOnly();
+const { data: secretListData } = useSecretListQuery(computed(() => {
+    apiQueryHelper.setFilters([{ k: 'provider', v: selectedCollectorData.value?.provider ?? '', o: '=' }]);
+
+    if (state.serviceAccountsFilter.length > 0) {
+        if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: state.serviceAccountsFilter, o: '!=' });
+        else apiQueryHelper.addFilter({ k: 'service_account_id', v: state.serviceAccountsFilter, o: '=' });
+    }
+
+    return {
+        query: apiQueryHelper.data,
+    };
+}));
 
 /* Components */
 const handleClickCancel = () => {
@@ -114,33 +124,11 @@ const handleClickConfirm = async () => {
     }
 };
 
-/* API */
-const apiQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
-    apiQueryHelper.setFilters([{ k: 'provider', v: provider, o: '=' }]);
 
-    if (serviceAccounts.length > 0) {
-        if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '!=' });
-        else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
-    }
-    try {
-        const { total_count } = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
-            query: apiQueryHelper.data,
-        });
-        state.secretsCount = total_count;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.secretsCount = 0;
-    }
-};
-
-watch([() => selectedCollectorData.value, () => collectorDataModalState.visible], async ([_selectedCollectorData, visible]) => {
+watch([() => selectedCollectorData.value, () => collectorDataModalState.visible], async ([, visible]) => {
     if (!visible) {
         collectorDataModalStore.reset();
-        return;
     }
-    if (!_selectedCollectorData) return;
-    await fetchSecrets(_selectedCollectorData.provider, state.serviceAccountsFilter);
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -154,7 +142,7 @@ onUnmounted(() => {
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
-                        :disabled="!state.secretsCount"
+                        :disabled="!secretListData?.total_count"
                         size="sm"
                         @confirm="handleClickConfirm"
                         @cancel="handleClickCancel"
@@ -171,7 +159,7 @@ onUnmounted(() => {
                     v-else
                     :name="state.accountName"
                     :icon="state.provider?.icon"
-                    :secrets-count="state.secretsCount"
+                    :secrets-count="secretListData?.total_count ?? 0"
                 />
             </template>
             <template #confirm-button>
