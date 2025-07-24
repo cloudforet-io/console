@@ -4,13 +4,9 @@ import {
 } from 'vue';
 import type { RawLocation } from 'vue-router';
 
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PPagination, PLazyImg, PLink,
@@ -21,8 +17,6 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { JobListParameters } from '@/api-clients/inventory/job/schema/api-verbs/list';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
@@ -37,10 +31,10 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import NoCollectorModal from '@/services/asset-inventory/components/CollectorHistoryNoCollectorModal.vue';
+import { useInventoryJobListPaginationQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-pagination-query';
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     statusClassFormatter,
@@ -105,16 +99,43 @@ const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 const state = reactive({
-    loading: true,
     modalVisible: false,
-    pageStart: 1,
     pageSize: 30,
     thisPage: 1,
-    totalCount: 0,
     selectedStatus: 'ALL',
-    items: [] as any[],
     sortBy: 'created_at',
+    sortDesc: true,
 });
+const items = computed<JobModel[]>(() => (jobListData.value?.results ?? []).map((job) => {
+    const collector = storeState.collectors[job.collector_id];
+    const plugin = storeState.plugins[job.plugin_id];
+    let progress;
+    if (job.total_tasks === 0 || job.total_tasks === undefined) {
+        if (job.status === JOB_STATE.SUCCESS) progress = { succeededPercentage: 100, failedPercentage: 0 };
+        else if (job.status === JOB_STATE.FAILURE) progress = { succeededPercentage: 0, failedPercentage: 100 };
+        else progress = { succeededPercentage: 0, failedPercentage: 0 };
+    } else {
+        progress = {
+            succeededPercentage: ((job.success_tasks ?? 0) / job.total_tasks) * 100,
+            failedPercentage: ((job.failure_tasks ?? 0) / job.total_tasks) * 100,
+            isCanceled: job.status === JOB_STATE.CANCELED,
+        };
+    }
+    return {
+        ...job,
+        total_tasks: job.total_tasks ?? 0,
+        collector_info: {
+            label: collector?.name,
+            plugin_info: {
+                label: plugin?.label,
+                icon: plugin?.icon,
+            },
+        },
+        progress,
+        created_at: job.created_at ? iso8601Formatter(job.created_at, storeState.timezone) : '--',
+        duration: job.created_at ? durationFormatter(job.created_at, job.finished_at, storeState.timezone) : '--',
+    };
+}));
 
 const queryTagsHelper = useQueryTags({
     keyItemSets: handlers.keyItemSets,
@@ -123,29 +144,42 @@ const queryTagsHelper = useQueryTags({
     },
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
-
 const apiQueryHelper = new ApiQueryHelper();
 
-const getQuery = () => {
-    apiQueryHelper.setFilters(searchFilters.value);
+/* Query */
+const {
+    data: jobListData,
+    isLoading: isJobListLoading,
+    totalCount: jobListTotalCount,
+    isSuccess: isJobListSuccess,
+} = useInventoryJobListPaginationQuery({
+    params: computed(() => {
+        apiQueryHelper
+            .setFilters(searchFilters.value)
+            .setSort(state.sortBy, state.sortDesc);
 
-    let statusValues: string[] = [];
-    if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
-        statusValues = [JOB_STATE.IN_PROGRESS];
-    } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
-        statusValues = [JOB_STATE.SUCCESS];
-    } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
-        statusValues = [JOB_STATE.FAILURE];
-    } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
-        statusValues = [JOB_STATE.CANCELED];
-    }
+        let statusValues: string[] = [];
+        if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
+            statusValues = [JOB_STATE.IN_PROGRESS];
+        } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
+            statusValues = [JOB_STATE.SUCCESS];
+        } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
+            statusValues = [JOB_STATE.FAILURE];
+        } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
+            statusValues = [JOB_STATE.CANCELED];
+        }
 
-    if (statusValues.length > 0) {
-        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
-    }
+        if (statusValues.length > 0) {
+            apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
+        }
 
-    return apiQueryHelper.data;
-};
+        return {
+            query: apiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageSize),
+});
 
 /* Components */
 const handleSelect = (item) => {
@@ -155,65 +189,9 @@ const handleSelect = (item) => {
     }).catch(() => {});
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    setApiQueryWithToolboxOptions(apiQueryHelper, options);
     if (options.queryTags) {
         queryTagsHelper.setQueryTags(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
-    }
-    if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
-    if (options?.pageLimit !== undefined) {
-        state.pageSize = options.pageLimit;
-        state.thisPage = 1;
-        state.pageStart = getPageStart(state.thisPage, state.pageSize);
-    }
-    await getJobs();
-};
-const handleChangePagination = () => {
-    state.pageStart = getPageStart(state.thisPage, state.pageSize);
-    apiQueryHelper.setPage(state.pageStart, state.pageSize);
-    getJobs();
-};
-
-/* API */
-const getJobs = async () => {
-    state.loading = true;
-    try {
-        const res = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
-        state.totalCount = res.total_count ?? 0;
-        state.items = (res.results ?? []).map((job) => {
-            const collector = storeState.collectors[job.collector_id];
-            const plugin = storeState.plugins[job.plugin_id];
-            let progress;
-            if (job.total_tasks === 0 || job.total_tasks === undefined) {
-                if (job.status === JOB_STATE.SUCCESS) progress = { succeededPercentage: 100, failedPercentage: 0 };
-                else if (job.status === JOB_STATE.FAILURE) progress = { succeededPercentage: 0, failedPercentage: 100 };
-                else progress = { succeededPercentage: 0, failedPercentage: 0 };
-            } else {
-                progress = {
-                    succeededPercentage: ((job.success_tasks ?? 0) / job.total_tasks) * 100,
-                    failedPercentage: ((job.failure_tasks ?? 0) / job.total_tasks) * 100,
-                    isCanceled: job.status === JOB_STATE.CANCELED,
-                };
-            }
-            return {
-                ...job,
-                total_tasks: job.total_tasks ?? 0,
-                collector_info: {
-                    label: collector?.name,
-                    plugin_info: {
-                        label: plugin?.label,
-                        icon: plugin?.icon,
-                    },
-                },
-                progress,
-                created_at: job.created_at ? iso8601Formatter(job.created_at, storeState.timezone) : '--',
-                duration: job.created_at ? durationFormatter(job.created_at, job.finished_at, storeState.timezone) : '--',
-            };
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
     }
 };
 
@@ -232,20 +210,17 @@ const getLocation = ({ workspaceId, collectorId, target }: {workspaceId:string, 
 watch(() => state.selectedStatus, (selectedStatus) => {
     state.selectedStatus = selectedStatus;
     state.thisPage = 1;
-    state.pageStart = 1;
-    getJobs();
+});
+watch(isJobListSuccess, (isSuccess) => {
+    if (isSuccess && jobListTotalCount.value === 0) {
+        state.modalVisible = true;
+    }
 });
 
 /* Init */
 (async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-    apiQueryHelper.setPage(state.pageStart, state.pageSize)
-        .setSort(state.sortBy, true)
-        .setFilters(searchFilters.value);
-
-    await getJobs();
-    if (state.totalCount === 0) state.modalVisible = true;
 })();
 </script>
 
@@ -267,20 +242,21 @@ watch(() => state.selectedStatus, (selectedStatus) => {
             </div>
             <p-toolbox-table search-type="query"
                              :fields="fields"
-                             :items="state.items"
+                             :items="items"
                              :query-tags="queryTags"
                              :key-item-sets="handlers.keyItemSets"
                              :value-handler-map="handlers.valueHandlerMap"
-                             :loading="state.loading"
-                             :total-count="state.totalCount"
+                             :loading="isJobListLoading"
+                             :total-count="jobListTotalCount"
                              :this-page.sync="state.thisPage"
                              :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
-                             :sort-by="state.sortBy"
+                             :sort-by.sync="state.sortBy"
+                             :sort-desc.sync="state.sortDesc"
                              :selectable="false"
                              :exportable="false"
-                             :class="state.items.length === 0 ? 'no-data' : ''"
+                             :class="items.length === 0 ? 'no-data' : ''"
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
                              @refresh="handleChange()"
@@ -343,13 +319,12 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     <span class="succeeded-text">{{ Math.floor(value.succeededPercentage) }}%</span>
                 </template>
             </p-toolbox-table>
-            <div v-if="state.items.length > 0"
+            <div v-if="items.length > 0"
                  class="pagination"
             >
-                <p-pagination :total-count="state.totalCount"
+                <p-pagination :total-count="jobListTotalCount"
                               :this-page.sync="state.thisPage"
                               :page-size.sync="state.pageSize"
-                              @change="handleChangePagination"
                 />
             </div>
         </div>
