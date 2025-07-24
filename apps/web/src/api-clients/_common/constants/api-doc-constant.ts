@@ -547,6 +547,7 @@ export const API_DOC = {
         job: [
             'analyze',
             'list',
+            'get',
         ],
         'job-task': [
             'list',
