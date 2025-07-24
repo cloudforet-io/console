@@ -1,15 +1,16 @@
 import { computed, ref, toRef } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getTextHighlightRegex } from '@cloudforet/mirinae';
 import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { WorkspaceAddPackageParameters } from '@/api-clients/identity/workspace/schema/api-verbs/add-package';
-import type { WorkspaceRemovePackageParameters } from '@/api-clients/identity/workspace/schema/api-verbs/remove-package';
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { useFieldValidator } from '@/common/composables/form-validator';
+
+
+const { workspaceAPI } = useWorkspaceApi();
 
 const WORKSPACE_SELECTION_TYPES = {
     all: {
@@ -73,7 +74,7 @@ export const useWorkspaceField = () => {
 
     const addPackageToWorkspaces = async (packageId: string, workspaceIds: string[]) => {
         const responses = await Promise.allSettled([
-            ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.addPackage<WorkspaceAddPackageParameters>({
+            ...workspaceIds.map((workspaceId) => workspaceAPI.addPackage({
                 package_id: packageId,
                 workspace_id: workspaceId,
             })),
@@ -90,7 +91,7 @@ export const useWorkspaceField = () => {
     };
     const removePackageFromWorkspaces = async (packageId: string, workspaceIds: string[]) => {
         const responses = await Promise.allSettled([
-            ...workspaceIds.map((workspaceId) => SpaceConnector.clientV2.identity.workspace.removePackage<WorkspaceRemovePackageParameters>({
+            ...workspaceIds.map((workspaceId) => workspaceAPI.removePackage({
                 package_id: packageId,
                 workspace_id: workspaceId,
             })),
