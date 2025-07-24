@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupRemoveUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/remove-users';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,55 +20,56 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const state = reactive({
-    loading: false,
+const { userGroupAPI } = useUserGroupApi();
+const queryClient = useQueryClient();
+
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'user-group', 'list');
+const { key: userGroupGetQueryKey } = useServiceQueryKey('identity', 'user-group', 'get');
+
+const { mutateAsync: removeUsers, isPending: removeUsersIsPending } = useMutation({
+    mutationFn: userGroupAPI.removeUsers,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupGetQueryKey.value });
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.SHOW_SUCCESS_MESSAGE'));
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSettled: () => {
+        handleCancel();
+        userGroupPageStore.setSelectedUserIdx([]);
+    },
 });
 
 /* Component */
 const handleConfirm = async () => {
-    try {
-        const users: (string | undefined)[] = [];
-        userGroupPageState.users.selectedIndices.forEach((d: number) => {
-            if (userGroupPageState.users.list) users.push(userGroupPageState.users.list[d]?.user_id);
-        });
-        await fetchRemoveUser({
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            users,
-        });
-        emit('confirm');
-        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.REMOVE_USER.SHOW_SUCCESS_MESSAGE'));
-    } finally {
-        state.loading = false;
-        handleCancel();
-        userGroupPageStore.$patch((_state) => {
-            _state.state.users.selectedIndices = [];
-        });
-    }
+    const users: (string | undefined)[] = [];
+    userGroupPageState.users.selectedIndices.forEach((d: number) => {
+        if (userGroupPageState.users.list) users.push(userGroupPageState.users.list[d]?.user_id);
+    });
+    await removeUsers({
+        user_group_id: userGroupPageGetters.selectedUserGroups[0]?.user_group_id ?? '',
+        users,
+    });
 };
 
 const handleCancel = () => {
-    state.loading = false;
-    userGroupPageState.modal = {
+    userGroupPageStore.updateModalSettings({
         type: '',
         title: '',
         themeColor: 'primary',
-    };
-};
-
-/* API */
-const fetchRemoveUser = async (params: UserGroupRemoveUsersParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+    });
 };
 </script>
 
 <template>
     <p-button-modal size="sm"
                     :header-title="userGroupPageState.modal.title"
-                    :loading="state.loading"
+                    :loading="removeUsersIsPending"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.REMOVE_USER"
                     :theme-color="userGroupPageState.modal.themeColor"
                     @confirm="handleConfirm"
