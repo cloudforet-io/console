@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { debounce } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PSelectDropdown, PStatus } from '@cloudforet/mirinae';
+import { PSelectDropdown, PStatus } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WorkspaceListParameters } from '@/api-clients/identity/workspace/schema/api-verbs/list';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
+
 
 const PAGE_SIZE = 10;
 
@@ -31,144 +27,75 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{(e: 'update', target: string): void; }>();
-
+const dropdownRef = ref<InstanceType<typeof PSelectDropdown>>();
 const router = useRouter();
 
+const resourceMenuHandler = useResourceMenuHandlerMap();
+const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
+
 const state = reactive({
-    loading: false,
-    isShowMore: computed(() => state.workspaceList.length < state.totalCount),
-    workspaceList: [],
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
-        const menuList = [
-            ...(state.workspaceList ?? []).map((_workspace) => ({
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                tags: _workspace.tags,
-                is_dormant: _workspace.is_dormant,
-            })),
-            { type: 'button', label: 'Create', name: 'create' },
-        ];
-        if (state.isShowMore) {
-            menuList.push({ type: 'showMore' });
-        }
-        return menuList;
+    workspaceMenuHandler: resourceMenuHandler.workspace({
+        fixedFilters: {
+            state: WORKSPACE_STATE.ENABLE,
+            is_dormant: false,
+        },
     }),
-    selected: props.selected,
-    selectedWorkspaceItem: computed(() => state.workspaceList.find((item) => item.workspace_id === state.selected)),
-    searchText: '',
-    totalCount: 0,
-    pageStart: 1,
-    pageLimit: PAGE_SIZE,
+    selected: computed<SelectDropdownMenuItem[]|undefined>(() => {
+        if (!props.selected) return [];
+        const selectedItem = workspaceMap[props.selected];
+        if (!selectedItem) return [];
+        return [
+            {
+                name: props.selected,
+                label: selectedItem?.label,
+            },
+        ];
+    }),
 });
 
-// TODO: apply resource menu handler query
-const fetchWorkspace = async (searchText?:string) => {
-    try {
-        state.loading = true;
-        const { results, total_count } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
-            query: {
-                keyword: searchText ?? state.searchText,
-                page: {
-                    start: state.pageStart,
-                    limit: state.pageLimit,
-                },
-                filter: [
-                    { k: 'state', v: WORKSPACE_STATE.ENABLE, o: 'eq' },
-                    { k: 'is_dormant', v: false, o: 'eq' },
-                ],
-            },
-        });
-        state.totalCount = total_count;
-        return results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.totalCount = 0;
-        return [];
-    } finally {
-        state.loading = false;
-    }
-};
-const handleClickReloadButton = async () => {
-    state.pageStart = 1;
-    state.workspaceList = await fetchWorkspace();
-};
 
 const handleClickCreateButton = () => {
     window.open(router.resolve({ name: ADMIN_ADVANCED_ROUTE.WORKSPACES._NAME }).href);
 };
 
-const handleClickShowMore = async () => {
-    state.pageStart += PAGE_SIZE;
-    const additionalWorkspaceList = await fetchWorkspace();
-    state.workspaceList = state.workspaceList.concat(additionalWorkspaceList);
+const handleSelectWorkspace = (selected:SelectDropdownMenuItem) => {
+    emit('update', selected.name);
 };
 
-const handleUpdateSearchText = async (searchText:string) => {
-    state.searchText = searchText;
-};
-
-const handleSelectWorkspace = (selected:string) => {
-    state.selected = selected;
-    emit('update', selected);
-};
-
-(async () => {
-    state.workspaceList = await fetchWorkspace();
-})();
-
-watch(() => state.searchText, debounce(async (searchText) => {
-    if (searchText) {
-        state.pageStart = 1;
-        state.workspaceList = await fetchWorkspace(searchText);
-    }
-}, 300));
 </script>
 
 <template>
-    <p-select-dropdown class="workspace-dropdown"
+    <p-select-dropdown ref="dropdownRef"
+                       class="workspace-dropdown"
                        :disabled="props.disabled"
-                       :menu="state.workspaceMenuList"
+                       :handler="state.workspaceMenuHandler"
                        :placeholder="$t('Select a workspace')"
-                       :loading="state.loading"
                        :selected="state.selected"
-                       disable-handler
                        use-fixed-menu-style
                        is-fixed-width
                        is-filterable
+                       :page-size="PAGE_SIZE"
                        @click-button="handleClickCreateButton"
-                       @click-show-more="handleClickShowMore"
-                       @update:search-text="handleUpdateSearchText"
-                       @update:selected="handleSelectWorkspace"
+                       @select="handleSelectWorkspace"
     >
         <template #dropdown-left-area>
-            <div v-if="state.selected">
-                <workspace-logo-icon :text="state.selectedWorkspaceItem?.name || ''"
-                                     :theme="state.selectedWorkspaceItem?.tags?.theme"
+            <div v-if="state.selected.length > 0">
+                <workspace-logo-icon :text="workspaceMap[props.selected]?.label || ''"
+                                     :theme="workspaceMap[props.selected]?.data?.tags?.theme"
                                      size="xs"
                 />
             </div>
         </template>
-        <template #context-menu-header>
-            <div class="context-menu-header">
-                <p-button style-type="tertiary"
-                          icon-left="ic_refresh"
-                          size="sm"
-                          @click="handleClickReloadButton"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.RELOAD') }}
-                </p-button>
-            </div>
-        </template>
-
         <template #menu-item--format="{item}">
             <div class="menu-item-wrapper">
                 <div class="label">
                     <workspace-logo-icon :text="item?.label || ''"
-                                         :theme="item?.tags?.theme"
+                                         :theme="item?.data?.tags?.theme"
                                          size="xs"
                     />
                     <span class="label-text">{{ item.label }}</span>
-                    <p-status v-if="item?.is_dormant"
+                    <p-status v-if="item?.data?.is_dormant"
                               v-bind="workspaceStateFormatter(WORKSPACE_STATE.DORMANT)"
                               class="capitalize state"
                     />
