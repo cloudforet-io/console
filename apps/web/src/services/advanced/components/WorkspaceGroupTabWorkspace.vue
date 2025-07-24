@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch, type ComputedRef,
+    computed, onMounted, reactive, type ComputedRef,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -49,8 +49,7 @@ interface TableState {
     timezone: ComputedRef<string|undefined>;
     sortBy: string;
     sortDesc: boolean;
-    pageStart: number;
-    pageLimit: number;
+    pageSize: number;
     thisPage: number;
     searchText: string;
     tableItems: ComputedRef<WorkspaceTableItem[]>;
@@ -67,9 +66,8 @@ const tableState = reactive<TableState>({
     timezone: computed(() => userStore.state.timezone),
     sortBy: 'name',
     sortDesc: false,
-    pageStart: 1,
-    pageLimit: 15,
     thisPage: 1,
+    pageSize: 15,
     searchText: '',
     tableItems: computed<WorkspaceTableItem[]>(() => workspaceList.value?.map((workspace) => ({
         ...workspace,
@@ -100,12 +98,10 @@ const {
         query: workspaceListApiQueryHelper.setFilters([
             { k: 'workspace_group_id', v: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id ?? '', o: '=' },
             { k: 'name', v: tableState.searchText, o: '' },
-        ])
-            .setSort(tableState.sortBy, tableState.sortDesc)
-            .setPage(tableState.pageStart, tableState.pageLimit).data,
+        ]).setSort(tableState.sortBy, tableState.sortDesc).data,
     })),
     thisPage: computed(() => tableState.thisPage),
-    pageSize: computed(() => tableState.pageLimit),
+    pageSize: computed(() => tableState.pageSize),
 });
 
 const getWorkspaceRouteLocationByWorkspaceId = (item) => ({
@@ -161,14 +157,8 @@ const handleSelect = (index:number[]) => {
 };
 
 const handleChange = async (options: any = {}) => {
-    if (options.pageStart) {
-        tableState.pageStart = options.pageStart;
-    }
-
-    if (options.pageLimit) {
-        tableState.pageStart = 1;
-        tableState.pageLimit = options.pageLimit;
-        tableState.thisPage = 1;
+    if (options.thisPage) {
+        tableState.thisPage = options.thisPage;
     }
     if (options.searchText) {
         tableState.thisPage = 1;
@@ -202,10 +192,6 @@ const handleChangeSort = (name:string, isDesc:boolean) => {
     tableState.sortDesc = isDesc;
     tableState.thisPage = 1;
 };
-
-watch(() => workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id, () => {
-    refreshWorkspaceList();
-}, { immediate: true });
 
 onMounted(async () => {
     await workspaceGroupPageStore.fetchCostReportConfig();
@@ -259,6 +245,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :show-footer="true"
                          :sort-desc="tableState.sortDesc"
                          :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
                          :search-text.sync="tableState.searchText"
                          :selectable="hasReadWriteAccess"
                          sortable

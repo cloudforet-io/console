@@ -29,29 +29,26 @@ const emit = defineEmits<{(e: 'confirm'): void,
 
 const state = reactive<{
     sequence: typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE[keyof typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE];
-    loading: boolean;
     isDeleteAble: ComputedRef<boolean>;
 }>({
     sequence: WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST,
-    loading: false,
     isDeleteAble: computed(() => (workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageState.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
 });
 
 
 const { key: workspaceGroupListQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
 const queryClient = useQueryClient();
-const { mutateAsync: deleteWorkspaceGroupMutation } = useMutation({
+const { mutateAsync: deleteWorkspaceGroupMutation, isPending: isDeleteWorkspaceGroupPending } = useMutation({
     mutationFn: (params: WorkspaceGroupDeleteParameters) => workspaceGroupAPI.delete(params),
     onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACE_GROUP'), '');
         queryClient.invalidateQueries({ queryKey: workspaceGroupListQueryKey.value });
+        workspaceGroupPageStore.reset();
+        resetSequence();
+        emit('confirm');
     },
     onError: (e) => {
-        ErrorHandler.handleError(e);
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACE_GROUP'));
-    },
-    onSettled: () => {
-        state.loading = false;
     },
 });
 
@@ -72,9 +69,6 @@ const handleConfirm = async () => {
     await deleteWorkspaceGroupMutation({
         workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
     });
-    workspaceGroupPageStore.reset();
-    resetSequence();
-    emit('confirm');
 };
 
 const handleCloseModal = () => {
@@ -88,7 +82,7 @@ const handleCloseModal = () => {
                     :header-title="workspaceGroupPageState.modal.title"
                     :theme-color="workspaceGroupPageState.modal.themeColor"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.DELETE"
-                    :loading="state.loading"
+                    :loading="isDeleteWorkspaceGroupPending"
                     :disabled="!state.isDeleteAble"
                     size="sm"
                     @confirm="handleConfirm"

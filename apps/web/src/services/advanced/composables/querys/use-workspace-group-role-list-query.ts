@@ -1,44 +1,28 @@
-import type { ComputedRef, Ref } from 'vue';
-import { computed } from 'vue';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
-import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { ROLE_STATE } from '@/api-clients/identity/role/constant';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-interface UseWorkspaceGroupRoleListQueryReturn {
-    data: Ref<RoleModel[]>;
-    totalCount: Ref<number>;
-    isLoading: Ref<boolean>;
-}
 
-interface UseWorkspaceGroupRoleListQueryOptions {
-    params: ComputedRef<RoleListParameters>;
-    enabled?: ComputedRef<boolean>;
-}
-
-export const useWorkspaceGroupRoleListQuery = ({ params, enabled }: UseWorkspaceGroupRoleListQueryOptions): UseWorkspaceGroupRoleListQueryReturn => {
+export const useWorkspaceGroupRoleListQuery = () => {
     const { roleAPI } = useRoleApi();
 
-    const { key: roleListQueryKey, params: roleListQueryParams } = useServiceQueryKey('identity', 'role', 'list', {
-        params,
+    const roleListApiQueryHelper = new ApiQueryHelper().setFilters([{ k: 'state', v: ROLE_STATE.ENABLED, o: '=' }]);
+
+    const { key: roleListQueryKey, params } = useServiceQueryKey('identity', 'role', 'list', {
+        params: {
+            query: roleListApiQueryHelper.data,
+        },
     });
 
-    const { data: queryData, isLoading } = useScopedQuery({
+    return useScopedQuery({
         queryKey: roleListQueryKey,
-        queryFn: async () => roleAPI.list(roleListQueryParams.value),
+        queryFn: () => roleAPI.list(params.value),
         gcTime: 1000 * 60 * 5,
         staleTime: 1000 * 60 * 5,
-        enabled: computed(() => {
-            if (enabled === undefined) return true;
-            return enabled.value;
-        }),
+        enabled: true,
     }, ['DOMAIN']);
-
-    return {
-        data: computed<RoleModel[]>(() => (queryData.value?.results ?? [])),
-        totalCount: computed<number>(() => queryData.value?.total_count ?? 0),
-        isLoading,
-    };
 };

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onUnmounted } from 'vue';
+
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -21,6 +23,10 @@ const workspaceGroupPageState = workspaceGroupPageStore.state;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
+onUnmounted(() => {
+    workspaceGroupPageStore.$dispose();
+    workspaceGroupPageStore.reset();
+});
 
 </script>
 
