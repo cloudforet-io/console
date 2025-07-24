@@ -115,27 +115,21 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI, screens,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
 import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useRepositoryListQuery } from '@/services/asset-inventory/composables/use-repository-list-query';
 import { repositoryColorMap, repositoryIconMap } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
-
 
 
 const collectorFormStore = useCollectorFormStore();
@@ -157,32 +151,25 @@ const state = reactive({
         { name: 'etc', label: 'ETC', img: undefined },
     ]),
     selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
-    repositories: [],
     repositoryList: computed<MenuItem[]>(() => ([
         {
             name: 'all', label: 'All Repository', icon: null, color: null,
         },
-        ...state.repositories.map((repo: RepositoryModel) => ({
+        ...(repositoryListData.value?.map((repo: RepositoryModel) => ({
             label: repo.name,
             name: repo.repository_id,
             icon: repositoryIconMap[repo.repository_type],
             color: repositoryColorMap[repo.repository_type],
             iconColor: repositoryColorMap[repo.repository_type],
-        })),
+        })) || []),
     ])),
     selectedRepository: 'all',
     isLaptopView: computed<boolean>(() => width.value > screens.tablet.max),
 });
 
-const getRepositories = async () => {
-    try {
-        const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>();
-        state.repositories = res.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.repositories = [];
-    }
-};
+/* Query */
+const { data: repositoryListData } = useRepositoryListQuery();
+
 
 const handleChangeProvider = (provider) => {
     const providerValue = provider === 'all' ? null : provider;
@@ -192,11 +179,6 @@ const handleChangeProvider = (provider) => {
 watch(() => state.selectedRepository, (repository) => {
     emit('selectRepository', repository);
 });
-
-(async () => {
-    await getRepositories();
-})();
-
 </script>
 
 <style lang="postcss" scoped>

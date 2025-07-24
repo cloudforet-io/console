@@ -9,7 +9,7 @@
         <div v-if="!state.isEditMode"
              class="contents-wrapper"
         >
-            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
+            <collector-detail-plugin-info :plugin="pluginData"
                                           :collector="originCollectorData"
             />
             <plugin-summary-cards :collector="originCollectorData"
@@ -22,7 +22,7 @@
         <div v-if="state.isEditMode"
              class="collector-base-info-edit"
         >
-            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
+            <collector-detail-plugin-info :plugin="pluginData"
                                           :collector="originCollectorData"
                                           show-minimal
             />
@@ -54,13 +54,12 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { Location } from 'vue-router';
 
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PPaneLayout,
@@ -71,8 +70,6 @@ import type { CollectorUpdateParameters } from '@/api-clients/inventory/collecto
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { UPGRADE_MODE } from '@/api-clients/plugin/plugin/constant';
-import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
-import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -89,6 +86,7 @@ import CollectorTagForm from '@/services/asset-inventory/components/CollectorFor
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
+import { usePluginGetQuery } from '@/services/asset-inventory/composables/use-plugin-get-query';
 import { usePluginGetVersionsQuery } from '@/services/asset-inventory/composables/use-plugin-get-versions-query';
 import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
@@ -106,7 +104,6 @@ const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
     collectorPluginInfo: computed<CollectorModel['plugin_info']|null>(() => originCollectorData.value?.plugin_info ?? null),
-    repositoryPlugin: null as null|PluginModel,
     isCollectorAutoUpgrade: computed<boolean>(() => originCollectorData.value?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {
         const version = state.collectorPluginInfo?.version;
@@ -154,6 +151,9 @@ const { data: recentJobsData } = useInventoryJobListQuery({
 const { data: pluginVersionsData } = usePluginGetVersionsQuery({
     pluginId: computed(() => collectorPluginId.value ?? ''),
 });
+const { data: pluginData } = usePluginGetQuery({
+    pluginId: computed(() => collectorPluginId.value ?? ''),
+});
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
@@ -172,16 +172,6 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     };
     return collectorAPI.update(params);
 };
-const getRepositoryPlugin = async (pluginId: string) => {
-    try {
-        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
-            plugin_id: pluginId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
 
 const handleClickEdit = () => {
     state.isEditMode = true;
@@ -221,11 +211,6 @@ const handleClickSave = async () => {
         state.isEditMode = false;
     }
 };
-
-watch(() => state.collectorPluginInfo, async (pluginInfo) => {
-    if (pluginInfo?.plugin_id) await getRepositoryPlugin(pluginInfo.plugin_id);
-}, { immediate: true });
-
 </script>
 
 <style lang="postcss" scoped>
