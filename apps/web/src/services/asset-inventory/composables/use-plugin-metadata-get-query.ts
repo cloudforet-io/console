@@ -20,7 +20,10 @@ export const usePluginMetadataGetQuery = (params: ComputedRef<GetPluginMetadataP
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {
-        ...query,
+        data: query.data,
+        isLoading: query.isLoading,
+        refetch: query.refetch,
+        error: query.error,
         key,
     };
 };
