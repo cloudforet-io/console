@@ -16,13 +16,14 @@ export const useUserGetQuery = (userId: Ref<string>) => {
     const isAdminMode = computed<boolean>(() => userPageStore.state.isAdminMode);
 
     const { key: userQueryKey, params: userQueryParams } = useServiceQueryKey('identity', 'user', 'get', {
+        contextKey: userId.value,
         params: computed(() => ({
             user_id: userId.value,
         })),
     });
 
     const { key: workspaceUserQueryKey, params: workspaceUserQueryParams } = useServiceQueryKey('identity', 'workspace-user', 'get', {
-        contextKey: userId,
+        contextKey: userId.value,
         params: computed(() => ({
             user_id: userId.value,
         })),

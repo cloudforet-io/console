@@ -219,7 +219,8 @@ const handleClose = () => {
 };
 
 const queryClient = useQueryClient();
-const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { withSuffix: withSuffixUserGetQueryKey } = useServiceQueryKey('identity', 'user', 'get');
 
 const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
     onSuccess: async () => {
@@ -247,6 +248,7 @@ const { mutateAsync: _enableUser } = useMutation({
     }),
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
@@ -260,6 +262,7 @@ const { mutateAsync: _disableUser } = useMutation({
     }),
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {

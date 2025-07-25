@@ -22,6 +22,7 @@ export const useUserGroupListQuery = ({ params }: { params: ComputedRef<UserGrou
             total_count: 0,
         },
         gcTime: 1000 * 60 * 2,
+        enabled: computed(() => params.value.query?.filter?.[0]?.v?.length > 0),
     }, ['WORKSPACE']);
 
     return {
