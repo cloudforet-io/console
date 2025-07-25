@@ -171,14 +171,14 @@ const {
 });
 const { userIdInput, passwordInput, confirmPasswordInput } = forms;
 
-const { withSuffix: userProfileQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get', {
-    contextKey: userIdInput.value,
+const { key: userProfileQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get', {
+    contextKey: userIdInput,
 });
 const { mutateAsync: resetPassword, isPending: isResetPasswordPending } = useMutation({
     mutationFn: userProfileAPI.resetPassword,
     onSuccess: async () => {
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId: userIdInput.value, status: 'done' } }).catch(() => {});
-        queyClient.invalidateQueries({ queryKey: userProfileQueryKey({ userId: userIdInput.value }) });
+        queyClient.invalidateQueries({ queryKey: userProfileQueryKey.value });
     },
     onError: async (e: any) => {
         if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
@@ -196,7 +196,7 @@ const { mutateAsync: updatePassword, isPending: isUpdatePasswordPending } = useM
     onSuccess: async () => {
         SpaceConnector.flushToken();
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
-        queyClient.invalidateQueries({ queryKey: userProfileQueryKey({ userId: userIdInput.value }) });
+        queyClient.invalidateQueries({ queryKey: userProfileQueryKey.value });
     },
     onError: (e: any) => {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
