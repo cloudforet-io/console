@@ -9,11 +9,10 @@ import { usePrivateWidgetApi } from '@/api-clients/dashboard/private-widget/comp
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { useDashboardCreateMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashbaord-create-mutation';
-import { getSharedDashboardLayouts } from '@/services/_shared/dashboard/core/helpers/dashboard-layout-template-helper';
+import { useDashboardLayoutSchema } from '@/services/_shared/dashboard/core/composables/use-dashboard-layout-schema';
 
 interface UseDashboardCloneMutationOptions {
     isPrivate?: ComputedRef<boolean>;
@@ -27,7 +26,7 @@ export const useDashboardCloneMutation = (options: UseDashboardCloneMutationOpti
     const { privateDashboardAPI } = usePrivateDashboardApi();
     const { privateWidgetAPI } = usePrivateWidgetApi();
     const { publicWidgetAPI } = usePublicWidgetApi();
-    const allReferenceStore = useAllReferenceStore();
+    const { getSharedDashboardLayouts } = useDashboardLayoutSchema();
     const userStore = useUserStore();
 
     const {
@@ -80,7 +79,7 @@ export const useDashboardCloneMutation = (options: UseDashboardCloneMutationOpti
         const dashboard = await _getDashboardFn(dashboardId);
         const widgetList = await _listWidgetFn(dashboardId);
 
-        const _sharedLayouts = await getSharedDashboardLayouts(dashboard.layouts, widgetList.results || [], allReferenceStore.getters.costDataSource);
+        const _sharedLayouts = await getSharedDashboardLayouts(dashboard.layouts, widgetList.results || []);
 
         const _sharedDashboard: DashboardCreateParams = {
             ...params,
