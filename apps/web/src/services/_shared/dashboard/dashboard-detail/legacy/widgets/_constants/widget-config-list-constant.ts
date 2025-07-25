@@ -13,7 +13,7 @@ import totalFailFindingsHistory from '@/services/_shared/dashboard/dashboard-det
 import totalFailFindingsStatus from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/total-fail-findings-status/widget-config';
 import trendOfPassAndFailFindings from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
 import budgetStatus from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-status/widget-config';
-import budgetUsageByTarget from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-by-target/widget-config';
+// import budgetUsageByTarget from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-by-target/widget-config';
 import budgetUsageSummary from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-summary/widget-config';
 import costByRegionMultiFields from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-by-region-multi-fields/widget-config';
 import costByRegion from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-by-region/widget-config';
@@ -45,7 +45,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'costByRegion',
     'costByRegionMultiFields',
     'budgetStatus',
-    'budgetUsageByTarget',
+    // 'budgetUsageByTarget',
     'severityStatusByService',
     'countOfFailFindings',
     'countOfPassAndFailFindings',
@@ -69,7 +69,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetConfigKey, Partial<WidgetConfi
     costByRegion,
     costByRegionMultiFields,
     budgetStatus,
-    budgetUsageByTarget,
+    // budgetUsageByTarget,
     // Asset Widgets
     severityStatusByService,
     countOfFailFindings,
