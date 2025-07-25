@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupCreateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/create';
-import type { UserGroupUpdateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/update';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -34,50 +34,70 @@ const state = reactive({
     description: '',
     disabled: false,
     isGroupNameDuplicated: false,
+    isFormEdited: false,
 });
 
-/* Watcher */
-watch(() => state, () => {
-    state.disabled = state.groupName.length > 0 && !state.isGroupNameDuplicated;
-}, { deep: true, immediate: true });
+const { userGroupAPI } = useUserGroupApi();
+const queryClient = useQueryClient();
+
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'user-group', 'list');
+const { withSuffix: userGroupGetQueryKey } = useServiceQueryKey('identity', 'user-group', 'get');
+
+const { mutateAsync: createUserGroup, isPending: isCreateUserGroupPending } = useMutation({
+    mutationFn: userGroupAPI.create,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupGetQueryKey({ userGroupId: userGroupPageGetters.selectedUserGroups[0].user_group_id }) });
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.SUCCESS_MESSAGE'));
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        handleClose();
+        userGroupPageStore.setSelectedIndices([]);
+    },
+});
+
+const { mutateAsync: updateUserGroup, isPending: isUpdateUserGroupPending } = useMutation({
+    mutationFn: userGroupAPI.update,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupGetQueryKey({ userGroupId: userGroupPageGetters.selectedUserGroups[0].user_group_id }) });
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_SUCCESS_MESSAGE'));
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        handleClose();
+        userGroupPageStore.setSelectedIndices([]);
+    },
+});
 
 /* Component */
 const handleConfirm = async () => {
     switch (storeState.modalType) {
     case USER_GROUP_MODAL_TYPE.CREATE:
-        state.loading = true;
-        try {
-            await fetchCreateUserGroup({
-                name: state.groupName,
-                description: state?.description,
-                tags: {
-                    key: '',
-                },
-            });
-            emit('confirm');
-            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.SUCCESS_MESSAGE'));
-        } finally {
-            state.loading = false;
-            handleClose();
-        }
+        await createUserGroup({
+            name: state.groupName,
+            description: state?.description,
+            tags: {
+                key: '',
+            },
+        });
         break;
     case USER_GROUP_MODAL_TYPE.UPDATE:
-        state.loading = true;
-        try {
-            await fetchUpdateUserGroup({
-                user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-                name: state.groupName,
-                description: state?.description,
-                tags: {
-                    key: '',
-                },
-            });
-            emit('confirm');
-            showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.CREATE_USER_GROUP.UPDATE_SUCCESS_MESSAGE'));
-        } finally {
-            state.loading = false;
-            handleClose();
-        }
+        await updateUserGroup({
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+            name: state.groupName,
+            description: state?.description,
+            tags: {
+                key: '',
+            },
+        });
         break;
     default:
         break;
@@ -96,24 +116,13 @@ const handleUpdateValues = (data) => {
     state.groupName = data.groupName;
     state.description = data.description;
     state.isGroupNameDuplicated = data.isGroupNameDuplicated;
+    state.isFormEdited = data.isFormEdited;
 };
 
-/* API */
-const fetchCreateUserGroup = async (params: UserGroupCreateParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-const fetchUpdateUserGroup = async (params: UserGroupUpdateParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.update<UserGroupUpdateParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
+/* Watcher */
+watch(() => state, () => {
+    state.disabled = state.groupName.length > 0 && !state.isGroupNameDuplicated && state.isFormEdited;
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -121,7 +130,7 @@ const fetchUpdateUserGroup = async (params: UserGroupUpdateParameters) => {
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE || userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE"
                     size="md"
-                    :loading="state.loading"
+                    :loading="isCreateUserGroupPending || isUpdateUserGroupPending"
                     :disabled="!state.disabled"
                     @cancel="handleClose"
                     @close="handleClose"

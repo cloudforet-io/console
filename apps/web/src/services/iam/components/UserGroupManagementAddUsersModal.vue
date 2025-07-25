@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupAddUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/add-users';
+import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import type { MembersType } from '@/api-clients/identity/user-group/schema/type';
+import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 
@@ -15,9 +19,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -25,64 +30,72 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
-const { userListData } = useUserListQuery();
+const selectedUserGroup = computed<UserGroupModel>(() => userGroupPageGetters.selectedUserGroups[0] as UserGroupModel);
 
 const state = reactive({
     loading: false,
     selectedUserIds: undefined,
-    excludedSelectedIds: [] as string[],
+    excludedSelectedIds: computed<string[]>(() => selectedUserGroup.value?.users ?? []),
     formattedMemberItems: {} as Record<MembersType, string[]>,
-    userPool: [] as string[],
+    userPool: computed<string[]>(() => userListData.value?.map((user) => user.user_id) ?? []),
 });
 
-/* Watcher */
-watch(userListData, (_userList) => {
-    if (!_userList) return;
-    state.userPool = _userList.map((user) => user.user_id);
-}, { deep: true, immediate: true });
+const { workspaceUserAPI } = useWorkspaceUserApi();
+const { userGroupAPI } = useUserGroupApi();
 
-watch(() => userGroupPageGetters.selectedUserGroups, (nv_selected_user_group) => {
-    if (nv_selected_user_group.length === 1 && nv_selected_user_group[0].users) {
-        state.excludedSelectedIds = nv_selected_user_group[0].users;
-    } else if (nv_selected_user_group.length === 1 && !Object.keys(nv_selected_user_group[0]).includes('users')) {
-        state.excludedSelectedIds = [];
-    }
-}, { deep: true, immediate: true });
+const queryClient = useQueryClient();
+
+const { key: userListQueryKey, params: userListQueryParams } = useServiceQueryKey('identity', 'workspace-user', 'list', {
+    params: computed(() => ({
+        query: {
+            filter: [{ k: 'user_id', v: selectedUserGroup.value?.users ?? [], o: 'contain_in' }],
+        },
+    })),
+});
+
+const { data: userListData } = useScopedQuery({
+    queryKey: userListQueryKey,
+    queryFn: () => workspaceUserAPI.list(userListQueryParams.value),
+    select: (data) => data?.results || [],
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 2,
+    enabled: computed(() => !!(selectedUserGroup.value?.users && selectedUserGroup.value?.users.length > 0)),
+}, ['WORKSPACE']);
+
+const { mutateAsync: addUsers, isPending: addUsersIsPending } = useMutation({
+    mutationFn: userGroupAPI.addUsers,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.SUCCESS_MESSAGE'));
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSettled: () => {
+        handleClose();
+        userGroupPageStore.setSelectedUserIdx([]);
+    },
+});
 
 /* Component */
 const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await fetchAddUsers({
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            users: state.formattedMemberItems.USER,
-        });
-        emit('confirm');
-        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.SUCCESS_MESSAGE'));
-    } finally {
-        state.loading = false;
-        handleClose();
-        userGroupPageStore.$patch((_state) => {
-            _state.state.users.selectedIndices = [];
-        });
-    }
+    await addUsers({
+        user_group_id: selectedUserGroup.value?.user_group_id ?? '',
+        users: state.formattedMemberItems.USER,
+    });
 };
 
 const handleClose = () => {
-    userGroupPageState.modal.type = '';
+    userGroupPageStore.updateModalSettings({
+        type: '',
+        title: '',
+        themeColor: '',
+    });
 };
 
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.formattedMemberItems = value;
-};
-
-/* API */
-const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
 };
 </script>
 
@@ -91,7 +104,7 @@ const fetchAddUsers = async (params: UserGroupAddUsersParameters) => {
                     :header-title="userGroupPageState.modal.title"
                     :visible="userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.ADD_NEW_USER"
                     size="md"
-                    :loading="state.loading"
+                    :loading="addUsersIsPending"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

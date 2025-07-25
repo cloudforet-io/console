@@ -3,14 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PDataTable, PButtonModal, PLink, PScopedNotification,
 } from '@cloudforet/mirinae';
 
-import type { UserGroupDeleteUserGroupParameters } from '@/api-clients/identity/user-group/schema/api-verbs/delete';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { UserGroupListItemType } from '@/api-clients/identity/user-group/schema/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +22,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-co
 import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
 import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
 
 type TableItemType = {
     user_group: string;
@@ -34,9 +36,32 @@ const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
+const serviceListQuery = useServiceListQuery();
+
+const { userGroupAPI } = useUserGroupApi();
+const queryClient = useQueryClient();
+
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'user-group', 'list');
+
+const { mutateAsync: deleteUserGroup } = useMutation({
+    mutationFn: userGroupAPI.delete,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
+        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
+        emit('confirm');
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        userGroupPageStore.setSelectedIndices([]);
+        handleCancel();
+    },
+});
+
 const storeState = reactive({
     selectedUserGroupList: computed<UserGroupListItemType[]>(() => userGroupPageGetters.selectedUserGroups),
-    selectedUserGroupIds: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id)),
+    selectedUserGroupIds: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.user_group_id ?? '')),
     selectedUserGroupNames: computed(() => userGroupPageGetters.selectedUserGroups.map((userGroup) => userGroup.name)),
 });
 
@@ -56,18 +81,10 @@ const tableState = reactive({
 
 /* Component */
 const handleConfirm = async () => {
-    const deletePromises = storeState.selectedUserGroupIds.map((userGroupId) => fetchDeleteUserGroup({
+    const deletePromises = storeState.selectedUserGroupIds.map((userGroupId) => deleteUserGroup({
         user_group_id: userGroupId,
     }));
-    try {
-        state.loading = true;
-        await Promise.all(deletePromises);
-        emit('confirm');
-        showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.DELETE.SHOW_SUCCESS_MESSAGE'));
-    } finally {
-        state.loading = false;
-        handleCancel();
-    }
+    await Promise.allSettled(deletePromises);
 };
 
 const handleCancel = () => {
@@ -94,17 +111,6 @@ const getServiceNames = (): string => {
     return Array.from(uniqueServices).join(', ');
 };
 
-/* API */
-const fetchDeleteUserGroup = async (params: UserGroupDeleteUserGroupParameters) => {
-    try {
-        await SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-const serviceListQuery = useServiceListQuery();
-
 /* Watcher */
 watch([serviceListQuery.data, () => storeState.selectedUserGroupList], ([nv_service_list, nv_user_group_list]) => {
     if (nv_service_list) {
@@ -113,7 +119,7 @@ watch([serviceListQuery.data, () => storeState.selectedUserGroupList], ([nv_serv
             Object.values(nv_service_list).forEach((service) => {
                 if (service && service.members) {
                     if (Object.keys(service.members).includes('USER_GROUP')) {
-                        if (service.members.USER_GROUP.includes(userGroup.user_group_id)) {
+                        if (service.members.USER_GROUP.includes(userGroup.user_group_id ?? '')) {
                             list.push({
                                 user_group: userGroup.name,
                                 service: service.name,

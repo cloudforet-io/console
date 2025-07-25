@@ -37,6 +37,7 @@ const { mutate: userGroupChannelDeleteMutate, isPending: userGroupChannelDeleteP
         ErrorHandler.handleError(error, true);
     },
     onSettled: () => {
+        userGroupPageStore.selectedUserGroupChannelIdx([0]);
         handleCancel();
     },
 });

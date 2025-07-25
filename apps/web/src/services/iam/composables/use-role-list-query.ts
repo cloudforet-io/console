@@ -9,8 +9,6 @@ import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-import { useRolePageStore } from '@/services/iam/store/role-page-store';
-
 interface UseRoleListQueryReturn {
     roleListData: Ref<RoleModel[]>;
     roleListIsLoading: Ref<boolean>;
@@ -24,10 +22,6 @@ export const useRoleListQuery = (
 ): UseRoleListQueryReturn => {
     const { roleAPI } = useRoleApi();
 
-    const rolePageStore = useRolePageStore();
-    const rolePageState = rolePageStore.$state;
-    const selectedRoleIds = computed<string[]>(() => rolePageState.selectedRoleIds);
-
     const { key: roleListQueryKey, params: roleListQueryParams } = useServiceQueryKey('identity', 'role', 'list', {
         params: computed(() => ({
             ...(params?.value ?? {}),
@@ -40,7 +34,7 @@ export const useRoleListQuery = (
         select: (data) => data?.results || [],
         staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 30,
-        enabled: computed(() => selectedRoleIds.value.length > 0),
+        enabled: true,
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {
