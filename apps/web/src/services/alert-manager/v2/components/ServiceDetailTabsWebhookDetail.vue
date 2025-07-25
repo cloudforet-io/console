@@ -216,7 +216,6 @@ const getRepositoryID = async () => {
         gcTime: 1000 * 60 * 2,
         staleTime: 1000 * 60 * 2,
     });
-    console.log({ res });
     return res.results ? res.results[0].repository_id : '';
 };
 const fetchPluginInfo = async () => {

@@ -1,26 +1,24 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PDataLoader, PI, PDivider, PEmpty,
+    PDataLoader,
+    PDivider, PEmpty,
+    PI,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { usePostApi } from '@/api-clients/board/post/composables/use-post-api';
 import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import type { PostModel } from '@/api-clients/board/post/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice/notice-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import TopBarNotiItem from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notice/modules/TopBarNotiItem.vue';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -38,15 +36,16 @@ const NOTICE_ITEM_LIMIT = 15;
 const emit = defineEmits<{(event: 'close'): void;
 }>();
 
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
+
 const state = reactive({
-    loading: true,
-    noticeData: [] as PostModel[],
     items: computed<NoticeItem[]>(() => {
-        const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
+        const filteredData = postListData?.value?.results?.filter((d) => !d.options.is_pinned) ?? [];
         return convertNoticeItem(filteredData);
     }),
     pinnedItems: computed<NoticeItem[]>(() => {
-        const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
+        const filteredData = postListData?.value?.results?.filter((d) => d.options.is_pinned) ?? [];
         const res = convertNoticeItem(filteredData);
         return res;
     }),
@@ -61,27 +60,24 @@ const convertNoticeItem = (rawData: PostModel[]): NoticeItem[] => rawData.map((d
     isPinned: d.options.is_pinned,
 }));
 
-const noticeStore = useNoticeStore();
-const noticeGetters = noticeStore.getters;
-
 /* Api */
 const noticeApiHelper = new ApiQueryHelper()
     .setPage(1, NOTICE_ITEM_LIMIT)
     .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-const listNotice = async () => {
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: noticeApiHelper.data,
-            board_type: POST_BOARD_TYPE.NOTICE,
-        });
-        state.proxyCount = total_count ?? 0;
-        state.noticeData = results ?? [];
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-        state.proxyCount = 0;
-        state.noticeData = [];
-    }
-};
+
+const { postAPI } = usePostApi();
+const { key: postListQueryKey, params: postListQueryParams } = useServiceQueryKey('board', 'post', 'list', {
+    params: computed(() => ({
+        query: noticeApiHelper.data,
+        board_type: POST_BOARD_TYPE.NOTICE,
+    })),
+});
+const { data: postListData, isFetching: postListFetching } = useScopedQuery({
+    queryKey: postListQueryKey,
+    queryFn: () => postAPI.list(postListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['DOMAIN', 'WORKSPACE']);
 
 /* Event */
 const handleSelectNotice = (postId: string) => {
@@ -97,21 +93,16 @@ const handleClickViewAllNotice = () => {
 };
 
 /* Init */
-const init = async () => {
-    state.loading = true;
-    await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
-    state.loading = false;
-};
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
-callApiWithGrantGuard();
-
+onMounted(async () => {
+    await noticeStore.fetchNoticeReadState();
+});
 </script>
 
 <template>
     <div class="top-bar-notice-context-menu">
-        <p-data-loader :data="state.noticeData"
-                       :loading="state.loading"
-                       :class="{ loading: state.loading && !state.noticeData.length }"
+        <p-data-loader :data="postListData?.results"
+                       :loading="postListFetching"
+                       :class="{ loading: postListFetching && !postListData?.results?.length }"
         >
             <div class="content-wrapper">
                 <template v-if="!!state.pinnedItems.length">

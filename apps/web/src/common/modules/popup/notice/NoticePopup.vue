@@ -82,7 +82,6 @@ const getPostList = async (): Promise<void> => {
         });
         const _excludedPostIdList = excludedPostIdList?.map((d) => d.name.split(':')[3]) ?? [];
         state.popupList = postList?.filter((d) => !_excludedPostIdList.includes(d.post_id)) ?? [];
-        console.log(state.popupList);
     } catch (e) {
         ErrorHandler.handleError(e);
         state.popupList = [];
