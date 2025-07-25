@@ -21,6 +21,7 @@ import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/u
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import type { UserListParameters } from '@/api-clients/identity/user/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -293,6 +294,23 @@ const {
 const { userGroupAPI } = useUserGroupApi();
 const userGroupPerUser = ref<UserGroupModel[]>();
 
+const { key: userGroupListQueryKey, params: userGroupListQueryParams } = useServiceQueryKey('identity', 'user-group', 'list', {
+    params: computed(() => ({
+        query: {
+            only: ['user_group_id', 'name', 'users'],
+        },
+    })),
+});
+
+const { data: userGroupList } = useScopedQuery({
+    queryKey: userGroupListQueryKey,
+    queryFn: () => userGroupAPI.list(userGroupListQueryParams.value),
+    select: (data) => data.results ?? [],
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+    enabled: true,
+}, ['WORKSPACE']);
+
 onMounted(async () => {
     const { results } = await userGroupAPI.list({});
     userGroupPerUser.value = results;
@@ -300,7 +318,7 @@ onMounted(async () => {
 
 const getUserGroupPerUser = (userId: string) => {
     const userGroupNames: string[] = [];
-    userGroupPerUser.value?.forEach((userGroup) => {
+    userGroupList.value?.forEach((userGroup) => {
         if (userGroup.users !== undefined) {
             if (userGroup.users.includes(userId)) {
                 userGroupNames.push(userGroup.name);

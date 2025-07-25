@@ -42,14 +42,13 @@ const serviceListQuery = useServiceListQuery();
 const { roleListData } = useRoleListQuery();
 
 const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
-const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
-
+const { userListData: selectedUsers, workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
 
 const { userGroupListData } = useUserGroupListQuery({
     params: computed(() => ({
         query: {
             filter: [
-                { k: 'user_id', v: selectedUsers.value?.map((user) => user.user_id), o: 'in' },
+                { k: 'user_id', v: selectedWorkspaceUsers.value?.map((user) => user.user_id), o: 'in' },
             ],
         },
     })),
@@ -79,12 +78,13 @@ const state = reactive({
     filteredUniqueItems: computed(() => {
         const serviceList = serviceListQuery.data.value;
         const userGroups = userGroupListData.value;
+        const _selectedUsers = userPageState.isAdminMode ? selectedUsers.value : selectedWorkspaceUsers.value;
 
-        if (!serviceList || !userGroups || !selectedUsers.value?.length) return [];
+        if (!serviceList || !userGroups || !_selectedUsers?.length) return [];
 
         const list: any[] = [];
 
-        selectedUsers.value?.forEach((selectedUser) => {
+        _selectedUsers?.forEach((selectedUser) => {
             Object.values(serviceList).forEach((service) => {
                 if (service && service.members) {
                     if (Object.keys(service.members).includes('USER')) {
@@ -106,6 +106,7 @@ const state = reactive({
             });
             list.push(selectedUser);
         });
+
 
         return Object.values(list.reduce((acc, cur) => {
             if (!acc[cur.user_id]) {
@@ -169,8 +170,6 @@ const state = reactive({
     }),
 });
 
-
-
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
@@ -219,7 +218,8 @@ const handleClose = () => {
 };
 
 const queryClient = useQueryClient();
-const { key: userListQueryKey } = useServiceQueryKey('identity', userPageState.isAdminMode ? 'user' : 'workspace-user', 'list');
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { withSuffix: withSuffixUserGetQueryKey } = useServiceQueryKey('identity', 'user', 'get');
 
 const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
     onSuccess: async () => {
@@ -247,6 +247,7 @@ const { mutateAsync: _enableUser } = useMutation({
     }),
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
@@ -260,6 +261,7 @@ const { mutateAsync: _disableUser } = useMutation({
     }),
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
         userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {

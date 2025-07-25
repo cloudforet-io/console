@@ -17,6 +17,8 @@ import { useUserListPaginationQuery } from '@/services/iam/composables/use-user-
 import { USER_MODAL_TYPE, USER_SEARCH_HANDLERS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
+import { useUserListQuery } from '../composables/use-user-list-query';
+
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -50,11 +52,14 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
+
 const route = useRoute();
 
 const state = reactive({
     selectedUsersType: computed<'OnlyWorkspaceGroupUser'|'OnlyWorkspaceUser'|'Mixed'>(() => {
-        const userTypeList = userPageState.selectedUsers?.map((user) => (user?.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser')) ?? [];
+        const userTypeList = selectedWorkspaceUsers.value?.map((user) => (user?.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser')) ?? [];
         if (userTypeList.includes('workspaceGroupUser') && userTypeList.includes('workspaceUser')) return 'Mixed';
         if (userTypeList.includes('workspaceGroupUser')) return 'OnlyWorkspaceGroupUser';
         return 'OnlyWorkspaceUser';
@@ -152,13 +157,13 @@ watch(() => route.query, (query) => {
                          class="toolbox"
                     >
                         <p-button style-type="tertiary"
-                                  :disabled="userPageState.selectedUsers?.length === 0"
+                                  :disabled="selectedWorkspaceUsers === undefined"
                                   @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
                         >
                             {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                         </p-button>
                         <p-button style-type="negative-secondary"
-                                  :disabled="userPageState.selectedUsers?.length === 0"
+                                  :disabled="selectedWorkspaceUsers === undefined"
                                   @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                         >
                             {{ $t('IAM.USER.REMOVE') }}

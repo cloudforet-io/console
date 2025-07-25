@@ -13,16 +13,20 @@ import { useUserStore } from '@/store/user/user-store';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userStore = useUserStore();
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
+
 const state = reactive({
     loading: false,
     isDomainAdmin: computed(() => userStore.getters.isDomainAdmin),
-    refinedTableData: computed(() => userPageState.selectedUsers?.map((user) => ({
+    refinedTableData: computed(() => selectedWorkspaceUsers.value?.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
     }))),
