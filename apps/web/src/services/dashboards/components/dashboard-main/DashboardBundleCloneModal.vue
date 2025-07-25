@@ -31,8 +31,6 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -43,7 +41,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { getSharedDashboardLayouts } from '@/services/_shared/dashboard/core/helpers/dashboard-layout-template-helper';
+import { useDashboardLayoutSchema } from '@/services/_shared/dashboard/core/composables/use-dashboard-layout-schema';
 import { useDashboardFolderQuery } from '@/services/dashboards/composables/use-dashboard-folder-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
@@ -91,9 +89,9 @@ const dashboardTreeControlStore = useDashboardTreeControlStore();
 const dashboardTreeControlState = dashboardTreeControlStore.state;
 const userStore = useUserStore();
 const authorizationStore = useAuthorizationStore();
-const allReferenceStore = useAllReferenceStore();
 const { privateWidgetAPI } = usePrivateWidgetApi();
 const { publicWidgetAPI } = usePublicWidgetApi();
+const { getSharedDashboardLayouts } = useDashboardLayoutSchema();
 
 /* Query */
 const {
@@ -112,7 +110,6 @@ const queryClient = useQueryClient();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });
 
@@ -326,7 +323,7 @@ const cloneDashboard = async (dashboardId: string, isPrivate?: boolean, folderId
 
     const _dashboardNameList = getDashboardNameList(_dashboardType);
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
-    const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+    const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets);
     const _createdDashboardParams: DashboardCreateParams = {
         name: getClonedName(_dashboardNameList, _dashboard.name),
         layouts: _createdLayouts,

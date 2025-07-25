@@ -10,14 +10,12 @@ import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { getSharedDashboardLayouts } from '@/services/_shared/dashboard/core/helpers/dashboard-layout-template-helper';
+import { useDashboardLayoutSchema } from '@/services/_shared/dashboard/core/composables/use-dashboard-layout-schema';
 import { useDashboardWidgetListQuery } from '@/services/_shared/dashboard/dashboard-detail/composables/use-dashboard-widget-list-query';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import type { SharedDashboardInfo } from '@/services/dashboards/types/shared-dashboard-type';
@@ -39,7 +37,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const appContextStore = useAppContextStore();
-const allReferenceStore = useAllReferenceStore();
+const { getSharedDashboardLayouts } = useDashboardLayoutSchema();
 
 /* Query */
 const {
@@ -64,7 +62,6 @@ const queryState = reactive({
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -95,7 +92,7 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         state.loading = true;
 
-        const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, widgetList.value, storeState.costDataSource);
+        const _sharedLayouts = await getSharedDashboardLayouts(state.targetDashboard.layouts, widgetList.value);
         state.sharedDashboard = {
             name: state.targetDashboard.name || '',
             layouts: _sharedLayouts,
