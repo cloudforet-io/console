@@ -3,9 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton,
@@ -20,7 +19,6 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import { useRoleBindingApi } from '@/api-clients/identity/role-binding/composables/use-role-binding-api';
-import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/list';
 import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
@@ -91,6 +89,7 @@ const state = reactive({
     sortDesc: true,
     // selectedUser: computed(() => userData.value ?? workspaceUserData.value ?? {}),
     selectedRemoveItem: '',
+    rowIndex: 0,
 });
 const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
@@ -117,7 +116,6 @@ const dropdownState = reactive({
 const modalState = reactive({
     visible: false,
     title: '',
-    loading: false,
 });
 
 /* Component */
@@ -183,6 +181,10 @@ const fetchWorkspaceList = async () => {
         { k: 'resource_group', v: RESOURCE_GROUP.WORKSPACE, o: '=' },
     ]);
     try {
+        if (!userData.value?.user_id) {
+            state.items = [];
+            return;
+        }
         const { results } = await getRoleBindingList({
             params: {
                 query: workspaceApiHelper.data,
@@ -278,42 +280,57 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     };
 };
 
-const handleSelectDropdownItem = async (value, rowIndex) => {
-    try {
-        const response = await roleBindingAPI.updateRole({
-            role_binding_id: state.items[rowIndex].role_binding.role_binding_id,
-            role_id: value || '',
-        });
+const { mutateAsync: updateRoleBinding } = useMutation({
+    mutationFn: roleBindingAPI.updateRole,
+    onSuccess: async (data) => {
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = roleListData.value?.find((role) => role.role_id === response.role_id)?.name ?? '';
-        state.items[rowIndex].role_binding = {
+        const roleName = roleListData.value?.find((role) => role.role_id === data.role_id)?.name ?? '';
+        state.items[state.rowIndex].role_binding = {
             name: roleName,
-            type: response.role_type,
-            role_binding_id: response.role_binding_id,
+            type: data.role_type,
+            role_binding_id: data.role_binding_id,
         };
-    } catch (e: any) {
+        await queryClient.invalidateQueries({ queryKey: roleBindingListQueryKey });
+    },
+    onError: (e: any) => {
         ErrorHandler.handleRequestError(e, e.message);
-    }
+    },
+});
+
+const handleSelectDropdownItem = async (value, rowIndex) => {
+    state.rowIndex = rowIndex;
+    await updateRoleBinding({
+        role_binding_id: state.items[rowIndex].role_binding.role_binding_id,
+        role_id: value || '',
+    });
 };
-const handleRemoveButton = async () => {
-    modalState.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
-            role_binding_id: state.selectedRemoveItem,
-        });
+
+const { mutateAsync: deleteRoleBinding, isPending: isDeleteRoleBindingPending } = useMutation({
+    mutationFn: roleBindingAPI.delete,
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         closeRemoveModal();
         await fetchWorkspaceList();
-    } catch (e) {
+    },
+    onError: (e: any) => {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
-    } finally {
-        modalState.loading = false;
-    }
+    },
+});
+
+const handleRemoveButton = async () => {
+    await deleteRoleBinding({
+        role_binding_id: state.selectedRemoveItem,
+    });
 };
 
 /* Watcher */
-watch([() => props.activeTab, () => userData.value?.user_id], async () => {
+watch([
+    () => props.activeTab,
+    () => userData.value?.user_id,
+    () => workspaceListData.value,
+], async ([, userId, workspaceList]) => {
+    if (!userId || !workspaceList) return;
     await fetchWorkspaceList();
 }, { immediate: true });
 </script>
@@ -404,7 +421,7 @@ watch([() => props.activeTab, () => userData.value?.user_id], async () => {
         <user-management-remove-modal v-if="modalState.visible"
                                       :visible.sync="modalState.visible"
                                       :title="modalState.title"
-                                      :loading="modalState.loading"
+                                      :loading="isDeleteRoleBindingPending"
                                       @confirm="handleRemoveButton"
         />
     </div>
