@@ -54,6 +54,11 @@ export default class ErrorHandler {
             console.error('API Error', error);
         } else {
             console.error(error);
+            if (import.meta.env.DEV) {
+                showErrorMessage('DEV Error: Something is Wrong.', error);
+            } else {
+                showErrorMessage('Something is Wrong! Please contact the administrator.', error);
+            }
         }
     }
 

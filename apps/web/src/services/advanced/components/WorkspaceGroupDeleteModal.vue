@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, type ComputedRef,
+} from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PI } from '@cloudforet/mirinae';
 
+
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupDeleteParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/delete';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -17,32 +22,36 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
 
 const emit = defineEmits<{(e: 'confirm'): void,
 }>();
 
-const state = reactive({
-    sequence: 'first',
-    loading: false,
-    isDeleteAble: computed(() => (workspaceGroupPageGetters.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageGetters.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
+const state = reactive<{
+    sequence: typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE[keyof typeof WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE];
+    isDeleteAble: ComputedRef<boolean>;
+}>({
+    sequence: WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST,
+    isDeleteAble: computed(() => (workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count ?? 0) === 0 && (workspaceGroupPageState.selectedWorkspaceGroup?.users?.length ?? 0) === 0),
 });
 
-const deleteWorkspaceGroups = async () => {
-    state.loading = true;
 
-    try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.delete<WorkspaceGroupDeleteParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
-        });
+const { key: workspaceGroupListQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const queryClient = useQueryClient();
+const { mutateAsync: deleteWorkspaceGroupMutation, isPending: isDeleteWorkspaceGroupPending } = useMutation({
+    mutationFn: (params: WorkspaceGroupDeleteParameters) => workspaceGroupAPI.delete(params),
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACE_GROUP'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListQueryKey.value });
+        workspaceGroupPageStore.reset();
+        resetSequence();
+        emit('confirm');
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACE_GROUP'));
-    } finally {
-        state.loading = false;
-    }
-};
+    },
+});
+
 
 const resetSequence = () => {
     state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.FIRST;
@@ -53,11 +62,13 @@ const handleConfirm = async () => {
         state.sequence = WORKSPACE_GROUP_DELETE_MODAL_SEQUENCE.LAST;
         return;
     }
-
-    await deleteWorkspaceGroups();
-    workspaceGroupPageStore.closeModal();
-    resetSequence();
-    emit('confirm');
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
+    await deleteWorkspaceGroupMutation({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
+    });
 };
 
 const handleCloseModal = () => {
@@ -71,7 +82,7 @@ const handleCloseModal = () => {
                     :header-title="workspaceGroupPageState.modal.title"
                     :theme-color="workspaceGroupPageState.modal.themeColor"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.DELETE"
-                    :loading="state.loading"
+                    :loading="isDeleteWorkspaceGroupPending"
                     :disabled="!state.isDeleteAble"
                     size="sm"
                     @confirm="handleConfirm"
@@ -84,7 +95,7 @@ const handleCloseModal = () => {
             >
                 <p>
                     {{ $t('IAM.WORKSPACE_GROUP.MODAL.DELETE_MODAL_FIRST_MESSAGE', {
-                        WorkspaceGroupName: workspaceGroupPageGetters.selectedWorkspaceGroup.name,
+                        WorkspaceGroupName: workspaceGroupPageState.selectedWorkspaceGroup?.name,
                     }) }}
                 </p>
                 <div class="count-wrappers">
@@ -93,7 +104,7 @@ const handleCloseModal = () => {
                             Workspace
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || 0 }}
+                            {{ workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count || 0 }}
                         </p>
                     </div>
                     <div class="count-wrapper">
@@ -101,11 +112,11 @@ const handleCloseModal = () => {
                             Group User
                         </h5>
                         <p class="count">
-                            {{ workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length || 0 }}
+                            {{ workspaceGroupPageState.selectedWorkspaceGroup?.users?.length || 0 }}
                         </p>
                     </div>
                 </div>
-                <div v-if="workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_count || workspaceGroupPageGetters.selectedWorkspaceGroup.users?.length"
+                <div v-if="workspaceGroupPageState.selectedWorkspaceGroup?.workspace_count || workspaceGroupPageState.selectedWorkspaceGroup?.users?.length"
                      class="warning-message-wrapper"
                 >
                     <div>

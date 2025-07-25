@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { onMounted } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupUpdateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,21 +22,18 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const state = reactive({
-    loading: false,
-});
 
 const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
-        if (state.loading) return true;
-        if (workspaceGroupPageGetters.selectedWorkspaceGroup.name === value) {
+        if (isUpdateWorkspaceGroupPending) return true;
+        if (workspaceGroupPageState.selectedWorkspaceGroup?.name === value) {
             return true;
         }
         if (!value?.length) {
@@ -48,24 +47,32 @@ const {
     },
 });
 
-const updateWorkspaceGroups = async () => {
-    try {
-        await SpaceConnector.clientV2.identity.workspaceGroup.update<WorkspaceGroupUpdateParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroup.workspace_group_id,
-            name: groupName.value,
-        });
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const queryClient = useQueryClient();
+
+const { mutateAsync: updateWorkspaceGroupMutation, isPending: isUpdateWorkspaceGroupPending } = useMutation({
+    mutationFn: (params: WorkspaceGroupUpdateParameters) => workspaceGroupAPI.update(params),
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_EDIT_WORKSPACE'), '');
-    } catch (e) {
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+        emit('confirm');
+        workspaceGroupPageStore.resetSelectedWorkspace();
+        workspaceGroupPageStore.closeModal();
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e);
-    }
-};
+    },
+});
 
 const handleConfirm = async () => {
-    state.loading = true;
-    await updateWorkspaceGroups();
-    workspaceGroupPageStore.closeModal();
-    emit('confirm');
-    state.loading = false;
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
+    await updateWorkspaceGroupMutation({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
+        name: groupName.value,
+    });
 };
 
 const handleCancel = () => {
@@ -77,10 +84,8 @@ const handleClose = () => {
 };
 
 
-watch(() => workspaceGroupPageState.modal.visible, () => {
-    if (workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.EDIT) {
-        setForm('groupName', workspaceGroupPageGetters.selectedWorkspaceGroup.name);
-    }
+onMounted(() => {
+    setForm('groupName', workspaceGroupPageState.selectedWorkspaceGroup?.name);
 });
 </script>
 
@@ -88,7 +93,7 @@ watch(() => workspaceGroupPageState.modal.visible, () => {
     <p-button-modal class="workspace-group-edit-modal"
                     :header-title="workspaceGroupPageState.modal.title"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.EDIT"
-                    :loading="state.loading"
+                    :loading="isUpdateWorkspaceGroupPending"
                     :disabled="(groupName === '' || invalidState.groupName)"
                     size="sm"
                     @confirm="handleConfirm"
