@@ -13,15 +13,20 @@ import {
 import { i18n } from '@/translations';
 
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
+
 const state = reactive({
     loading: false,
-    refinedTableData: computed(() => userPageState.selectedUsers.map((user) => ({
+    refinedTableData: computed(() => selectedWorkspaceUsers.value?.map((user) => ({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
     }))),
