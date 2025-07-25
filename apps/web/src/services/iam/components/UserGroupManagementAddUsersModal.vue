@@ -9,7 +9,6 @@ import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/u
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
 import type { MembersType } from '@/api-clients/identity/user-group/schema/type';
 import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
-import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
@@ -56,7 +55,7 @@ const { key: userListQueryKey, params: userListQueryParams } = useServiceQueryKe
 
 const { data: userListData } = useScopedQuery({
     queryKey: userListQueryKey,
-    queryFn: () => workspaceUserAPI.list(userListQueryParams.value as WorkspaceUserListParameters),
+    queryFn: () => workspaceUserAPI.list(userListQueryParams.value),
     select: (data) => data?.results || [],
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 2,
