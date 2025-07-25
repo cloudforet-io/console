@@ -82,6 +82,10 @@ const checkDeleteState = reactive({
     headerTitle: i18n.t('MY_PAGE.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE'),
 });
 
+/**
+ * @note: notification.userChannel - v1 api
+ * @note: alertManager.userChannel - v2 api
+ */
 const { mutate: userChannelDeleteMutate } = useMutation({
     mutationFn: (params: UserChannelDeleteParameters|UserChannelDeleteParametersV1) => {
         if (props.visibleUserNotification) {

@@ -88,6 +88,7 @@ const onChangeSchedule = async (scheduleSettingFormType: ScheduleSettingFormType
     state.isScheduleValid = true;
 };
 
+// note: notification.userChannel - v1
 const setUserChannelSchedule = async () => {
     try {
         if (!notificationItemState.userChannelId) throw new Error('User channel id is not defined');

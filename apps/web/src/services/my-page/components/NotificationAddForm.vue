@@ -68,6 +68,11 @@ const state = reactive({
     isInputValid: false,
 });
 
+
+/**
+ * @note: notification.userChannel - v1 api
+ * @note: alertManager.userChannel - v2 api
+ */
 const { mutate: userChannelCreateMutate } = useMutation({
     mutationFn: (params: UserChannelCreateParameters|UserChannelCreateParametersV1) => {
         if (state.visibleUserNotification) {
