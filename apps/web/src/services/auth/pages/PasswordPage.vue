@@ -2,7 +2,7 @@
     <centered-page-layout>
         <p-data-loader
             class="password-page"
-            :loading="state.loading"
+            :loading="isResetPasswordPending || isUpdatePasswordPending"
         >
             <div class="contents-wrapper">
                 <div class="headline-wrapper">
@@ -90,6 +90,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
 import { jwtDecode } from 'jwt-decode';
@@ -97,8 +98,9 @@ import { jwtDecode } from 'jwt-decode';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PDataLoader, PIconButton } from '@cloudforet/mirinae';
 
-import type { UserProfileResetPasswordParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/reset-password';
+import { useUserProfileApi } from '@/api-clients/identity/user-profile/composables/use-user-profile-api';
 import type { UserProfileUpdatePasswordParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/update-password';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -136,10 +138,12 @@ const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 const router = useRouter();
 const route = useRoute();
 
+const { userProfileAPI } = useUserProfileApi();
+const queyClient = useQueryClient();
+
 const domainStore = useDomainStore();
 const userStore = useUserStore();
 const state = reactive({
-    loading: false,
     userType: '',
     pageTitle: computed(() => {
         if (props.status === PASSWORD_STATUS.FIND) {
@@ -167,6 +171,38 @@ const {
 });
 const { userIdInput, passwordInput, confirmPasswordInput } = forms;
 
+const { withSuffix: userProfileQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get', {
+    contextKey: userIdInput.value,
+});
+const { mutateAsync: resetPassword, isPending: isResetPasswordPending } = useMutation({
+    mutationFn: userProfileAPI.resetPassword,
+    onSuccess: async () => {
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId: userIdInput.value, status: 'done' } }).catch(() => {});
+        queyClient.invalidateQueries({ queryKey: userProfileQueryKey({ userId: userIdInput.value }) });
+    },
+    onError: async (e: any) => {
+        if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
+            passwordFormEl.value.validationState.isIdValid = true;
+            passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
+        } else {
+            ErrorHandler.handleError(e);
+            await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId: userIdInput.value, status: 'fail' } }).catch(() => {});
+        }
+    },
+});
+
+const { mutateAsync: updatePassword, isPending: isUpdatePasswordPending } = useMutation({
+    mutationFn: userProfileAPI.updatePassword,
+    onSuccess: async () => {
+        SpaceConnector.flushToken();
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
+        queyClient.invalidateQueries({ queryKey: userProfileQueryKey({ userId: userIdInput.value }) });
+    },
+    onError: (e: any) => {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+    },
+});
+
 /* Components */
 const handleChangeInput = (value: PasswordFormState) => {
     setForm({
@@ -175,6 +211,7 @@ const handleChangeInput = (value: PasswordFormState) => {
         confirmPasswordInput: value.confirmPasswordInput.value,
     });
 };
+
 const handleClickButton = () => {
     if (userIdInput.value !== '' && passwordFormEl.value) {
         if (invalidState.userIdInput) {
@@ -182,12 +219,15 @@ const handleClickButton = () => {
             passwordFormEl.value.validationState.idInvalidText = invalidTexts.userIdInput;
             return;
         }
-        sendResetEmail(userIdInput.value, state.domainId);
+        resetPassword({
+            user_id: userIdInput.value,
+            domain_id: state.domainId,
+        });
     } else {
         const request: UserProfileUpdatePasswordParameters = {
             new_password: passwordInput.value,
         };
-        postResetPassword(request);
+        updatePassword(request);
     }
     resetInputs();
 };
@@ -213,40 +253,6 @@ const resetInputs = () => {
         passwordInput: '',
         confirmPasswordInput: '',
     });
-};
-
-/* API */
-const sendResetEmail = async (userId, domainId) => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.userProfile.resetPassword<UserProfileResetPasswordParameters>({
-            user_id: userId,
-            domain_id: domainId,
-        });
-        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
-    } catch (e: any) {
-        if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
-            passwordFormEl.value.validationState.isIdValid = true;
-            passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
-        } else {
-            ErrorHandler.handleError(e);
-            await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
-        }
-    } finally {
-        state.loading = false;
-    }
-};
-const postResetPassword = async (request: UserProfileUpdatePasswordParameters) => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.userProfile.updatePassword<UserProfileUpdatePasswordParameters>(request);
-        SpaceConnector.flushToken();
-        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
-    } finally {
-        state.loading = false;
-    }
 };
 
 /* Init */
