@@ -2,14 +2,8 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ROLE_STATE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useAppPageStore = defineStore('page-app', () => {
     const state = reactive({
@@ -44,21 +38,6 @@ export const useAppPageStore = defineStore('page-app', () => {
             state.modalInfo.type = '';
             state.modalInfo.title = '';
             state.modalInfo.themeColor = 'primary';
-        },
-        async listRoles() {
-            try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-                    query: {
-                        filter: [
-                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                        ],
-                    },
-                });
-                state.roles = results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.roles = [];
-            }
         },
     };
 
