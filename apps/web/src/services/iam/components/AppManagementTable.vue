@@ -7,7 +7,11 @@ import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge, PI,
+    PBadge,
+    PCopyButton,
+    PI,
+    PSelectDropdown, PStatus,
+    PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
@@ -17,8 +21,11 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { APP_STATUS_TYPE } from '@/api-clients/identity/app/schema/constant';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
-import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -112,8 +119,8 @@ const state = reactive({
         return {
             ...app,
             role_type: {
-                type: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.role_type || '',
-                name: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.name || '',
+                type: roleListData.value?.results?.filter((r) => r.role_id === app.role_id)[0]?.role_type || '',
+                name: roleListData.value?.results?.filter((r) => r.role_id === app.role_id)[0]?.name || '',
             },
             last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
             project: projectLabel && (app.project_group_id || app.project_id) ? {
@@ -192,6 +199,25 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         ,
     },
 ]));
+
+const { roleAPI } = useRoleApi();
+const roleListApiQueryHelper = new ApiQueryHelper();
+const { key: roleListQueryKey, params: roleListQueryParams } = useServiceQueryKey('identity', 'role', 'list', {
+    params: computed(() => {
+        roleListApiQueryHelper.setFilters([
+            { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+        ]);
+        return {
+            query: roleListApiQueryHelper.data,
+        };
+    }),
+});
+const { data: roleListData } = useScopedQuery({
+    queryKey: roleListQueryKey,
+    queryFn: () => roleAPI.list(roleListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
 
 const appListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.appSearchHandlers.keyItemSets });

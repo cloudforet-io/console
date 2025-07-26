@@ -4,24 +4,26 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import type { RawLocation } from 'vue-router/types/router';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PBadge, PDefinitionTable, PPaneLayout, PLink, PTextButton,
+    PBadge, PDefinitionTable,
+    PLink,
+    PPaneLayout,
+    PTextButton,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
 import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
-import type { CloudServiceGetParameters } from '@/api-clients/inventory/cloud-service/schema/api-verbs/get';
-import type { CloudServiceModel } from '@/api-clients/inventory/cloud-service/schema/model';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/components/AlertDetailInfoTableDescription.vue';
 import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
@@ -45,6 +47,27 @@ const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const queryHelper = new QueryHelper();
 
+const cloudServiceState = reactive({
+    id: '',
+    type: undefined as string | undefined,
+    params: computed(() => {
+        const [provider, group, name] = cloudServiceState.type.split('.');
+        if (cloudServiceState.type) {
+            return {
+                provider,
+                group,
+                name,
+                id: cloudServiceState.id,
+            };
+        }
+        return {
+            provider: cloudServiceData.value?.provider || provider,
+            group: cloudServiceData.value?.cloud_service_group || group,
+            name: cloudServiceData.value?.cloud_service_type || name,
+            id: cloudServiceData.value?.cloud_service_id || cloudServiceState.id,
+        };
+    }),
+});
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || 'UTC'),
 });
@@ -117,39 +140,30 @@ const createRouteParams = (params: {
     },
 });
 
-const handleRouteViewButton = async (id: string, type?: string) => {
-    const [provider, group, name] = type?.split('.') || [];
+const { cloudServiceAPI } = useCloudServiceApi();
+const { key: cloudServiceQueryKey, params: cloudServiceQueryParams } = useServiceQueryKey('inventory', 'cloud-service', 'get', {
+    params: computed(() => ({
+        cloud_service_id: cloudServiceState.id,
+    })),
+});
+const { data: cloudServiceData } = useScopedQuery({
+    queryKey: cloudServiceQueryKey,
+    queryFn: () => cloudServiceAPI.get(cloudServiceQueryParams.value),
+    enabled: !!cloudServiceState.id,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 10,
+}, ['WORKSPACE']);
 
+const handleRouteViewButton = async (id: string, type?: string) => {
     if (!type && !id) {
         console.warn('Invalid parameters: both id and type are missing');
         return;
     }
 
-    try {
-        const routeParams = type ? {
-            provider, group, name, id,
-        } : await (async () => {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: id,
-            });
-            return {
-                provider: response.provider,
-                group: response.cloud_service_group,
-                name: response.cloud_service_type,
-                id: response.cloud_service_id,
-            };
-        })();
+    cloudServiceState.id = id;
+    cloudServiceState.type = type;
 
-        window.open(router.resolve(createRouteParams(routeParams)).href, '_blank');
-    } catch (e) {
-        if (!type) {
-            ErrorHandler.handleError(e, true);
-            return;
-        }
-        window.open(router.resolve(createRouteParams({
-            provider, group, name, id,
-        })).href, '_blank');
-    }
+    await window.open(router.resolve(createRouteParams(cloudServiceState.params)).href, '_blank');
 };
 </script>
 

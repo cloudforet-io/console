@@ -79,6 +79,7 @@ export const useUserStore = defineStore('user-store', () => {
         state.requiredActions = userInfo.requiredActions;
         state.emailVerified = userInfo.emailVerified;
         state.mfa = userInfo.mfa;
+        state.isSessionExpired = userInfo.isSessionExpired;
 
         if (userInfo.language) {
             await setI18nLocale(userInfo.language);

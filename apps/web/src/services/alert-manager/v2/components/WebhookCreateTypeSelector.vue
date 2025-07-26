@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
-    PSelectCard, PLazyImg, PDataLoader,
+    PDataLoader,
+    PLazyImg,
+    PSelectCard,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PluginListParameters } from '@/api-clients/repository/plugin/schema/api-verbs/list';
+import { usePluginApi } from '@/api-clients/repository/plugin/composables/use-plugin-api';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
-import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
+import { useRepositoryApi } from '@/api-clients/repository/repository/composables/use-repository-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -30,9 +32,25 @@ const handleSelectWebhook = () => {
     serviceCreateFormStore.setSelectedWebhookType(state.selectedWebhookType);
 };
 
-const getRepositoryID = async (): Promise<string> => {
-    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
+const queryClient = useQueryClient();
+const { repositoryAPI } = useRepositoryApi();
+const { pluginAPI } = usePluginApi();
+const { key: repositoryQueryKey, params: repositoryQueryParams } = useServiceQueryKey('repository', 'repository', 'list', {
+    params: computed(() => ({
         repository_type: 'remote',
+    })),
+});
+const { key: pluginQueryKey, params: pluginQueryParams } = useServiceQueryKey('repository', 'plugin', 'list', {
+    params: computed(() => ({
+        resource_type: 'monitoring.Webhook',
+    })),
+});
+const getRepositoryID = async (): Promise<string> => {
+    const res = await queryClient.fetchQuery({
+        queryKey: repositoryQueryKey.value,
+        queryFn: () => repositoryAPI.list(repositoryQueryParams.value),
+        gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
     });
     return res.results ? res.results[0].repository_id : '';
 };
@@ -40,9 +58,14 @@ const getListWebhookType = async () => {
     state.loading = true;
     try {
         const repositoryId = await getRepositoryID();
-        const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
-            repository_id: repositoryId,
-            resource_type: 'monitoring.Webhook',
+        const { results } = await queryClient.fetchQuery({
+            queryKey: pluginQueryKey.value,
+            queryFn: () => pluginAPI.list({
+                ...pluginQueryParams.value,
+                repository_id: repositoryId,
+            }),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
         });
         state.webhookTypeList = results ?? [];
     } catch (e) {
