@@ -18,7 +18,7 @@ export const useUserProfileConfirmMfaMutation = ({
     const { userProfileAPI } = useUserProfileApi();
 
     return useMutation({
-        mutationFn: userProfileAPI.confirmMfa,
+        mutationFn: (params: UserProfileConfirmMfaParameters) => userProfileAPI.confirmMfa(params),
         onSuccess: async (data, variables) => {
             if (onSuccess) await onSuccess(data, variables);
         },
