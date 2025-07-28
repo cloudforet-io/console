@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { UserConfigGetParameters } from '@/api-clients/config/user-config/schema/api-verbs/get';
-import type { UserConfigUpdateParameters } from '@/api-clients/config/user-config/schema/api-verbs/update';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { UserType } from '@/api-clients/identity/user/schema/type';
 import { i18n } from '@/translations';
 
@@ -23,6 +18,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useUserConfigListQuery } from '@/common/modules/custom-table/custom-field-modal/composables/use-user-config-list-query';
+import { useUserConfigSetMutation } from '@/common/modules/custom-table/custom-field-modal/composables/use-user-config-set-mutation';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
 
@@ -70,9 +67,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     search: '',
     isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
-    loading: true,
     availableColumns: [] as DataTableFieldType[], // all default fields including optional fields.
-    currentColumns: [] as DataTableFieldType[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
     allColumns: [] as DataTableFieldType[], // fields merged with availableColumns and currentColumns
     selectedColumnMap: {} as SelectedColumnMap,
     selectedColumns: computed<DataTableFieldType[]>({
@@ -91,8 +86,10 @@ const state = reactive({
         });
         return orderMap;
     }),
-    isValid: computed(() => state.loading || state.selectedColumns.length > 0),
+    isValid: computed(() => state.selectedColumns.length > 0),
 });
+
+const currentColumns = computed<DataTableFieldType[]>(() => userConfigList.value?.results?.[0]?.data?.data ?? props.defaultField ?? []);
 
 const sortByRecommendation = () => {
     state.allColumns = state.allColumns.sort((a, b) => {
@@ -123,50 +120,22 @@ const onChangeAllSelect = (val) => {
         state.selectedColumns = [];
     }
 };
-const updateCustomTableField = async (userData:{userType:string, userId: string}, resourceType:string, data:DataTableFieldType[]) => {
-    try {
-        const { userType, userId } = userData;
-        await SpaceConnector.clientV2.config.userConfig.set<UserConfigUpdateParameters, UserConfigModel>({
-            name: `console:${userType}:${userId}:custom-field:${resourceType}`,
-            data: { data },
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
-interface CustomFieldsConfigData {
-    data: DataTableFieldType[];
-}
-
-const getCustomTableField = async (userData:{userType:string, userId: string}, resourceType:string):Promise<DataTableFieldType[] | undefined> => {
-    let userConfig:UserConfigModel<CustomFieldsConfigData>|undefined;
-    try {
-        const { userType, userId } = userData;
-        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigGetParameters, ListResponse<UserConfigModel<CustomFieldsConfigData>>>({
-            name: `console:${userType}:${userId}:custom-field:${resourceType}`,
-        });
-        userConfig = results ? results[0] : undefined;
-    } catch (e:any) {
-        if (e?.status !== 404) ErrorHandler.handleError(e);
-        return undefined;
-    }
-    return (userConfig?.data) ? userConfig?.data?.data : props.defaultField ?? [];
-};
-
-const getCurrentColumns = async (): Promise<DataTableFieldType[]> => {
-    try {
-        const currentSavedFields = await getCustomTableField({
-            userType: storeState.userType ?? 'USER',
-            userId: storeState.userId ?? '',
-        }, props.resourceType) ?? [];
-        if (!currentSavedFields) return props.defaultField ?? [];
-        return currentSavedFields;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
+const { mutateAsync: updateCustomTableField, isPending: isUpdatingCustomTableField } = useUserConfigSetMutation({
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
+        state.proxyVisible = false;
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
+const { data: userConfigList, isFetching: isFetchingUserConfigList } = useUserConfigListQuery({
+    params: computed(() => ({
+        name: `console:${storeState.userType ?? 'USER'}:${storeState.userId ?? ''}:custom-field:${props.resourceType}`,
+    })),
+    enabled: computed(() => !!storeState.userType && !!storeState.userId && !!props.resourceType),
+});
 
 const setColumnsDefault = async () => {
     state.allColumns = state.availableColumns;
@@ -175,26 +144,10 @@ const setColumnsDefault = async () => {
 };
 
 const handleConfirm = async () => {
-    state.loading = true;
-
-    try {
-        await updateCustomTableField(
-            {
-                userType: storeState.userType ?? 'USER',
-                userId: storeState.userId ?? '',
-            },
-            props.resourceType,
-            state.selectedColumns,
-        );
-        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
-        emit('custom-field-loaded', state.selectedColumns);
-        emit('complete');
-        state.proxyVisible = false;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
-    } finally {
-        state.loading = false;
-    }
+    await updateCustomTableField({
+        name: `console:${storeState.userType ?? 'USER'}:${storeState.userId ?? ''}:custom-field:${props.resourceType}`,
+        data: { data: state.selectedColumns },
+    });
 };
 
 const handleUpdateSelectedKeys = (keys: string[]) => {
@@ -202,38 +155,27 @@ const handleUpdateSelectedKeys = (keys: string[]) => {
 };
 
 /* Init */
-const initColumns = async () => {
-    state.loading = true;
-    const currentColumns = await getCurrentColumns();
-    state.availableColumns = props.defaultField ?? [];
-    state.currentColumns = currentColumns;
-    state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
-    state.selectedColumns = [...state.currentColumns];
-    emit('custom-field-loaded', state.selectedColumns);
-    state.loading = false;
-};
-watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
+watch([() => props.visible, () => props.resourceType, currentColumns], ([visible, resourceType, _currentColumns]) => {
     if (visible && resourceType) {
-        initColumns();
+        state.availableColumns = props.defaultField ?? [];
+        state.allColumns = mergeFields(_currentColumns, state.availableColumns);
+        state.selectedColumns = [..._currentColumns];
+        emit('custom-field-loaded', state.selectedColumns);
     }
 }, { immediate: true });
-
-onMounted(() => {
-    initColumns();
-});
 
 </script>
 
 <template>
     <p-button-modal :visible.sync="state.proxyVisible"
                     :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
-                    :loading="state.loading"
+                    :loading="isUpdatingCustomTableField || isFetchingUserConfigList"
                     :disabled="!state.isValid"
                     size="sm"
                     @confirm="handleConfirm"
     >
         <template #body>
-            <p-data-loader :loading="state.loading"
+            <p-data-loader :loading="isUpdatingCustomTableField || isFetchingUserConfigList"
                            :min-loading-time="500"
             >
                 <div class="contents-wrapper">

@@ -223,6 +223,7 @@ export const API_DOC = {
         ],
         job: [
             'cancel',
+            'get',
             'list',
         ],
         'report-adjustment': [
@@ -244,7 +245,6 @@ export const API_DOC = {
         ],
         'unified-cost': [
             'analyze',
-            'get',
             'list',
             'stat',
         ],
@@ -321,6 +321,20 @@ export const API_DOC = {
             'update',
         ],
     },
+    'api-clients': {
+        'file-manager': [
+            'add',
+            'delete',
+            'get-download-url',
+            'get',
+            'list',
+            'update',
+        ],
+        plugin: [
+            'get-plugin-endpoint',
+            'get-plugin-metadata',
+        ],
+    },
     identity: {
         agent: [
             'create',
@@ -373,6 +387,7 @@ export const API_DOC = {
             'get',
             'list',
             'remove-users',
+            'stat',
             'udpate',
             'update-project-type',
         ],
@@ -384,6 +399,7 @@ export const API_DOC = {
             'get',
             'list',
             'remove-users',
+            'stat',
             'update',
         ],
         provider: [
@@ -523,6 +539,9 @@ export const API_DOC = {
         'cloud-service-query-set': [
             'list',
         ],
+        'cloud-service-stats': [
+            'analyze',
+        ],
         'cloud-service-type': [
             'list',
             'stat',
@@ -546,8 +565,8 @@ export const API_DOC = {
         ],
         job: [
             'analyze',
-            'list',
             'get',
+            'list',
         ],
         'job-task': [
             'list',
@@ -562,7 +581,7 @@ export const API_DOC = {
         ],
         'metric-data': [
             'analyze',
-            'list',
+            'stat',
         ],
         'metric-example': [
             'create',
@@ -574,6 +593,7 @@ export const API_DOC = {
         namespace: [
             'get',
             'list',
+            'stat',
         ],
         note: [
             'create',
@@ -583,6 +603,23 @@ export const API_DOC = {
         ],
         region: [
             'list',
+            'stat',
+        ],
+    },
+    'inventory-v2': {
+        namespace: [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
+        ],
+        'namespace-group': [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'update',
         ],
     },
     monitoring: {
@@ -596,6 +633,7 @@ export const API_DOC = {
             'update',
         ],
         'data-source': [
+            'get',
             'list',
         ],
         'escalation-policy': [
@@ -618,6 +656,10 @@ export const API_DOC = {
             'update',
         ],
         log: [
+            'list',
+        ],
+        metric: [
+            'get-data',
             'list',
         ],
         note: [
@@ -647,6 +689,25 @@ export const API_DOC = {
         ],
     },
     notification: {
+        notification: [
+            'create',
+            'delete',
+            'get',
+            'list',
+            'push',
+            'set-read',
+        ],
+        'project-channel': [
+            'create',
+            'delete',
+            'disable',
+            'enable',
+            'get',
+            'list',
+            'set-schedule',
+            'set-subscription',
+            'update',
+        ],
         protocol: [
             'create',
             'delete',
@@ -655,6 +716,17 @@ export const API_DOC = {
             'get',
             'list',
             'update-plugin',
+            'update',
+        ],
+        'user-channel': [
+            'create',
+            'delete',
+            'disable',
+            'enable',
+            'get',
+            'list',
+            'set-schedule',
+            'set-subscription',
             'update',
         ],
     },
@@ -715,6 +787,11 @@ export const API_DOC = {
             'list',
         ],
     },
+    search: {
+        resource: [
+            'search',
+        ],
+    },
     secret: {
         secret: [
             'create',
@@ -728,11 +805,6 @@ export const API_DOC = {
             'list',
             'update-data',
             'update',
-        ],
-    },
-    plugin: {
-        plugin: [
-            'get-plugin-metadata',
         ],
     },
 } as const;

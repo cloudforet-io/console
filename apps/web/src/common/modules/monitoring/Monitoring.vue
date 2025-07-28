@@ -1,11 +1,253 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
+
+import dayjs from 'dayjs';
+import {
+    debounce, find, capitalize, chain, range, sortBy, get,
+} from 'lodash';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
+} from '@cloudforet/mirinae';
+
+
+import { MONITORING_TYPE } from '@/api-clients/monitoring/data-source/schema/constants';
+
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
+
+import { useUserStore } from '@/store/user/user-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useMonitoringDataSourceGetQuery } from '@/common/modules/monitoring/composables/use-monitoring-data-source-get-query';
+import { useMonitoringDataSourceListQuery } from '@/common/modules/monitoring/composables/use-monitoring-data-source-list-query';
+import { useMonitoringMetricGetDataFetcher } from '@/common/modules/monitoring/composables/use-monitoring-metric-get-data-fetcher';
+import { useMonitoringMetricListQuery } from '@/common/modules/monitoring/composables/use-monitoring-metric-list-query';
+import type { StatisticsType } from '@/common/modules/monitoring/config';
+import {
+    COLORS, STATISTICS_TYPE, TIME_RANGE,
+} from '@/common/modules/monitoring/config';
+import MetricChart from '@/common/modules/monitoring/MetricChart.vue';
+import type {
+    AvailableResource,
+    Metric, MetricChartData, StatItem,
+} from '@/common/modules/monitoring/type';
+
+
+interface DataToolType {
+    id: string;
+    name: string;
+    statisticsTypes: StatisticsType[];
+}
+
+const LOAD_LIMIT = 12;
+
+interface Props {
+    loading: boolean;
+    resources: AvailableResource[];
+    selectedMetrics: Metric[];
+    dataSourceId?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+    resources: () => [],
+    selectedMetrics: () => [],
+    dataSourceId: undefined,
+});
+
+const router = useRouter();
+const userStore = useUserStore();
+const { getReferenceLocation } = useReferenceRouter();
+
+
+const state = reactive({
+    showLoader: computed(() => isLoadingMetrics.value || isLoadingDataSources.value || isLoadingDataSource.value),
+    timezone: computed(() => userStore.state.timezone),
+    selectedTimeRange: '1h',
+    selectedToolId: '',
+    statisticsTypes: computed(() => {
+        const tool = find(dataTools.value, { id: state.selectedToolId });
+        return tool ? tool.statisticsTypes : [STATISTICS_TYPE.AVERAGE];
+    }),
+    statItems: computed<StatItem[]>(() => state.statisticsTypes.map((d) => ({
+        type: 'item', label: capitalize(d), name: d,
+    }))),
+    selectedStat: STATISTICS_TYPE.AVERAGE,
+    metrics: [] as Metric[],
+    metricChartDataList: [] as MetricChartData[],
+    availableResources: [] as AvailableResource[],
+    noData: false,
+});
+
+const dataTools = computed<DataToolType[]>(() => {
+    if (props.dataSourceId) {
+        return [{
+            id: props.dataSourceId,
+            name: dataSource.value?.name ?? '',
+            statisticsTypes: get(dataSource.value, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
+        }];
+    }
+    return chain(dataSources.value?.results)
+        .map((d) => ({
+            id: d.data_source_id,
+            name: d.name,
+            statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
+        })).compact().uniqBy('id')
+        .value();
+});
+const tools = computed(() => dataTools.value.map((d) => ({
+    name: d.id,
+    label: d.name,
+})));
+const metrics = computed(() => {
+    if (props.selectedMetrics && props.selectedMetrics.length > 0) {
+        return sortBy(props.selectedMetrics, (m) => m.name);
+    }
+    return sortBy(metricList.value?.metrics, (m) => m.name);
+});
+
+/* api */
+const setAvailableResources = () => {
+    let resources = props.resources.slice(0, 16);
+    resources = resources.map((resource, idx) => ({
+        ...resource,
+        color: COLORS[idx],
+        link: router.resolve(getReferenceLocation(resource.id, { resource_type: 'inventory.Server' })).href,
+    }));
+    state.availableResources = sortBy(resources, (m) => m.name);
+};
+
+const { data: dataSource, isFetching: isLoadingDataSource } = useMonitoringDataSourceGetQuery({
+    dataSourceId: computed(() => props.dataSourceId || ''),
+});
+
+const apiQuery = new ApiQueryHelper();
+const { data: dataSources, isFetching: isLoadingDataSources } = useMonitoringDataSourceListQuery({
+    params: computed(() => {
+        apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map((d) => d.provider) }]);
+        return {
+            monitoring_type: MONITORING_TYPE.METRIC,
+            query: apiQuery.data,
+        };
+    }),
+    enabled: computed(() => !props.dataSourceId),
+});
+
+const { data: metricList, isFetching: isLoadingMetrics } = useMonitoringMetricListQuery({
+    params: computed(() => ({
+        data_source_id: state.selectedToolId,
+        resources: props.resources.map((d) => d.id),
+    })),
+    enabled: computed(() => !!state.selectedToolId && !!props.resources),
+});
+
+
+
+
+// list metric chart data
+const { getMetricData } = useMonitoringMetricGetDataFetcher();
+const getMetricChartData = async (data: MetricChartData) => {
+    try {
+        data.loading = true;
+        const res = await getMetricData({
+            data_source_id: state.selectedToolId,
+            metric_query: data.metric.metric_query,
+            stat: state.selectedStat,
+            end: dayjs.utc().toISOString(),
+            start: dayjs.utc().subtract(TIME_RANGE[state.selectedTimeRange], 'hour').toISOString(),
+            metric: data.metric.key,
+        });
+        data.labels = res.labels;
+        data.dataset = res.values;
+        data.error = false;
+        data.resources = state.availableResources;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        data.error = true;
+    } finally {
+        data.loading = false;
+    }
+
+    return data;
+};
+const listMetricCharts = debounce(async (start = 0): Promise<void> => {
+    if (state.availableResources.length === 0) return;
+    try {
+        await Promise.all(
+            range(start, state.metricChartDataList.length).map((i) => getMetricChartData(state.metricChartDataList[i])),
+        );
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+}, 300);
+
+const initMetricChartData = (start = 0): void => {
+    let endIdx = start + LOAD_LIMIT;
+    if (endIdx > state.metrics.length) endIdx = state.metrics.length;
+
+    range(start, endIdx).forEach((current) => {
+        state.metricChartDataList[current] = {
+            dataset: {},
+            labels: [],
+            loading: true,
+            metric: state.metrics[current],
+        };
+    });
+    state.metricChartDataList = [...state.metricChartDataList];
+};
+
+const listAll = debounce(async (): Promise<void> => {
+    state.metricChartDataList = [];
+    setAvailableResources();
+    if (metrics.value.length === 0) return;
+
+    initMetricChartData();
+    await listMetricCharts();
+}, 300);
+
+/* event */
+const loadMoreMetricCharts = async () => {
+    const start = state.metricChartDataList.length;
+    initMetricChartData(start);
+    await listMetricCharts(start);
+};
+
+watch(dataTools, (_dataTools) => {
+    if (props.dataSourceId) {
+        state.selectedToolId = props.dataSourceId;
+    } else if (_dataTools.length > 0) {
+        state.selectedToolId = _dataTools[0].id;
+    }
+}, { immediate: true });
+
+watch(() => state.statisticsTypes, (types) => {
+    if (types) state.selectedStat = types[0] || STATISTICS_TYPE.AVERAGE;
+}, { immediate: true });
+
+watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
+    if (timeRange && stat) listMetricCharts();
+}, { immediate: false });
+
+watch([() => state.selectedToolId, () => props.selectedMetrics, () => props.resources], async () => {
+    if (props.resources) {
+        await listAll();
+    }
+}, { immediate: false });
+
+</script>
+
 <template>
     <div class="monitoring">
-        <section v-if="!dataSourceId && dataTools.length > 1"
+        <section v-if="!props.dataSourceId && tools.length > 1"
                  class="data-source-section"
         >
             <p-select-button-group class="data-source-wrapper"
                                    :buttons="tools"
-                                   :selected.sync="selectedToolId"
+                                   :selected.sync="state.selectedToolId"
             />
         </section>
         <section class="resource-section">
@@ -18,7 +260,7 @@
                 }) }}
             </span>
             <div>
-                <p-link v-for="resource in availableResources"
+                <p-link v-for="resource in state.availableResources"
                         :key="resource.id"
                         action-icon="external-link"
                         class="legend"
@@ -41,8 +283,8 @@
                           :key="timeRange"
                           :title="timeRange"
                           class="button"
-                          :class="{selected: timeRange === selectedTimeRange}"
-                          @click="selectedTimeRange = timeRange"
+                          :class="{selected: timeRange === state.selectedTimeRange}"
+                          @click="state.selectedTimeRange = timeRange"
                     >
                         {{ timeRange }}
                     </span>
@@ -50,8 +292,8 @@
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
-                <p-select-dropdown :selected.sync="selectedStat"
-                                   :menu="statItems"
+                <p-select-dropdown :selected.sync="state.selectedStat"
+                                   :menu="state.statItems"
                 />
                 <p-icon-button class="ml-4 flex-shrink-0"
                                name="ic_refresh"
@@ -68,29 +310,29 @@
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <p-spinner v-if="showLoader"
+            <p-spinner v-if="state.showLoader"
                        size="xl"
             />
-            <div v-else-if="metrics.length === 0"
+            <div v-else-if="state.metrics.length === 0"
                  class="text-center text-gray"
             >
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
             <template v-else>
                 <div class="metric-chart-wrapper grid grid-cols-12">
-                    <metric-chart v-for="(item, idx) in metricChartDataList"
+                    <metric-chart v-for="(item, idx) in state.metricChartDataList"
                                   :key="`${item.metric.key}-${idx}`"
                                   :loading="item.loading"
                                   :labels="item.labels"
                                   :dataset="item.dataset"
                                   :unit="item.metric.unit"
-                                  :timezone="timezone"
-                                  :resources="availableResources"
+                                  :timezone="state.timezone"
+                                  :resources="state.availableResources"
                                   :title="item.metric.name"
                                   :error="item.error"
                     />
                 </div>
-                <p-button v-if="metricChartDataList.length !== metrics.length"
+                <p-button v-if="state.metricChartDataList.length !== state.metrics.length"
                           style-type="tertiary"
                           class="more-btn"
                           @click="loadMoreMetricCharts"
@@ -101,294 +343,6 @@
         </section>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import { useRouter } from 'vue-router/composables';
-
-import dayjs from 'dayjs';
-import {
-    debounce, find, capitalize, chain, range, sortBy, get,
-} from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
-} from '@cloudforet/mirinae';
-
-
-import { MONITORING_TYPE } from '@/api-clients/monitoring/data-source/schema/constants';
-
-import { useReferenceRouter } from '@/router/composables/use-reference-router';
-
-import { useUserStore } from '@/store/user/user-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { StatisticsType } from '@/common/modules/monitoring/config';
-import {
-    COLORS, STATISTICS_TYPE, TIME_RANGE,
-} from '@/common/modules/monitoring/config';
-import MetricChart from '@/common/modules/monitoring/MetricChart.vue';
-import type {
-    AvailableResource,
-    Metric, MetricChartData, StatItem,
-} from '@/common/modules/monitoring/type';
-
-interface DataToolType {
-    id: string;
-    name: string;
-    statisticsTypes: StatisticsType[];
-}
-
-const LOAD_LIMIT = 12;
-
-export default {
-    name: 'Monitoring',
-    components: {
-        MetricChart,
-        PButton,
-        PSelectDropdown,
-        PSelectButtonGroup,
-        PIconButton,
-        PLink,
-        // MetricChart,
-        PSpinner,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        resources: {
-            type: Array,
-            default: () => [],
-            validator(resources) {
-                return resources.every((resource) => resource.id);
-            },
-        },
-        selectedMetrics: {
-            type: Array,
-            default: () => ([]),
-        },
-        dataSourceId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const router = useRouter();
-        const userStore = useUserStore();
-        const { getReferenceLocation } = useReferenceRouter();
-
-
-        const state = reactive({
-            showLoader: computed(() => props.loading || state.metricsLoading),
-            timezone: computed(() => userStore.state.timezone),
-            dataTools: [],
-            selectedToolId: '',
-            tools: computed<DataToolType[]>(() => state.dataTools.map((d) => ({
-                name: d.id,
-                label: d.name,
-            }))),
-            selectedTimeRange: '1h',
-            statisticsTypes: computed(() => {
-                const tool = find(state.dataTools, { id: state.selectedToolId });
-                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.AVERAGE];
-            }),
-            statItems: computed<StatItem[]>(() => state.statisticsTypes.map((d) => ({
-                type: 'item', label: capitalize(d), name: d,
-            }))),
-            selectedStat: STATISTICS_TYPE.AVERAGE,
-            metricsLoading: true,
-            metrics: [] as Metric[],
-            metricChartDataList: [] as MetricChartData[],
-            availableResources: [] as AvailableResource[],
-            noData: false,
-        });
-
-        /* api */
-        const setAvailableResources = () => {
-            let resources = props.resources.slice(0, 16);
-            resources = resources.map((resource, idx) => ({
-                ...resource,
-                color: COLORS[idx],
-                link: router.resolve(getReferenceLocation(resource.id, { resource_type: 'inventory.Server' })).href,
-            }));
-            state.availableResources = sortBy(resources, (m) => m.name);
-        };
-        const getDataSource = async () => {
-            try {
-                const res = await SpaceConnector.client.monitoring.dataSource.get({
-                    data_source_id: props.dataSourceId,
-                });
-                state.selectedToolId = props.dataSourceId;
-                state.dataTools = [{
-                    id: props.dataSourceId,
-                    name: res.name,
-                    statisticsTypes: get(res, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
-                }];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dataTools = [];
-                state.selectedToolId = '';
-            }
-        };
-
-        const apiQuery = new ApiQueryHelper();
-        const listDataSources = async () => {
-            try {
-                apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map((d) => d.provider) }]);
-                const res = await SpaceConnector.client.monitoring.dataSource.list({
-                    monitoring_type: MONITORING_TYPE.METRIC,
-                    query: apiQuery.data,
-                });
-                state.dataTools = chain(res.results)
-                    .map((d) => ({
-                        id: d.data_source_id,
-                        name: d.name,
-                        statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
-                    })).compact().uniqBy('id')
-                    .value();
-                if (state.dataTools.length > 0) {
-                    state.selectedToolId = state.dataTools[0].id;
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dataTools = [];
-            }
-        };
-        const fetcher = getCancellableFetcher(SpaceConnector.client.monitoring.metric.list);
-        const listMetrics = async () => {
-            if (!state.selectedToolId) return;
-            try {
-                state.metrics = [];
-
-                const { status, response } = await fetcher({
-                    data_source_id: state.selectedToolId,
-                    resources: props.resources.map((d) => d.id),
-                });
-                if (status === 'succeed') {
-                    state.metrics = sortBy(response.metrics, (m) => m.name);
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.metrics = [];
-            }
-        };
-
-        const initMetricChartData = (start = 0): void => {
-            let endIdx = start + LOAD_LIMIT;
-            if (endIdx > state.metrics.length) endIdx = state.metrics.length;
-
-            range(start, endIdx).forEach((current) => {
-                state.metricChartDataList[current] = {
-                    dataset: {},
-                    labels: [],
-                    loading: true,
-                    metric: state.metrics[current],
-                };
-            });
-            state.metricChartDataList = [...state.metricChartDataList];
-        };
-        const getMetricChartData = async (data: MetricChartData) => {
-            try {
-                data.loading = true;
-                const res = await SpaceConnector.client.monitoring.metric.getData({
-                    data_source_id: state.selectedToolId,
-                    metric_query: data.metric.metric_query,
-                    stat: state.selectedStat,
-                    end: dayjs.utc().toISOString(),
-                    start: dayjs.utc().subtract(TIME_RANGE[state.selectedTimeRange], 'hour').toISOString(),
-                    metric: data.metric.key,
-                });
-                data.labels = res.labels;
-                data.dataset = res.values;
-                data.error = false;
-                data.resources = state.availableResources;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                data.error = true;
-            } finally {
-                data.loading = false;
-            }
-
-            return data;
-        };
-        const listMetricCharts = debounce(async (start = 0): Promise<void> => {
-            if (state.availableResources.length === 0) return;
-            try {
-                await Promise.all(
-                    range(start, state.metricChartDataList.length).map((i) => getMetricChartData(state.metricChartDataList[i])),
-                );
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        }, 300);
-
-        const listAll = debounce(async (): Promise<void> => {
-            state.metricChartDataList = [];
-
-            setAvailableResources();
-
-            state.metricsLoading = true;
-            if (props.selectedMetrics && props.selectedMetrics.length > 0) {
-                state.metrics = sortBy(props.selectedMetrics, (m) => m.name);
-            } else {
-                await listMetrics();
-            }
-            state.metricsLoading = false;
-
-            if (state.metrics.length === 0) return;
-
-            initMetricChartData();
-            await listMetricCharts();
-        }, 300);
-
-        /* event */
-        const loadMoreMetricCharts = async () => {
-            const start = state.metricChartDataList.length;
-            initMetricChartData(start);
-            await listMetricCharts(start);
-        };
-
-        watch(() => state.statisticsTypes, (types) => {
-            if (types) state.selectedStat = types[0] || STATISTICS_TYPE.AVERAGE;
-        }, { immediate: true });
-
-        watch(() => props.resources, async () => {
-            if (props.resources) {
-                if (props.dataSourceId) await getDataSource();
-                else await listDataSources();
-                await listAll();
-            }
-        }, { immediate: true });
-
-        watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
-            if (timeRange && stat) listMetricCharts();
-        }, { immediate: false });
-
-        watch([() => state.selectedToolId, () => props.selectedMetrics], async () => {
-            if (props.resources) {
-                await listAll();
-            }
-        }, { immediate: false });
-
-        return {
-            ...toRefs(state),
-            TIME_RANGE,
-            legendFormatter(resource): string {
-                return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
-            },
-            listMetricCharts,
-            loadMoreMetricCharts,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 section {

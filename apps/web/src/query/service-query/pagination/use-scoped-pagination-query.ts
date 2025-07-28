@@ -60,7 +60,7 @@ type UsePaginationQueryOptions<TParams extends object, TPageData, TError> = Omit
 interface UsePaginationQueryPageOptions {
     thisPage: ComputedRef<number>;
     pageSize: ComputedRef<number>;
-    verb: 'list' | 'load' | 'get-data' | 'analyze' | 'find';
+    verb: 'list' | 'load' | 'get-data' | 'analyze' | 'find' | 'stat';
 }
 
 export const useScopedPaginationQuery = <TParams extends object, TPageData extends PaginatableBaseData, TError = unknown>(
