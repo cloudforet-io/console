@@ -3,19 +3,20 @@ import { computed } from 'vue';
 
 
 import { useMonitoringDataSourceApi } from '@/api-clients/monitoring/data-source/composables/use-monitoring-data-source-api';
+import type { DataSourceGetParameters } from '@/api-clients/monitoring/data-source/schema/api-verbs/get';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 
 interface MonitoringDataSourceGetQueryOptions {
-    dataSourceId: ComputedRef<string | undefined>;
+    dataSourceId: ComputedRef<string>;
 }
 
 export const useMonitoringDataSourceGetQuery = ({ dataSourceId }: MonitoringDataSourceGetQueryOptions) => {
     const { dataSourceAPI } = useMonitoringDataSourceApi();
     const { key, params } = useServiceQueryKey('monitoring', 'data-source', 'get', {
         contextKey: computed(() => dataSourceId.value),
-        params: computed(() => ({
+        params: computed<DataSourceGetParameters>(() => ({
             data_source_id: dataSourceId.value,
         })),
     });

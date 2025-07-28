@@ -122,7 +122,7 @@ const setAvailableResources = () => {
 };
 
 const { data: dataSource, isFetching: isLoadingDataSource } = useMonitoringDataSourceGetQuery({
-    dataSourceId: computed(() => props.dataSourceId),
+    dataSourceId: computed(() => props.dataSourceId || ''),
 });
 
 const apiQuery = new ApiQueryHelper();

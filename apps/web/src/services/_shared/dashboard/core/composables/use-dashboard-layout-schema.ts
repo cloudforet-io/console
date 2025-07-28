@@ -11,7 +11,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type {
-    ConcatOptions, CostOptions, DataTableTransformOptions, JoinOptions,
+    AddLabelsOptions,
+    AggregateOptions,
+    ConcatOptions, CostOptions, DataTableTransformOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
 import { useCostDataSourceMap } from '@/services/_shared/dashboard/core/composables/use-cost-data-source-map';
@@ -120,9 +122,9 @@ const _getSharedDataTableInfoList = (widgetDataTablesMap: Record<string, DataTab
             if (dt.operator === 'JOIN' || dt.operator === 'CONCAT') {
                 const dataTableIds = (operatorOptions as JoinOptions | ConcatOptions)?.data_tables;
                 const dataTableIndices = dataTableIds?.map((dtId) => dataTables.findIndex((d) => d.data_table_id === dtId));
-                (sharedDataTable.options as DataTableTransformOptions)[dt.operator] = { ...operatorOptions, data_tables: dataTableIndices };
+                (sharedDataTable.options[dt.operator as 'JOIN' | 'CONCAT'] as JoinOptions | ConcatOptions) = { ...operatorOptions, data_tables: dataTableIndices };
             } else {
-                const operatorDataTableId = (operatorOptions as Omit<DataTableTransformOptions, 'JOIN'|'CONCAT'>)?.data_table_id;
+                const operatorDataTableId = (operatorOptions as AggregateOptions|ValueMappingOptions|EvalOptions|PivotOptions|AddLabelsOptions|QueryOptions)?.data_table_id;
                 const dataTableIdx = dataTables.findIndex((d) => d.data_table_id === operatorDataTableId);
                 (sharedDataTable.options as DataTableTransformOptions) = { [dt.operator as string]: { ...operatorOptions, data_table_id: dataTableIdx } };
             }

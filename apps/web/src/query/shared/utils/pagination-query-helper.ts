@@ -47,7 +47,7 @@ const _addPageToListParams = (
 });
 
 export const addPageToVerbParams = <TParams extends object>(
-    verb: 'load' | 'list' | 'analyze' | 'stat' | 'get-data',
+    verb: 'load' | 'list' | 'analyze' | 'stat' | 'get-data' | 'find',
     params: TParams,
     page: Page,
 ): TParams => {
