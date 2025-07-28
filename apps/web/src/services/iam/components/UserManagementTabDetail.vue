@@ -130,12 +130,18 @@ const handleClickButton = (type: string) => {
         themeColor: 'alert',
         modalVisibleType: 'status',
     }); break;
-    case USER_MODAL_TYPE.UPDATE: userPageStore.updateModalSettings({
-        type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
-        themeColor: 'primary',
-        modalVisibleType: 'form',
-    }); break;
+    case USER_MODAL_TYPE.UPDATE:
+        userPageStore.updateModalSettings({
+            type,
+            title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
+            themeColor: 'primary',
+            modalVisibleType: 'form',
+        });
+        if (userPageGetters.selectedUsers.length) { // NOTE: temporarily setting before vue query is ready
+            const selectedUser = userPageGetters.selectedUsers[0];
+            userPageStore.setSelectedUserForForm(selectedUser);
+        }
+        break;
     default: break;
     }
 };
