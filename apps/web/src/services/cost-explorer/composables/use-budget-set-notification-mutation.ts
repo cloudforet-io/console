@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/vue-query';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 
@@ -25,8 +26,7 @@ interface UseBudgetSetNotificationMutationOptions {
 }
 
 export const useBudgetSetNotificationMutation = (options: UseBudgetSetNotificationMutationOptions) => {
-    const { budgetAPI, queryClient } = useBudgetQuery();
-    const { withSuffix: budgetGetQueryKey } = useServiceQueryKey('cost-analysis', 'budget', 'get');
+    const { budgetAPI } = useBudgetQuery();
 
     const {
         context, onSuccess, onError, onSettled,
@@ -36,17 +36,16 @@ export const useBudgetSetNotificationMutation = (options: UseBudgetSetNotificati
         mutationFn: budgetAPI.setNotification,
         onSuccess: async (data) => {
             if (context?.type) {
-                queryClient.setQueryData(budgetGetQueryKey(data.budget_id), data);
-
                 const formattedType = formatMutationType(context.type);
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.UPDATE_SUCCESS', {
                     data: formattedType,
                 }), '');
             }
+
             if (onSuccess) await onSuccess(data);
         },
         onError: async (error) => {
-            if (onError) await onError(error);
+            if (onError) ErrorHandler.handleError(error);
         },
         onSettled: async (data, error) => {
             if (onSettled) await onSettled(data, error);

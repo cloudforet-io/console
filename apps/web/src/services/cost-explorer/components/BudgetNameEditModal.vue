@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 
-const { invalidateBudgetGetQuery } = useBudgetGetQuery(computed(() => props.budgetId));
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const {
     forms: { budgetName },
@@ -33,7 +33,7 @@ const {
     invalidTexts,
     setForm,
 } = useFormValidator({
-    budgetName: props.budgetName,
+    budgetName: budgetData.value?.name ?? '',
 }, {
     budgetName: (val: string) => {
         if (val.length < 1) {
@@ -45,12 +45,11 @@ const {
     },
 });
 
-const { mutate: updateBudget, isPending: isUpdatingBudget } = useBudgetUpdateMutation({
+const { mutateAsync: updateBudget, isPending: isUpdatingBudget } = useBudgetUpdateMutation({
     context: {
         type: 'BUDGET_NAME',
     },
     onSuccess: () => {
-        invalidateBudgetGetQuery();
         emit('update:visible', false);
     },
     onError: (error) => {
@@ -62,9 +61,9 @@ const handleCancel = () => {
     emit('update:visible', false);
 };
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
     if (props.budgetId) {
-        updateBudget({
+        await updateBudget({
             budget_id: props.budgetId,
             name: budgetName.value,
         });
