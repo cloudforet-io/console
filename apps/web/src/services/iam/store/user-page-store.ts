@@ -58,6 +58,7 @@ export const useUserPageStore = defineStore('page-user', () => {
             themeColor: 'primary',
             visible: undefined,
         } as ModalState,
+        selectedUserForForm: undefined as UserListItemType | undefined,
     });
 
     const modalState = reactive<UserPageModalState>({
@@ -95,6 +96,9 @@ export const useUserPageStore = defineStore('page-user', () => {
         },
         setMfaSecretKeyDeleteModalVisible(visible: boolean) {
             modalState.mfaSecretKeyDeleteModalVisible = visible;
+        },
+        setSelectedUserForForm(user: UserListItemType | undefined) {
+            state.selectedUserForForm = user;
         },
     };
 

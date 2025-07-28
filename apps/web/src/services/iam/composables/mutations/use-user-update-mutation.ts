@@ -21,6 +21,8 @@ export const useUserUpdateMutation = ({
     const queryClient = useQueryClient();
     const { withSuffix: userGetSuffix } = useServiceQueryKey('identity', 'user', 'get');
     const { key: userListKey } = useServiceQueryKey('identity', 'user', 'list');
+    const { withSuffix: userProfileGetSuffix } = useServiceQueryKey('identity', 'user-profile', 'get');
+    const { key: userProfileListKey } = useServiceQueryKey('identity', 'user-profile', 'list');
     const { withSuffix: workspaceUserGetSuffix } = useServiceQueryKey('identity', 'workspace-user', 'get');
     const { key: workspaceUserListKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
 
@@ -36,6 +38,8 @@ export const useUserUpdateMutation = ({
         onSuccess: async (data, variables) => {
             await queryClient.invalidateQueries({ queryKey: userGetSuffix(variables.user_id) });
             await queryClient.invalidateQueries({ queryKey: userListKey.value });
+            await queryClient.invalidateQueries({ queryKey: userProfileGetSuffix(variables.user_id) });
+            await queryClient.invalidateQueries({ queryKey: userProfileListKey.value });
             await queryClient.invalidateQueries({ queryKey: workspaceUserGetSuffix(variables.user_id) });
             await queryClient.invalidateQueries({ queryKey: workspaceUserListKey.value });
             if (onSuccess) await onSuccess(data, variables);

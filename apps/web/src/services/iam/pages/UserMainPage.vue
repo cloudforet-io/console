@@ -51,9 +51,9 @@ const refreshUserList = async () => {
         .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
         .setFilters(userPageState.searchFilters);
     try {
-        if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
+        if (storeState.isAdminMode && storeState.grantInfo?.scope === 'DOMAIN') {
             await userPageStore.listUsers({ query: userListApiQueryHelper.data });
-        } else if (storeState.grantInfo.scope === 'WORKSPACE') {
+        } else if (storeState.grantInfo?.scope === 'WORKSPACE') {
             await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
         }
     } finally {
