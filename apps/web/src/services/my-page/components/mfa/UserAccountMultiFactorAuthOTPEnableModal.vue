@@ -71,6 +71,7 @@ const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileCo
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
+        validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setOTPEnableModalVisible(true);
     },
     onError: (error: Error) => {

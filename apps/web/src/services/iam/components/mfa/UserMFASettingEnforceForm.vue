@@ -81,13 +81,6 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
                        class="mt-4"
                        required
         >
-            <template #label-extra>
-                <info-tooltip :tooltip-contents="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELECT_FIELD_TOOLTIP_TEXT')"
-                              tooltip-position="bottom"
-                              width="1rem"
-                              height="1rem"
-                />
-            </template>
             <p-radio-group direction="vertical">
                 <p-radio v-for="item in MULTI_FACTOR_AUTH_ITEMS"
                          :key="item.type"

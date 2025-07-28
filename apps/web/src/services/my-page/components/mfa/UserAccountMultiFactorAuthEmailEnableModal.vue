@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import {
+    computed, reactive, ref,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -73,6 +75,8 @@ const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileCo
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
+        isSentCode.value = false;
+        validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
     },
     onError: (error: Error) => {
