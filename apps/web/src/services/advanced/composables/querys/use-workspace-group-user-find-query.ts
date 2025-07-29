@@ -14,10 +14,6 @@ interface UseWorkspaceGroupUserFindQueryOptions {
 }
 
 export const useWorkspaceGroupUserFindQuery = ({ params, enabled }: UseWorkspaceGroupUserFindQueryOptions) => {
-    if (!params.value.workspace_group_id) {
-        ErrorHandler.handleError(new Error('workspace_group_id is required'));
-    }
-
     const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
 
     const { key: workspaceGroupUserFindQueryKey, params: workspaceGroupUserFindQueryParams } = useServiceQueryKey('identity', 'workspace-group-user', 'find', {
@@ -26,7 +22,12 @@ export const useWorkspaceGroupUserFindQuery = ({ params, enabled }: UseWorkspace
 
     return useScopedQuery({
         queryKey: workspaceGroupUserFindQueryKey,
-        queryFn: async () => workspaceGroupUserAPI.find(workspaceGroupUserFindQueryParams.value),
+        queryFn: async () => {
+            if (!params.value.workspace_group_id) {
+                ErrorHandler.handleError(new Error('workspace_group_id is required'));
+            }
+            return workspaceGroupUserAPI.find(workspaceGroupUserFindQueryParams.value);
+        },
         gcTime: 1000 * 60 * 5,
         staleTime: 1000 * 60 * 5,
         select: (data) => data.results ?? [],

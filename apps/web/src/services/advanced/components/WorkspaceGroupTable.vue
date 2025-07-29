@@ -41,7 +41,6 @@ const workspaceGroupListApiQueryHelper = new ApiQueryHelper();
 interface TableState {
     thisPage: number;
     pageSize: number;
-    totalCount: number;
     sortBy: string;
     sortDesc: boolean;
     searchFilters: ConsoleFilter[];
@@ -58,7 +57,6 @@ interface TableState {
 const tableState = reactive<TableState>({
     thisPage: 1,
     pageSize: 15,
-    totalCount: 0,
     sortBy: 'name',
     sortDesc: true,
     searchFilters: [],
@@ -103,14 +101,6 @@ const {
             query,
         };
     }),
-
-});
-
-watch(totalCount, (newTotalCount) => {
-    tableState.totalCount = newTotalCount;
-    workspaceGroupPageStore.$patch((_state) => {
-        _state.state.totalCount = newTotalCount;
-    });
 });
 
 const handleUpdateSelectIndices = (indices: number[]) => {
@@ -151,7 +141,7 @@ const handleChange = async (options: ToolboxTableOptions = {}) => {
             :select-index="workspaceGroupPageState.selectedIndices"
             :key-item-sets="WORKSPACE_GROUP_SEARCH_HANDLERS.keyItemSets"
             :value-handler-map="tableState.valueHandlerMap"
-            :total-count="tableState.totalCount"
+            :total-count="totalCount"
             :this-page.sync="tableState.thisPage"
             :page-size.sync="tableState.pageSize"
             :sort-by="tableState.sortBy"

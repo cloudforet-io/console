@@ -35,7 +35,6 @@ interface ModalAdditionalData {
 interface WorkspaceGroupPageState {
     loading: boolean;
     selectedIndices: number[];
-    totalCount: number;
     searchFilters: ConsoleFilter[];
     selectedWorkspaceGroup: WorkspaceGroupModel | null;
 
@@ -55,7 +54,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
     const state = reactive<WorkspaceGroupPageState>({
         loading: false,
         selectedIndices: [],
-        totalCount: 0,
         searchFilters: [],
         selectedWorkspaceGroup: null,
         // Group User Tab,
@@ -131,7 +129,6 @@ export const useWorkspaceGroupPageStore = defineStore('page-workspace-group', ()
             state.loading = false;
             state.selectedWorkspaceGroup = null;
             state.selectedIndices = [];
-            state.totalCount = 0;
 
             actions.resetGroupUser();
             actions.closeModal();
