@@ -10,10 +10,6 @@ export const useWorkspaceGroupListQuery = () => {
     return useScopedQuery({
         queryKey: workspaceGroupListQueryKey,
         queryFn: async () => workspaceGroupAPI.list(workspaceGroupListQueryParams.value),
-        initialData: {
-            results: [],
-            total_count: 0,
-        },
         gcTime: 1000 * 60 * 5,
         staleTime: 1000 * 60 * 5,
         enabled: true,

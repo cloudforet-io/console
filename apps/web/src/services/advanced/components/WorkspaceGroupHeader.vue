@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
@@ -18,6 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const { data: workspaceGroupListData } = useWorkspaceGroupListQuery();
 
+const totalCount = computed(() => workspaceGroupListData.value?.total_count ?? 0);
+
 const handleCreateButtonClick = () => {
     workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.CREATE,
@@ -34,7 +38,7 @@ const handleCreateButtonClick = () => {
                 <p-heading class="workspace-group-header"
                            :title="$t('IAM.WORKSPACE_GROUP.TITLE')"
                            use-total-count
-                           :total-count="workspaceGroupListData?.total_count ?? 0"
+                           :total-count="totalCount"
                 />
             </template>
             <template v-if="props.hasReadWriteAccess"
