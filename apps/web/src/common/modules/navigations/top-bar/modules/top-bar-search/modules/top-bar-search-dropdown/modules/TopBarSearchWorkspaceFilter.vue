@@ -6,15 +6,22 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
-    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton, PScopedNotification,
+    PCheckbox,
+    PCheckboxGroup,
+    PContextMenu, PIconButton, PScopedNotification,
+    PTextButton,
+    PToggleButton,
+    PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 
-import type { ResourceSearchParameters, ResourceSearchResponse } from '@/api-clients/search/resource/schema/api-verbs/search';
+import { useResourceApi } from '@/api-clients/search/resource/composables/use-resource-api';
 import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -43,6 +50,7 @@ const windowSize = useWindowSize();
 
 const STAGED_WORKSPACE_LIMIT = 5;
 
+const searchTextValue = ref('');
 const state = reactive({
     // workspace search menu
     isActivatedSearchMenu: false,
@@ -67,13 +75,27 @@ const state = reactive({
     searchContextMenuMaxHeight: computed(() => `${windowSize.height.value - (searchContextMenuElementBounding.top.value + 16)}px`),
 });
 
+const queryClient = useQueryClient();
+const { resourceAPI } = useResourceApi();
+const { key: searchQueryKey, params: searchQueryParams } = useServiceQueryKey('search', 'resource', 'search', {
+    params: computed(() => ({
+        resource_type: 'identity.Workspace',
+    })),
+});
+
 const fetchSearchResult = async (searchText: string) => {
+    searchTextValue.value = searchText;
     try {
-        const { results, next_token } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
-            resource_type: 'identity.Workspace',
-            keyword: searchText,
-            limit: 10,
-            all_workspaces: true,
+        const { results, next_token } = await queryClient.fetchQuery({
+            queryKey: searchQueryKey,
+            queryFn: () => resourceAPI.search({
+                ...searchQueryParams.value,
+                keyword: searchTextValue.value,
+                limit: 10,
+                all_workspaces: true,
+            }),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
         });
         state.searchResult = results ?? [];
         if (next_token?.length) state.nextToken = next_token;
@@ -85,9 +107,14 @@ const fetchSearchResult = async (searchText: string) => {
 
 const fetchMoreSearchResult = async () => {
     try {
-        const { results, next_token } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
-            resource_type: 'identity.Workspace',
-            next_token: state.nextToken,
+        const { results, next_token } = await queryClient.fetchQuery({
+            queryKey: searchQueryKey,
+            queryFn: () => resourceAPI.search({
+                ...searchQueryParams.value,
+                next_token: state.nextToken,
+            }),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
         });
         if (results) state.searchResult = state.searchResult.concat(results);
         if (next_token?.length) state.nextToken = next_token;

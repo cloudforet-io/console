@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onUnmounted, reactive,
 } from 'vue';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -51,7 +51,9 @@ const state = reactive({
 });
 
 const appListApiQueryHelper = new ApiQueryHelper().setCountOnly();
+
 const { appAPI } = useAppApi();
+
 const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey('identity', 'app', 'list', {
     params: computed(() => {
         appListApiQueryHelper.setFilters([
@@ -62,6 +64,7 @@ const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey(
         };
     }),
 });
+
 const { data: appListData } = useScopedQuery({
     queryKey: appListQueryKey,
     queryFn: () => appAPI.list(appListQueryParams.value),
@@ -74,10 +77,6 @@ const handleCreateApp = () => {
     appPageStore.setModalInfo(APP_DROPDOWN_MODAL_TYPE.CREATE, i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string);
     appPageStore.setModalVisible('form', true);
 };
-
-onMounted(async () => {
-    await appPageStore.listRoles();
-});
 
 onUnmounted(() => {
     appPageStore.$dispose();

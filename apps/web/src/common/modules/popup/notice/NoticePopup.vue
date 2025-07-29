@@ -3,16 +3,15 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PostListParameters } from '@/api-clients/board/post/schema/api-verbs/list';
+import { usePostApi } from '@/api-clients/board/post/composables/use-post-api';
 import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import type { PostModel } from '@/api-clients/board/post/schema/model';
-import type { NoticeConfigData } from '@/api-clients/board/post/schema/type';
-import type { UserConfigListParameters } from '@/api-clients/config/user-config/schema/api-verbs/list';
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
+import { useUserConfigApi } from '@/api-clients/config/user-config/composables/use-user-config-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
@@ -50,26 +49,39 @@ const postListQueryHelper = new ApiQueryHelper()
     }]);
 
 // API
-const getUserConfigBoardPostExcludedIdList = async (): Promise<Array<string>> => {
-    try {
-        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<NoticeConfigData>>>({
-            query: apiQueryForPostIdList,
-        });
-        return results ? results.map((d) => d.name.split(':')[3]) : [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
+const queryClient = useQueryClient();
+
+const { userConfigAPI } = useUserConfigApi();
+const { postAPI } = usePostApi();
+
+const { key: userConfigQueryKey, params: userConfigQueryParams } = useServiceQueryKey('config', 'user-config', 'list', {
+    params: computed(() => ({
+        query: apiQueryForPostIdList,
+    })),
+});
+const { key: postListQueryKey, params: postListQueryParams } = useServiceQueryKey('board', 'post', 'list', {
+    params: computed(() => ({
+        query: postListQueryHelper.data,
+        board_type: POST_BOARD_TYPE.NOTICE,
+    })),
+});
 
 const getPostList = async (): Promise<void> => {
     try {
-        const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: postListQueryHelper.data,
-            board_type: POST_BOARD_TYPE.NOTICE,
+        const { results: excludedPostIdList } = await queryClient.fetchQuery({
+            queryKey: userConfigQueryKey,
+            queryFn: () => userConfigAPI.list(userConfigQueryParams.value),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
         });
-        const excludedPostIdList = await getUserConfigBoardPostExcludedIdList();
-        state.popupList = results?.filter((d) => !excludedPostIdList.includes(d.post_id)) ?? [];
+        const { results: postList } = await queryClient.fetchQuery({
+            queryKey: postListQueryKey.value,
+            queryFn: () => postAPI.list(postListQueryParams.value),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
+        });
+        const _excludedPostIdList = excludedPostIdList?.map((d) => d.name.split(':')[3]) ?? [];
+        state.popupList = postList?.filter((d) => !_excludedPostIdList.includes(d.post_id)) ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.popupList = [];

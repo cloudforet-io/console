@@ -7,24 +7,30 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PHeadingLayout, PTab, PHeading, PDefinitionTable, PStatus, PLazyImg, PMarkdown, PBadge, PDataTable, PButton, PToolboxTable,
+    PBadge,
+    PButton,
+    PDataTable,
+    PDefinitionTable,
+    PHeading,
+    PHeadingLayout,
+    PLazyImg, PMarkdown,
+    PStatus,
+    PTab,
+    PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookUpdateMessageFormatParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update-message-format';
-import type { WebhookModel, WebhookListErrorsModel } from '@/api-clients/alert-manager/webhook/schema/model';
+import type { WebhookListErrorsModel, WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 import type { WebhookMessageFormatType } from '@/api-clients/alert-manager/webhook/schema/type';
-import type { PluginGetParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get';
+import { usePluginApi } from '@/api-clients/repository/plugin/composables/use-plugin-api';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
-import type { RepositoryListParameters } from '@/api-clients/repository/repository/schema/api-verbs/list';
-import type { RepositoryModel } from '@/api-clients/repository/repository/schema/model';
+import { useRepositoryApi } from '@/api-clients/repository/repository/composables/use-repository-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
@@ -37,10 +43,8 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { useQueryTags } from '@/common/composables/query-tags';
 import { sortTableItems } from '@/common/utils/table-sort';
 
-import ServiceDetailTabsWebhookDetailMessageOverlay
-    from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookDetailMessageOverlay.vue';
-import ServiceDetailTabsWebhookDetailRawDataModal
-    from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookDetailRawDataModal.vue';
+import ServiceDetailTabsWebhookDetailMessageOverlay from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookDetailMessageOverlay.vue';
+import ServiceDetailTabsWebhookDetailRawDataModal from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookDetailRawDataModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { WEBHOOK_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import {
@@ -136,6 +140,20 @@ const errorListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_ERROR_TABLE_KEY_ITEM_SETS });
 const { queryTags } = queryTagHelper;
 
+const { repositoryAPI } = useRepositoryApi();
+const { pluginAPI } = usePluginApi();
+
+const { key: repositoryQueryKey, params: repositoryQueryParams } = useServiceQueryKey('repository', 'repository', 'list', {
+    params: computed(() => ({
+        repository_type: 'remote',
+    })),
+});
+const { key: pluginQueryKey, params: pluginQueryParams } = useServiceQueryKey('repository', 'plugin', 'get', {
+    params: computed(() => ({
+        plugin_id: state.webhookInfo.plugin_info?.plugin_id,
+    })),
+});
+
 const { key: webhookErrorListQueryKey, params: webhookErrorListQueryParams } = useServiceQueryKey('alert-manager', 'webhook', 'list-errors', {
     params: computed(() => {
         errorListApiQueryHelper.setFilters([
@@ -190,18 +208,27 @@ const setWebhookDetail = () => {
     messageState.formatList = state.webhookInfo.message_formats || [];
     messageState.formats = state.webhookInfo.message_formats?.map((i) => ({ [i.from]: i.to })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
 };
+
 const getRepositoryID = async () => {
-    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
-        repository_type: 'remote',
+    const res = await queryClient.fetchQuery({
+        queryKey: repositoryQueryKey.value,
+        queryFn: () => repositoryAPI.list(repositoryQueryParams.value),
+        gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 60 * 2,
     });
     return res.results ? res.results[0].repository_id : '';
 };
 const fetchPluginInfo = async () => {
     try {
         const repositoryId = await getRepositoryID();
-        state.selectedPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
-            repository_id: repositoryId,
-            plugin_id: state.webhookInfo.plugin_info?.plugin_id,
+        state.selectedPlugin = await queryClient.fetchQuery({
+            queryKey: pluginQueryKey.value,
+            queryFn: () => pluginAPI.get({
+                ...pluginQueryParams.value,
+                repository_id: repositoryId,
+            }),
+            gcTime: 1000 * 60 * 2,
+            staleTime: 1000 * 60 * 2,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -237,7 +264,7 @@ watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
         queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
     }
 });
-watch(() => storeState.selectedWebhookId, async () => {
+watch(() => webhookDetailData.value, async () => {
     if (isEmpty(state.webhookInfo)) return;
     if (!state.webhookInfo.plugin_info?.plugin_id) return;
     await fetchPluginInfo();

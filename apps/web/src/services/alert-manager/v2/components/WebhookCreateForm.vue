@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PTextInput, PSelectDropdown, PDataLoader, PLazyImg,
+    PDataLoader,
+    PFieldGroup,
+    PLazyImg,
+    PSelectDropdown,
+    PTextInput,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PluginGetVersionsParameters } from '@/api-clients/repository/plugin/schema/api-verbs/get-versions';
+import { usePluginApi } from '@/api-clients/repository/plugin/composables/use-plugin-api';
 import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
@@ -23,10 +26,6 @@ const serviceCreateFormState = serviceCreateFormStore.state;
 
 const storeState = reactive({
     selectedWebhookType: computed<PluginModel|undefined>(() => serviceCreateFormState.selectedWebhookType),
-});
-const state = reactive({
-    loading: false,
-    pluginVersions: undefined as undefined|string,
 });
 
 const {
@@ -53,31 +52,28 @@ const handleChangeInput = (val: string) => {
     serviceCreateFormStore.setWebhookName(val);
 };
 
-const getVersions = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
-            plugin_id: storeState.selectedWebhookType?.plugin_id || '',
-        });
-        state.pluginVersions = results ? results[0] : undefined;
-        serviceCreateFormStore.setWebhookVersion(state.pluginVersions);
-    } catch (e) {
-        state.pluginVersions = undefined;
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
-    } finally {
-        state.loading = false;
-    }
-};
-
-onMounted(async () => {
-    await getVersions();
+const { pluginAPI } = usePluginApi();
+const { key: pluginVersionsQueryKey, params: pluginVersionsQueryParams } = useServiceQueryKey('repository', 'plugin', 'get-versions', {
+    params: computed(() => ({
+        plugin_id: storeState.selectedWebhookType?.plugin_id || '',
+    })),
 });
+const { data: pluginVersionsData, isFetching: pluginVersionsFetching } = useScopedQuery({
+    queryKey: pluginVersionsQueryKey,
+    queryFn: () => pluginAPI.getVersions(pluginVersionsQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['WORKSPACE']);
+
+watch(() => pluginVersionsData.value, async (val) => {
+    serviceCreateFormStore.setWebhookVersion(val?.results?.[0] || '');
+}, { immediate: true });
 </script>
 
 <template>
     <p-data-loader class="webhook-create-form"
                    :data="true"
-                   :loading="state.loading"
+                   :loading="pluginVersionsFetching"
                    loader-backdrop-color="0"
     >
         <div v-if="storeState.selectedWebhookType"
@@ -118,7 +114,7 @@ onMounted(async () => {
                                :menu="[]"
                                block
                                :visible-menu="false"
-                               :placeholder="state.pluginVersions || ''"
+                               :placeholder="pluginVersionsData?.results?.[0] || ''"
                                disabled
             />
         </p-field-group>
@@ -127,6 +123,7 @@ onMounted(async () => {
 
 <style lang="postcss" scoped>
 .webhook-create-form {
+    min-height: 5rem;
     .webhook-item {
         @apply flex items-center w-full;
         margin-bottom: 1.5rem;
