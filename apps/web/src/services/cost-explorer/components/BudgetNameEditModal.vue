@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 
-const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
+const { budgetData, setQueryData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const {
     forms: { budgetName },
@@ -49,7 +49,8 @@ const { mutateAsync: updateBudget, isPending: isUpdatingBudget } = useBudgetUpda
     context: {
         type: 'BUDGET_NAME',
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+        setQueryData(data);
         emit('update:visible', false);
     },
     onError: (error) => {
