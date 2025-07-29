@@ -4,29 +4,32 @@ import {
     computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
 import type { WorkspaceGroupCreateParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/create';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceGroupChangeWorkspaceGroupMutation } from '@/services/advanced/composables/querys/use-workspace-group-change-workspace-group-mutation';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { useWorkspaceGroupNameListQuery } from '@/services/advanced/composables/use-workspace-group-name-list-query';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -35,19 +38,19 @@ const emit = defineEmits<{(e: 'confirm'): void,
 }>();
 
 const state = reactive({
-    loading: false,
     menuIds: computed<string[]>(() => menuList.value.map((item) => item.name)),
     isSelectDropdownVisible: false,
     isEllipsisMap: {} as Record<string, boolean>,
 });
 const referenceMap = useAllReferenceDataModel();
 const { workspaceAPI } = useWorkspaceApi();
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
 const { data: workspaceGroupNameList } = useWorkspaceGroupNameListQuery();
 const {
     forms: { groupName }, invalidState, invalidTexts, setForm,
 } = useFormValidator({ groupName: '' }, {
     groupName: (value: string) => {
-        if (state.loading) {
+        if (isCreateWorkspaceGroupPending) {
             return true;
         }
         if (!value.length) {
@@ -76,47 +79,50 @@ const {
         query: apiQueryHelper.data,
     }),
 });
+const queryClient = useQueryClient();
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
 
-const createWorkspaceGroup = async (): Promise<string | undefined> => {
-    state.loading = true;
-
-    try {
-        const { workspace_group_id } = await SpaceConnector.clientV2.identity.workspaceGroup.create<WorkspaceGroupCreateParameters, WorkspaceGroupModel>({
-            name: groupName.value,
+const { mutateAsync: createWorkspaceGroupMutation, isPending: isCreateWorkspaceGroupPending } = useMutation({
+    mutationFn: (params: WorkspaceGroupCreateParameters) => workspaceGroupAPI.create(params),
+    onSuccess: ({ workspace_group_id }) => {
+        workspaceGroupPageStore.updateModalSettings({
+            type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+            title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: groupName.value }),
+            visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+            additionalData: {
+                workspaceGroupId: workspace_group_id,
+                isOpenByWorkspaceGroupCreateModal: true,
+            },
         });
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+});
 
-        if (!selectedItems.value.length) {
-            return workspace_group_id;
-        }
+const { changeWorkspaceGroupMutation } = useWorkspaceGroupChangeWorkspaceGroupMutation({
+    onError: (e) => {
+        throw e;
+    },
+});
 
-
-        await Promise.allSettled(selectedItems.value.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
-            workspace_group_id,
-            workspace_id: item.name,
-        })));
-        await resetWorkspaceMenuList();
-
-        return workspace_group_id;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    } finally {
-        state.loading = false;
-    }
-};
 
 const handleConfirm = async () => {
-    const workspaceGroupId = await createWorkspaceGroup();
-    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_CREATE_WORKSPACE'), '');
-    workspaceGroupPageStore.closeModal();
-    emit('confirm');
-
-    workspaceGroupPageStore.updateModalSettings({
-        type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: groupName.value }),
-        visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        additionalData: { workspaceGroupId },
+    const { workspace_group_id } = await createWorkspaceGroupMutation({
+        name: groupName.value,
     });
+    const results = await Promise.allSettled(selectedItems.value.map((item) => changeWorkspaceGroupMutation({
+        workspace_group_id,
+        workspace_id: item.name,
+    })));
+    if (results.some((result) => result.status === 'rejected')) {
+        const error = new Error('Failed to change workspace group');
+        showErrorMessage(error.message, error);
+        return;
+    }
+    await resetWorkspaceMenuList();
+    emit('confirm');
 };
 
 const handleModalClose = () => {
@@ -145,7 +151,7 @@ watch([() => state.menuIds, () => state.isSelectDropdownVisible], async (menuIds
     <p-button-modal class="workspace-group-create-modal"
                     :header-title="workspaceGroupPageState.modal.title"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.CREATE"
-                    :loading="state.loading"
+                    :loading="isCreateWorkspaceGroupPending"
                     size="sm"
                     :disabled="(groupName === '' || invalidState.groupName)"
                     @confirm="handleConfirm"

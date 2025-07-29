@@ -4,23 +4,24 @@ import {
     computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PTooltip,
 } from '@cloudforet/mirinae';
 
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceGroupChangeWorkspaceGroupMutation } from '@/services/advanced/composables/querys/use-workspace-group-change-workspace-group-mutation';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -28,7 +29,6 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const referenceMap = useAllReferenceDataModel();
 
@@ -37,7 +37,7 @@ const { workspaceAPI } = useWorkspaceApi();
 const state = reactive({
     loading: false,
     workspaceDropdownFilter: computed<ConsoleFilter[]>(() => [
-        { k: 'workspace_id', v: workspaceTabState.workspacesInSelectedGroup.map((w) => w.workspace_id) || [], o: '!=' },
+        { k: 'workspace_id', v: workspaceTabState.selectedWorkspaces.map((w) => w.workspace_id) || [], o: '!=' },
     ]),
     menuIds: computed<string[]>(() => menuList.value.map((item) => item.name)),
     isSelectDropdownVisible: false,
@@ -45,7 +45,7 @@ const state = reactive({
 });
 
 const workspaceDropdownFilter = computed<ConsoleFilter[]>(() => [
-    { k: 'workspace_id', v: workspaceTabState.workspacesInSelectedGroup.map((w) => w.workspace_id) || [], o: '!=' },
+    { k: 'workspace_id', v: workspaceTabState.selectedWorkspaces.map((w) => w.workspace_id) || [], o: '!=' },
 ]);
 
 const {
@@ -65,28 +65,30 @@ const {
     }),
     filter: workspaceDropdownFilter,
 });
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const queryClient = useQueryClient();
+
+const { changeWorkspaceGroupMutation } = useWorkspaceGroupChangeWorkspaceGroupMutation();
 
 const addWorkspace = async () => {
     state.loading = true;
 
-    try {
-        if (!selectedItems.value.length) {
-            return;
-        }
-        // eslint-disable-next-line max-len
-        await Promise.allSettled(selectedItems.value.map((item) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId,
-            workspace_id: item.name,
-        })));
-        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_WORKSPACE'), '');
-
-        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
-        await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
+    if (!selectedItems.value.length) {
+        return;
     }
+
+    await Promise.allSettled(selectedItems.value.map((item) => changeWorkspaceGroupMutation({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id ?? '',
+        workspace_id: item.name,
+    })));
+
+    showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_WORKSPACE'), '');
+
+    queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+    queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
+
+    state.loading = false;
 };
 const resetForm = () => {
     selectedItems.value = [];

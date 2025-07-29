@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
+import { useWorkspaceGroupListQuery } from '@/services/advanced/composables/querys/use-workspace-group-list-query';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
 
@@ -15,7 +18,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
-const workspaceGroupState = workspaceGroupPageStore.state;
+const { data: workspaceGroupListData } = useWorkspaceGroupListQuery();
+
+const totalCount = computed(() => workspaceGroupListData.value?.total_count ?? 0);
 
 const handleCreateButtonClick = () => {
     workspaceGroupPageStore.updateModalSettings({
@@ -33,7 +38,7 @@ const handleCreateButtonClick = () => {
                 <p-heading class="workspace-group-header"
                            :title="$t('IAM.WORKSPACE_GROUP.TITLE')"
                            use-total-count
-                           :total-count="workspaceGroupState.totalCount"
+                           :total-count="totalCount"
                 />
             </template>
             <template v-if="props.hasReadWriteAccess"

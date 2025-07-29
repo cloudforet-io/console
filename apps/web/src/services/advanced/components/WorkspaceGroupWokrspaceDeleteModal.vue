@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PLink, PStatus, PDataTable,
 } from '@cloudforet/mirinae';
 
-import type { WorkspaceChangeWorkspaceGroupParameters } from '@/api-clients/identity/workspace/schema/api-verbs/change-workspace-group';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -16,6 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { sortTableItems } from '@/common/utils/table-sort';
 
+import { useWorkspaceGroupChangeWorkspaceGroupMutation } from '@/services/advanced/composables/querys/use-workspace-group-change-workspace-group-mutation';
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -27,8 +29,6 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const workspaceTabState = workspaceGroupPageStore.workspaceTabState;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
-
 
 const state = reactive({
     loading: false,
@@ -37,9 +37,11 @@ const state = reactive({
     items: computed<WorkspaceModel[]>(() => {
         switch (workspaceGroupPageState.modal.type) {
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_WORKSPACES:
-            return workspaceTabState.selectedWorkspaceIndices.map((index: number) => workspaceTabState.workspacesInSelectedGroup[index]);
+            return sortTableItems<WorkspaceModel>(workspaceTabState.selectedWorkspaces, state.sortBy, state.sortDesc);
         case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_WORKSPACE:
-            return workspaceGroupPageState.modalAdditionalData.selectedWorkspace ? [workspaceGroupPageState.modalAdditionalData.selectedWorkspace] : [];
+            return sortTableItems<WorkspaceModel>(workspaceGroupPageState.modalAdditionalData.selectedWorkspace
+                ? [workspaceGroupPageState.modalAdditionalData.selectedWorkspace]
+                : [], state.sortBy, state.sortDesc);
         default:
             return [];
         }
@@ -74,23 +76,28 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
+const { changeWorkspaceGroupMutation } = useWorkspaceGroupChangeWorkspaceGroupMutation();
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const queryClient = useQueryClient();
+
 const deleteWorkspaces = async () => {
     state.loading = true;
 
     try {
         if (state.isRemoveSingleWorkspaceType) {
             if (!workspaceGroupPageState.modalAdditionalData.selectedWorkspace?.workspace_id) throw new Error('Invalid workspace id');
-            await SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
+            await changeWorkspaceGroupMutation({
                 workspace_id: workspaceGroupPageState.modalAdditionalData.selectedWorkspace?.workspace_id,
             });
         } else {
-            const fetcher = (wId:string) => SpaceConnector.clientV2.identity.workspace.changeWorkspaceGroup<WorkspaceChangeWorkspaceGroupParameters, WorkspaceModel>({
-                workspace_id: wId,
-            });
-            await Promise.allSettled(workspaceGroupPageGetters.selectedWorkspaceIds.map((item) => fetcher(item)));
+            await Promise.allSettled(workspaceTabState.selectedWorkspaces.map((item) => changeWorkspaceGroupMutation({
+                workspace_id: item.workspace_id,
+            })));
         }
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_WORKSPACES'), '');
-        await workspaceGroupPageStore.listWorkspacesInSelectedGroup();
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_WORKSPACES'));
     } finally {
@@ -102,20 +109,16 @@ const deleteWorkspaces = async () => {
 const handleConfirm = async () => {
     await deleteWorkspaces();
     workspaceGroupPageStore.resetSelectedWorkspace();
-    await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
-
     workspaceGroupPageStore.closeModal();
 };
 
 const handleCloseModal = () => {
     workspaceGroupPageStore.closeModal();
-    workspaceGroupPageStore.resetSelectedWorkspace();
 };
 
 const handleChangeSort = (sortBy:string, sortDesc:boolean) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
-    state.items = sortTableItems<WorkspaceModel>(state.items, sortBy, sortDesc);
 };
 </script>
 

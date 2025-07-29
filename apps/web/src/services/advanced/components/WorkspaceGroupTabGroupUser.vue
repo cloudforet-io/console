@@ -1,21 +1,27 @@
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
+
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PToolboxTable, PStatus, PSelectDropdown, PTooltip, PHeadingLayout,
 } from '@cloudforet/mirinae';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
+import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
-import type { RoleType } from '@/api-clients/identity/role/type';
+import type { WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-user/schema/model';
 import type { WorkspaceGroupUpdateRoleParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update-role';
 import type { WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,6 +29,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
+import { useWorkspaceGroupRoleListQuery } from '@/services/advanced/composables/querys/use-workspace-group-role-list-query';
+import { useWorkspaceGroupUserListQuery } from '@/services/advanced/composables/querys/use-workspace-group-user-list-query';
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
@@ -31,13 +39,28 @@ import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
 const userTabState = workspaceGroupPageStore.userTabState;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const emit = defineEmits<{(e: 'refresh', payload: { isGroupUser?: boolean, isWorkspace?: boolean }): void; }>();
 
-const tableState = reactive({
+const {
+    data: roleListData,
+    isPending: isRoleListPending,
+} = useWorkspaceGroupRoleListQuery();
+
+interface TableState {
+    fields: ComputedRef<DataTableFieldType[]>;
+    roleMap: ComputedRef<Record<string, RoleModel>>;
+    pageStart: number;
+    pageLimit: number;
+    thisPage: number;
+    searchText: string;
+    sortBy: string;
+    sortDesc: boolean;
+}
+
+const tableState = reactive<TableState>({
     fields: computed<DataTableFieldType[]>(() => {
         const defaultFields: DataTableFieldType[] = [
             { name: 'user_id', label: 'User ID' },
@@ -52,15 +75,65 @@ const tableState = reactive({
     }),
     roleMap: computed(() => {
         const map: Record<string, RoleModel> = {};
-        workspaceGroupPageState.roles.forEach((role) => {
+        roleListData.value?.results?.forEach((role) => {
             map[role.role_id] = role;
         });
         return map;
     }),
+    pageStart: 1,
+    pageLimit: 10,
+    thisPage: 1,
+    searchText: '',
+    sortBy: 'user_id',
+    sortDesc: false,
 });
 
 const {
-    loading, searchText, menuList, selectedItems, handleClickShowMore,
+    data: workspaceGroupUserListData, isPending: isWorkspaceGroupUserListPending, refetch: workspaceGroupUserListRefetch,
+} = useWorkspaceGroupUserListQuery({
+    params: computed(() => ({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
+    })),
+});
+
+const filterSearchUser = (user:WorkspaceGroupUser) => {
+    const searchText = tableState.searchText.trim();
+
+    if (searchText === '') {
+        return true;
+    }
+
+    const userIdMatches = user.user_id && user.user_id.includes(searchText);
+
+    return userIdMatches;
+};
+
+const filterSortUser = (users: WorkspaceGroupUser[]) : WorkspaceGroupUser[] => {
+    const sortedSelectedGroupUsers = users?.sort((a, b) => {
+        const aValue = a[tableState.sortBy];
+        const bValue = b[tableState.sortBy];
+
+        if (aValue === undefined) return 1;
+        if (bValue === undefined) return -1;
+
+        if (tableState.sortDesc) {
+            return bValue.localeCompare(aValue);
+        }
+
+        return aValue.localeCompare(bValue);
+    });
+
+    if ((workspaceGroupUserListData.value?.length ?? 0) < tableState.pageStart - 1 + tableState.pageLimit) {
+        return sortedSelectedGroupUsers.slice(tableState.pageStart - 1);
+    }
+
+    return sortedSelectedGroupUsers?.slice(tableState.pageStart - 1, tableState.pageStart - 1 + tableState.pageLimit);
+};
+
+const filteredWorkspaceGroupUserListData = computed(() => filterSortUser(workspaceGroupUserListData.value?.filter(filterSearchUser) ?? []));
+
+const {
+    loading, searchText: roleSearchText, menuList, selectedItems, handleClickShowMore,
 } = useSelectDropDownList<RoleModel>({
     pageSize: 10,
     transformer: (_role) => ({
@@ -90,8 +163,9 @@ const setupModal = (type) => {
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
-        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.workspaceGroups[workspaceGroupPageState.selectedIndices[0]]?.name }),
+        title: i18n.t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: workspaceGroupPageState.selectedWorkspaceGroup?.name }),
         visible: WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS,
+        additionalData: { isOpenByWorkspaceGroupUsersTab: true },
     }); break;
     case WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER: workspaceGroupPageStore.updateModalSettings({
         type: WORKSPACE_GROUP_MODAL_TYPE.REMOVE_SINGLE_GROUP_USER,
@@ -105,45 +179,70 @@ const setupModal = (type) => {
 };
 
 const handleSelect = (index:number[]) => {
-    userTabState.selectedUserIndices = index;
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.userTabState.selectedUser = workspaceGroupUserListData.value?.filter((_, i) => index.includes(i)) ?? [];
+        _state.userTabState.selectedUserIndices = index;
+    });
 };
 
-const handleChange = async (options: any = {}) => {
+const handleChange = async (options:ToolboxTableOptions = {}) => {
     if (options.pageStart) {
-        userTabState.pageStart = options.pageStart;
+        tableState.pageStart = options.pageStart;
     }
 
     if (options.pageLimit) {
-        userTabState.pageStart = 1;
-        userTabState.pageLimit = options.pageLimit;
-        userTabState.thisPage = 1;
+        tableState.pageStart = 1;
+        tableState.pageLimit = options.pageLimit;
+        tableState.thisPage = 1;
     }
     if (options.searchText) {
-        userTabState.thisPage = 1;
+        tableState.thisPage = 1;
     }
-    await workspaceGroupPageStore.listWorkspaceGroupUsers();
 };
 
-const handleSelectMenu = async (value:{label:string, name:string, role_type: RoleType}, userId: string) => {
-    try {
-        const roleId = value.name;
-        const workspaceGroupId = workspaceGroupPageGetters.selectedWorkspaceGroupId;
-
-        await SpaceConnector.clientV2.identity.workspaceGroup.updateRole<WorkspaceGroupUpdateRoleParameters>({
-            workspace_group_id: workspaceGroupId,
-            user_id: userId,
-            role_id: roleId,
-        });
-        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        await workspaceGroupPageStore.listWorkspaceGroupUsers();
+const handleChangeSort = (name:string, isDesc:boolean) => {
+    if (name === 'role') {
+        tableState.sortBy = `${name}_type`;
+    } else {
+        tableState.sortBy = name;
     }
+
+    workspaceGroupPageStore.$patch((_state) => {
+        _state.userTabState.selectedUserIndices = [];
+    });
+    tableState.sortDesc = isDesc;
+};
+const { key: workspaceGroupUserListQueryKey } = useServiceQueryKey('identity', 'workspace-group-user', 'list');
+const queryClient = useQueryClient();
+const { mutateAsync: updateRoleMutation, isPending: isUpdatingRole } = useMutation({
+    mutationFn: (params: WorkspaceGroupUpdateRoleParameters) => SpaceConnector.clientV2.identity.workspaceGroup.updateRole(params),
+    onError: async (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceGroupUserListQueryKey });
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.ALT_S_UPDATE_ROLE'), '');
+    },
+});
+
+const handleSelectMenu = async (value:SelectDropdownMenuItem|string|number, userId: string) => {
+    if (typeof value === 'string' || typeof value === 'number') {
+        ErrorHandler.handleError(new Error('value is not a string or number'));
+        return;
+    }
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
+    updateRoleMutation({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
+        user_id: userId,
+        role_id: value.name,
+    });
 };
 
 const handleRefresh = async () => {
-    await workspaceGroupPageStore.listWorkspaceGroupUsers();
+    await workspaceGroupUserListRefetch();
 
     emit('refresh', { isGroupUser: true });
 };
@@ -163,19 +262,8 @@ const handleSelectedGroupUserRemoveButtonClick = (item:WorkspaceUser) => {
     };
 };
 
-const handleChangeSort = (name:string, isDesc:boolean) => {
-    if (name === 'role') {
-        userTabState.sortBy = `${name}_type`;
-    } else {
-        userTabState.sortBy = name;
-    }
+watch(() => workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id, () => {
 
-    userTabState.selectedUserIndices = [];
-    userTabState.sortDesc = isDesc;
-};
-
-watch(() => workspaceGroupPageGetters.selectedWorkspaceGroupId, () => {
-    workspaceGroupPageStore.listWorkspaceGroupUsers();
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -190,7 +278,7 @@ onUnmounted(() => {
                 <p-heading class="workspace-group-tab-group-user-header"
                            :title="$t('IAM.WORKSPACE_GROUP.TAB.GROUP_USER')"
                            use-total-count
-                           :total-count="userTabState.userInSelectedGroupTotalCount"
+                           :total-count="workspaceGroupUserListData?.length ?? 0"
                            heading-type="sub"
                 />
             </template>
@@ -212,16 +300,16 @@ onUnmounted(() => {
             </template>
         </p-heading-layout>
         <p-toolbox-table class="workspace-group-tab-group-user-table"
-                         :loading="workspaceGroupPageState.loading"
+                         :loading="isRoleListPending || isWorkspaceGroupUserListPending"
                          :fields="tableState.fields"
-                         :items="userTabState.userInSelectedGroup"
+                         :items="filteredWorkspaceGroupUserListData"
                          :select-index="userTabState.selectedUserIndices"
-                         :total-count="userTabState.userInSelectedGroupTotalCount"
+                         :total-count="workspaceGroupUserListData?.length ?? 0"
                          sort-by="user_id"
                          search-type="plain"
-                         :sort-desc="userTabState.sortDesc"
-                         :this-page.sync="userTabState.thisPage"
-                         :search-text.sync="userTabState.searchText"
+                         :sort-desc="tableState.sortDesc"
+                         :this-page.sync="tableState.thisPage"
+                         :search-text.sync="tableState.searchText"
                          :selectable="hasReadWriteAccess"
                          sortable
                          searchable
@@ -245,10 +333,10 @@ onUnmounted(() => {
                         :disabled="!hasReadWriteAccess"
                         :menu="menuList"
                         :selected.sync="selectedItems"
-                        :search-text.sync="searchText"
-                        :loading="loading"
+                        :search-text.sync="roleSearchText"
+                        :loading="loading || isRoleListPending || isUpdatingRole"
                         disable-handler
-                        page-size="10"
+                        :page-size="10"
                         @click-show-more="handleClickShowMore"
                         @select="handleSelectMenu($event, item.user_id)"
                     >
@@ -256,7 +344,7 @@ onUnmounted(() => {
                             <img :src="useRoleFormatter(item.role_type).image"
                                  alt="role-type-icon"
                                  class="role-type-icon"
-                            ><span>{{ tableState.roleMap[item.role_id].name }}</span>
+                            ><span>{{ tableState.roleMap[item.role_id]?.name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
