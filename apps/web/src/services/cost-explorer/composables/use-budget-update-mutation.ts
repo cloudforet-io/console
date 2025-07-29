@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/vue-query';
 
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -26,8 +25,7 @@ interface UseBudgetUpdateMutationOptions {
 
 
 export const useBudgetUpdateMutation = (options: UseBudgetUpdateMutationOptions) => {
-    const { budgetAPI, queryClient } = useBudgetQuery();
-    const { withSuffix: budgetGetQueryKey } = useServiceQueryKey('cost-analysis', 'budget', 'get');
+    const { budgetAPI } = useBudgetQuery();
 
     const {
         context, onSuccess, onError, onSettled,
@@ -37,7 +35,6 @@ export const useBudgetUpdateMutation = (options: UseBudgetUpdateMutationOptions)
         mutationFn: budgetAPI.update,
         onSuccess: async (data) => {
             if (context?.type) {
-                queryClient.setQueryData(budgetGetQueryKey(data.budget_id), data);
                 if (context.type === 'BUDGET_NAME') {
                     showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NAME_EDIT_SUCCESS'), '');
                 } else {

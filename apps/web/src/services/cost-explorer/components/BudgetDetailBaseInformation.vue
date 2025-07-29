@@ -22,7 +22,6 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
-import BudgetAlertsModal from '@/services/cost-explorer/components/BudgetAlertsModal.vue';
 import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 import { useBudgetSetNotificationMutation } from '@/services/cost-explorer/composables/use-budget-set-notification-mutation';
 import { useBudgetUpdateMutation } from '@/services/cost-explorer/composables/use-budget-update-mutation';
@@ -37,7 +36,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const {
-    budgetData: _budgetData, isFetching, invalidateBudgetGetQuery,
+    budgetData, isFetching, setQueryData,
 } = useBudgetGetQuery(computed(() => props.budgetId));
 
 
@@ -53,7 +52,25 @@ const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
 });
 
-const budgetData = computed(() => _budgetData.value);
+const cycleText = computed(() => (budgetData.value?.time_unit === 'MONTHLY'
+    ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY')
+    : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.FIXED_TERM')));
+
+const totalPeriodText = computed(() => `${budgetData.value?.start} ~ ${budgetData.value?.end}`);
+
+const budgetScopeText = computed(() => budgetData.value?.service_account_id ?? budgetData.value?.project_id);
+
+const budgetPlanData = computed(() => (budgetData.value?.time_unit === 'MONTHLY'
+    ? budgetData.value?.planned_limits
+    : budgetData.value?.limit));
+
+const budgetManagerId = computed(() => budgetData.value?.budget_manager_id);
+
+const budgetAlertsData = computed(() => (budgetData.value?.notification?.plans?.length
+    ? budgetData.value?.notification
+    : { state: 'DISABLED', plans: [] }));
+
+const alertRecipientsData = computed(() => budgetData.value?.notification?.recipients?.users);
 
 const state = reactive({
     definitionFields: [
@@ -66,19 +83,15 @@ const state = reactive({
         { name: 'alertRecipients', label: 'Alert Recipients', disableCopy: true },
     ],
     definitionData: computed(() => ({
-        cycle: budgetData.value?.time_unit === 'MONTHLY' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.MONTHLY') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.FIXED_TERM'),
-        totalPeriod: `${budgetData.value?.start} ~ ${budgetData.value?.end}`,
-        budgetScope: budgetData.value?.service_account_id ?? budgetData.value?.project_id,
-        budgetPlan: budgetData.value?.time_unit === 'MONTHLY' ? budgetData.value.planned_limits : budgetData.value?.limit,
-        budgetManager: budgetData.value?.budget_manager_id,
-        budgetAlerts: budgetData.value?.notification.plans
-            && budgetData.value?.notification.plans?.length > 0 ? budgetData.value?.notification : {
-                state: 'DISABLED',
-                plans: [],
-            },
-        alertRecipients: budgetData.value?.notification.recipients?.users,
+        cycle: cycleText.value,
+        totalPeriod: totalPeriodText.value,
+        budgetScope: budgetScopeText.value,
+        budgetPlan: budgetPlanData.value,
+        budgetManager: budgetManagerId.value,
+        budgetAlerts: budgetAlertsData.value,
+        alertRecipients: alertRecipientsData.value,
     })),
-    isBudgetAlertsEnabled: computed(() => (budgetData.value?.notification?.state === 'ENABLED')),
+    isBudgetAlertsEnabled: budgetData.value?.notification?.state === 'ENABLED',
     updateBudgetAlertsModalVisible: false,
     budgetAlertEdit: false,
     budgetEdit: false,
@@ -96,6 +109,9 @@ const { mutate: updateBudgetManager, isPending: isUpdateBudgetManagerPending } =
     context: {
         type: 'BUDGET_MANAGER',
     },
+    onSuccess: async (data) => {
+        setQueryData(data);
+    },
     onError: (error: any) => {
         showErrorMessage(error.code, error.message);
     },
@@ -108,8 +124,8 @@ const { mutate: updateBudgetPlan, isPending: isUpdateBudgetPlanPending } = useBu
     context: {
         type: 'BUDGET_PLAN',
     },
-    onSuccess: () => {
-        invalidateBudgetGetQuery();
+    onSuccess: async (data) => {
+        setQueryData(data);
     },
     onError: (error: any) => {
         showErrorMessage(error.code, error.message);
@@ -123,6 +139,9 @@ const { mutate: setBudgetAlert, isPending: isSetBudgetAlertPending } = useBudget
     context: {
         type: 'BUDGET_ALERTS',
     },
+    onSuccess: async (data) => {
+        setQueryData(data);
+    },
     onError: (error: any) => {
         showErrorMessage(error.code, error.message);
     },
@@ -135,6 +154,9 @@ const { mutate: setAlertRecipients, isPending: isSetAlertRecipientsPending } = u
     context: {
         type: 'ALERT_RECIPIENTS',
     },
+    onSuccess: async (data) => {
+        setQueryData(data);
+    },
     onError: (error: any) => {
         showErrorMessage(error.code, error.message);
     },
@@ -143,13 +165,9 @@ const { mutate: setAlertRecipients, isPending: isSetAlertRecipientsPending } = u
     },
 });
 
-const handleUpdateBudgetAlerts = async (value: boolean) => {
-    if (!value) {
-        state.updateBudgetAlertsModalVisible = value;
-    } else {
-        invalidateBudgetGetQuery();
-        state.updateBudgetAlertsModalVisible = false;
-    }
+const handleCancelBudgetAlertEdit = () => {
+    state.budgetAlertEdit = false;
+    state.isBudgetAlertsEnabled = budgetData.value?.notification?.state === 'ENABLED';
 };
 
 const handleSelectBudgetManager = (userId: string|undefined) => {
@@ -171,10 +189,6 @@ const handleselectedBudgetThresholds = (value) => {
     state.selectedThresholds = value.map((v) => Number(v.label));
 };
 
-const handleChangeToggle = () => {
-    state.updateBudgetAlertsModalVisible = true;
-};
-
 const handleUpdateAlertRecipients = async () => {
     setAlertRecipients({
         budget_id: props.budgetId,
@@ -192,6 +206,7 @@ const handleUpdateBudgetThresholds = async () => {
         budget_id: props.budgetId,
         notification: {
             ...budgetData.value?.notification,
+            state: state.isBudgetAlertsEnabled ? 'ENABLED' : 'DISABLED',
             plans: state.selectedThresholds.map((threshold) => ({
                 unit: 'PERCENT',
                 threshold: Number(threshold),
@@ -223,6 +238,10 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
         state.budgetManagerEditable = true;
     }
 }, { deep: true, immediate: true });
+
+watch(() => budgetData.value?.notification?.state, (nv) => {
+    state.isBudgetAlertsEnabled = nv === 'ENABLED';
+}, { immediate: true });
 </script>
 
 <template>
@@ -235,6 +254,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                 class="mb-10"
                                 :fields="state.definitionFields"
                                 :data="state.definitionData"
+                                :loading="isFetching"
                                 block
                                 custom-key-width="160px"
                                 style-type="white"
@@ -264,7 +284,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                     <p-text-input v-else
                                                   v-model="state.editableBudgetPlan[dateInfo.date]"
                                                   block
-                                                  :placeholder="dateInfo.limit"
+                                                  :placeholder="Number(dateInfo.limit).toLocaleString()"
                                                   :disabled="dayjs.utc(dateInfo.date).isBefore(dayjs.utc().startOf('month'))"
                                     >
                                         <template #input-right>
@@ -308,6 +328,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                 size="sm"
                                 :loading="isUpdateBudgetPlanPending"
                                 @click="() => {
+                                    // note: update budget plan as monthly
                                     if (Object.keys(state.editableBudgetPlan).length > 0) {
                                         const newPlannedLimits = Object.entries(state.editableBudgetPlan)
                                             .filter(([, limit]) => limit !== '' && limit !== null && limit !== undefined)
@@ -319,6 +340,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                                                 limit: Number(limit)
                                             }))
                                         })
+                                    // note: update budget plan as total
                                     } else if (state.editableTotalBudgetPlan) {
                                         const limit = Number(state.editableTotalBudgetPlan);
                                         updateBudgetPlan({
@@ -412,12 +434,13 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                          :class="{'alerts-wrapper-isEditing': state.budgetAlertEdit}"
                     >
                         <div class="budget-alerts-content flex items-start gap-2">
-                            <p-toggle-button :value.sync="state.isBudgetAlertsEnabled"
-                                             show-state-text
-                                             position="left"
-                                             :disabled="storeState.isAdminMode"
-                                             :read-only="!state.budgetAlertEdit"
-                                             @change-toggle="handleChangeToggle"
+                            <p-toggle-button
+                                :value="state.isBudgetAlertsEnabled"
+                                show-state-text
+                                position="left"
+                                :disabled="storeState.isAdminMode"
+                                :read-only="!state.budgetAlertEdit"
+                                @update:value="(val) => state.isBudgetAlertsEnabled = val"
                             />
                             <div class="threshold-wrapper">
                                 <span class="text-gray-500">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.BUDGET_ALERTS_TEXT') }}:</span>
@@ -457,7 +480,7 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                             >
                                 <p-button size="sm"
                                           style-type="tertiary"
-                                          @click="state.budgetAlertEdit = false"
+                                          @click="handleCancelBudgetAlertEdit"
                                 >
                                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CANCEL') }}
                                 </p-button>
@@ -529,11 +552,6 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
                 </template>
             </p-definition-table>
         </p-card>
-        <budget-alerts-modal :visible="state.updateBudgetAlertsModalVisible"
-                             :budget-on-off-value="state.isBudgetAlertsEnabled"
-                             :budget-id="budgetId"
-                             @update:visible="handleUpdateBudgetAlerts"
-        />
     </div>
 </template>
 
@@ -574,18 +592,18 @@ watch(() => state.selectedBudgetManager, (nv, ov) => {
             gap: 1.5rem;
             padding: 0.25rem;
         }
-        &.budget-plan-monthly-editable {
-            @apply grid-cols-6 w-full;
+    }
+    .budget-plan-monthly-editable {
+        @apply grid grid-cols-6 w-full gap-4 p-2;
 
-            @screen tablet {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        @screen tablet {
+            grid-template-columns: repeat(3, 1fr);
+        }
 
-            @screen mobile {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-                padding: 0.25rem;
-            }
+        @screen mobile {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 0.25rem;
         }
     }
 }

@@ -28,6 +28,7 @@ export const useBudgetListPaginationQuery = ({ params, thisPage, pageSize }: Use
         queryKey: budgetListPaginationQueryKey,
         queryFn: budgetAPI.list,
         params: budgetListPaginationQueryParams,
+        staleTime: 1000 * 60 * 2,
         gcTime: 1000 * 60 * 2,
         enabled: true,
     }, {

@@ -425,7 +425,9 @@ const handleChange = async (options: any = {}) => {
     }
 
     budgetApiQueryHelper.setFilters(state.queryFilters);
+};
 
+const handleRefresh = async () => {
     Promise.all([
         refreshBudgetList(),
         refetchBudgetUsageAnalyze(),
@@ -495,7 +497,7 @@ watch(() => state.selectedIndex, () => {
                              :query-tags="queryTags"
                              @update:select-index="handleUpdateSelectIndex"
                              @change="handleChange"
-                             @refresh="handleChange"
+                             @refresh="handleRefresh"
                              @export="handleExportToExcel"
             >
                 <template #toolbox-left>

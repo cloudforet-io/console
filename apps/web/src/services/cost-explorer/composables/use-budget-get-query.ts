@@ -14,6 +14,7 @@ export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
     const { budgetAPI } = useBudgetApi();
 
     const { key: budgetGetQueryKey, params: budgetGetQueryParams } = useServiceQueryKey('cost-analysis', 'budget', 'get', {
+        contextKey: budgetId,
         params: computed(() => ({
             budget_id: budgetId.value,
         })),
@@ -22,10 +23,8 @@ export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
     const budgetDataQuery = useScopedQuery({
         queryKey: budgetGetQueryKey,
         queryFn: () => budgetAPI.get(budgetGetQueryParams.value),
-        select: (data) => data,
-        initialData: undefined,
-        initialDataUpdatedAt: 0,
         staleTime: STALE_TIME,
+        gcTime: STALE_TIME,
         enabled: computed(() => !!budgetId.value),
     }, ['DOMAIN', 'WORKSPACE']);
 
@@ -34,11 +33,7 @@ export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
     const queryClient = useQueryClient();
 
     const setQueryData = (newData: BudgetModel) => {
-        queryClient.setQueryData([budgetGetQueryKey], newData);
-    };
-
-    const invalidateBudgetGetQuery = () => {
-        queryClient.invalidateQueries({ queryKey: budgetGetQueryKey.value });
+        queryClient.setQueryData(budgetGetQueryKey.value, () => newData);
     };
 
     return {
@@ -47,7 +42,5 @@ export const useBudgetGetQuery = (budgetId: ComputedRef<string>) => {
         isFetching,
         budgetGetQueryKey,
         setQueryData,
-        invalidateBudgetGetQuery,
-        queryClient,
     };
 };
