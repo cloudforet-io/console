@@ -21,7 +21,14 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { UserModalType } from '@/services/iam/types/modal-type';
 import type { UserListItemType, ModalSettingState, ModalState } from '@/services/iam/types/user-type';
+
+interface UserPageModalState {
+    previousModalType: UserModalType | undefined;
+    bulkMfaSettingModalVisible: boolean;
+    mfaSecretKeyDeleteModalVisible: boolean;
+}
 
 export const useUserPageStore = defineStore('page-user', () => {
     const state = reactive({
@@ -44,7 +51,15 @@ export const useUserPageStore = defineStore('page-user', () => {
             themeColor: 'primary',
             visible: undefined,
         } as ModalState,
+        selectedUserForForm: undefined as UserListItemType | undefined,
     });
+
+    const modalState = reactive<UserPageModalState>({
+        previousModalType: undefined,
+        bulkMfaSettingModalVisible: false,
+        mfaSecretKeyDeleteModalVisible: false,
+    });
+
     const getters = reactive({
         timezone: computed(() => store.state.user.timezone),
         isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -65,6 +80,20 @@ export const useUserPageStore = defineStore('page-user', () => {
             return map;
         }),
     });
+    const mutations = {
+        setPreviousModalType(type: UserModalType | undefined) {
+            modalState.previousModalType = type;
+        },
+        setBulkMfaSettingModalVisible(visible: boolean) {
+            modalState.bulkMfaSettingModalVisible = visible;
+        },
+        setMfaSecretKeyDeleteModalVisible(visible: boolean) {
+            modalState.mfaSecretKeyDeleteModalVisible = visible;
+        },
+        setSelectedUserForForm(user: UserListItemType | undefined) {
+            state.selectedUserForForm = user;
+        },
+    };
     const actions = {
         // User
         async listUsers(params: UserListParameters) {
@@ -167,7 +196,9 @@ export const useUserPageStore = defineStore('page-user', () => {
     };
     return {
         state,
+        modalState,
         getters,
+        ...mutations,
         ...actions,
     };
 });
