@@ -129,6 +129,10 @@ export class SpaceConnector {
         SpaceConnector.instance.tokenApi.flushToken();
     }
 
+    static removeRefreshToken(): void {
+        SpaceConnector.instance.tokenApi.removeRefreshToken();
+    }
+
     static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean|undefined> {
         return SpaceConnector.instance.tokenApi.refreshAccessToken(executeSessionTimeoutCallback);
     }

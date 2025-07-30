@@ -62,6 +62,11 @@ export default class TokenAPI {
         this.refreshToken = undefined;
     }
 
+    removeRefreshToken(): void {
+        LocalStorageAccessor.removeItem(REFRESH_TOKEN_KEY);
+        this.refreshToken = undefined;
+    }
+
     setToken(accessToken: string, refreshToken?: string): void {
         this.accessToken = accessToken;
         if (refreshToken) {

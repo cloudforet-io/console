@@ -16,3 +16,8 @@ export const MANAGED_ROLES = {
     'managed-workspace-owner': ROLE_TYPE.WORKSPACE_OWNER,
     'managed-workspace-member': ROLE_TYPE.WORKSPACE_MEMBER,
 } as const;
+
+export const REQUIRED_ACTIONS = {
+    ENFORCE_MFA: 'ENFORCE_MFA',
+    UPDATE_PASSWORD: 'UPDATE_PASSWORD',
+} as const;
