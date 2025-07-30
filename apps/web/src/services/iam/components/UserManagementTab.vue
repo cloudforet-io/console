@@ -96,6 +96,7 @@ const multiItemTabState = reactive({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         last_accessed_at: user?.last_accessed_at,
+        tags: user?.tags ?? {},
     }))),
 });
 
@@ -311,7 +312,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                         <div v-else />
                     </template>
                     <template #col-tags-format="{value}">
-                        <template v-if="value !== undefined && Object.keys(value).length > 0">
+                        <template v-if="value && typeof value === 'object' && Object.keys(value).length > 0">
                             <p-badge v-for="([key, val], idx) in Object.entries(value)"
                                      :key="`${key}-${val}-${idx}`"
                                      badge-type="subtle"

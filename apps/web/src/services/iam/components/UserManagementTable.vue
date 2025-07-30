@@ -72,6 +72,7 @@ const state = reactive({
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: user?.last_accessed_at,
+        tags: user?.tags ?? {},
     }))),
     // refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map)
 });
@@ -367,7 +368,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 </span>
             </template>
             <template #col-tags-format="{value}">
-                <template v-if="value && !!Object.keys(value).length">
+                <template v-if="value && typeof value === 'object' && !!Object.keys(value).length">
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
                              :key="`${key}-${val}-${idx}`"
                              badge-type="subtle"
