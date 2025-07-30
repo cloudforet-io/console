@@ -69,6 +69,7 @@ const state = reactive({
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
+        tags: user?.tags ?? {},
     }))),
 });
 const tableState = reactive({
@@ -362,7 +363,7 @@ const isWorkspaceGroupUser = (item: ExtendUserListItemType) => !!item?.role_bind
                 </span>
             </template>
             <template #col-tags-format="{value}">
-                <template v-if="!!Object.keys(value).length">
+                <template v-if="!!value && !!Object.keys(value).length">
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
                              :key="`${key}-${val}-${idx}`"
                              badge-type="subtle"
