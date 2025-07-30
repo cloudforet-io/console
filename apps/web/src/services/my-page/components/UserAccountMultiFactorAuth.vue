@@ -3,14 +3,13 @@ import { computed, onUnmounted } from 'vue';
 
 import { store } from '@/store';
 
-// import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
+import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
 
 import { blue } from '@/styles/colors';
 
-// import UserAccountMultiFactorAuthEmailDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailDisableModal.vue';
+import UserAccountMultiFactorAuthEmailDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailDisableModal.vue';
 import UserAccountMultiFactorAuthEmailEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailEnableModal.vue';
-// import UserAccountMultiFactorAuthOTPDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPDisableModal.vue';
-// import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
+import UserAccountMultiFactorAuthOTPDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPDisableModal.vue';
 import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
@@ -68,7 +67,6 @@ onUnmounted(() => {
         <user-account-multi-factor-auth-email-enable-modal v-if="multiFactorAuthModalState.emailReSyncModalVisible"
                                                            re-sync
         />
-        <!--
         <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPDisableModalVisible" />
         <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPSwitchModalVisible"
                                                             switch
@@ -77,7 +75,6 @@ onUnmounted(() => {
         <user-account-multi-factor-auth-email-disable-modal v-if="multiFactorAuthModalState.emailSwitchModalVisible"
                                                             switch
         />
-        -->
     </user-account-module-container>
 </template>
 
