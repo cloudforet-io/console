@@ -1,5 +1,7 @@
 import type { KeyItemSet } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
+
 import * as styles from '@/styles/colors';
 
 export const PASSWORD_TYPE = {
@@ -90,3 +92,13 @@ export const LOCAL_TYPE = {
     ID: 'ID',
 } as const;
 
+export const MULTI_FACTOR_AUTH_ITEMS = [
+    {
+        type: MULTI_FACTOR_AUTH_TYPE.OTP,
+        title: 'Microsoft Authenticator App',
+    },
+    {
+        type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
+        title: 'Email',
+    },
+];
