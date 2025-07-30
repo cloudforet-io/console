@@ -19,13 +19,14 @@ import type { UserListItemType } from '@/services/iam/types/user-type';
 
 
 const userPageStore = useUserPageStore();
+const userPageGetters = userPageStore.getters;
 
 const emit = defineEmits<{(e: 'change-input', formState): void,
     (e: 'change-verify', value: boolean): void,
 }>();
 
 const state = reactive({
-    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
+    data: computed<UserListItemType>(() => userPageGetters.selectedUsers[0]),
     loading: false,
     isEdit: false,
     isCollapsed: true,
