@@ -1210,18 +1210,21 @@
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "비활성화를 위한 이메일 인증이 필요합니다.",
+				"DESC_MS": "비활성화를 위한 Microsoft Authenticator 코드 인증이 필요합니다.",
 				"DISABLED": "비활성화",
 				"EMAIL_INFO": "입력한 이메일로 인증 코드를 전송하세요.",
-				"TITLE": "MFA를 비활성화 하시겠습니까?",
+				"TITLE": "멀티 팩터 인증(MFA)을 비활성화 하시겠습니까?",
 				"VERIFIED": "인증됨"
 			},
+			"ALT_S_DISABLED": "멀티 팩터 인증(MFA) 비활성화 완료",
+			"ALT_S_ENABLED": "멀티 팩터 인증(MFA) 활성화 완료",
 			"ALT_S_SENT_EMAIL": "인증 코드가 이메일로 전송되었습니다.",
 			"CHANGE": {
 				"CANCEL": "취소",
 				"CONFIRM_BTN": "새로운 이메일 입력",
 				"DESC": "새로운 이메일로 변경하기 위해 기존 이메일 인증을 완료해주세요.",
 				"TITLE": "이메일 변경 인증",
-				"TOOLTIP": "새로운 이메일 주소를 입력하지 않을 경우, \nMFA가 비활성화 상태로 유지됩니다."
+				"TOOLTIP": "새로운 이메일 주소를 입력하지 않을 경우, \n멀티 팩터 인증(MFA)이 비활성화 상태로 유지됩니다."
 			},
 			"COLLAPSE_DESC": "스팸 메일을 확인하거나 조금만 더 기다려 주세요. 만일 아직도 이메일을 받지 못한 경우, ",
 			"COLLAPSE_TITLE": "인증 코드를 받지 못하셨나요?",
@@ -1229,12 +1232,12 @@
 				"TITLE": "새로운 이메일 주소를 입력하세요"
 			},
 			"EMAIL": "이메일",
-			"INVALID_CODE": "잘못된 인증 코드 입니다. 이메일을 다시 확인 해주세요.",
+			"INVALID_CODE_EMAIL": "잘못된 인증 코드 입니다. 이메일을 다시 확인 해주세요.",
+			"INVALID_CODE_OTP": "잘못된 인증 코드 입니다.",
 			"SEND_CODE": "인증 코드 전송",
 			"SEND_NEW_CODE": "인증 코드 재전송",
 			"SENT_DESC": "인증코드가 입력한 이메일로 발송 되었습니다: ",
 			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
-			"TITLE": "이메일 주소 인증",
 			"VERIFICATION_CODE": "인증 코드",
 			"VERIFY": "인증"
 		},
