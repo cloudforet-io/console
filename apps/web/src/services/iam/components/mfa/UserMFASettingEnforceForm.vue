@@ -6,6 +6,7 @@ import {
     useProxyValue,
 } from '@cloudforet/mirinae';
 
+import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 
 import InfoTooltip from '@/common/components/info-tooltip/InfoTooltip.vue';
@@ -29,7 +30,7 @@ interface UserMFAEnforceFormState {
 
 const props = withDefaults(defineProps<UserMFAEnforceFormProps>(), {
     isRequiredMfa: false,
-    selectedMfaType: MULTI_FACTOR_AUTH_ITEMS[0].type,
+    selectedMfaType: MULTI_FACTOR_AUTH_TYPE.OTP,
 });
 const emit = defineEmits<UserMFAEnforceFormEmits>();
 

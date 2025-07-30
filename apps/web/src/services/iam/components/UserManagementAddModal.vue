@@ -13,7 +13,7 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import { MFA_STATE } from '@/schema/identity/user-profile/constant';
+import { MULTI_FACTOR_AUTH_TYPE, MFA_STATE } from '@/schema/identity/user-profile/constant';
 import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -37,7 +37,7 @@ import UserManagementAddPassword from '@/services/iam/components/UserManagementA
 import UserManagementAddRole from '@/services/iam/components/UserManagementAddRole.vue';
 import UserManagementAddTag from '@/services/iam/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/iam/components/UserManagementAddUser.vue';
-import { MULTI_FACTOR_AUTH_ITEMS, USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
+import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
@@ -94,7 +94,7 @@ const state = reactive({
 });
 const mfaSettingState = reactive<UserMFASettingFormState>({
     isRequiredMfa: false,
-    selectedMfaType: MULTI_FACTOR_AUTH_ITEMS[0].type,
+    selectedMfaType: MULTI_FACTOR_AUTH_TYPE.OTP,
 });
 
 /* Component */
