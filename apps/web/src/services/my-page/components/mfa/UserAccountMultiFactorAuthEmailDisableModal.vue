@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, ref,
-} from 'vue';
+import { reactive, ref, computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import {
-    PButtonModal,
-} from '@cloudforet/mirinae';
+import { PButtonModal } from '@cloudforet/mirinae';
 
 import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-profile/api-verbs/confirm-mfa';
 import { store } from '@/store';
@@ -22,14 +18,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
-
 interface Props {
-    reSync?: boolean;
+    switch?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    reSync: false,
+    switch: false,
 });
+
 
 const emit = defineEmits<{(e: 'refresh'): void }>();
 
@@ -43,30 +39,30 @@ const state = reactive({
 });
 const validationState = reactive({
     verificationCode: '',
-    isInvalidationCodeValid: false as undefined | boolean,
+    isInvalidationCodeValid: false,
 });
 const isSentCode = ref<boolean>(false);
 
 /* Computed */
 const visible = computed<boolean>(() => {
-    if (props.reSync) {
-        return multiFactorAuthState.emailReSyncModalVisible;
+    if (props.switch) {
+        return multiFactorAuthState.emailSwitchModalVisible;
     }
-    return multiFactorAuthState.emailEnableModalVisible;
+    return multiFactorAuthState.emailDisableModalVisible;
 });
 const headerTitle = computed<TranslateResult>(() => {
-    if (props.reSync) {
-        return i18n.t('MY_PAGE.MFA.RESYNC_TITLE');
+    if (props.switch) {
+        return i18n.t('MY_PAGE.MFA.CHANGE_TITLE');
     }
-    return i18n.t('MY_PAGE.MFA.MODAL_EMAIL_TITLE');
+    return i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
 });
 
 /* Utils */
 const closeModal = () => {
-    if (props.reSync) {
-        multiFactorAuthStore.setEmailReSyncModalVisible(false);
+    if (props.switch) {
+        multiFactorAuthStore.setEmailSwitchModalVisible(false);
     } else {
-        multiFactorAuthStore.setEmailEnableModalVisible(false);
+        multiFactorAuthStore.setEmailDisableModalVisible(false);
     }
 };
 
@@ -75,12 +71,10 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
     state.loading = true;
     try {
         const res = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
-        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
+        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_DISABLED'), '');
         store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
-        isSentCode.value = false;
-        validationState.verificationCode = '';
-        if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
+        if (props.switch) multiFactorAuthStore.setOTPEnableModalVisible(true);
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
         validationState.isInvalidationCodeValid = true;
@@ -109,7 +103,7 @@ const handleClickVerifyButton = async () => {
                     :header-title="headerTitle"
                     class="mfa-modal-wrapper"
                     size="sm"
-                    theme-color="primary"
+                    theme-color="alert"
                     :disabled="validationState.verificationCode === '' || !isSentCode"
                     :loading="state.loading"
                     @confirm="handleClickVerifyButton"
@@ -118,26 +112,28 @@ const handleClickVerifyButton = async () => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <p class="re-sync-desc">
-                    {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
-                </p>
-                <email-info :is-sent-code.sync="isSentCode"
-                            :is-form="!props.reSync"
-                />
-
+                <span v-if="props.switch"
+                      class="disable-modal-desc"
+                >
+                    {{ $t('MY_PAGE.MFA.CHANGE_DESC') }}
+                </span>
+                <span v-else
+                      class="disable-modal-desc"
+                >
+                    {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
+                </span>
+                <email-info :is-sent-code.sync="isSentCode" />
                 <verification-code-form :invalid.sync="validationState.isInvalidationCodeValid"
                                         :code-value.sync="validationState.verificationCode"
                                         :invalid-text="$t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL')"
                 />
-                <email-folding-info :is-re-sync-modal="props.reSync"
+                <email-folding-info is-disabled-modal
                                     :is-sent-code.sync="isSentCode"
                 />
             </div>
         </template>
-        <template v-if="!props.reSync"
-                  #confirm-button
-        >
-            {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+        <template #confirm-button>
+            {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
         </template>
     </p-button-modal>
 </template>
