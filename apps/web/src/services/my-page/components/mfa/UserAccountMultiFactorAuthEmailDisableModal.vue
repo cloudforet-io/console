@@ -71,7 +71,7 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
     state.loading = true;
     try {
         const res = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
-        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
+        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_DISABLED'), '');
         store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
         if (props.switch) multiFactorAuthStore.setOTPEnableModalVisible(true);
@@ -105,7 +105,7 @@ const handleClickVerifyButton = async () => {
                     size="sm"
                     theme-color="alert"
                     :disabled="validationState.verificationCode === '' || !isSentCode"
-                    :loading="isConfirmingMfa"
+                    :loading="state.loading"
                     @confirm="handleClickVerifyButton"
                     @cancel="handleClickCancel"
                     @close="handleClickCancel"
