@@ -13,17 +13,12 @@ import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-pro
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-// import type { UserModel } from '@/api-clients/identity/user/schema/model';
-
-// import { useUserStore } from '@/store/user/user-store';
-
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import EmailFoldingInfo from '@/common/components/mfa/components/EmailFoldingInfo.vue';
 import EmailInfo from '@/common/components/mfa/components/EmailInfo.vue';
 import VerificationCodeForm from '@/common/components/mfa/components/VerificationCodeForm.vue';
-// import { useUserProfileConfirmMfaMutation } from '@/common/components/mfa/composables/use-user-profile-confirm-mfa-mutation';
-// import ErrorHandler from '@/common/composables/error/errorHandler';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
@@ -41,7 +36,6 @@ const emit = defineEmits<{(e: 'refresh'): void }>();
 /* Store */
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.modalState;
-// const userStore = useUserStore();
 
 /* State */
 const state = reactive({
@@ -80,15 +74,15 @@ const closeModal = () => {
 const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
     state.loading = true;
     try {
-        const data = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
+        const res = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
-        store.dispatch('user/setMfa', data.mfa ?? {});
+        store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
         isSentCode.value = false;
         validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
-    } catch (error: any) {
-        showErrorMessage(error.message, error);
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
         validationState.isInvalidationCodeValid = true;
     } finally {
         state.loading = false;

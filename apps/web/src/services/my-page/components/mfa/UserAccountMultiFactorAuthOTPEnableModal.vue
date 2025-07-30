@@ -11,14 +11,13 @@ import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-pro
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import OTPForm from '@/common/components/mfa/components/OTPForm.vue';
 import VerificationCodeForm from '@/common/components/mfa/components/VerificationCodeForm.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
-
 
 
 interface Props {
@@ -71,15 +70,14 @@ const closeModal = () => {
 const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
     state.loading = true;
     try {
-        const data = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
+        const res = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
-        store.dispatch('user/setMfa', data.mfa ?? {});
+        store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
         validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setOTPEnableModalVisible(true);
-    } catch (error: any) {
-        ErrorHandler.handleError(error);
-        showErrorMessage(error.message, error);
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
         validationState.isInvalidationCodeValid = true;
     } finally {
         state.loading = false;

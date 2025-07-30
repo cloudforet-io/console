@@ -10,7 +10,6 @@ import {
 
 import { MULTI_FACTOR_AUTH_TYPE } from '@/schema/identity/user-profile/constant';
 import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
-import type { UserMfa } from '@/schema/identity/user/model';
 import { store } from '@/store';
 
 import { MULTI_FACTOR_AUTH_ITEMS } from '@/services/my-page/constants/multi-factor-auth-constants';
@@ -24,15 +23,9 @@ interface Props {
 const props = defineProps<Props>();
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
-const multiFactorAuthState = multiFactorAuthStore.state;
 
-const storeState = reactive({
-    mfa: computed<UserMfa|undefined>(() => store.state.user.mfa),
-    selectedType: computed<string>(() => multiFactorAuthState.selectedType),
-    enableMfaMap: computed<Record<string, boolean>>(() => multiFactorAuthState.enableMfaMap),
-});
 const state = reactive({
-    isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
+    isVerified: computed<boolean>(() => store.state.user.mfa?.state === 'ENABLED'),
     currentType: computed<string|undefined>(() => store.state.user.mfa?.mfa_type || undefined),
     isEnforced: computed<boolean>(() => !!store.state.user.mfa?.options?.enforce),
 });
