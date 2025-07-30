@@ -2,7 +2,9 @@ import type { Mutation } from 'vuex';
 
 import { setI18nLocale } from '@/translations';
 
-import type { UserState, RoleInfo, GrantInfo } from './type';
+import type {
+    UserState, RoleInfo, GrantInfo, Mfa,
+} from './type';
 
 export const setUser = async (state: UserState, userInfo: UserState): Promise<void> => {
     state.userId = userInfo.userId;
@@ -43,3 +45,6 @@ export const setIsSignInLoading: Mutation<UserState> = (state, isSignInLoading: 
     state.isSignInLoading = isSignInLoading;
 };
 
+export const setMfa = (state: UserState, mfa: Mfa): void => {
+    state.mfa = mfa;
+};

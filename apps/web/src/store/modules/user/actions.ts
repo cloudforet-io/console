@@ -28,7 +28,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import type {
-    UserState, SignInRequest, UpdateUserRequest, RoleInfo,
+    UserState, SignInRequest, UpdateUserRequest, RoleInfo, Mfa,
 } from './type';
 
 interface JWTPayload {
@@ -259,7 +259,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
     }
 };
 
-export const setMfa = ({ commit }, mfa) => {
+export const setMfa = ({ commit }, mfa: Mfa) => {
     commit('setMfa', mfa);
 };
 
