@@ -72,7 +72,7 @@ const state = reactive({
                 <user-account-base-information />
                 <user-account-change-password v-if="storeState.authType === 'LOCAL'" />
                 <user-account-notification-email v-if="state.smtpEnabled && (storeState.authType === 'LOCAL' || storeState.authType === 'EXTERNAL')" />
-                <user-account-multi-factor-auth />
+                <user-account-multi-factor-auth v-if="storeState.authType === 'LOCAL'" />
             </div>
         </div>
     </section>
