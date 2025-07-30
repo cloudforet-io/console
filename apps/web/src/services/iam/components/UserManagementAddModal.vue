@@ -13,6 +13,8 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import { MFA_STATE } from '@/schema/identity/user-profile/constant';
+import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
@@ -29,16 +31,23 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import UserMFASettingEnforceForm from '@/services/iam/components/mfa/UserMFASettingEnforceForm.vue';
 import UserManagementAddAdminRole from '@/services/iam/components/UserManagementAddAdminRole.vue';
 import UserManagementAddPassword from '@/services/iam/components/UserManagementAddPassword.vue';
 import UserManagementAddRole from '@/services/iam/components/UserManagementAddRole.vue';
 import UserManagementAddTag from '@/services/iam/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/iam/components/UserManagementAddUser.vue';
-import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
+import { MULTI_FACTOR_AUTH_ITEMS, USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { checkEmailFormat } from '@/services/iam/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, AddAdminRoleFormState } from '@/services/iam/types/user-type';
 
+
+
+interface UserMFASettingFormState {
+    isRequiredMfa: boolean;
+    selectedMfaType: MultiFactorAuthType;
+}
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
@@ -82,6 +91,10 @@ const state = reactive({
     isSetAdminRole: false,
     // tag
     tags: {} as Tags,
+});
+const mfaSettingState = reactive<UserMFASettingFormState>({
+    isRequiredMfa: false,
+    selectedMfaType: MULTI_FACTOR_AUTH_ITEMS[0].type,
 });
 
 /* Component */
@@ -146,6 +159,11 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         language: domainSettings?.language || 'en',
         timezone: domainSettings?.timezone || 'UTC',
     };
+
+    if (userPageState.isAdminMode && userInfoParams.auth_type === 'LOCAL') {
+        userInfoParams.enforce_mfa_state = mfaSettingState.isRequiredMfa ? MFA_STATE.ENABLED : undefined;
+        userInfoParams.enforce_mfa_type = mfaSettingState.isRequiredMfa ? mfaSettingState.selectedMfaType : undefined;
+    }
 
     const createRoleBinding = async () => {
         if (userPageStore.getters.isWorkspaceOwner || state.isSetAdminRole) {
@@ -243,6 +261,13 @@ watch(() => route.query, (query) => {
                                               :password.sync="state.password"
                                               :disabled-reset-password="state.disabledResetPassword"
                 />
+                <div v-if="userPageState.isAdminMode && state.userList.length > 0 && !state.userList.some((item) => item.auth_type === 'EXTERNAL')"
+                     class="p-3 bg-white rounded-lg"
+                >
+                    <user-m-f-a-setting-enforce-form :is-required-mfa.sync="mfaSettingState.isRequiredMfa"
+                                                     :selected-mfa-type.sync="mfaSettingState.selectedMfaType"
+                    />
+                </div>
                 <user-management-add-admin-role v-if="userPageState.isAdminMode"
                                                 :is-set-admin-role.sync="state.isSetAdminRole"
                                                 @change-input="handleAdminRoleChangeInput"
