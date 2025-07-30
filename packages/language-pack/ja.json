@@ -4262,11 +4262,25 @@
 		"MFA": {
 			"BTN_CHANGE": "変更",
 			"BTN_SEND_MAIL": "認証コード送信",
-			"ENABLE_MFA": "MFA有効化",
+			"CHANGE_DESC": "既にマルチファクタ認証(MFA)が有効です。本当に無効にして新しい認証に切り替えますか？まず、現在のMFAで認証してください。",
+			"CHANGE_TITLE": "マルチファクタ認証(MFA)を変更しますか？",
+			"EMAIL_DESC": "メールでコードを受け取る",
+			"ENABLE_MFA": "マルチファクタ認証(MFA)有効化",
+			"MODAL_EMAIL_TITLE": "メール設定",
+			"MODAL_MS_TITLE": "Microsoft Authenticator アプリを設定する",
+			"MS_DESC": "Microsoft Authenticatorアプリでコードを受け取る",
+			"RESYNC": "再同期",
+			"RESYNC_DESC": "再同期すると、既存の認証記録が削除されます。",
+			"RESYNC_TITLE": "この多要素認証を再同期してもよろしいですか？",
 			"STATE_NOT_VERIFIED": "認証されていません",
 			"STATE_VERIFIED": "認証済みです",
+			"STEP1": "Microsoft Authenticatorアプリを携帯電話にダウンロードしてください。",
+			"STEP2": "このQRコードをスキャンするか、Microsoft Authenticatorアプリに秘密鍵を入力してください。",
+			"STEP3": "Microsoft Authenticatorアプリが生成した下のコードを入力してください。",
+			"STEP_DESC": "{type}を使用して二段階認証を設定するには",
+			"SYNC": "同期中",
 			"TITLE": "マルチファクタ認証",
-			"TYPE": "MFAタイプ"
+			"TYPE": "マルチファクタ認証(MFA)タイプ"
 		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "通知チャンネル追加",
