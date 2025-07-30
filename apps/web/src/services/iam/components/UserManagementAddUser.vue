@@ -60,30 +60,24 @@ const validationState = reactive({
 
 /* Component */
 const hideMenu = () => {
-    emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
-    formState.searchText = '';
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
     resetValidationState();
 };
 const handleChangeTextInput = (value: string) => {
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
     formState.searchText = value;
     if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
 };
-const handleEnterTextInput = debounce(async (value) => {
+const handleEnterTextInput = debounce(async () => {
     if (formState.searchText === '') return;
     if (validateUserId()) {
-        const isFocusOut = value.type === 'focusout';
-        await getUserList(isFocusOut);
+        await getUserList();
     }
 }, 100);
 const handleClickDeleteButton = (idx: number) => {
@@ -92,10 +86,9 @@ const handleClickDeleteButton = (idx: number) => {
 };
 const handleSelectDropdownItem = (selected: AuthType|LocalType) => {
     formState.selectedMenuItem = selected;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
 };
-const getUserList = async (isFocusOut?: boolean) => {
+const getUserList = async () => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
         if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
@@ -106,11 +99,10 @@ const getUserList = async (isFocusOut?: boolean) => {
             await fetchGetWorkspaceUsers(formState.searchText);
         }
     } catch (e) {
-        if (!isFocusOut) {
-            addSelectedItem(isNew);
-        }
-    } finally {
-        await hideMenu();
+        addSelectedItem(formState.searchText, isNew);
+        hideMenu();
+        formState.searchText = '';
+        resetValidationState();
     }
 };
 const checkEmailValidation = () => {
@@ -161,17 +153,20 @@ const initAuthTypeList = async () => {
         ];
     }
 };
-const addSelectedItem = (isNew: boolean) => {
-    if (!formState.searchText) return;
+const addSelectedItem = (name: string, isNew: boolean) => {
+    if (!name) return;
+    const trimmedText = name.trim();
+    if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
+
     state.selectedItems.unshift({
-        user_id: formState.searchText?.trim(),
-        label: formState.searchText?.trim(),
-        name: formState.searchText?.trim(),
+        user_id: trimmedText,
+        label: trimmedText,
+        name: trimmedText,
         isNew,
         auth_type: formState.selectedMenuItem,
     });
-    formState.searchText = '';
-    resetValidationState();
+
+    emit('change-input', { userList: state.selectedItems });
 };
 
 /* API */
@@ -213,7 +208,7 @@ const fetchGetUsers = async (userId: string) => {
         user_id: userId,
     });
     if (userPageState.afterWorkspaceCreated) {
-        addSelectedItem(false);
+        addSelectedItem(formState.searchText, false);
     } else {
         validationState.userIdInvalid = true;
         validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
