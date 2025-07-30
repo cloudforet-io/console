@@ -8,6 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-profile/api-verbs/confirm-mfa';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -68,11 +69,11 @@ const closeModal = () => {
 
 /* API */
 const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
+    state.loading = true;
     try {
-        state.loading = true;
-        await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
+        const data = await SpaceConnector.clientV2.identity.userProfile.confirmMfa(params);
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
-        // userStore.setMfa(data.mfa ?? {});
+        store.dispatch('user/setMfa', data.mfa ?? {});
         closeModal();
         validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setOTPEnableModalVisible(true);
