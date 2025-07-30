@@ -11,6 +11,7 @@ import { blue } from '@/styles/colors';
 // import UserAccountMultiFactorAuthEmailEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailEnableModal.vue';
 // import UserAccountMultiFactorAuthOTPDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPDisableModal.vue';
 // import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
+import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthItems from '@/services/my-page/components/UserAccountMultiFactorAuthItems.vue';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
@@ -24,7 +25,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const multiFactorAuthStore = useMultiFactorAuthStore();
-// const multiFactorAuthModalState = multiFactorAuthStore.modalState;
+const multiFactorAuthModalState = multiFactorAuthStore.modalState;
 
 const isMFAEnforced = computed<boolean>(() => !!store.state.user.mfa?.options?.enforce);
 
@@ -58,8 +59,9 @@ onUnmounted(() => {
         </template>
 
         <user-account-multi-factor-auth-items :readonly-mode="props.readonlyMode" />
-        <!--
+
         <user-account-multi-factor-auth-o-t-p-enable-modal v-if="multiFactorAuthModalState.OTPEnableModalVisible" />
+        <!--
         <user-account-multi-factor-auth-o-t-p-enable-modal v-if="multiFactorAuthModalState.OTPReSyncModalVisible"
                                                            re-sync
         />
