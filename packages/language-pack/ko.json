@@ -4262,11 +4262,25 @@
 		"MFA": {
 			"BTN_CHANGE": "변경",
 			"BTN_SEND_MAIL": "인증 코드 전송",
-			"ENABLE_MFA": "MFA 활성화",
+			"CHANGE_DESC": "이미 멀티 팩터 인증(MFA)이 활성화되어 있습니다. 새로운 인증으로 전환하려면 먼저 현재 MFA로 인증해 주세요.",
+			"CHANGE_TITLE": "멀티 팩터 인증(MFA)을 변경하시겠습니까?",
+			"EMAIL_DESC": "이메일로 인증 코드를 받으세요.",
+			"ENABLE_MFA": "멀티 팩터 인증(MFA) 활성화",
+			"MODAL_EMAIL_TITLE": "이메일 설정",
+			"MODAL_MS_TITLE": "Microsoft Authenticator 앱 설정",
+			"MS_DESC": "Microsoft Authenticator 앱으로 인증 코드를 받으세요.",
+			"RESYNC": "동기화",
+			"RESYNC_DESC": "동기화할 경우 기존 인증 기록은 삭제됩니다.",
+			"RESYNC_TITLE": "멀티 팩터 인증을 동기화하시겠습니까?",
 			"STATE_NOT_VERIFIED": "인증되지 않음",
 			"STATE_VERIFIED": "인증됨",
+			"STEP1": "휴대폰에서 Microsoft Authenticator 앱을 다운로드하세요.",
+			"STEP2": "QR 코드를 스캔하거나 Microsoft Authenticator 앱에 키를 입력하세요.",
+			"STEP3": "Microsoft Authenticator 앱에서 생성된 아래 인증 코드를 입력하세요.",
+			"STEP_DESC": "{type}을 사용하여 2단계 인증을 설정하려면",
+			"SYNC": "동기화됨",
 			"TITLE": "멀티 팩터 인증",
-			"TYPE": "MFA 타입"
+			"TYPE": "멀티 팩터 인증(MFA) 타입"
 		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "알림 채널 추가",

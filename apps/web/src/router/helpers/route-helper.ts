@@ -1,7 +1,6 @@
 import type { Route, NavigationGuardNext } from 'vue-router';
 
-import type { JwtPayload } from 'jwt-decode';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
