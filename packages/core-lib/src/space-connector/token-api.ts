@@ -3,7 +3,7 @@ import type {
 } from 'axios';
 import axios from 'axios';
 import type { JwtPayload } from 'jwt-decode';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 import { LocalStorageAccessor } from '@/local-storage-accessor';
 import type {
