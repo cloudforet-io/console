@@ -28,7 +28,10 @@ export interface UserMfa {
     state: UserMfaState,
     mfa_type: UserMfaType,
     options: {
-        email: string,
+        enforce?: boolean, // if true, mfa_type is required
+        email?: string,
+        user_secret_id?: string,
+        otp_qrcode_uri?: string, // response from 'enable-mfa' verb only
     }
 }
 
