@@ -1210,11 +1210,14 @@
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
+				"DESC_MS": "To turn off, you need to verifiy with the microsoft authenticator code.",
 				"DISABLED": "Disable",
 				"EMAIL_INFO": "Send verification code to the email",
 				"TITLE": "Are you sure you want to disable MFA?",
 				"VERIFIED": "Verified"
 			},
+			"ALT_S_DISABLED": "MFA successfully disabled",
+			"ALT_S_ENABLED": "MFA successfully enabled",
 			"ALT_S_SENT_EMAIL": "A verification code has been sent to your email.",
 			"CHANGE": {
 				"CANCEL": "Cancel",
@@ -1229,12 +1232,12 @@
 				"TITLE": "Enter New Email Address"
 			},
 			"EMAIL": "Email",
-			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_EMAIL": "Invalid code. Please check the email try again.",
+			"INVALID_CODE_OTP": "Invalid code.",
 			"SEND_CODE": "Send Code",
 			"SEND_NEW_CODE": "Send new code",
 			"SENT_DESC": "A verification code has been sent to",
 			"SUCCESS": "A verification code has been sent to your notification email.",
-			"TITLE": "Verify your Email Address",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY": "Verify"
 		},
