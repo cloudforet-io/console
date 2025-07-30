@@ -77,7 +77,7 @@ const tableState = reactive({
         const additionalFields: DataTableFieldType[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa_state', label: 'MFA' },
+                { name: 'mfa_state', label: 'MFA', sortKey: 'mfa.state' },
                 {
                     name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
                 },
