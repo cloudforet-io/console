@@ -9,7 +9,6 @@ import { clone } from 'lodash';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
-
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,6 +20,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+import UserBulkMFASettingModal from '@/services/iam/components/mfa/UserBulkMFASettingModal.vue';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
@@ -115,6 +115,14 @@ onUnmounted(() => {
         <user-management-remove-mixed-type-modal />
         <user-management-status-modal @confirm="refreshUserList" />
         <user-management-form-modal @confirm="refreshUserList" />
+        <user-bulk-m-f-a-setting-modal v-if="state.hasReadWriteAccess"
+                                       @confirm="refreshUserList"
+        />
+        <!--
+        <user-m-f-a-secret-key-delete-modal v-if="state.hasReadWriteAccess"
+                                            @confirm="refreshUserList"
+        />
+         -->
     </section>
 </template>
 
