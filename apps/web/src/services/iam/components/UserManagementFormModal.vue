@@ -92,7 +92,6 @@ const closeModal = () => {
 };
 const handleClose = () => {
     closeModal();
-    userPageStore.setSelectedUserForForm(undefined);
 };
 const setForm = () => {
     formState.name = state.data.name || '';
