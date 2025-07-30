@@ -8,7 +8,7 @@ import { store } from '@/store';
 import { blue } from '@/styles/colors';
 
 // import UserAccountMultiFactorAuthEmailDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailDisableModal.vue';
-// import UserAccountMultiFactorAuthEmailEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailEnableModal.vue';
+import UserAccountMultiFactorAuthEmailEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthEmailEnableModal.vue';
 // import UserAccountMultiFactorAuthOTPDisableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPDisableModal.vue';
 // import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
 import UserAccountMultiFactorAuthOTPEnableModal from '@/services/my-page/components/mfa/UserAccountMultiFactorAuthOTPEnableModal.vue';
@@ -61,17 +61,17 @@ onUnmounted(() => {
         <user-account-multi-factor-auth-items :readonly-mode="props.readonlyMode" />
 
         <user-account-multi-factor-auth-o-t-p-enable-modal v-if="multiFactorAuthModalState.OTPEnableModalVisible" />
-        <!--
         <user-account-multi-factor-auth-o-t-p-enable-modal v-if="multiFactorAuthModalState.OTPReSyncModalVisible"
                                                            re-sync
-        />
-        <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPDisableModalVisible" />
-        <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPSwitchModalVisible"
-                                                            switch
         />
         <user-account-multi-factor-auth-email-enable-modal v-if="multiFactorAuthModalState.emailEnableModalVisible" />
         <user-account-multi-factor-auth-email-enable-modal v-if="multiFactorAuthModalState.emailReSyncModalVisible"
                                                            re-sync
+        />
+        <!--
+        <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPDisableModalVisible" />
+        <user-account-multi-factor-auth-o-t-p-disable-modal v-if="multiFactorAuthModalState.OTPSwitchModalVisible"
+                                                            switch
         />
         <user-account-multi-factor-auth-email-disable-modal v-if="multiFactorAuthModalState.emailDisableModalVisible" />
         <user-account-multi-factor-auth-email-disable-modal v-if="multiFactorAuthModalState.emailSwitchModalVisible"

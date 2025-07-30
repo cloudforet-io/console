@@ -259,6 +259,10 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
     }
 };
 
+export const setMfa = ({ commit }, mfa) => {
+    commit('setMfa', mfa);
+};
+
 export const startSignIn = ({ commit }) => {
     commit('setIsSignInLoading', true);
 };
