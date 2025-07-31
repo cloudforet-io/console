@@ -13,9 +13,16 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PSelectDropdown, PLink, PBadge, PI, PSelectStatus, PDivider, PTextButton,
+    PBadge,
+    PDivider,
+    PI,
+    PLink,
+    PSelectDropdown,
+    PSelectStatus,
+    PTextButton,
+    PToolboxTable,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { AutocompleteHandler, SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 
@@ -55,7 +62,8 @@ import {
     ALERT_EXCEL_FIELDS,
     ALERT_MANAGEMENT_TABLE_FIELDS,
     ALERT_MANAGEMENT_TABLE_HANDLER,
-    ALERT_STATUS_FILTERS, ALERT_PERIOD_DROPDOWN_MENU,
+    ALERT_PERIOD_DROPDOWN_MENU,
+    ALERT_STATUS_FILTERS,
 } from '@/services/alert-manager/v2/constants/alert-table-constant';
 import {
     convertRelativePeriodToPeriod,
@@ -63,8 +71,9 @@ import {
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/v2/stores/alert-page-store';
 import type {
-    AlertFilterType, AlertPeriodItemType,
+    AlertFilterType,
     AlertPeriodDropdownMenuType,
+    AlertPeriodItemType,
     Period,
 } from '@/services/alert-manager/v2/types/alert-manager-type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -457,7 +466,7 @@ watch(() => storeState.serviceId, (serviceId) => {
 
 (async () => {
     const {
-        status, urgency, filters: queryFilters, labels, period, range,
+        status, urgency, filters: queryFilters, labels, period, range, serviceId,
     } = route.query;
     await handleSelectStatus(status as string || 'OPEN');
     await handleSelectUrgency(urgency as string || 'ALL');
@@ -480,7 +489,10 @@ watch(() => storeState.serviceId, (serviceId) => {
     if (queryFilters) {
         await queryTagHelper.setURLQueryStringFilters(queryFilters);
     }
-    refreshAlertList();
+    if (serviceId) {
+        await handleSelectServiceDropdownItem(serviceId as string);
+    }
+    await refreshAlertList();
 })();
 </script>
 
