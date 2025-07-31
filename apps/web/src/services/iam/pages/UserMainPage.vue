@@ -21,6 +21,7 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import UserBulkMFASettingModal from '@/services/iam/components/mfa/UserBulkMFASettingModal.vue';
+import UserMFASecretKeyDeleteModal from '@/services/iam/components/mfa/UserMFASecretKeyDeleteModal.vue';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/iam/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/iam/components/UserManagementHeader.vue';
@@ -110,19 +111,23 @@ onUnmounted(() => {
             </template>
         </p-horizontal-layout>
         <user-management-tab :has-read-write-access="state.hasReadWriteAccess" />
-        <user-management-add-modal @confirm="refreshUserList" />
-        <user-management-only-remove-workspace-group-type-modal />
-        <user-management-remove-mixed-type-modal />
-        <user-management-status-modal @confirm="refreshUserList" />
-        <user-management-form-modal @confirm="refreshUserList" />
+        <user-management-add-modal v-if="state.hasReadWriteAccess"
+                                   @confirm="refreshUserList"
+        />
+        <user-management-only-remove-workspace-group-type-modal v-if="state.hasReadWriteAccess" />
+        <user-management-remove-mixed-type-modal v-if="state.hasReadWriteAccess" />
+        <user-management-status-modal v-if="state.hasReadWriteAccess"
+                                      @confirm="refreshUserList"
+        />
+        <user-management-form-modal v-if="state.hasReadWriteAccess"
+                                    @confirm="refreshUserList"
+        />
         <user-bulk-m-f-a-setting-modal v-if="state.hasReadWriteAccess"
                                        @confirm="refreshUserList"
         />
-        <!--
         <user-m-f-a-secret-key-delete-modal v-if="state.hasReadWriteAccess"
                                             @confirm="refreshUserList"
         />
-         -->
     </section>
 </template>
 
