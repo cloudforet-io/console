@@ -11,7 +11,7 @@
              width="1.25rem"
              height="1.25rem"
         />
-        <div class="select-card-contents">
+        <div class="select-card-contents contents">
             <slot v-bind="{isSelected}">
                 <p-lazy-img v-if="imageUrl || icon"
                             :src="imageUrl"
