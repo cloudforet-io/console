@@ -85,7 +85,7 @@ const handleDeleteMfaSecretKey = async () => {
     // Disable MFA Promise for each user (Bulk)
     const userMFADisablePromises = selectedMFAEnabledUsers.value.map(async (user) => {
         if (!user.user_id) {
-            if (import.meta.env.DEV) throw new Error('[UserMFASettingDisableButton.vue] There are users without user_id');
+            if (import.meta.env.DEV) throw new Error('[UserMFASecretKeyDeleteModal.vue] There are users without user_id');
             else throw new Error('[User MFA Secret Key Delete] Something went wrong! Try again later. If the problem persists, please contact support.');
         }
         return disableMfa({ user_id: user.user_id });
@@ -103,7 +103,7 @@ const handleDeleteMfaSecretKey = async () => {
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk disable MFA failed
             if (import.meta.env.DEV) {
                 const joinedFailedUserIds = Array.from(state.failedUserIds.keys()).join(', ');
-                throw new Error(`[UserMFASettingDisableButton.vue] Bulk disable MFA failed user IDs: [${joinedFailedUserIds}]`);
+                throw new Error(`[UserMFASecretKeyDeleteModal.vue] Bulk disable MFA failed user IDs: [${joinedFailedUserIds}]`);
             } else throw new Error('[User MFA Secret Key Delete] Something went wrong! Try again later. If the problem persists, please contact support.');
         }
     } catch (error: any) {
