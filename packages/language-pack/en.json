@@ -51,7 +51,7 @@
 			"EMAIL_INFO": "Allows multi-factor authentication(MFA) for account logins. A MFA code has been sent to an email address:",
 			"ENTER_CODE": "Enter Code",
 			"GO_BACK": "Back to Sign in",
-			"MFA_CONFIGURED": "\\bMulti-Factor Authentication Configured.",
+			"MFA_CONFIGURED": "Multi-Factor Authentication Configured.",
 			"MFA_CONFIGURED_DESC": "Please sign-in again using the authentication method you set.",
 			"OTP_INFO": "allows multi-factor authentication(MFA) for account logins. Enter the code that you see in the app.",
 			"PROBLEM_TITLE": "Having problems?",
