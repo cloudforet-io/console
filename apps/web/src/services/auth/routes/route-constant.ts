@@ -4,6 +4,7 @@ export const AUTH_ROUTE = Object.freeze({
         _NAME: 'signIn',
         KEYCLOAK: { _NAME: 'keycloak' },
         MULTI_FACTOR_AUTH: { _NAME: 'multiFactorAuth' },
+        MULTI_FACTOR_AUTH_SETUP: { _NAME: 'multiFactorAuthSetup' },
         KB: { _NAME: 'KB_SSO', _PATH: 'kbfg-sso' },
     },
     SIGN_OUT: {
