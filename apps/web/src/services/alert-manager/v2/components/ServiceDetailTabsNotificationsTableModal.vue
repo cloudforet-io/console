@@ -5,7 +5,9 @@ import type { TranslateResult } from 'vue-i18n';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
-    PTableCheckModal, PLazyImg, PStatus, PI,
+    PI,
+    PLazyImg, PStatus,
+    PTableCheckModal,
 } from '@cloudforet/mirinae';
 
 import { useServiceChannelApi } from '@/api-clients/alert-manager/service-channel/composables/use-service-channel-api';
@@ -39,6 +41,7 @@ const queryClient = useQueryClient();
 const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
 
+const { withSuffix: serviceChannelGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'get');
 const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -62,13 +65,15 @@ const { mutate: serviceChannelChangeStatusMutate, isPending: changeStatusLoading
         }
         return serviceChannelAPI.enable(params);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+        const _serviceChannelId = { channel_id: data?.channel_id };
+        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: serviceChannelGetBaseQueryKey(_serviceChannelId) });
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_DISABLED'), '');
         } else {
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_ENABLED'), '');
         }
-        queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
         state.proxyVisible = false;
         emit('close');
     },

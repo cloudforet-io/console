@@ -3,16 +3,20 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown, PLazyImg,
+    PButtonModal, PFieldGroup,
+    PLazyImg,
+    PSelectDropdown,
+    PTextInput,
 } from '@cloudforet/mirinae';
 
 
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookUpdateParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/update';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -69,10 +73,14 @@ const {
     },
 });
 
+const queryClient = useQueryClient();
+const { withSuffix: webhookGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'get');
 const { webhookAPI } = useWebhookApi();
 const { mutateAsync: updateWebhook, isPending: updateWebhookLoading } = useMutation({
     mutationFn: (params: WebhookUpdateParameters) => webhookAPI.update(params),
-    onSuccess: () => {
+    onSuccess: (data) => {
+        const _webhookId = { webhook_id: data?.webhook_id };
+        queryClient.invalidateQueries({ queryKey: webhookGetBaseQueryKey(_webhookId) });
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_UPDATE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');

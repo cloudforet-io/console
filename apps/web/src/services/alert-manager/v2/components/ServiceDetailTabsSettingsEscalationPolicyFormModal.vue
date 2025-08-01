@@ -8,7 +8,11 @@ import { useRoute } from 'vue-router/composables';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
-    PButtonModal, PTextInput, PRadio, PFieldGroup, PRadioGroup, PTextButton,
+    PButtonModal,
+    PFieldGroup,
+    PRadio,
+    PRadioGroup, PTextButton,
+    PTextInput,
 } from '@cloudforet/mirinae';
 
 import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
@@ -27,11 +31,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import ServiceDetailTabsSettingsEscalationPolicyForm
-    from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicyForm.vue';
+import ServiceDetailTabsSettingsEscalationPolicyForm from '@/services/alert-manager/v2/components/ServiceDetailTabsSettingsEscalationPolicyForm.vue';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { EscalationPolicyRadioType, EscalationPolicyModalType } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { EscalationPolicyModalType, EscalationPolicyRadioType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -97,6 +100,7 @@ const {
 
 const queryClient = useQueryClient();
 const { escalationPolicyAPI } = useEscalationPolicyApi();
+const { withSuffix: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
 const { key: escalationPolicyLisBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
 
 const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
@@ -106,7 +110,9 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
         }
         return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+        const _serviceId = { service_id: data?.service_id };
+        queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
         queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey.value });
         if (props.type === 'CREATE') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');
