@@ -38,7 +38,7 @@ export const useServiceChannelCreateMutation = (options?: ServiceChannelCreateMu
         onSuccess: async (data, variables) => {
             const _serviceId = { service_id: variables.service_id };
             queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
-            queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey });
+            queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },
