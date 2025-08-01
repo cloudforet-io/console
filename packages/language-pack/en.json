@@ -55,6 +55,7 @@
 			"MFA_CONFIGURED_DESC": "Please sign-in again using the authentication method you set.",
 			"OTP_INFO": "allows multi-factor authentication(MFA) for account logins. Enter the code that you see in the app.",
 			"PROBLEM_TITLE": "Having problems?",
+			"REQUIRED_BY_ADMIN": "Required by admin",
 			"SETUP_VERIFY": "Verify",
 			"SUB_TITLE": "Your account required to verify with email MFA.",
 			"TITLE": "Multi-factor\nauthentication"
