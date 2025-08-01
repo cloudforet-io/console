@@ -12,17 +12,13 @@ import { MULTI_FACTOR_AUTH_TYPE, MFA_STATE } from '@/schema/identity/user-profil
 import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserModel } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-// import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserMFASettingFormLayout from '@/services/iam/components/mfa/UserMFASettingFormLayout.vue';
-// import { useUserUpdateMutation } from '@/services/iam/composables/mutations/use-user-update-mutation';
 import { USER_MODAL_MAP } from '@/services/iam/constants/modal-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { UserListItemType } from '@/services/iam/types/user-type';
@@ -38,7 +34,6 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageModalState = userPageStore.modalState;
 const userPageGetters = userPageStore.getters;
-// const userStore = useUserStore();
 
 /* State */
 const state = reactive({
@@ -69,6 +64,13 @@ const updateUser = async (user: UserUpdateParameters) => {
 /* Utils */
 const closeModal = () => {
     userPageStore.setBulkMfaSettingModalVisible(false);
+};
+const initMfaState = () => {
+    const firstUser = userPageGetters.selectedUsers[0];
+    if (firstUser) {
+        state.isRequiredMfa = !!firstUser.mfa?.options?.enforce;
+        state.selectedMfaType = firstUser.mfa?.mfa_type || MULTI_FACTOR_AUTH_TYPE.OTP;
+    }
 };
 
 /* Events */
@@ -129,11 +131,9 @@ const handleConfirm = async () => {
     }
 };
 
-watch(() => store.state.mfa, (mfa) => {
-    if (mfa) {
-        state.isRequiredMfa = !!mfa.options?.enforce;
-        state.selectedMfaType = mfa.mfa_type || MULTI_FACTOR_AUTH_TYPE.OTP;
-    }
+/* Watcher */
+watch(() => userPageModalState.bulkMfaSettingModalVisible, (visible) => {
+    if (visible) initMfaState();
 }, { immediate: true });
 </script>
 
