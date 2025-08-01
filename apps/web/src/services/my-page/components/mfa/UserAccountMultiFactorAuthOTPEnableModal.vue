@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -28,8 +28,6 @@ const props = withDefaults(defineProps<Props>(), {
     reSync: false,
 });
 
-const emit = defineEmits<{(e: 'refresh'): void }>();
-
 /* Store */
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.modalState;
@@ -40,7 +38,7 @@ const state = reactive({
 });
 const validationState = reactive({
     verificationCode: '',
-    isInvalidationCodeValid: false as undefined | boolean,
+    isInvalidationCodeValid: false,
 });
 
 /* Computed */
@@ -74,7 +72,6 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
-        validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setOTPEnableModalVisible(true);
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -87,16 +84,21 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
 /* Events */
 const handleClickCancel = async () => {
     closeModal();
-    emit('refresh');
 };
 
 const handleClickVerifyButton = async () => {
     await confirmMfa({
         verify_code: validationState.verificationCode,
     });
-    emit('refresh');
 };
 
+/* Watcher */
+watch(visible, (_visible) => {
+    if (!_visible) {
+        validationState.verificationCode = '';
+        validationState.isInvalidationCodeValid = false;
+    }
+}, { immediate: true });
 </script>
 
 <template>

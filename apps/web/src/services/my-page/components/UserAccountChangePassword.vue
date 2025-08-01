@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PButton, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
-
+import {
+    PButton, PFieldGroup, PTextInput, PButtonModal,
+} from '@cloudforet/mirinae';
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenIssueModel } from '@/schema/identity/token/model';
@@ -12,8 +13,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDomainStore } from '@/store/domain/domain-store';
-import type { UpdateUserRequest } from '@/store/modules/user/type';
-
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
@@ -23,16 +22,20 @@ import {
     samePasswordValidator,
 } from '@/lib/helper/user-validation-helper';
 
+import MFAAuthenticationForm from '@/common/components/mfa/components/MFAAuthenticationForm.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { loadAuth } from '@/services/auth/authenticator/loader';
 import UserAccountModuleContainer
     from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
 
 const domainStore = useDomainStore();
+
+/* State */
 const state = reactive({
-    userId: computed(() => store.state.user.userId),
     isCheckedToken: false,
+    isMfaModalVisible: false,
 });
 const {
     forms: {
@@ -74,24 +77,29 @@ const resetPasswordForm = () => {
         passwordCheck: '',
     });
 };
+const handleOpenMfaModal = () => {
+    loadAuth().signIn({
+        user_id: store.state.user.userId,
+        password: currentPassword.value,
+    }, 'LOCAL');
+    state.isMfaModalVisible = true;
+};
 const handleClickPasswordConfirm = async () => {
-    const userParam: UpdateUserRequest = {
-        password: password.value,
-    };
-    await updateUser(userParam);
+    await updateUser();
     resetPasswordForm();
 };
 
 /* API */
-const checkCurrentPassword = async () => {
+const checkCurrentPassword = async (verificationCode: string) => {
     try {
         const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
             domain_id: domainStore.state.domainId,
-            auth_type: 'LOCAL',
+            auth_type: 'MFA',
             credentials: {
-                user_id: state.userId,
+                user_id: store.state.user.userId,
                 password: currentPassword.value,
             },
+            verify_code: verificationCode,
         }, { skipAuthRefresh: true });
         if (response.access_token !== '' && response.refresh_token !== '') {
             state.isCheckedToken = true;
@@ -103,12 +111,14 @@ const checkCurrentPassword = async () => {
         validationState.currentPasswordInvalidText = i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
     }
 };
-const updateUser = async (userParam: UpdateUserRequest) => {
+const updateUser = async () => {
     try {
-        await checkCurrentPassword();
         if (!state.isCheckedToken) return;
-        await store.dispatch('user/setUser', userParam);
+        await store.dispatch('user/setUser', {
+            password: password.value,
+        });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
+        state.isMfaModalVisible = false;
     } catch (e: any) {
         if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
             showErrorMessage(e.message, '');
@@ -177,11 +187,29 @@ const updateUser = async (userParam: UpdateUserRequest) => {
         <div class="save-button">
             <p-button style-type="primary"
                       :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
-                      @click="handleClickPasswordConfirm"
+                      @click="handleOpenMfaModal"
             >
                 {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
         </div>
+        <p-button-modal :visible.sync="state.isMfaModalVisible"
+                        class="mfa-modal-wrapper"
+                        size="sm"
+                        hide-footer
+        >
+            <template #body>
+                <m-f-a-authentication-form
+                    check-current-password
+                    :password="currentPassword"
+                    :user-id="store.state.user.userId"
+                    :mfa-email="store.state.user.mfa?.mfa_email"
+                    :access-token="store.state.user.access_token"
+                    :mfa-type="store.state.user.mfa?.mfa_type"
+                    :confirm-event="checkCurrentPassword"
+                    @confirmed="handleClickPasswordConfirm"
+                />
+            </template>
+        </p-button-modal>
     </user-account-module-container>
 </template>
 
