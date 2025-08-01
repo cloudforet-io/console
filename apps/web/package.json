@@ -6,7 +6,7 @@
   "author": "Cloudforet",
   "scripts": {
     "dev": "vite --host",
-    "build": "NODE_OPTIONS=--max_old_space_size=9216 vite build --debug",
+    "build": "NODE_OPTIONS=--max_old_space_size=12288 vite build --debug",
     "preview": "vite preview --host",
     "test": "vitest run",
     "test:watch": "vitest watch --ui",
