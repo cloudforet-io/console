@@ -6,7 +6,8 @@
          v-on="$listeners"
          @keydown="handleKeydown"
     >
-        <p-i :name="markerIconName"
+        <p-i v-if="showSelectMarker"
+             :name="markerIconName"
              class="marker"
              width="1.25rem"
              height="1.25rem"
@@ -48,6 +49,7 @@ interface Props extends SelectProps {
     iconColor?: string;
     label?: string;
     tabIndex?: number|undefined;
+    showSelectMarker?: boolean;
 }
 // FIXME:: tabIndex should be a required member;
 
@@ -108,6 +110,10 @@ export default defineComponent<Props>({
         tabIndex: {
             type: Number,
             default: undefined,
+        },
+        showSelectMarker: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props, { emit }: SetupContext) {

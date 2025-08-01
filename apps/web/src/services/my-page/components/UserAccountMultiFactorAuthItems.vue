@@ -78,6 +78,7 @@ const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEv
                        :readonly="props.readonlyMode"
                        :selected="state.isVerified ? state.currentType : undefined"
                        :disabled="state.isEnforced && state.currentType !== item.type"
+                       :show-select-marker="state.isVerified && state.currentType === item.type"
                        :value="item.type"
                        @change="handleChange(state.isVerified && state.currentType === item.type, $event)"
         >
