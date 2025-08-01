@@ -976,8 +976,13 @@
 		"BUTTONS": {
 			"ADD": "추가",
 			"CANCEL": "취소",
+			"CONFIRM": "확인",
+			"CREATE": "생성",
+			"DELETE": "삭제",
 			"DONE": "완료",
 			"DOWNLOAD": "다운로드",
+			"EDIT": "편집",
+			"NEXT": "다음",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "데스크탑",
 				"SUPPORT_PDF_HELP_TEXT": "해당 기능을 지원하지 않는 브라우저 또는 디바이스입니다. {desktop} 환경의 {chrome} 또는 {edge} 브라우저에서 이용해주세요."
@@ -2824,6 +2829,7 @@
 				"ROLE": "역할(Role)",
 				"ROLE_NAME": "역할(Role)명",
 				"ROLE_TYPE": "역할(Role) 타입",
+				"SET_MFA": "",
 				"STATE": "상태",
 				"TAB_SELECTED_DATA": "선택한 데이터 ",
 				"TAG": "태그",

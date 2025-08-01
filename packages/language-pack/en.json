@@ -976,8 +976,13 @@
 		"BUTTONS": {
 			"ADD": "Add",
 			"CANCEL": "Cancel",
+			"CONFIRM": "Confirm",
+			"CREATE": "Create",
+			"DELETE": "Delete",
 			"DONE": "Done",
 			"DOWNLOAD": "Download",
+			"EDIT": "Edit",
+			"NEXT": "Next",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
 				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with {chrome} or {edge} browser on {desktop}."
@@ -2824,6 +2829,7 @@
 				"ROLE": "Role",
 				"ROLE_NAME": "Role Name",
 				"ROLE_TYPE": "Role Type",
+				"SET_MFA": "Set MFA",
 				"STATE": "State",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAG": "Tag",
