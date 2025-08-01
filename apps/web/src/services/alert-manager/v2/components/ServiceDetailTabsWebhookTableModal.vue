@@ -2,15 +2,16 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { PTableCheckModal, PLazyImg, PStatus } from '@cloudforet/mirinae';
+import { PLazyImg, PStatus, PTableCheckModal } from '@cloudforet/mirinae';
 
 import { useWebhookApi } from '@/api-clients/alert-manager/webhook/composables/use-webhook-api';
 import type { WebhookDisableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/disable';
 import type { WebhookEnableParameters } from '@/api-clients/alert-manager/webhook/schema/api-verbs/enable';
 import { WEBHOOK_STATE } from '@/api-clients/alert-manager/webhook/schema/constants';
 import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -54,6 +55,9 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
+const queryClient = useQueryClient();
+const { withSuffix: webhookGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'get');
+
 const { webhookAPI } = useWebhookApi();
 const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = useMutation({
     mutationFn: (params: WebhookDisableParameters|WebhookEnableParameters) => {
@@ -62,7 +66,9 @@ const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = 
         }
         return webhookAPI.enable(params);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+        const _webhookId = { webhook_id: data?.webhook_id };
+        queryClient.invalidateQueries({ queryKey: webhookGetBaseQueryKey(_webhookId) });
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DISABLE_WEBHOOK'), '');
         } else {

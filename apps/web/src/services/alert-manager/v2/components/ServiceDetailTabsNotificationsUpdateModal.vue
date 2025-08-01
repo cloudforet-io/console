@@ -8,7 +8,14 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { mapValues } from 'lodash';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PRadio, PRadioGroup, PPaneLayout, PLazyImg, PJsonSchemaForm, PI, PSelectDropdown, PTag,
+    PButtonModal, PFieldGroup,
+    PI,
+    PJsonSchemaForm,
+    PLazyImg,
+    PPaneLayout,
+    PRadio, PRadioGroup,
+    PSelectDropdown, PTag,
+    PTextInput,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
@@ -34,7 +41,7 @@ import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { UserRadioType, ProtocolInfo } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { ProtocolInfo, UserRadioType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     selectedItem?: ServiceChannelModel;
@@ -56,6 +63,7 @@ const { notificationProtocolListData } = useNotificationProtocolListQuery();
 const { serviceChannelAPI } = useServiceChannelApi();
 const { serviceData } = useServiceGetQuery(serviceId);
 
+const { withSuffix: serviceChannelGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'get');
 const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -111,7 +119,9 @@ const state = reactive({
 
 const { mutate: serviceChannelUpdateMutate, isPending: updateLoading } = useMutation({
     mutationFn: (params: ServiceChannelUpdateParameters) => serviceChannelAPI.update(params),
-    onSuccess: () => {
+    onSuccess: (data) => {
+        const _serviceChannelId = { channel_id: data?.channel_id };
+        queryClient.invalidateQueries({ queryKey: serviceChannelGetBaseQueryKey(_serviceChannelId) });
         queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
         showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
         state.proxyVisible = false;

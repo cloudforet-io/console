@@ -7,7 +7,15 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PI, PPaneLayout, PTooltip, PFieldTitle, PSelectStatus, PIconButton, PDataTable, PBadge, PTextButton,
+    PBadge,
+    PDataTable,
+    PFieldTitle,
+    PI,
+    PIconButton,
+    PPaneLayout,
+    PSelectStatus,
+    PTextButton,
+    PTooltip,
 } from '@cloudforet/mirinae';
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -90,22 +98,24 @@ const tableState = reactive({
     alertsList: [] as AlertModel[],
     alertStateLabels: getAlertStateI18n(),
     urgencyLabels: getAlertUrgencyI18n(),
-    sortBy: '',
-    sortDesc: false,
+    sortBy: 'created_at',
+    sortDesc: true,
 });
 
 const queryClient = useQueryClient();
-const alertListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true)
-    .setPage(1, 15);
+const alertListApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const {
     alertListData, alertListTotalCount, alertListFetching, alertListQueryKey,
 } = useAlertListQuery({
-    params: computed(() => ({
-        service_id: serviceId.value,
-        status: state.selectedStatus,
-        urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
-        query: alertListApiQueryHelper.data,
-    })),
+    params: computed(() => {
+        alertListApiQueryHelper.setSort(tableState.sortBy, tableState.sortDesc);
+        return {
+            service_id: serviceId.value,
+            status: state.selectedStatus,
+            urgency: state.selectedUrgency === 'ALL' ? undefined : state.selectedUrgency as AlertUrgencyType,
+            query: alertListApiQueryHelper.data,
+        };
+    }),
 });
 
 const refetchAlertList = () => {
