@@ -43,6 +43,7 @@ const Template: Story = {
             <p-select-card :value="value"
                 v-model="proxySelected"
                 :disabled="disabled"
+                :show-select-marker="showSelectMarker"
                 :predicate="predicate"
                 :multi-selectable="multiSelectable"
                 :block="block"
@@ -309,6 +310,7 @@ export const Disabled: Story = {
     ...Template,
     args: {
         disabled: true,
+        showSelectMarker: false,
     },
 };
 
