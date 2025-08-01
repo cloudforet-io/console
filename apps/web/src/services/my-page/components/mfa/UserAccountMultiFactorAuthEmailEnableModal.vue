@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, ref,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -31,8 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
     reSync: false,
 });
 
-const emit = defineEmits<{(e: 'refresh'): void }>();
-
 /* Store */
 const multiFactorAuthStore = useMultiFactorAuthStore();
 const multiFactorAuthState = multiFactorAuthStore.modalState;
@@ -43,9 +41,9 @@ const state = reactive({
 });
 const validationState = reactive({
     verificationCode: '',
-    isInvalidationCodeValid: false as undefined | boolean,
+    isInvalidationCodeValid: false,
+    isSentCode: false,
 });
-const isSentCode = ref<boolean>(false);
 
 /* Computed */
 const visible = computed<boolean>(() => {
@@ -78,8 +76,6 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         store.dispatch('user/setMfa', res.mfa ?? {});
         closeModal();
-        isSentCode.value = false;
-        validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -92,16 +88,22 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
 /* Events */
 const handleClickCancel = async () => {
     closeModal();
-    emit('refresh');
 };
 
 const handleClickVerifyButton = async () => {
     await confirmMfa({
         verify_code: validationState.verificationCode,
     });
-    emit('refresh');
 };
 
+/* Watcher */
+watch(visible, (_visible) => {
+    if (!_visible) {
+        validationState.verificationCode = '';
+        validationState.isInvalidationCodeValid = false;
+        validationState.isSentCode = false;
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -110,7 +112,7 @@ const handleClickVerifyButton = async () => {
                     class="mfa-modal-wrapper"
                     size="sm"
                     theme-color="primary"
-                    :disabled="validationState.verificationCode === '' || !isSentCode"
+                    :disabled="validationState.verificationCode === '' || !validationState.isSentCode"
                     :loading="state.loading"
                     @confirm="handleClickVerifyButton"
                     @cancel="handleClickCancel"
@@ -121,7 +123,7 @@ const handleClickVerifyButton = async () => {
                 <p class="re-sync-desc">
                     {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
                 </p>
-                <email-info :is-sent-code.sync="isSentCode"
+                <email-info :is-sent-code.sync="validationState.isSentCode"
                             :is-form="!props.reSync"
                 />
 
@@ -130,7 +132,7 @@ const handleClickVerifyButton = async () => {
                                         :invalid-text="$t('COMMON.MFA_MODAL.INVALID_CODE_EMAIL')"
                 />
                 <email-folding-info :is-re-sync-modal="props.reSync"
-                                    :is-sent-code.sync="isSentCode"
+                                    :is-sent-code.sync="validationState.isSentCode"
                 />
             </div>
         </template>
