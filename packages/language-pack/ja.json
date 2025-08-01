@@ -976,8 +976,13 @@
 		"BUTTONS": {
 			"ADD": "追加",
 			"CANCEL": "キャンセル",
+			"CONFIRM": "確認",
+			"CREATE": "生成",
+			"DELETE": "削除",
 			"DONE": "完了",
 			"DOWNLOAD": "ダウンロード",
+			"EDIT": "編集",
+			"NEXT": "次へ",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
 				"SUPPORT_PDF_HELP_TEXT": "この機能は、ご使用のブラウザまたはデバイスではサポートされていません。 {desktop}で{chrome}または{edge}ブラウザを使用して再試行してください。"
@@ -2824,6 +2829,7 @@
 				"ROLE": "ロール",
 				"ROLE_NAME": "ロール名",
 				"ROLE_TYPE": "ロールタイプ",
+				"SET_MFA": "",
 				"STATE": "状態",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAG": "タグ",
