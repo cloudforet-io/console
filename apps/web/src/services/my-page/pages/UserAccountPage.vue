@@ -78,6 +78,7 @@ const passwordFormState = reactive({
 const passwordCheckFecher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.issue);
 
 const handleConfirmPasswordCheckModal = async () => {
+    if (passwordFormState.password.length < 8) return;
     passwordFormState.loading = true;
     try {
         const result = await passwordCheckFecher<TokenIssueParameters, TokenIssueModel>({
@@ -125,6 +126,11 @@ const handleClickCancel = () => {
     passwordFormState.isTokenChecked = undefined;
     passwordFormState.invalidText = '';
 };
+
+// TODO: remove this after tanstack query is implemented
+(async () => {
+    await userStore.getUserInfo();
+})();
 
 </script>
 
@@ -195,6 +201,7 @@ const handleClickCancel = () => {
                                           appearance-type="masking"
                                           :invalid="invalid"
                                           block
+                                          @keyup.enter="handleConfirmPasswordCheckModal"
                             />
                         </template>
                     </p-field-group>
