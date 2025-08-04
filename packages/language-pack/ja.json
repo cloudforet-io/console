@@ -42,7 +42,13 @@
 			"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
 			"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
 			"EXTENSION_TITLE_1": "メールが届かない場合は、",
-			"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？"
+			"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？",
+			"GOOGLE_GUIDE": "Microsoft認証ガイド",
+			"OTP_EXTENSION_DESC_1": "認証に関して引き続き問題が発生する場合は、{guide}を参照してください。SpaceONEにのみ関連する問題については、{contact}。",
+			"OTP_EXTENSION_REASON_1": "コードを送受信する際に、適切なインターネット接続があることを確認してください。",
+			"OTP_EXTENSION_REASON_2": "認証アプリが時間を正しく同期していない可能性があります。デバイスが最新の状態であることを確認し、日付と時間の設定が正しいことを確認してください",
+			"OTP_EXTENSION_TITLE_1": "Microsoft Authenticatorアプリでプッシュ通知を受け取れませんでしたか？",
+			"OTP_EXTENSION_TITLE_2": "まだ問題がありますか？"
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "認証コード",
