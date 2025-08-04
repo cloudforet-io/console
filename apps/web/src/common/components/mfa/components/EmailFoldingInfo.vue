@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref,
+} from 'vue';
 
 import { PTextButton, PCollapsibleToggle } from '@cloudforet/mirinae';
 
@@ -33,18 +35,31 @@ const state = reactive({
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 
+const isCooldown = ref(false);
+
 const handleClickSendEmailButton = async () => {
-    if (props.isDisabledModal || props.isReSyncModal) {
-        await postUserProfileDisableMfa();
-    } else {
-        await postEnableMfa({
-            mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
-            options: {
-                email: storeState.email,
-            },
-        });
+    if (isCooldown.value) return;
+    isCooldown.value = true;
+    try {
+        if (props.isDisabledModal || props.isReSyncModal) {
+            await postUserProfileDisableMfa();
+        } else {
+            await postEnableMfa({
+                mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
+                options: {
+                    email: storeState.email,
+                },
+            });
+        }
+        state.proxyIsSentCode = true;
+    } catch (error) {
+        console.error(error);
+        isCooldown.value = false;
+        return;
     }
-    state.proxyIsSentCode = true;
+    setTimeout(() => {
+        isCooldown.value = false;
+    }, 10000);
 };
 </script>
 
@@ -61,7 +76,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
-                           :disabled="(props.isDisabledModal || props.isReSyncModal) ? !storeState.email : !props.isSentCode"
+                           :disabled="(props.isDisabledModal || props.isReSyncModal) ? !storeState.email || isCooldown : !props.isSentCode || isCooldown"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>
