@@ -14,7 +14,6 @@ import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -109,11 +108,11 @@ const signIn = async () => {
                     password: credentials.password, mfaEmail, mfaType, userId: state.userId?.trim() as string,
                 },
             });
-        } else if (e.code === 'ERROR_AUTHENTICATE_FAILURE') {
+        } else if (message.includes('Authenticate failure')) {
             ErrorHandler.handleError(e);
             await store.dispatch('display/showSignInErrorMessage');
         } else {
-            showErrorMessage('Something went wrong! Contact support.', 'MFA_NOT_SETUP');
+            ErrorHandler.handleRequestError(e, e.message);
             await router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
         }
         state.password = '';
