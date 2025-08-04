@@ -19,14 +19,11 @@ export const useWebhookCreateMutation = (options?: UseWebhookCreateMutationOptio
     const { webhookAPI } = useWebhookApi();
     const queryClient = useQueryClient();
 
-    const { withSuffix: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
     const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 
     return useMutation({
         mutationFn: (params: WebhookCreateParameters) => webhookAPI.create(params),
         onSuccess: async (data, variables) => {
-            const _serviceId = { service_id: variables.service_id };
-            queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
             queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_CREATE_WEBHOOK'), '');
             if (options?.onSuccess) await options.onSuccess(data, variables);

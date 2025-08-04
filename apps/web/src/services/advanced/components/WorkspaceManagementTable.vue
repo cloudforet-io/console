@@ -90,7 +90,7 @@ const pagination = reactive({
     pageSize: 15,
 });
 const sortState = reactive({
-    sortKey: 'name',
+    sortKey: 'created_at',
     sortDesc: true,
 });
 

@@ -5,7 +5,11 @@ import { useRoute } from 'vue-router/composables';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PTextarea, PSelectDropdown, PRadioGroup, PRadio,
+    PButtonModal, PFieldGroup,
+    PRadio,
+    PRadioGroup,
+    PSelectDropdown,
+    PTextInput, PTextarea,
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
@@ -43,7 +47,7 @@ const route = useRoute();
 
 const queryClient = useQueryClient();
 const { alertAPI } = useAlertApi();
-const { key: alertListQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
+const { key: alertListBaseQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
 
 const storeState = reactive({
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => alertPageGetters.serviceDropdownList),
@@ -88,7 +92,7 @@ const { mutate: createAlert, isPending } = useMutation({
     mutationFn: alertAPI.create,
     onSuccess: () => {
         showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_CREATE'), '');
-        queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: alertListBaseQueryKey.value });
     },
     onError: (error) => {
         ErrorHandler.handleError(error, true);

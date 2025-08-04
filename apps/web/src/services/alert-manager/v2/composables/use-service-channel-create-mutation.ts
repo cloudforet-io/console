@@ -25,7 +25,6 @@ export const useServiceChannelCreateMutation = (options?: ServiceChannelCreateMu
     const { serviceChannelAPI } = useServiceChannelApi();
     const queryClient = useQueryClient();
 
-    const { withSuffix: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
     const { key: serviceChannelListBaseQueryKey } = useServiceQueryKey('alert-manager', 'service-channel', 'list');
 
     return useMutation({
@@ -36,8 +35,6 @@ export const useServiceChannelCreateMutation = (options?: ServiceChannelCreateMu
             return serviceChannelAPI.create(params as ServiceChannelCreateParameters);
         },
         onSuccess: async (data, variables) => {
-            const _serviceId = { service_id: variables.service_id };
-            queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
             queryClient.invalidateQueries({ queryKey: serviceChannelListBaseQueryKey.value });
             showSuccessMessage(i18n.t('ALERT_MANAGER.NOTIFICATIONS.ALT_S_CREATED'), '');
             if (options?.onSuccess) await options.onSuccess(data, variables);

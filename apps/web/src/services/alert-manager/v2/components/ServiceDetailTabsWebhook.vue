@@ -4,8 +4,6 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { useQueryClient } from '@tanstack/vue-query';
-
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -41,7 +39,6 @@ import ServiceDetailTabsWebhookUpdateModal
     from '@/services/alert-manager/v2/components/ServiceDetailTabsWebhookUpdateModal.vue';
 import { alertManagerStateFormatter } from '@/services/alert-manager/v2/composables/refined-table-data';
 import { useWebhookListPaginationQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-pagination-query';
-import { useWebhookListQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-query';
 import { SERVICE_TAB_HEIGHT } from '@/services/alert-manager/v2/constants/common-constant';
 import {
     ALERT_EXCEL_FIELDS,
@@ -130,13 +127,8 @@ const webhookListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: WEBHOOK_MANAGEMENT_TABLE_KEY_ITEMS_SETS });
 const { queryTags } = queryTagHelper;
 
-const queryClient = useQueryClient();
-const { webhookListQueryKey } = useWebhookListQuery(serviceId);
-
 const handleCloseModal = () => {
     state.selectIndex = undefined;
-    queryClient.invalidateQueries({ queryKey: webhookListQueryKey.value });
-    refreshWebhookList();
     serviceDetailPageStore.setSelectedWebhookId(undefined);
 };
 const initSelectedWebhook = () => {

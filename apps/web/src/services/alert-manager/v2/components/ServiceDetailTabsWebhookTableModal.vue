@@ -57,6 +57,7 @@ const state = reactive({
 
 const queryClient = useQueryClient();
 const { withSuffix: webhookGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'get');
+const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 
 const { webhookAPI } = useWebhookApi();
 const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = useMutation({
@@ -69,6 +70,7 @@ const { mutateAsync: webhookStatusMutation, isPending: webhookStatusLoading } = 
     onSuccess: (data) => {
         const _webhookId = { webhook_id: data?.webhook_id };
         queryClient.invalidateQueries({ queryKey: webhookGetBaseQueryKey(_webhookId) });
+        queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
         if (props.selectedItem?.state === WEBHOOK_STATE.ENABLED) {
             showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_DISABLE_WEBHOOK'), '');
         } else {
