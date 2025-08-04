@@ -77,8 +77,8 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
 
         <p-divider horizontal />
 
-        <p-field-group :label="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELECT_FIELD_TITLE')"
-                       class="mt-4"
+        <p-field-group v-if="mfaSettingState.isRequiredMfa"
+                       :label="$t('IAM.USER.MAIN.MODAL.MFA.MFA_TYPE_SELECT_FIELD_TITLE')"
                        required
         >
             <p-radio-group direction="vertical">
@@ -95,3 +95,10 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
         </p-field-group>
     </div>
 </template>
+
+<style scoped lang="postcss">
+/* custom design-system component - p-divider */
+:deep(.p-divider) {
+    margin-bottom: 1rem;
+}
+</style>

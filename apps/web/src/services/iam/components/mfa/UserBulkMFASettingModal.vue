@@ -148,12 +148,11 @@ watch(() => userStore.state.mfa, (mfa) => {
                                    :title="$t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_WARNING_TITLE')"
                                    icon="ic_warning-filled"
                                    layout="in-section"
-                                   class="mb-4"
             >
                 <span>{{ $t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_WARNING_DESC') }}</span>
             </p-scoped-notification>
 
-            <div class="p-4 bg-gray-100 rounded-lg">
+            <div class="p-4 bg-gray-100 rounded-lg mt-4">
                 <user-m-f-a-setting-form-layout :selected-mfa-controllable-target="selectedMFAControllableUsers"
                                                 :is-required-mfa.sync="isRequiredMfa"
                                                 :selected-mfa-type.sync="selectedMfaType"
