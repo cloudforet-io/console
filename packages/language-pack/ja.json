@@ -1320,6 +1320,8 @@
 			"KEEP_PASSWORD": "現在のパスワードを維持する",
 			"LANGUAGE": "言語",
 			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
+			"MFA_NOT_ENABLED_DESCRIPTION": "MFAの有効化が必要です。",
+			"MFA_NOT_ENABLED_TITLE": "MFA活性化が必要",
 			"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
 			"MOBILE": "電話番号",
 			"NAME": "お名前",
@@ -1329,11 +1331,14 @@
 			"PASSWORD_CHECK": "パスワードの確認",
 			"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください",
 			"PASSWORD_HELP_TEXT": "認証済みの通知専用メールアドレスがあるアカウントの場合に限り、パスワードリセットリンクの受信が可能です。",
+			"PASSWORD_VERIFIED": "現在のパスワードが認証されました。",
 			"ROLE": "権限",
 			"SEND_LINK": "パスワードリセットメール送信",
 			"SET_MANUALLY": "管理者がパスワードを設定する",
 			"TIMEZONE": "タイムゾーン",
-			"TITLE": "個人情報"
+			"TITLE": "個人情報",
+			"VERIFIED": "認証済みです",
+			"VERIFY": "認証"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "作成",
