@@ -1320,6 +1320,8 @@
 			"KEEP_PASSWORD": "현재 비밀번호 유지",
 			"LANGUAGE": "언어",
 			"MAX_LENGTH_INVALID": "{max}자 이하로 입력해 주세요.",
+			"MFA_NOT_ENABLED_DESCRIPTION": "MFA 활성화가 필요합니다.",
+			"MFA_NOT_ENABLED_TITLE": "MFA 활성화 필요",
 			"MIN_LENGTH_INVALID": "{min}자 이상 입력해 주세요.",
 			"MOBILE": "전화번호",
 			"NAME": "이름 ",
@@ -1329,11 +1331,14 @@
 			"PASSWORD_CHECK": "비밀번호 확인",
 			"PASSWORD_CHECK_INVALID": "동일한 비밀번호를 입력해 주세요.",
 			"PASSWORD_HELP_TEXT": "인증된 알림 전용 이메일이 있는 계정일 경우에만 비밀번호 재설정 링크 수신이 가능합니다.",
+			"PASSWORD_VERIFIED": "현재 비밀번호가 인증되었습니다.",
 			"ROLE": "권한",
 			"SEND_LINK": "사용자에게 비밀번호 재설정 이메일 발송",
 			"SET_MANUALLY": "관리자가 대신 비밀번호 설정",
 			"TIMEZONE": "타임존",
-			"TITLE": "개인 정보"
+			"TITLE": "개인 정보",
+			"VERIFIED": "인증됨",
+			"VERIFY": "인증"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "생성",

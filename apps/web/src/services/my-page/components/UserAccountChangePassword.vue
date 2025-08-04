@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PTextInput, PButtonModal,
+    PButton, PFieldGroup, PTextInput, PButtonModal, PScopedNotification,
 } from '@cloudforet/mirinae';
 
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
@@ -23,6 +23,7 @@ import {
 } from '@/lib/helper/user-validation-helper';
 
 import MFAAuthenticationForm from '@/common/components/mfa/components/MFAAuthenticationForm.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
@@ -34,8 +35,18 @@ const domainStore = useDomainStore();
 
 /* State */
 const state = reactive({
-    isCheckedToken: false,
+    loading: false,
+    disableChangePassword: computed<boolean>(() => {
+        if (!!store.state.user.mfa?.options?.enforce && store.state.user.mfa?.state !== 'ENABLED') {
+            return true;
+        }
+        return false;
+    }),
     isMfaModalVisible: false,
+    isSaveButtonDisabled: computed<boolean>(() => {
+        if (validationState.isCurrentPasswordInValid) return true;
+        return password.value === '' || passwordCheck.value === '';
+    }),
 });
 const {
     forms: {
@@ -65,7 +76,8 @@ const {
     },
 });
 const validationState = reactive({
-    isCurrentPasswordValid: undefined as undefined | boolean,
+    isVerified: false,
+    isCurrentPasswordInValid: undefined as undefined | boolean,
     currentPasswordInvalidText: '' as TranslateResult,
 });
 
@@ -76,8 +88,19 @@ const resetPasswordForm = () => {
         password: '',
         passwordCheck: '',
     });
+    validationState.isVerified = false;
 };
-const handleOpenMfaModal = () => {
+const handleClickVerifyButton = () => {
+    // 1. MFA is enforced but not enabled
+    if (!!store.state.user.mfa?.options?.enforce && store.state.user.mfa?.state !== 'ENABLED') return;
+
+    // 2. MFA is not enabled
+    if (store.state.user.mfa?.state !== 'ENABLED') {
+        checkCurrentPassword();
+        return;
+    }
+
+    // 3. MFA is enabled
     loadAuth().signIn({
         user_id: store.state.user.userId,
         password: currentPassword.value,
@@ -86,15 +109,17 @@ const handleOpenMfaModal = () => {
 };
 const handleClickPasswordConfirm = async () => {
     await updateUser();
-    resetPasswordForm();
+};
+const handleConfirmMfa = () => {
+    state.isMfaModalVisible = false;
 };
 
 /* API */
-const checkCurrentPassword = async (verificationCode: string) => {
+const checkCurrentPassword = async (verificationCode?: string) => {
     try {
         const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
             domain_id: domainStore.state.domainId,
-            auth_type: 'MFA',
+            auth_type: verificationCode ? 'MFA' : 'LOCAL',
             credentials: {
                 user_id: store.state.user.userId,
                 password: currentPassword.value,
@@ -102,22 +127,26 @@ const checkCurrentPassword = async (verificationCode: string) => {
             verify_code: verificationCode,
         }, { skipAuthRefresh: true });
         if (response.access_token !== '' && response.refresh_token !== '') {
-            state.isCheckedToken = true;
+            validationState.isCurrentPasswordInValid = false;
+            validationState.currentPasswordInvalidText = '';
+            validationState.isVerified = true;
         }
-        validationState.isCurrentPasswordValid = false;
-        validationState.currentPasswordInvalidText = '';
-    } catch (e) {
-        validationState.isCurrentPasswordValid = true;
-        validationState.currentPasswordInvalidText = i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        showSuccessMessage(i18n.t('COMMON.PROFILE.PASSWORD_VERIFIED'), '');
+    } catch (e: any) {
+        validationState.isCurrentPasswordInValid = true;
+        validationState.isVerified = false;
+        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 const updateUser = async () => {
+    state.loading = true;
     try {
-        if (!state.isCheckedToken) return;
+        if (validationState.isCurrentPasswordInValid) return;
         await store.dispatch('user/setUser', {
             password: password.value,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
+        resetPasswordForm();
         state.isMfaModalVisible = false;
     } catch (e: any) {
         if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
@@ -125,6 +154,8 @@ const updateUser = async () => {
         } else {
             showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
         }
+    } finally {
+        state.loading = false;
     }
 };
 </script>
@@ -134,21 +165,38 @@ const updateUser = async () => {
         :title="$t('COMMON.PROFILE.PASSWORD')"
         class="change-password-wrapper"
     >
-        <form class="form">
+        <p-scoped-notification v-if="state.disableChangePassword"
+                               type="warning"
+                               icon="ic_warning-filled"
+                               layout="in-section"
+                               class="mb-8"
+                               :title="$t('COMMON.PROFILE.MFA_NOT_ENABLED_TITLE')"
+        />
+        <div :class="{ 'disabled': state.disableChangePassword }">
             <p-field-group
                 :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
                 required
-                :invalid="validationState.isCurrentPasswordValid"
+                :invalid="validationState.isCurrentPasswordInValid"
                 :invalid-text="validationState.currentPasswordInvalidText"
                 class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="currentPassword"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('currentPassword', $event)"
-                    />
+                    <div class="current-password-wrapper">
+                        <p-text-input :value="currentPassword"
+                                      type="password"
+                                      class="text-input"
+                                      :invalid="invalid"
+                                      :disabled="validationState.isVerified"
+                                      @update:value="setForm('currentPassword', $event)"
+                        />
+                        <p-button style-type="primary"
+                                  size="sm"
+                                  :disabled="validationState.isVerified || !currentPassword"
+                                  @click="handleClickVerifyButton"
+                        >
+                            {{ $t('COMMON.PROFILE.VERIFY') }}
+                        </p-button>
+                    </div>
                 </template>
             </p-field-group>
             <p-field-group
@@ -163,6 +211,7 @@ const updateUser = async () => {
                                   type="password"
                                   class="text-input"
                                   :invalid="invalid"
+                                  :disabled="!validationState.isVerified"
                                   @update:value="setForm('password', $event)"
                     />
                 </template>
@@ -179,15 +228,17 @@ const updateUser = async () => {
                                   type="password"
                                   class="text-input"
                                   :invalid="invalid"
+                                  :disabled="!validationState.isVerified"
                                   @update:value="setForm('passwordCheck', $event)"
                     />
                 </template>
             </p-field-group>
-        </form>
+        </div>
         <div class="save-button">
             <p-button style-type="primary"
-                      :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
-                      @click="handleOpenMfaModal"
+                      :disabled="state.isSaveButtonDisabled"
+                      :loading="state.loading"
+                      @click="handleClickPasswordConfirm"
             >
                 {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
@@ -206,7 +257,7 @@ const updateUser = async () => {
                     :access-token="store.state.user.access_token"
                     :mfa-type="store.state.user.mfa?.mfa_type"
                     :confirm-event="checkCurrentPassword"
-                    @confirmed="handleClickPasswordConfirm"
+                    @confirmed="handleConfirmMfa"
                 />
             </template>
         </p-button-modal>
@@ -216,6 +267,18 @@ const updateUser = async () => {
 <style lang="postcss" scoped>
 .change-password-wrapper {
     margin-top: 1rem;
+
+    .disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .current-password-wrapper {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
     /* custom design-system component - p-field-group */
     :deep(.input-form.p-field-group) {

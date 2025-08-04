@@ -1320,6 +1320,8 @@
 			"KEEP_PASSWORD": "Keep current password",
 			"LANGUAGE": "Language",
 			"MAX_LENGTH_INVALID": "{max} characters in max",
+			"MFA_NOT_ENABLED_DESCRIPTION": "MFA activation is required.",
+			"MFA_NOT_ENABLED_TITLE": "MFA activation required",
 			"MIN_LENGTH_INVALID": "must longer than {min} characters.",
 			"MOBILE": "Mobile",
 			"NAME": "Name",
@@ -1329,11 +1331,14 @@
 			"PASSWORD_CHECK": "Password Check",
 			"PASSWORD_CHECK_INVALID": "Please enter same value again",
 			"PASSWORD_HELP_TEXT": "Notification email verification is required to send a password reset link.",
+			"PASSWORD_VERIFIED": "Current password is verified.",
 			"ROLE": "Role",
 			"SEND_LINK": "Send user a password reset link",
 			"SET_MANUALLY": "Set password manually",
 			"TIMEZONE": "Time Zone",
-			"TITLE": "Profile"
+			"TITLE": "Profile",
+			"VERIFIED": "Verified",
+			"VERIFY": "Verify"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "Create",
