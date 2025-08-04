@@ -5,16 +5,12 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PTextInput, PFieldGroup, PTextButton,
 } from '@cloudforet/mirinae';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useDomainStore } from '@/store/domain/domain-store';
-import { pinia } from '@/store/pinia';
 
 import config from '@/lib/config';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -24,7 +20,6 @@ import { loadAuth } from '@/services/auth/authenticator/loader';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const router = useRouter();
-const domainStore = useDomainStore(pinia);
 
 const state = reactive({
     userId: '' as string | undefined,
@@ -53,8 +48,6 @@ const checkUserId = () => {
         validationState.idInvalidText = '';
     }
 };
-
-const domainSettings = domainStore.state.config?.settings;
 
 const checkPassword = async () => {
     if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
@@ -101,25 +94,12 @@ const signIn = async () => {
 
         if (message.includes('MFA is not activated.') && isStateDisabled && mfaType) {
             const token = message.match(/access_token\s*=\s*([\w.-]+)/)?.[1];
-            if (token) SpaceConnector.setToken(token, '');
-            const response = await SpaceConnector.clientV2.identity.userProfile.get();
 
-            store.commit('user/setUser', {
-                userId: response.user_id,
-                roleType: response.role_type,
-                authType: response.auth_type,
-                name: response.name,
-                email: response.email,
-                language: response.language || domainSettings?.language,
-                timezone: response.timezone || domainSettings?.timezone,
-                requiredActions: response.required_actions,
-                emailVerified: !!response.email_verified,
-                mfa: response.mfa,
+            await router.push({
+                name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME,
+                params: { mfaType },
+                query: { sso_access_token: token },
             });
-            store.commit('user/setCurrentGrantInfo', { scope: 'USER' });
-            store.commit('user/setCurrentRoleInfo', undefined);
-
-            await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME, params: { mfaType } });
         } else if (message.includes('required') || (message.includes('MFA is not activated.') && isStateEnabled)) {
             await router.push({
                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,

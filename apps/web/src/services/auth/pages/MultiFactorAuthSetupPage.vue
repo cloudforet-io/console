@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import type Vue from 'vue';
 import {
-    computed, onBeforeUnmount, onMounted, reactive, ref,
+    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive, ref,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
@@ -16,8 +17,6 @@ import type { MultiFactorAuthType } from '@/schema/identity/user-profile/type';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
-import { ROOT_ROUTE } from '@/router/constant';
-
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 
@@ -29,6 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import MultifactorAuthConfigured from '@/services/auth/components/mfa/MultifactorAuthConfigured.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+
 
 type TitleType = {
     icon: string;
@@ -44,8 +44,7 @@ const {
 } = route.params as { mfaType: MultiFactorAuthType | undefined };
 
 const state = reactive({
-    isLocalLogin: computed<boolean>(() => store.state.user.authType === 'LOCAL'),
-    myMFAType: computed<MultiFactorAuthType|undefined>(() => store.state.user.mfa?.mfa_type),
+    myMFAType: computed<MultiFactorAuthType|undefined>(() => mfaTypeRouteParam),
     isInvalidMfaType: computed<boolean>(() => state.myMFAType !== mfaTypeRouteParam || !state.myMFAType || !mfaTypeRouteParam),
     needToEnableMFA: computed<boolean>(() => {
         const isMFAEnforced = !!store.state?.user.mfa?.options?.enforce && !!state.myMFAType;
@@ -113,16 +112,18 @@ const handleClickConfirmButton = async () => {
     });
 };
 
-onMounted(() => {
-    // Remove refresh token to prevent forced access to other pages
-    SpaceConnector.removeRefreshToken();
+const vm = getCurrentInstance()?.proxy as Vue;
 
-    if (!SpaceConnector.getAccessToken() || !state.needToEnableMFA || state.isInvalidMfaType) {
-        router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
-        return;
-    } if (!state.isLocalLogin) {
-        router.push({ name: ROOT_ROUTE._NAME });
-    }
+const getSSOTokenFromUrl = (): string|undefined => {
+    const query = vm.$router.currentRoute.query;
+    return query.sso_access_token as string;
+};
+
+onMounted(async () => {
+    const ssoAccessToken = getSSOTokenFromUrl();
+
+    if (!ssoAccessToken) return;
+    SpaceConnector.setToken(ssoAccessToken, '');
 });
 
 onBeforeUnmount(() => {
