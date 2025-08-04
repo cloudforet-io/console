@@ -8,7 +8,16 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import {
-    PPaneLayout, PDivider, PTextButton, PCheckbox, PToggleButton, PFieldGroup, PTextInput, PButton, PTooltip, PI,
+    PButton,
+    PCheckbox,
+    PDivider,
+    PFieldGroup,
+    PI,
+    PPaneLayout,
+    PTextButton,
+    PTextInput,
+    PToggleButton,
+    PTooltip,
 } from '@cloudforet/mirinae';
 import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
@@ -75,6 +84,8 @@ const { data: currencyData } = useScopedQuery({
     queryKey: costReportConfigQueryKey,
     queryFn: () => costReportConfigAPI.list({}),
     select: (data) => data.results?.[0]?.currency as Currency ?? CURRENCY_SYMBOL.USD,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
 }, ['DOMAIN']);
 
 const { mutate: createDomainDormancyMutation } = useMutation({
