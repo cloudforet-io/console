@@ -150,54 +150,38 @@ const signIn = async () => {
 //         await loadAuth().signIn(credentials, 'LOCAL');
 //         await store.dispatch('display/hideSignInErrorMessage');
 
+//         if (store.state.user.requiredActions?.includes(REQUIRED_ACTIONS.ENFORCE_MFA)) {
+//             const MFA_TYPE = store.state.user.mfa?.mfa_type;
+//             const isMFAEnforced = !!store.state.user.mfa?.options?.enforce && !!MFA_TYPE;
+//             const needToEnableMFA = !!isMFAEnforced && store.state.user.mfa?.state !== 'ENABLED';
+//             if (needToEnableMFA) { // Enforced MFA by admin. Always has both `options.enforce` and `mfa_type`
+//                 if (import.meta.env.DEV) console.debug(`[ID_PW.vue] MFA_TYPE: ${MFA_TYPE}`);
+//                 await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME, params: { mfaType: MFA_TYPE } });
+//             } else {
+//                 showErrorMessage('Something went wrong! Contact support.', 'MFA_NOT_SETUP');
+//                 await router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
+//             }
+//             return;
+//         }
+
 //         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
 //             await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
 //         } else {
 //             emit('sign-in', state.userId);
 //         }
 //     } catch (e: any) {
-//         // enforce MFA && state: disabled
-//         // if (store.state.user.requiredActions?.includes(REQUIRED_ACTIONS.ENFORCE_MFA)) {
-//         if (e.message.includes('state')) {
-//             if (e.message.includes('ENABLED')) {
-//                 // TODO:
-//             }
-//             // const MFA_TYPE = store.state.user.mfa?.mfa_type;
-//             // const isMFAEnforced = !!store.state.user.mfa?.options?.enforce && !!MFA_TYPE;
-//             // const needToEnableMFA = !!isMFAEnforced && store.state.user.mfa?.state !== 'ENABLED';
-//             // if (needToEnableMFA) { // Enforced MFA by admin. Always has both `options.enforce` and `mfa_type`
-//             //     if (import.meta.env.DEV) console.debug(`[ID_PW.vue] MFA_TYPE: ${MFA_TYPE}`);
-//             //     await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME, params: { mfaType: MFA_TYPE } });
-//             // } else {
-//             //     showErrorMessage('Something went wrong! Contact support.', 'MFA_NOT_SETUP');
-//             //     await router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
-//             // }
-//             // return;
-//         }
-//         // TODO: e.message.includes condition going to be updated
-//         const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-//         const mfaTypeRegex = /mfa_type\s*=\s*(\w+)/;
-//         if (e.message.includes('not')) {
-//             if (!e.message.includes('state')) {
-//                 console.log('1', e.message);
-//                 await router.push({
-//                     name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
-//                     params: {
-//                         password: credentials.password,
-//                         mfaEmail: e.message.match(emailRegex)?.[0],
-//                         mfaType: e.message.match(mfaTypeRegex)?.[1],
-//                         userId: state.userId?.trim() as string,
-//                     },
-//                 });
-//             } else if (e.message.includes('ENABLED')) {
-//                 console.log('2', e.message);
-//                 showErrorMessage('Something went wrong! Contact support.', 'MFA_NOT_SETUP');
-//                 await router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
-//             } else {
-//                 const MFA_TYPE = e.message.match(mfaTypeRegex)?.[1];
-//                 if (import.meta.env.DEV) console.debug(`[ID_PW.vue] MFA_TYPE: ${MFA_TYPE}`);
-//                 await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH_SETUP._NAME, params: { mfaType: MFA_TYPE } });
-//             }
+//         if (e.message.includes('MFA')) {
+//             const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+//             const mfaTypeRegex = /mfa_type\s*=\s*(\w+)/;
+//             await router.push({
+//                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
+//                 params: {
+//                     password: credentials.password,
+//                     mfaEmail: e.message.match(emailRegex)?.[0],
+//                     mfaType: e.message.match(mfaTypeRegex)?.[1],
+//                     userId: state.userId?.trim() as string,
+//                 },
+//             });
 //         } else {
 //             ErrorHandler.handleError(e);
 //             await store.dispatch('display/showSignInErrorMessage');
@@ -205,8 +189,6 @@ const signIn = async () => {
 //         state.password = '';
 //     }
 // };
-
-// console.log('_signIn', _signIn);
 
 const handleClickResetPassword = async () => {
     await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } });
