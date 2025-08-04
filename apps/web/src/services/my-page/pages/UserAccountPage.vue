@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -32,7 +34,7 @@ import UserAccountChangePassword from '@/services/my-page/components/UserAccount
 import UserAccountMultiFactorAuth from '@/services/my-page/components/UserAccountMultiFactorAuth.vue';
 import UserAccountNotificationEmail from '@/services/my-page/components/UserAccountNotificationEmail.vue';
 
-
+const PASSWORD_MIN_LENGTH = 8;
 
 const domainStore = useDomainStore();
 const userStore = useUserStore();
@@ -78,7 +80,7 @@ const passwordFormState = reactive({
 const passwordCheckFecher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.issue);
 
 const handleConfirmPasswordCheckModal = async () => {
-    if (passwordFormState.password.length < 8) return;
+    if (passwordFormState.password.length < PASSWORD_MIN_LENGTH) return;
     passwordFormState.loading = true;
     try {
         const result = await passwordCheckFecher<TokenIssueParameters, TokenIssueModel>({
@@ -128,9 +130,9 @@ const handleClickCancel = () => {
 };
 
 // TODO: remove this after tanstack query is implemented
-(async () => {
+onMounted(async () => {
     await userStore.getUserInfo();
-})();
+});
 
 </script>
 
@@ -181,7 +183,7 @@ const handleClickCancel = () => {
         <p-button-modal :header-title="$t('COMMON.PROFILE.PASSWORD_CHECK_TITLE')"
                         :visible.sync="passwordFormState.passwordCheckModalVisible"
                         :loading="passwordFormState.loading"
-                        :disabled="passwordFormState.password.length < 8"
+                        :disabled="passwordFormState.password.length < PASSWORD_MIN_LENGTH"
                         size="sm"
                         @confirm="handleConfirmPasswordCheckModal"
                         @cancel="handleClickCancel"
