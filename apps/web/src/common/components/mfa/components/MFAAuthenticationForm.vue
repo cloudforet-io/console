@@ -157,6 +157,7 @@ onMounted(() => {
         >
             <p-text-input :value="validationState.verificationCode"
                           :invalid="validationState.isVerificationCodeValid"
+                          :disabled="state.confirmLoading"
                           :placeholder="$t('AUTH.MFA.ENTER_CODE')"
                           class="text-input"
                           @update:value="handleChangeInput"
