@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PHeading, PPaneLayout, PLazyImg, PAvatar,
@@ -43,6 +43,10 @@ const state = reactive({
         if (storeState.currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'Workspace Member';
         return 'User';
     }),
+});
+
+onMounted(() => {
+    store.dispatch('user/fetchUser');
 });
 </script>
 
