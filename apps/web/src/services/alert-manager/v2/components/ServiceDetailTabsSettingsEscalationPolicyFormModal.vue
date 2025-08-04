@@ -100,7 +100,6 @@ const {
 
 const queryClient = useQueryClient();
 const { escalationPolicyAPI } = useEscalationPolicyApi();
-const { withSuffix: serviceGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'service', 'get');
 const { key: escalationPolicyLisBaseQueryKey } = useServiceQueryKey('alert-manager', 'escalation-policy', 'list');
 
 const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPending } = useMutation({
@@ -110,9 +109,7 @@ const { mutate: escalationPolicyMutation, isPending: escalationPolicyMutationPen
         }
         return escalationPolicyAPI.update(params as EscalationPolicyUpdateParameters);
     },
-    onSuccess: async (data) => {
-        const _serviceId = { service_id: data?.service_id };
-        queryClient.invalidateQueries({ queryKey: serviceGetBaseQueryKey(_serviceId) });
+    onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: escalationPolicyLisBaseQueryKey.value });
         if (props.type === 'CREATE') {
             showSuccessMessage(i18n.t('ALERT_MANAGER.ESCALATION_POLICY.ALT_S_CREATE_POLICY'), '');

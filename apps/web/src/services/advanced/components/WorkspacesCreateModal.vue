@@ -12,6 +12,7 @@ import {
 import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceCreateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
+import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
@@ -98,6 +99,8 @@ const { mutate: createWorkspaceMutation } = useMutation({
     onSuccess: async (data) => {
         showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
         createDefaultBookmark(data.workspace_id);
         queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
         emit('confirm', {

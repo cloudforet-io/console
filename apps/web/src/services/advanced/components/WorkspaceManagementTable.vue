@@ -8,7 +8,12 @@ import { isEmpty } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus, PI, PTooltip,
+    PI,
+    PLink,
+    PSelectDropdown,
+    PSelectStatus,
+    PStatus, PToolboxTable,
+    PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type {
@@ -90,7 +95,7 @@ const pagination = reactive({
     pageSize: 15,
 });
 const sortState = reactive({
-    sortKey: 'name',
+    sortKey: 'created_at',
     sortDesc: true,
 });
 
@@ -129,6 +134,8 @@ const { key: costReportConfigQueryKey } = useServiceQueryKey('cost-analysis', 'c
 const { data: costReportConfigData } = useScopedQuery({
     queryKey: costReportConfigQueryKey,
     queryFn: () => costReportConfigAPI.list({}),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
 }, ['DOMAIN']);
 const {
     data: workspaceListData,

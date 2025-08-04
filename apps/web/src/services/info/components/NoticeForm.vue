@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch, toRef, ref,
+    computed, reactive,
+    ref,
+    toRef,
+    watch,
 } from 'vue';
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
@@ -152,7 +155,8 @@ const { mutate: createNoticeMutation, isPending: isCreatingNotice } = useMutatio
 const { mutate: updateNoticeMutation, isPending: isUpdatingNotice } = useMutation({
     mutationFn: postAPI.update,
     onSuccess: async (data) => {
-        queryClient.invalidateQueries({ queryKey: noticeGetQueryKey(data.post_id) });
+        queryClient.invalidateQueries({ queryKey: noticeGetQueryKey({ post_id: data.post_id }) });
+        queryClient.invalidateQueries({ queryKey: noticeListBaseQueryKey.value });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
     },

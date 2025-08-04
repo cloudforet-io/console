@@ -75,12 +75,14 @@ const {
 
 const queryClient = useQueryClient();
 const { withSuffix: webhookGetBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'get');
+const { key: webhookListBaseQueryKey } = useServiceQueryKey('alert-manager', 'webhook', 'list');
 const { webhookAPI } = useWebhookApi();
 const { mutateAsync: updateWebhook, isPending: updateWebhookLoading } = useMutation({
     mutationFn: (params: WebhookUpdateParameters) => webhookAPI.update(params),
     onSuccess: (data) => {
         const _webhookId = { webhook_id: data?.webhook_id };
         queryClient.invalidateQueries({ queryKey: webhookGetBaseQueryKey(_webhookId) });
+        queryClient.invalidateQueries({ queryKey: webhookListBaseQueryKey.value });
         showSuccessMessage(i18n.t('ALERT_MANAGER.WEBHOOK.ALT_S_UPDATE_WEBHOOK'), '');
         state.proxyVisible = false;
         emit('close');

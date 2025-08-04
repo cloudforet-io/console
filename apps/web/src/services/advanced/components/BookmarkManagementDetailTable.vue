@@ -65,6 +65,7 @@ const tableState = reactive({
             name: 'name',
             label: 'Name',
             type: 'item',
+            sortable: false,
         },
         {
             name: 'link',

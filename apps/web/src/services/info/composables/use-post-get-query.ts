@@ -25,7 +25,7 @@ export const usePostGetQuery = (postId: ComputedRef<string>): UsePostGetQueryRet
         queryFn: () => postAPI.get(postQueryParams.value),
         enabled: computed(() => !!postId.value),
         gcTime: 1000 * 60 * 2,
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 60 * 2,
     }, ['DOMAIN', 'WORKSPACE']);
 
     return {
