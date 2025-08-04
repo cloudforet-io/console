@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import type Vue from 'vue';
 import {
-    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive, ref,
+    computed, onBeforeUnmount, onMounted, reactive, ref,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
@@ -112,10 +111,8 @@ const handleClickConfirmButton = async () => {
     });
 };
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
 const getSSOTokenFromUrl = (): string|undefined => {
-    const query = vm.$router.currentRoute.query;
+    const query = router.currentRoute.query;
     return query.sso_access_token as string;
 };
 
