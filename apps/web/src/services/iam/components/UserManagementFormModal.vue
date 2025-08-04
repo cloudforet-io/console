@@ -89,6 +89,7 @@ const closeModal = () => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
+    mfaSettingFormState.isRequiredMfa = false;
 };
 const handleClose = () => {
     closeModal();
