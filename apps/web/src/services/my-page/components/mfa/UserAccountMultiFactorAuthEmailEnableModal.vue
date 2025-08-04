@@ -148,11 +148,9 @@ watch(visible, (_visible) => {
 .mfa-modal-wrapper {
     .disable-modal-desc {
         @apply block;
-        margin-top: 1.625rem;
         margin-bottom: 1rem;
     }
     .re-sync-desc {
-        margin-top: 1rem;
         margin-bottom: 1rem;
     }
     .validation-code-form {
