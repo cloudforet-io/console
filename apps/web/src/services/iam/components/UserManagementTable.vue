@@ -68,6 +68,9 @@ const state = reactive({
         ...user,
         type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
         mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+        // eslint-disable-next-line no-nested-ternary
+        mfa_type: user?.mfa?.mfa_type === 'EMAIL' ? 'Email' : (user?.mfa?.mfa_type === 'OTP' ? 'OTP' : ''),
+        mfa_enforced: user.mfa?.options.enforce ? 'TRUE' : 'FALSE',
         last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
         tags: user?.tags ?? {},
     }))),
@@ -78,6 +81,8 @@ const tableState = reactive({
         if (userPageState.isAdminMode) {
             additionalFields.push(
                 { name: 'mfa_state', label: 'MFA', sortKey: 'mfa.state' },
+                { name: 'mfa_type', label: 'MFA Type', sortKey: 'mfa.mfa_type' },
+                { name: 'mfa_enforced', label: 'MFA Enforced', sortKey: 'mfa.options.enforce' },
                 {
                     name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
                 },
