@@ -42,7 +42,13 @@
 			"EXTENSION_REASON_2": "Check your spam.",
 			"EXTENSION_REASON_3": "to re-send the email.",
 			"EXTENSION_TITLE_1": "Didn't receive an email?",
-			"EXTENSION_TITLE_2": "Still having trouble?"
+			"EXTENSION_TITLE_2": "Still having trouble?",
+			"GOOGLE_GUIDE": "Microsoft verification guide",
+			"OTP_EXTENSION_DESC_1": "If you are still experiencing problems with {guide}, follow Microsoft verification guide. If the problem only exists across SpaceONE, {contact}. ",
+			"OTP_EXTENSION_REASON_1": "Make sure you have adequate internet connection when trying to send/receive codes.",
+			"OTP_EXTENSION_REASON_2": "Your authenticator app may not be syncing the time correctly. Please ensure your device is up to date and that the date and time settings are accurate.",
+			"OTP_EXTENSION_TITLE_1": "Didn’t recieve a push notification in your Microsoft authenticator app?",
+			"OTP_EXTENSION_TITLE_2": "Still having problems?"
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "Authentication code",
