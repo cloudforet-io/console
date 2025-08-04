@@ -41,7 +41,7 @@ const state = reactive({
 });
 
 const handleChange = async (isSelected: boolean, selected: MultiFactorAuthType) => {
-    if (props.readonlyMode) return;
+    if (props.readonlyMode || state.isEnforced) return;
     if (state.isEnforced && state.currentType !== selected) return;
     if (state.isVerified && state.currentType !== selected) {
         if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
@@ -85,7 +85,7 @@ const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEv
         <p-select-card v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
                        :key="`${item.type} - ${idx}`"
                        block
-                       :readonly="props.readonlyMode"
+                       :readonly="props.readonlyMode || state.isEnforced"
                        :selected="state.isVerified ? state.currentType : undefined"
                        :disabled="state.isEnforced && state.currentType !== item.type"
                        :value="item.type"

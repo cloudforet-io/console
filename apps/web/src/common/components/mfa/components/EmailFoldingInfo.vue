@@ -11,6 +11,8 @@ import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-fac
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+const RE_SEND_CODE_COOLDOWN_TIME = 10000;
+
 interface Props {
     isDisabledModal?: boolean
     isReSyncModal?: boolean
@@ -32,20 +34,38 @@ const storeState = reactive({
 const state = reactive({
     isCollapsed: true,
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
+    loading: false,
+    cooldown: false,
 });
 
+const startCooldown = () => {
+    state.cooldown = true;
+    setTimeout(() => {
+        state.cooldown = false;
+    }, RE_SEND_CODE_COOLDOWN_TIME);
+};
+
 const handleClickSendEmailButton = async () => {
-    if (props.isDisabledModal || props.isReSyncModal) {
-        await postUserProfileDisableMfa();
-    } else {
-        await postEnableMfa({
-            mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
-            options: {
-                email: storeState.email,
-            },
-        });
+    if (state.cooldown) return;
+
+    state.loading = true;
+
+    try {
+        if (props.isDisabledModal || props.isReSyncModal) {
+            await postUserProfileDisableMfa();
+        } else {
+            await postEnableMfa({
+                mfa_type: MULTI_FACTOR_AUTH_TYPE.EMAIL,
+                options: {
+                    email: storeState.email,
+                },
+            });
+        }
+        state.proxyIsSentCode = true;
+        startCooldown();
+    } finally {
+        state.loading = false;
     }
-    state.proxyIsSentCode = true;
 };
 </script>
 
@@ -62,7 +82,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
-                           :disabled="(props.isDisabledModal || props.isReSyncModal) ? !storeState.email : !props.isSentCode"
+                           :disabled="((props.isDisabledModal || props.isReSyncModal) ? !storeState.email : !props.isSentCode) || state.loading || state.cooldown"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>
