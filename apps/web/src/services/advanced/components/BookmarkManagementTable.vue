@@ -73,11 +73,13 @@ const tableState = reactive({
             name: 'name',
             label: 'Name',
             type: 'item',
+            sortable: false,
         },
         {
             name: 'workspace_id',
             label: 'Scope',
             type: 'item',
+            sortable: false,
         },
         {
             name: 'link',
