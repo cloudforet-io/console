@@ -35,7 +35,10 @@ const state = reactive({
     proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 
+
 const isCooldown = ref(false);
+
+const isSendButtonDisabled = computed(() => ((props.isDisabledModal || props.isReSyncModal) ? !storeState.email || isCooldown.value : !props.isSentCode || isCooldown.value));
 
 const handleClickSendEmailButton = async () => {
     if (isCooldown.value) return;
@@ -76,7 +79,7 @@ const handleClickSendEmailButton = async () => {
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
             <p-text-button class="send-code-button"
                            style-type="highlight"
-                           :disabled="(props.isDisabledModal || props.isReSyncModal) ? !storeState.email || isCooldown : !props.isSentCode || isCooldown"
+                           :disabled="isSendButtonDisabled"
                            @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>

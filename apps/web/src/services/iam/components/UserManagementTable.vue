@@ -64,16 +64,21 @@ const storeState = reactive({
 });
 const state = reactive({
     selectedRemoveItem: '',
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => ({
-        ...user,
-        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-        mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        // eslint-disable-next-line no-nested-ternary
-        mfa_type: user?.mfa?.mfa_type === 'EMAIL' ? 'Email' : (user?.mfa?.mfa_type === 'OTP' ? 'OTP' : ''),
-        mfa_enforced: user.mfa?.options?.enforce ? 'TRUE' : 'FALSE',
-        last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
-        tags: user?.tags ?? {},
-    }))),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => {
+        let mfaType = '';
+        if (user?.mfa?.mfa_type === 'EMAIL') mfaType = 'Email';
+        else if (user?.mfa?.mfa_type === 'OTP') mfaType = 'OTP';
+
+        return {
+            ...user,
+            type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+            mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+            mfa_type: mfaType ?? '',
+            mfa_enforced: user.mfa?.options?.enforce ? 'TRUE' : 'FALSE',
+            last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
+            tags: user?.tags ?? {},
+        };
+    })),
 });
 const tableState = reactive({
     userTableFields: computed<DataTableFieldType[]>(() => {
