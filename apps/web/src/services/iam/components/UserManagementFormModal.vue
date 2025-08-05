@@ -36,7 +36,6 @@ import UserManagementFormInfoForm from '@/services/iam/components/UserManagement
 import UserManagementFormNotificationEmailForm
     from '@/services/iam/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/iam/components/UserManagementFormPasswordForm.vue';
-import { USER_MODAL_MAP } from '@/services/iam/constants/modal-constant';
 import { MULTI_FACTOR_AUTH_ITEMS, PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
@@ -117,7 +116,7 @@ const buildUserInfoParams = (): UserUpdateParameters => ({
 const handleOpenDisableMfaModal = () => {
     closeModal();
     userPageStore.setMfaSecretKeyDeleteModalVisible(true);
-    userPageStore.setPreviousModalType(USER_MODAL_MAP.UPDATE);
+    // userPageStore.setPreviousModalType(USER_MODAL_MAP.UPDATE);
 };
 
 /* API */

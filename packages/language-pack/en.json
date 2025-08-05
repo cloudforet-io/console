@@ -1230,7 +1230,7 @@
 				"DESC_MS": "To turn off, you need to verifiy with the microsoft authenticator code.",
 				"DISABLED": "Disable",
 				"EMAIL_INFO": "Send verification code to the email",
-				"TITLE": "Are you sure you want to disable MFA?",
+				"TITLE": "Disable MFA",
 				"VERIFIED": "Verified"
 			},
 			"ALT_S_DISABLED": "MFA successfully disabled",
@@ -4316,7 +4316,7 @@
 			"MS_DESC": "Receive a code with the Microsoft Authenticator app",
 			"RESYNC": "Re-Sync",
 			"RESYNC_DESC": "To re-sync, your existing authentication records will be deleted.",
-			"RESYNC_TITLE": "Are you sure you want to resync this multi-factor authentication?",
+			"RESYNC_TITLE": "Resync Multi-factor Authentication",
 			"STATE_NOT_VERIFIED": "Not Verified",
 			"STATE_VERIFIED": "Verified",
 			"STEP1": "Download the Microsoft Authenticator app to your phone.",

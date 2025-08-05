@@ -1230,7 +1230,7 @@
 				"DESC_MS": "비활성화를 위한 Microsoft Authenticator 코드 인증이 필요합니다.",
 				"DISABLED": "비활성화",
 				"EMAIL_INFO": "입력한 이메일로 인증 코드를 전송하세요.",
-				"TITLE": "멀티 팩터 인증(MFA)을 비활성화 하시겠습니까?",
+				"TITLE": "멀티 팩터 인증 비활성화",
 				"VERIFIED": "인증됨"
 			},
 			"ALT_S_DISABLED": "멀티 팩터 인증(MFA) 비활성화 완료",
@@ -4316,7 +4316,7 @@
 			"MS_DESC": "Microsoft Authenticator 앱으로 인증 코드를 받으세요.",
 			"RESYNC": "동기화",
 			"RESYNC_DESC": "동기화할 경우 기존 인증 기록은 삭제됩니다.",
-			"RESYNC_TITLE": "멀티 팩터 인증을 동기화하시겠습니까?",
+			"RESYNC_TITLE": "멀티 팩터 인증 재동기화",
 			"STATE_NOT_VERIFIED": "인증되지 않음",
 			"STATE_VERIFIED": "인증됨",
 			"STEP1": "휴대폰에서 Microsoft Authenticator 앱을 다운로드하세요.",
