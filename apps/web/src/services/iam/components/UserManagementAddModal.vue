@@ -139,6 +139,9 @@ const handleClose = () => {
     state.resetPasswordVisible = false;
     state.isResetPassword = true;
     state.isSetAdminRole = false;
+    state.userList = [];
+    mfaSettingState.isRequiredMfa = false;
+    mfaSettingState.selectedMfaType = MULTI_FACTOR_AUTH_TYPE.OTP;
     userPageStore.$patch((_state) => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
