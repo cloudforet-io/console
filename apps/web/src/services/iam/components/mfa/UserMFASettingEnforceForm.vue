@@ -2,7 +2,7 @@
 import { reactive, type Ref } from 'vue';
 
 import {
-    PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio,
+    PFieldGroup, PDivider, PToggleButton, PRadioGroup, PRadio, PFieldTitle,
     useProxyValue,
 } from '@cloudforet/mirinae';
 
@@ -57,16 +57,18 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
 
 <template>
     <div class="user-mfa-setting-enforce-form bg-white">
-        <p-field-group :label="$t('IAM.USER.MAIN.MODAL.MFA.REQUIRED_SETTING_FIELD_TITLE')"
-                       required
-        >
-            <template #label-extra>
-                <info-tooltip :tooltip-contents="$t('IAM.USER.MAIN.MODAL.MFA.REQUIRED_FIELD_TOOLTIP_TEXT')"
-                              tooltip-position="bottom"
-                              width="1rem"
-                              height="1rem"
-                />
-            </template>
+        <div class="title-wrapper">
+            <p-field-title :label="$t('IAM.USER.MAIN.MODAL.MFA.REQUIRED_SETTING_FIELD_TITLE')"
+                           required
+            >
+                <template #right>
+                    <info-tooltip :tooltip-contents="$t('IAM.USER.MAIN.MODAL.MFA.REQUIRED_FIELD_TOOLTIP_TEXT')"
+                                  tooltip-position="bottom"
+                                  width="1rem"
+                                  height="1rem"
+                    />
+                </template>
+            </p-field-title>
             <p-toggle-button :value="mfaSettingState.isRequiredMfa"
                              show-state-text
                              true-state-text="Required"
@@ -74,7 +76,7 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
                              position="left"
                              @change-toggle="handleChangeRequiredMfa"
             />
-        </p-field-group>
+        </div>
 
         <p-divider horizontal />
 
@@ -96,3 +98,12 @@ const handleChangeMfaType = (value: MultiFactorAuthType) => {
         </p-field-group>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+}
+</style>
