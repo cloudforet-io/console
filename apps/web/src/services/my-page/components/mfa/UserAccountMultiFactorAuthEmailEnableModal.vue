@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -60,7 +60,13 @@ const headerTitle = computed<TranslateResult>(() => {
 });
 
 /* Utils */
+const resetValidationState = () => {
+    validationState.verificationCode = '';
+    validationState.isInvalidationCodeValid = false;
+    validationState.isSentCode = false;
+};
 const closeModal = () => {
+    resetValidationState();
     if (props.reSync) {
         multiFactorAuthStore.setEmailReSyncModalVisible(false);
     } else {
@@ -86,24 +92,14 @@ const confirmMfa = async (params: UserProfileConfirmMfaParameters) => {
 };
 
 /* Events */
-const handleClickCancel = async () => {
+const handleClickCancel = () => {
     closeModal();
 };
-
 const handleClickVerifyButton = async () => {
     await confirmMfa({
         verify_code: validationState.verificationCode,
     });
 };
-
-/* Watcher */
-watch(visible, (_visible) => {
-    if (!_visible) {
-        validationState.verificationCode = '';
-        validationState.isInvalidationCodeValid = false;
-        validationState.isSentCode = false;
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -120,7 +116,9 @@ watch(visible, (_visible) => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <p class="re-sync-desc">
+                <p v-if="props.reSync"
+                   class="re-sync-desc"
+                >
                     {{ $t('MY_PAGE.MFA.RESYNC_DESC') }}
                 </p>
                 <email-info :is-sent-code.sync="validationState.isSentCode"
