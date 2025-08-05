@@ -37,7 +37,7 @@ import UserManagementFormNotificationEmailForm
     from '@/services/iam/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/iam/components/UserManagementFormPasswordForm.vue';
 import { USER_MODAL_MAP } from '@/services/iam/constants/modal-constant';
-import { MULTI_FACTOR_AUTH_ITEMS, PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
+import { PASSWORD_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem, UserListItemType } from '@/services/iam/types/user-type';
 
@@ -89,7 +89,6 @@ const closeModal = () => {
         _state.state.modal.visible = undefined;
         _state.state.modal = cloneDeep(_state.state.modal);
     });
-    mfaSettingFormState.isRequiredMfa = false;
 };
 const handleClose = () => {
     closeModal();
@@ -273,10 +272,8 @@ watch(() => userPageState.modal.visible, async (visible) => {
 });
 
 watch(() => state.data?.mfa, (mfa) => {
-    if (mfa) {
-        mfaSettingFormState.isRequiredMfa = !!mfa.options?.enforce;
-        mfaSettingFormState.selectedMfaType = mfa.mfa_type || MULTI_FACTOR_AUTH_ITEMS[0].type;
-    }
+    mfaSettingFormState.isRequiredMfa = !!mfa?.options?.enforce;
+    mfaSettingFormState.selectedMfaType = mfa?.mfa_type || MULTI_FACTOR_AUTH_TYPE.OTP;
 }, { immediate: true });
 </script>
 
