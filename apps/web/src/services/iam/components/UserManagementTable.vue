@@ -67,14 +67,14 @@ const state = reactive({
     refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageState.users.map((user) => {
         let mfaType = '';
         if (user?.mfa?.mfa_type === 'EMAIL') mfaType = 'Email';
-        else if (user?.mfa?.mfa_type === 'OTP') mfaType = 'OTP';
+        else if (user?.mfa?.mfa_type === 'OTP') mfaType = 'Microsoft Authenticator App';
 
         return {
             ...user,
             type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
             mfa_state: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
             mfa_type: mfaType ?? '',
-            mfa_enforced: user.mfa?.options?.enforce ? 'TRUE' : 'FALSE',
+            mfa_enforced: user.mfa?.options?.enforce ? 'Required' : '',
             last_accessed_count: calculateTime(user?.last_accessed_at, userPageGetters.timezone),
             tags: user?.tags ?? {},
         };
@@ -85,9 +85,9 @@ const tableState = reactive({
         const additionalFields: DataTableFieldType[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa_state', label: 'MFA', sortKey: 'mfa.state' },
+                { name: 'mfa_state', label: 'MFA State', sortKey: 'mfa.state' },
                 { name: 'mfa_type', label: 'MFA Type', sortKey: 'mfa.mfa_type' },
-                { name: 'mfa_enforced', label: 'MFA Enforced', sortKey: 'mfa.options.enforce' },
+                { name: 'mfa_enforced', label: 'MFA Required', sortKey: 'mfa.options.enforce' },
                 {
                     name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
                 },
