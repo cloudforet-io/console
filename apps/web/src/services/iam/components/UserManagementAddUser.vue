@@ -156,7 +156,7 @@ const initAuthTypeList = async () => {
 const addSelectedItem = (name: string, isNew: boolean) => {
     if (!name) return;
     const trimmedText = name.trim();
-    if (state.selectedItems.some((item) => item.name === trimmedText && item.auth_type === formState.selectedMenuItem)) return;
+    state.selectedItems = state.selectedItems.filter((item) => item.user_id !== trimmedText);
 
     state.selectedItems.unshift({
         user_id: trimmedText,
