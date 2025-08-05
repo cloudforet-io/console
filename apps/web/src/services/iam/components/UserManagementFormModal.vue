@@ -116,7 +116,7 @@ const buildUserInfoParams = (): UserUpdateParameters => ({
 const handleOpenDisableMfaModal = () => {
     closeModal();
     userPageStore.setMfaSecretKeyDeleteModalVisible(true);
-    userPageStore.setPreviousModalType(USER_MODAL_MAP.UPDATE);
+    // userPageStore.setPreviousModalType(USER_MODAL_MAP.UPDATE);
 };
 
 /* API */
