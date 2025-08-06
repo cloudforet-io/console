@@ -92,12 +92,12 @@ export const useUserPageStore = defineStore('page-user', () => {
     };
     const actions = {
         // User
-        async listUsers(params: UserListParameters) {
+        async listUsers(params: UserListParameters, resetSelectedIndices = true) {
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
                 state.users = res.results || [];
                 state.totalCount = res.total_count ?? 0;
-                state.selectedIndices = [];
+                if (resetSelectedIndices) state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.users = [];
@@ -114,7 +114,7 @@ export const useUserPageStore = defineStore('page-user', () => {
             }
         },
         // Workspace User
-        async listWorkspaceUsers(params: WorkspaceUserListParameters) {
+        async listWorkspaceUsers(params: WorkspaceUserListParameters, resetSelectedIndices = true) {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
                 state.users = (results ?? [])?.map((item) => ({
@@ -126,7 +126,7 @@ export const useUserPageStore = defineStore('page-user', () => {
                     },
                 }));
                 state.totalCount = total_count ?? 0;
-                state.selectedIndices = [];
+                if (resetSelectedIndices) state.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.users = [];

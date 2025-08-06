@@ -127,10 +127,10 @@ const handleConfirm = async () => {
         if (formState.isValidEmail) {
             await updateUserEmail();
             await verifyUserEmail();
-            if (state.loginUserId === state.data.user_id) {
-                await store.dispatch('user/setUser', { email: state.data.email, email_verified: true });
+            if (state.loginUserId === state.data?.user_id) {
+                await store.dispatch('user/setUser', { email: state.data?.email, email_verified: true });
             }
-            userPageStore.setUserEmail(state.data.user_id, state.data.email);
+            userPageStore.setUserEmail(state.data?.user_id, state.data?.email);
         }
         if (state.isChangedMfaToggle) {
             await fetchPostDisableMfa();
@@ -167,7 +167,7 @@ const handleConfirm = async () => {
     }
 };
 const fetchRoleBinding = async (item?: AddModalMenuItem) => {
-    if (state.data.user_id === store.state.user.userId) return;
+    if (state.data?.user_id === store.state.user.userId) return;
     if (isEmpty(formState.role)) return;
 
     const roleParams = {
@@ -297,7 +297,7 @@ watch(() => state.data?.mfa, (mfa) => {
                     @change-input="handleChangeInputs"
                 />
                 <user-management-form-password-form
-                    v-if="state.data.auth_type === 'LOCAL'"
+                    v-if="state.data?.auth_type === 'LOCAL'"
                     @change-input="handleChangeInputs"
                 />
                 <user-m-f-a-setting-form-layout v-if="state.data?.auth_type === 'LOCAL'"
