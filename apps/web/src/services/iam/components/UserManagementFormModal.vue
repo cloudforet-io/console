@@ -97,6 +97,8 @@ const setForm = () => {
     formState.name = state.data.name || '';
     formState.email = state.data.email || '';
     formState.tags = state.data.tags || {};
+    mfaSettingFormState.isRequiredMfa = !!state.data?.mfa?.options?.enforce;
+    mfaSettingFormState.selectedMfaType = state.data?.mfa?.mfa_type || MULTI_FACTOR_AUTH_TYPE.OTP;
 };
 const handleChangeInputs = (value) => {
     if (value.email) formState.email = value.email;
@@ -270,11 +272,6 @@ watch(() => userPageState.modal.visible, async (visible) => {
         formState.role = {} as AddModalMenuItem;
     }
 });
-
-watch(() => state.data?.mfa, (mfa) => {
-    mfaSettingFormState.isRequiredMfa = !!mfa?.options?.enforce;
-    mfaSettingFormState.selectedMfaType = mfa?.mfa_type || MULTI_FACTOR_AUTH_TYPE.OTP;
-}, { immediate: true });
 </script>
 
 <template>
