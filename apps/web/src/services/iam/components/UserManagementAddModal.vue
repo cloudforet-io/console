@@ -112,9 +112,7 @@ const handleChangeInput = (items) => {
         state.resetPasswordVisible = state.localUserItem.length > 0 && newUserItem.length > 0;
         const emailUsers = state.userList.filter((item) => item.auth_type === 'EMAIL');
 
-        if (state.userList.length === 0) {
-            state.isResetPassword = true;
-        } else if (!state.isResetPassword && (emailUsers.length === state.userList.length) && storeState.smtpEnabled) {
+        if (!state.isResetPassword && (emailUsers.length === state.userList.length) && storeState.smtpEnabled) {
             state.isResetPassword = false;
         } else {
             const hasNonEmailLocalUser = state.userList.some((item) => (item.auth_type === 'ID' || item.auth_type === 'LOCAL') && !item.user_id?.includes('@'));
