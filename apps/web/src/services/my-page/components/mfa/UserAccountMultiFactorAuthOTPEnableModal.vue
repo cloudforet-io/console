@@ -59,6 +59,8 @@ const headerTitle = computed<TranslateResult>(() => {
 const closeModal = () => {
     if (props.reSync) {
         multiFactorAuthStore.setOTPReSyncModalVisible(false);
+        validationState.verificationCode = '';
+        validationState.isInvalidationCodeValid = false;
     } else {
         multiFactorAuthStore.setOTPEnableModalVisible(false);
     }
