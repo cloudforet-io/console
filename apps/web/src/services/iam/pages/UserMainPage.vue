@@ -63,16 +63,16 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
 /* API */
-const refreshUserList = async () => {
+const refreshUserList = async (resetSelectedIndices = true) => {
     userPageState.loading = true;
     userListApiQueryHelper
         .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
         .setFilters(userPageState.searchFilters);
     try {
         if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
-            await userPageStore.listUsers({ query: userListApiQueryHelper.data });
+            await userPageStore.listUsers({ query: userListApiQueryHelper.data }, resetSelectedIndices);
         } else if (storeState.grantInfo.scope === 'WORKSPACE') {
-            await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+            await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data }, resetSelectedIndices);
         }
     } finally {
         userPageState.loading = false;
@@ -126,7 +126,7 @@ onUnmounted(() => {
                                        @confirm="refreshUserList"
         />
         <user-m-f-a-secret-key-delete-modal v-if="state.hasReadWriteAccess"
-                                            @confirm="refreshUserList"
+                                            @confirm="refreshUserList(false)"
         />
     </section>
 </template>

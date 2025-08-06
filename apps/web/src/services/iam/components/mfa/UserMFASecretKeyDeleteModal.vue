@@ -71,6 +71,7 @@ const openPreviousModal = () => {
 /* Events */
 const handleCancel = () => {
     openPreviousModal();
+    emit('confirm');
     closeModal();
 };
 
