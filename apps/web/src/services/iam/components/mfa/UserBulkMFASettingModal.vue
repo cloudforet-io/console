@@ -139,7 +139,6 @@ watch(() => userPageModalState.bulkMfaSettingModalVisible, (visible) => {
 
 <template>
     <p-button-modal class="user-bulk-mfa-setting-modal"
-                    size="sm"
                     :visible="userPageModalState.bulkMfaSettingModalVisible"
                     :header-title="$t('IAM.USER.MAIN.MODAL.MFA.SET_MFA_MODAL_TITLE')"
                     :theme-color="userPageState.modal.themeColor"

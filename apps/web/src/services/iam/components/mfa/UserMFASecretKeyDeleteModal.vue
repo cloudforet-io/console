@@ -61,7 +61,7 @@ const openPreviousModal = () => {
     if (userPageModalState.previousModalType === USER_MODAL_MAP.UPDATE) {
         userPageStore.updateModalSettings({
             type: USER_MODAL_TYPE.UPDATE,
-            title: '',
+            title: _i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE'),
             themeColor: 'primary',
             modalVisibleType: 'form',
         });
@@ -97,7 +97,12 @@ const handleDeleteMfaSecretKey = async () => {
         const results = await Promise.allSettled(userMFADisablePromises);
         if (results.every((result) => result.status === 'fulfilled')) {
             showSuccessMessage(_i18n.t('IAM.USER.MAIN.MODAL.MFA.DELETE_MFA_SECRET_KEY_SUCCESS_MESSAGE'), '');
-            // openPreviousModal();
+            if (selectedMFAEnabledUsers.value.length === 1) {
+                await userPageStore.getUser({
+                    user_id: selectedMFAEnabledUsers.value[0].user_id || '',
+                });
+            }
+            openPreviousModal();
             closeModal();
             emit('confirm');
         } else if (results.some((result) => result.status === 'rejected')) { // Bulk disable MFA failed
