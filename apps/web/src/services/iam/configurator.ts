@@ -56,7 +56,6 @@ class IamConfigurator implements FeatureConfigurator {
 
         if (isEnabledAlertManager && alertManagerVersion === 'V2') {
             workspaceSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP, needPermissionByRole: true });
-            adminSubMenuList.splice(1, 0, { id: MENU_ID.USER_GROUP });
         }
 
         return {
