@@ -255,7 +255,7 @@ watch([
                             <img :src="useRoleFormatter(item.role_type).image"
                                  alt="role-type-icon"
                                  class="role-type-icon"
-                            ><span class="role-name">{{ tableState.roleMap[item.role_id]?.name }}</span>
+                            ><span class="role-name">{{ tableState.roleMap?.[item.role_id]?.name }}</span>
                         </template>
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
@@ -281,9 +281,9 @@ watch([
                              alt="role-type-icon"
                              class="role-type-icon"
                         ><p-tooltip position="bottom"
-                                    :contents="tableState.roleMap[item.role_id]?.name"
+                                    :contents="tableState.roleMap?.[item.role_id]?.name"
                                     class="role-label"
-                        ><span>{{ tableState.roleMap[item.role_id]?.name }}</span></p-tooltip>
+                        ><span>{{ tableState.roleMap?.[item.role_id]?.name }}</span></p-tooltip>
                     </div>
                 </span>
             </template>
