@@ -33,7 +33,7 @@
             <div class="button-group">
                 <p-button style-type="tertiary"
                           size="lg"
-                          :disabled="state.updateLoading"
+                          :disabled="isUpdating"
                           @click="handleClickCancel"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
@@ -42,7 +42,7 @@
                           size="lg"
                           class="save-changes-button"
                           :disabled="!state.isAllValid"
-                          :loading="state.updateLoading"
+                          :loading="isUpdating"
                           @click="handleClickSave"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -58,6 +58,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -66,8 +67,6 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
-import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
-import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { UPGRADE_MODE } from '@/api-clients/plugin/plugin/constant';
 import { i18n } from '@/translations';
@@ -125,14 +124,16 @@ const state = reactive({
         return JSON.stringify(originCollectorData.value.tags) !== JSON.stringify(collectorFormState.tags);
     }),
     isAllValid: computed(() => (state.isPluginUpdated || state.isTagsUpdated) && state.isVersionValid && state.isTagsValid),
-    updateLoading: false,
 });
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const collectorPluginId = computed<string|undefined>(() => originCollectorData.value?.plugin_info?.plugin_id ?? collectorFormState.repositoryPlugin?.plugin_id);
 const isEditable = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+const isUpdating = computed<boolean>(() => isUpdateCollectorPending.value || isUpdateCollectorPluginPending.value);
 
 /* Query */
-const { data: originCollectorData } = useCollectorGetQuery({
+const {
+    data: originCollectorData, collectorGetQueryKey,
+} = useCollectorGetQuery({
     collectorId: computed(() => collectorFormState.collectorId),
 });
 const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
@@ -155,24 +156,32 @@ const { data: pluginData } = usePluginGetQuery({
     pluginId: computed(() => collectorPluginId.value ?? ''),
 });
 
-const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormState.collectorId,
-        version: collectorFormState.version,
-        upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-    };
-    return collectorAPI.updatePlugin(params);
-};
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameters = {
-        collector_id: collectorFormState.collectorId,
-        tags: collectorFormState.tags,
-    };
-    return collectorAPI.update(params);
-};
+/* Mutation */
+const queryClient = useQueryClient();
+const { mutateAsync: updateCollector, isPending: isUpdateCollectorPending } = useMutation({
+    mutationFn: collectorAPI.update,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    },
+    onError: (e) => {
+        collectorFormStore.initForm(originCollectorData.value);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    },
+});
+const { mutateAsync: updateCollectorPlugin, isPending: isUpdateCollectorPluginPending } = useMutation({
+    mutationFn: collectorAPI.updatePlugin,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    },
+    onError: (e) => {
+        collectorFormStore.initForm(originCollectorData.value);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    },
+});
 
+/* Event Handler */
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -189,27 +198,22 @@ const handleClickCancel = () => {
     state.isEditMode = false;
 };
 const handleClickSave = async () => {
+    console.log('handleClickSave', state.isAllValid, state.isPluginUpdated, state.isTagsUpdated);
     if (!state.isAllValid) return;
-    try {
-        state.updateLoading = true;
-        let collector: CollectorModel|undefined;
-        if (state.isPluginUpdated) {
-            collector = await fetchCollectorPluginUpdate();
-        }
-        if (state.isTagsUpdated) {
-            const result = await fetchCollectorUpdate();
-            if (collector) collector = { ...collector, ...result };
-            else collector = result;
-        }
-        if (!collector) throw new Error('collector is undefined'); // collector must be defined if all valid
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
-    } catch (e) {
-        collectorFormStore.initForm(originCollectorData.value);
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
-    } finally {
-        state.updateLoading = false;
-        state.isEditMode = false;
+    if (state.isPluginUpdated) {
+        await updateCollectorPlugin({
+            collector_id: collectorFormState.collectorId ?? '',
+            version: collectorFormState.version,
+            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+        });
     }
+    if (state.isTagsUpdated) {
+        await updateCollector({
+            collector_id: collectorFormState.collectorId ?? '',
+            tags: collectorFormState.tags,
+        });
+    }
+    state.isEditMode = false;
 };
 </script>
 
