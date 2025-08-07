@@ -36,7 +36,8 @@ export const useInventoryJobListPaginationQuery = ({ params, thisPage, pageSize 
     return {
         data,
         totalCount,
-        isLoading,
+        isLoading: isLoading || query.isFetching,
         isSuccess: computed(() => query.isSuccess.value),
+        refetch: query.refetch,
     };
 };

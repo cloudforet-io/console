@@ -22,7 +22,7 @@ export const useCollectorListQuery = ({
         pagination: true,
     });
     const {
-        data, isLoading, totalCount,
+        data, isLoading, totalCount, query,
     } = useScopedPaginationQuery({
         queryKey: key,
         queryFn: collectorAPI.list,
@@ -37,7 +37,8 @@ export const useCollectorListQuery = ({
 
     return {
         collectorListData: data,
-        isLoading,
+        isLoading: isLoading || query.isFetching,
         totalCount,
+        refetch: query.refetch,
     };
 };

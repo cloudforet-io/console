@@ -172,7 +172,9 @@ const handleChange = async (options: any = {}) => {
 };
 
 /* Query */
-const { jobTaskListData: jobTasksData, isLoading: isLoadingJobTasks, totalCount } = useInventoryJobTaskListQuery({
+const {
+    jobTaskListData: jobTasksData, isLoading: isLoadingJobTasks, totalCount, refetch: refetchJobTasks,
+} = useInventoryJobTaskListQuery({
     params: computed(() => ({
         job_id: props.jobId,
         query: getQuery(),
@@ -226,7 +228,7 @@ onDeactivated(() => {
                      :excel-visible="false"
                      :timezone="state.timezone"
                      @change="handleChange"
-                     @refresh="handleChange()"
+                     @refresh="refetchJobTasks"
                      @select="handleSelect"
     >
         <template #toolbox-top>

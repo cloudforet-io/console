@@ -23,7 +23,7 @@ export const useInventoryJobTaskListQuery = ({
     });
 
     const {
-        data, isLoading, totalCount,
+        data, isLoading, totalCount, query,
     } = useScopedPaginationQuery({
         queryKey: key,
         queryFn: jobTaskAPI.list,
@@ -38,7 +38,8 @@ export const useInventoryJobTaskListQuery = ({
 
     return {
         jobTaskListData: data,
-        isLoading,
+        isLoading: isLoading || query.isFetching,
         totalCount,
+        refetch: query.refetch,
     };
 };
