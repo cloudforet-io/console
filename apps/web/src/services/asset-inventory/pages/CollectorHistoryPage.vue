@@ -143,6 +143,7 @@ const {
     isLoading: isJobListLoading,
     totalCount: jobListTotalCount,
     isSuccess: isJobListSuccess,
+    refetch: refetchJobList,
 } = useInventoryJobListPaginationQuery({
     params: computed(() => {
         apiQueryHelper
@@ -239,7 +240,7 @@ watch(isJobListSuccess, (isSuccess) => {
                              :class="items.length === 0 ? 'no-data' : ''"
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
-                             @refresh="handleChange()"
+                             @refresh="refetchJobList"
                              @rowLeftClick="handleSelect"
             >
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">

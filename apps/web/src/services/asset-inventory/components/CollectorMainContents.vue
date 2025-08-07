@@ -209,7 +209,9 @@ const handleClickListItem = (detailLink) => {
 
 /* Query */
 const collectorApiQueryHelper = new ApiQueryHelper().setSort('name', true);
-const { collectorListData, isLoading, totalCount } = useCollectorListQuery({
+const {
+    collectorListData, isLoading, totalCount, refetch,
+} = useCollectorListQuery({
     thisPage: computed(() => state.thisPage),
     pageSize: computed(() => state.pageSize),
     params: computed(() => {
@@ -260,7 +262,7 @@ onMounted(async () => {
             :this-page.sync="state.thisPage"
             :page-size.sync="state.pageSize"
             @change="handleChangeToolbox"
-            @refresh="handleChangeToolbox()"
+            @refresh="refetch"
             @export="handleExportExcel"
         >
             <template v-if="state.hasReadWriteAccess"
