@@ -20,6 +20,7 @@ export const useAlertUpdateMutation = (options?: UseAlertUpdateMutationOptions) 
     const queryClient = useQueryClient();
 
     const { withSuffix: alertQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'get');
+    const { withSuffix: alertHistoryQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'history');
     const { key: alertListQueryKey } = useServiceQueryKey('alert-manager', 'alert', 'list');
 
     return useMutation({
@@ -28,6 +29,7 @@ export const useAlertUpdateMutation = (options?: UseAlertUpdateMutationOptions) 
             const _alertId = { alert_id: variables.alert_id };
             queryClient.invalidateQueries({ queryKey: alertQueryKey(_alertId) });
             queryClient.invalidateQueries({ queryKey: alertListQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: alertHistoryQueryKey(_alertId) });
             showSuccessMessage(i18n.t('ALERT_MANAGER.ALERTS.ALT_S_UPDATE'), '');
             if (options?.onSuccess) await options.onSuccess(data, variables);
         },
