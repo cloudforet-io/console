@@ -313,8 +313,16 @@ watch([() => props.handler, () => props.initSelectedWithHandler], async ([handle
     const { results } = Array.isArray(responses) ? { results: responses.map((r) => r.results).flat() } : responses;
     state.proxySelectedItem = state.proxySelectedItem.map((item) => {
         const found = results.find((d) => d.name === item.name);
-        if (found) return found;
-        return item;
+        if (found) {
+            return {
+                ...found,
+                label: found.label ?? found.name,
+            };
+        }
+        return {
+            ...item,
+            label: item.label ?? item.name,
+        };
     });
 
     isInitiatingWithHandler.value = false;
