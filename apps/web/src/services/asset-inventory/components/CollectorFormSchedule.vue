@@ -47,6 +47,7 @@ import {
     defineProps, reactive, computed, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
@@ -56,7 +57,6 @@ import {
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
-import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n as i18nTranslator } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -67,7 +67,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-
 
 const props = defineProps<{
     hoursReadonly?: boolean;
@@ -80,6 +79,7 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const userStore = useUserStore();
+const queryClient = useQueryClient();
 const { collectorAPI } = useCollectorApi();
 
 const hoursMatrix: number[] = range(24);
@@ -103,7 +103,7 @@ const state = reactive({
 });
 
 /* Query */
-const { data: originCollectorData, isLoading: isOriginCollectorLoading } = useCollectorGetQuery({
+const { data: originCollectorData, isLoading: isOriginCollectorLoading, collectorGetQueryKey } = useCollectorGetQuery({
     collectorId: computed(() => collectorFormState.collectorId),
 });
 
@@ -113,31 +113,32 @@ const updateSelectedHours = () => {
         _state.state.scheduleHours = hours;
     });
 };
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is not defined');
-    const hours = originCollectorData.value?.schedule?.hours ?? [];
-    const params: CollectorUpdateParameters = {
-        collector_id: collectorFormState.collectorId,
-        schedule: {
-            hours,
-            state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
-        },
-    };
-    return collectorAPI.update(params);
-};
+const { mutate: updateCollector } = useMutation({
+    mutationFn: collectorAPI.update,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+    },
+    onError: (error) => {
+        collectorFormStore.resetSchedulePower(originCollectorData.value);
+        ErrorHandler.handleRequestError(error, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+    },
+});
 
 const handleChangeToggle = async (value: boolean) => {
     collectorFormStore.$patch((_state) => {
         _state.state.schedulePower = value;
     });
     if (props.callApiOnPowerChange) {
-        try {
-            await fetchCollectorUpdate();
-            showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
-        } catch (e) {
-            collectorFormStore.resetSchedulePower(originCollectorData.value);
-            ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
-        }
+        const hours = originCollectorData.value?.schedule?.hours ?? [];
+        const params: CollectorUpdateParameters = {
+            collector_id: collectorFormState.collectorId ?? '',
+            schedule: {
+                hours,
+                state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
+            },
+        };
+        updateCollector(params);
     }
 };
 
