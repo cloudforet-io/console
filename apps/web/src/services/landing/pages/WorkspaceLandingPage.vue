@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import { useQueryClient } from '@tanstack/vue-query';
+
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
 import LandingContents from '@/services/landing/components/workspace-landing/LandingContents.vue';
@@ -9,6 +14,7 @@ import type { WorkspaceLandingPageQueryValue } from '@/services/landing/type/wor
 
 const route = useRoute();
 const router = useRouter();
+const queryClient = useQueryClient();
 
 const landingPageStore = useLandingPageStore();
 landingPageStore.setRedirectPath((route.query as WorkspaceLandingPageQueryValue).redirectPath);
@@ -16,6 +22,13 @@ landingPageStore.setRedirectPath((route.query as WorkspaceLandingPageQueryValue)
 const handleClickLogo = () => {
     router.push({ name: LANDING_ROUTE.DOMAIN._NAME });
 };
+
+const { key: workspacesQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get-workspaces');
+const { key: workspaceGroupsQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get-workspace-groups');
+onBeforeMount(() => {
+    queryClient.invalidateQueries({ queryKey: workspacesQueryKey.value });
+    queryClient.invalidateQueries({ queryKey: workspaceGroupsQueryKey.value });
+});
 </script>
 
 <template>

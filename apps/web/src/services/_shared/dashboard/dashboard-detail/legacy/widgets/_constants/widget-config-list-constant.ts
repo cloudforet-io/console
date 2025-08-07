@@ -12,9 +12,9 @@ import severityStatusByService from '@/services/_shared/dashboard/dashboard-deta
 import totalFailFindingsHistory from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/total-fail-findings-history/widget-config';
 import totalFailFindingsStatus from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/total-fail-findings-status/widget-config';
 import trendOfPassAndFailFindings from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
-import budgetStatus from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-status/widget-config';
+// import budgetStatus from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-status/widget-config';
 // import budgetUsageByTarget from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-by-target/widget-config';
-import budgetUsageSummary from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-summary/widget-config';
+// import budgetUsageSummary from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-summary/widget-config';
 import costByRegionMultiFields from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-by-region-multi-fields/widget-config';
 import costByRegion from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-by-region/widget-config';
 import costDonut from '@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-donut/widget-config';
@@ -35,7 +35,7 @@ export const BASE_WIDGET_CONFIG_KEYS = [
 ] as const;
 export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'monthlyCost',
-    'budgetUsageSummary',
+    // 'budgetUsageSummary',
     'costMap',
     'costTrend',
     'costTrendStacked',
@@ -44,7 +44,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'costDonut',
     'costByRegion',
     'costByRegionMultiFields',
-    'budgetStatus',
+    // 'budgetStatus',
     // 'budgetUsageByTarget',
     'severityStatusByService',
     'countOfFailFindings',
@@ -59,7 +59,7 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
 export const CONSOLE_WIDGET_CONFIGS: Record<WidgetConfigKey, Partial<WidgetConfig>> = {
     // Cost Widgets
     monthlyCost,
-    budgetUsageSummary,
+    // budgetUsageSummary,
     costMap,
     costTrend,
     costTrendStacked,
@@ -68,7 +68,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetConfigKey, Partial<WidgetConfi
     costDonut,
     costByRegion,
     costByRegionMultiFields,
-    budgetStatus,
+    // budgetStatus,
     // budgetUsageByTarget,
     // Asset Widgets
     severityStatusByService,

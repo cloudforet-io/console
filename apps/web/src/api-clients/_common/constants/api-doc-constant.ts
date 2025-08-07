@@ -807,5 +807,10 @@ export const API_DOC = {
             'update',
         ],
     },
+    plugin: {
+        plugin: [
+            'get-plugin-metadata',
+        ],
+    },
 } as const;
 export type APIDoc = typeof API_DOC;
