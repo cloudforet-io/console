@@ -62,6 +62,7 @@ const state = reactive({
         });
         return handlerMaps;
     }),
+    isSelectedInitiated: false,
 });
 
 /* Query */
@@ -101,6 +102,7 @@ const initSelectedFilters = (filters: MetricFilter) => {
         _selectedItemsMap[groupBy] = filters?.[groupBy].map((d) => ({ name: d })) ?? [];
     });
     state.selectedItemsMap = _selectedItemsMap;
+    state.isSelectedInitiated = true;
 };
 
 /* Event */
@@ -148,7 +150,7 @@ watch(() => props.visible, (visible) => {
             show-select-marker
             use-fixed-menu-style
             selection-highlight
-            :init-selected-with-handler="props.visible"
+            :init-selected-with-handler="state.isSelectedInitiated"
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
             :page-size="10"
