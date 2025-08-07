@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { isEmpty } from 'lodash';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -49,7 +50,6 @@ import {
     APP_STATE,
 } from '@/services/iam/constants/app-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
-
 
 interface Props {
     tableHeight?: number;
@@ -200,8 +200,10 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
     },
 ]));
 
+const queryClient = useQueryClient();
 const { roleAPI } = useRoleApi();
 const roleListApiQueryHelper = new ApiQueryHelper();
+const { key: appListBaseQueryKey } = useServiceQueryKey('identity', 'app', 'list');
 const { key: roleListQueryKey, params: roleListQueryParams } = useServiceQueryKey('identity', 'role', 'list', {
     params: computed(() => {
         roleListApiQueryHelper.setFilters([
@@ -245,6 +247,9 @@ const {
 });
 
 /* Component */
+const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
+};
 const handleSelectDropdown = (name) => {
     switch (name) {
     case APP_DROPDOWN_MODAL_TYPE.EDIT: clickFormModal({
@@ -331,7 +336,7 @@ const handleConfirmButton = (value?: AppModel) => {
                          :style="{height: `${props.tableHeight}px`}"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refresh"
         >
             <template v-if="props.hasReadWriteAccess"
                       #toolbox-left
