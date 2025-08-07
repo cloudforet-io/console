@@ -198,7 +198,6 @@ const handleClickCancel = () => {
     state.isEditMode = false;
 };
 const handleClickSave = async () => {
-    console.log('handleClickSave', state.isAllValid, state.isPluginUpdated, state.isTagsUpdated);
     if (!state.isAllValid) return;
     if (state.isPluginUpdated) {
         await updateCollectorPlugin({
