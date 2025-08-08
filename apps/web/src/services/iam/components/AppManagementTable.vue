@@ -147,7 +147,9 @@ const state = reactive({
                 name: 'app_id', label: 'App ID', sortable: false, disableCopy: false,
             },
             ...additionalFields,
-            { name: 'tags', label: 'Tags', sortable: false },
+            {
+                name: 'tags', label: 'Tags', sortable: false, width: '150px',
+            },
             { name: 'last_accessed_at', label: 'Last Activity' },
             { name: 'expired_at', label: 'Expiration Date' },
             { name: 'created_at', label: 'Created' },

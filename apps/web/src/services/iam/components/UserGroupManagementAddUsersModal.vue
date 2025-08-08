@@ -53,6 +53,8 @@ const { key: userListQueryKey, params: userListQueryParams } = useServiceQueryKe
     })),
 });
 
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'user-group', 'list');
+
 const { data: userListData } = useScopedQuery({
     queryKey: userListQueryKey,
     queryFn: () => workspaceUserAPI.list(userListQueryParams.value),
@@ -66,6 +68,7 @@ const { mutateAsync: addUsers, isPending: addUsersIsPending } = useMutation({
     mutationFn: userGroupAPI.addUsers,
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
         emit('confirm');
         showSuccessMessage('', i18n.t('IAM.USER_GROUP.MODAL.ADD_NEW_USER.SUCCESS_MESSAGE'));
     },

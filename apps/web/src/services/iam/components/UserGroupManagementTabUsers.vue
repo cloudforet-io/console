@@ -84,6 +84,7 @@ const {
     data: userList, totalCount: userTotalCount, isLoading: userIsLoading, refresh: userRefresh,
 } = useWorkspaceUserListPaginationQuery({
     params: computed(() => {
+        userListApiQueryHelper.setSort(filterState.sortKey, filterState.sortDesc);
         userListApiQueryHelper.setFilters([{ k: 'user_id', v: usersIdList.value, o: '' }, ...queryTagHelper.filters.value]);
 
         return {
@@ -94,7 +95,6 @@ const {
     pageSize: computed(() => tableState.pageSize),
     selectedUserGroup: computed(() => userGroupPageGetters.selectedUserGroups[0] as UserGroupModel),
 });
-
 
 /* Component */
 const handleSelect = async (index) => {
@@ -122,6 +122,10 @@ const handleChange = async (options: any = {}) => {
     if (options.sortBy !== undefined) filterState.sortKey = options.sortBy;
     if (options.sortDesc !== undefined) filterState.sortDesc = options.sortDesc;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+};
+
+const handleRefresh = async () => {
+    await userRefresh();
 };
 
 watch(() => userGroupPageGetters.selectedUserGroups[0].user_group_id, () => {
@@ -185,7 +189,7 @@ watch(userList, (nv_user_list) => {
                          :page-size.sync="tableState.pageSize"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="userRefresh"
+                         @refresh="handleRefresh"
         >
             <template #col-last_accessed_at-format="{value, item}">
                 <span v-if="calculateTime(value, item.timezone) === -1">

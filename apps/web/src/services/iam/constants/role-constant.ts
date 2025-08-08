@@ -28,13 +28,25 @@ const ROLE_STATE_MAP = {
 } as const;
 
 const ROLE_TYPE_LABEL = {
-    DOMAIN: {
-        label: 'Admin',
-        name: 'DOMAIN',
+    [ROLE_TYPE.SYSTEM_ADMIN]: {
+        label: 'System Admin',
+        name: 'SYSTEM_ADMIN',
     },
-    PROJECT: {
+    [ROLE_TYPE.DOMAIN_ADMIN]: {
+        label: 'Admin',
+        name: 'DOMAIN_ADMIN',
+    },
+    [ROLE_TYPE.WORKSPACE_OWNER]: {
+        label: 'Workspace Owner',
+        name: 'WORKSPACE_OWNER',
+    },
+    [ROLE_TYPE.WORKSPACE_MEMBER]: {
+        label: 'Workspace Member',
+        name: 'WORKSPACE_MEMBER',
+    },
+    [ROLE_TYPE.USER]: {
         label: 'User',
-        name: 'PROJECT',
+        name: 'USER',
     },
 } as const;
 

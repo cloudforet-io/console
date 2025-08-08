@@ -501,7 +501,8 @@ watch(() => state.selectedIndex, () => {
                              @export="handleExportToExcel"
             >
                 <template #toolbox-left>
-                    <p-select-dropdown placeholder="Action"
+                    <p-select-dropdown v-if="!isAdminMode"
+                                       placeholder="Action"
                                        :menu="tableState.actionMenus"
                                        :selected.sync="tableState.selectedActionItem"
                                        reset-selected-on-unmounted
