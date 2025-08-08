@@ -92,7 +92,6 @@ const handleCloseTag = async () => {
 const { mutateAsync: updateUser, isPending: updateUserTagsLoading } = useMutation({
     mutationFn: userAPI.update,
     onSuccess: async (data) => {
-        console.log(data.tags);
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
         tableState.tagEditPageVisible = false;
         state.items = convertUserTagsToKeyValueArray(data.tags);
