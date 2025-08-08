@@ -67,7 +67,7 @@ const tableState = reactive({
         { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') as string },
     ]),
     loading: false,
-    tags: {},
+    tags: selectedUsers.value?.[0]?.tags || {},
     tagEditPageVisible: false,
 });
 const convertUserTagsToKeyValueArray = (tags: Tags) => Object.entries(tags).map(([k, v]) => ({
@@ -149,7 +149,7 @@ watch([() => props.activeTab, () => state.selectedUser], async () => {
         />
         <transition name="slide-up">
             <tags-overlay v-if="tableState.tagEditPageVisible"
-                          :tags="state.selectedUser?.tags"
+                          :tags="tableState.tags"
                           :resource-id="state.selectedUser?.user_id"
                           resource-type="identity.User"
                           resource-key="user_id"
