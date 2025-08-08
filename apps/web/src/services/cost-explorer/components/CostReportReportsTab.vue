@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -96,12 +96,39 @@ const tableState = reactive({
     },
 });
 
-const costReportListApiQueryHelper = new ApiQueryHelper().setSort('issue_date', true);
+const apiQueryHelper = new ApiQueryHelper().setSort('issue_date', true);
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 /* Query */
 const { costReportConfig } = useCostReportConfigQuery();
+const { costReportListData, isLoading: isCostReportListLoading, totalCount } = useCostReportListQuery({
+    thisPage: computed(() => tableState.thisPage),
+    pageSize: computed(() => tableState.pageSize),
+    params: computed<CostReportListParameters>(() => {
+        apiQueryHelper.setFilters(queryTagHelper.filters.value);
+        apiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportConfig.value?.cost_report_config_id || '', o: '=' });
+
+        // set period
+        if (state.selectedPeriod !== 'all') {
+            if (state.selectedPeriod === 'custom') {
+                apiQueryHelper.addFilter({ k: 'issue_date', v: dayjs.utc(state.customPeriod?.start).format('YYYY-MM') || '', o: '>=' });
+                apiQueryHelper.addFilter({ k: 'issue_date', v: dayjs.utc(state.customPeriod?.end).add(1, 'month').format('YYYY-MM') || '', o: '<' });
+            } else {
+                apiQueryHelper.addFilter({ k: 'report_month', v: dayjs.utc(state.selectedPeriod).subtract(1, 'month').format('YYYY-MM'), o: '=' });
+            }
+        }
+
+        if (!isAdminMode.value) {
+            apiQueryHelper.addFilter({ k: 'status', v: ['DONE'], o: '' });
+        }
+        return {
+            query: {
+                ...apiQueryHelper.data,
+            },
+        };
+    }),
+});
 
 /* Util */
 const getDateRangeText = (date: string): string => {
@@ -176,40 +203,6 @@ const handleClickLinkButton = async (id: string) => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-
-/* Query */
-const { costReportListData, isLoading: isCostReportListLoading, totalCount } = useCostReportListQuery({
-    thisPage: computed(() => tableState.thisPage),
-    pageSize: computed(() => tableState.pageSize),
-    params: computed<CostReportListParameters>(() => {
-        costReportListApiQueryHelper.setFilters(queryTagHelper.filters.value);
-        costReportListApiQueryHelper.addFilter({ k: 'cost_report_config_id', v: costReportConfig.value?.cost_report_config_id || '', o: '=' });
-        if (!isAdminMode.value) {
-            costReportListApiQueryHelper.setFilters([
-                { k: 'status', v: ['DONE'], o: '' },
-            ]);
-        }
-        return {
-            query: {
-                ...costReportListApiQueryHelper.data,
-            },
-        };
-    }),
-});
-
-watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, customPeriod]) => {
-    const filters = [...tableState.searchFilters];
-
-    if (selectedPeriod !== 'all') {
-        if (selectedPeriod === 'custom') {
-            filters.push({ k: 'issue_date', v: dayjs.utc(customPeriod?.start).format('YYYY-MM') || '', o: '>=' });
-            filters.push({ k: 'issue_date', v: dayjs.utc(customPeriod?.end).add(1, 'month').format('YYYY-MM') || '', o: '<' });
-        } else {
-            filters.push({ k: 'report_month', v: dayjs.utc(selectedPeriod).subtract(1, 'month').format('YYYY-MM'), o: '=' });
-        }
-    }
-    costReportListApiQueryHelper.setFilters(filters);
-});
 </script>
 
 <template>
