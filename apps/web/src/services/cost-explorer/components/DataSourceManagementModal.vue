@@ -53,6 +53,12 @@ const dropdownState = reactive({
     selectedMenuId: '',
     menu: computed(() => storeState.workspaceList.map((i) => ({ label: i.name, name: i.workspace_id }))),
 });
+const isConfirmDisabled = computed(() => {
+    if (dataSourcesPageState.modalType === 'RESET') {
+        return !dataSourcesPageState.selectedLinkedAccountIds.length;
+    }
+    return !dropdownState.selectedMenuId;
+});
 
 const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
     fixedFilters: {
@@ -150,6 +156,7 @@ const handleSelectDropdownItem = (item: string) => {
                     :backdrop="true"
                     :theme-color="dataSourcesPageState.modalType === 'RESET' ? 'alert' : 'primary'"
                     :visible="dataSourcesPageState.modalVisible"
+                    :disabled="isConfirmDisabled"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

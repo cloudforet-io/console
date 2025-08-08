@@ -19,7 +19,7 @@ export const useCostReportListQuery = ({
 }: UseCostReportListQueryOptions) => {
     const { costReportAPI } = useCostReportApi();
     const { key, params: queryParams } = useServiceQueryKey('cost-analysis', 'cost-report', 'list', {
-        params: computed(() => params.value),
+        params,
         pagination: true,
     });
     const {
