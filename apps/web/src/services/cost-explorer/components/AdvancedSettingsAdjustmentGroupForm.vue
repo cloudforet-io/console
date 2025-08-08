@@ -5,18 +5,13 @@ import draggable from 'vuedraggable';
 import {
     PButton, PIconButton, PCard, PSelectDropdown, PCheckbox, PButtonModal,
 } from '@cloudforet/mirinae';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 
 import type { Currency } from '@/store/display/type';
 
 import getRandomId from '@/lib/random-id-generator';
-import { VariableModelFactory } from '@/lib/variable-models';
-import {
-    getVariableModelMenuHandler,
-} from '@/lib/variable-models/variable-model-menu-handler';
-import type {
-    VariableModelMenuHandlerInfo,
-} from '@/lib/variable-models/variable-model-menu-handler';
 
 import AdvancedSettingsAdjustmentsForm from '@/services/cost-explorer/components/AdvancedSettingsAdjustmentsForm.vue';
 import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
@@ -26,6 +21,8 @@ import { useAdvancedSettingsPageStore } from '@/services/cost-explorer/stores/ad
 
 const emit = defineEmits<{(e: 'sync-currency', policyIdList: string[]): void; }>();
 
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
+
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
 const { costReportConfig } = useCostReportConfigQuery();
@@ -34,6 +31,8 @@ const { reportAdjustmentList } = useReportAdjustmentQuery();
 const state = reactive({
     syncCurrencyModalVisible: false,
 });
+
+/* Computed */
 const originCostReportConfigCurrency = computed<Currency|undefined>(() => costReportConfig.value?.currency);
 const differentCurrencyPolicyIds = computed<string[]>(() => {
     const ids = reportAdjustmentList.value
@@ -41,14 +40,13 @@ const differentCurrencyPolicyIds = computed<string[]>(() => {
         .map((d) => d.report_adjustment_policy_id) ?? [];
     return Array.from(new Set(ids));
 });
+const workspaceMenuHandler = computed(() => resourceMenuHandlerMap.workspace({
+    fixedFilters: {
+        is_dormant: false,
+    },
+}));
 
-const workspaceMenuHandler = computed<AutocompleteHandler>(() => {
-    const variableModelInfo: VariableModelMenuHandlerInfo = {
-        variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'workspace' }),
-    };
-    return getVariableModelMenuHandler([variableModelInfo]);
-});
-
+/* Event Handler */
 const handleSelectWorkspace = (policyId: string, selected: SelectDropdownMenuItem[]) => {
     const targetPolicy = advancedSettingsPageState.adjustmentPolicyList.find((d) => d.id === policyId);
     if (targetPolicy) {

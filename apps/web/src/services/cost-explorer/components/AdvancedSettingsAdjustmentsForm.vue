@@ -9,6 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,6 +22,9 @@ import type { AdjustmentData, AdjustmentType } from '@/services/cost-explorer/ty
 const props = defineProps<{
     policyId: string;
 }>();
+const referenceMap = useAllReferenceDataModel();
+const providerDataMap = referenceMap.provider;
+
 const allReferenceStore = useAllReferenceStore();
 const advancedSettingsPageStore = useAdvancedSettingsPageStore();
 const advancedSettingsPageState = advancedSettingsPageStore.$state;
@@ -156,20 +160,14 @@ const handleUpdateAdjustment = (adjustmentId: string, selected: AdjustmentType) 
                         <div v-if="!isEmpty(dropdownItem)"
                              class="flex items-center gap-2"
                         >
-                            <p-lazy-img v-if="dropdownItem && dropdownItem.imageUrl"
+                            <p-lazy-img v-if="providerDataMap[dropdownItem.name]?.data?.icon"
                                         class="selected-icon"
-                                        :src="dropdownItem.imageUrl"
+                                        :src="providerDataMap[dropdownItem.name]?.data?.icon"
                                         width="1rem"
                                         height="1rem"
                             />
-                            <p-i v-if="dropdownItem && dropdownItem.icon"
-                                 width="1rem"
-                                 height="1rem"
-                                 class="selected-icon"
-                                 :name="dropdownItem.icon"
-                            />
                             <span class="selected-text">
-                                {{ dropdownItem?.label }}
+                                {{ providerDataMap[dropdownItem.name]?.data?.name }}
                             </span>
                         </div>
                         <div v-else>
