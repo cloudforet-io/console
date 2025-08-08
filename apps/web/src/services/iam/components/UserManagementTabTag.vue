@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { cloneDeep } from 'lodash';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButton, PDataTable, PHeading, PHeadingLayout,
+    PButton, PHeading, PHeadingLayout, PDataTable,
 } from '@cloudforet/mirinae';
 
 
 import type { Tags, TimeStamp } from '@/api-clients/_common/schema/model';
-import type { UserUpdateParameters } from '@/api-clients/identity/user/schema/api-verbs/update';
-import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -19,7 +18,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 interface TableItem {
     project_id?: string;
@@ -40,9 +41,22 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers, userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: userGetQueryKey } = useServiceQueryKey('identity', 'user', 'get', {
+    contextKey: userPageState.selectedUserIds[0],
+});
+
+const { userAPI } = useUserApi();
+const queryClient = useQueryClient();
+
+const isAdminMode = computed(() => userPageState.isAdminMode);
+
 const state = reactive({
     items: [] as TableItem[],
-    selectedUser: computed(() => userPageStore.getters.selectedUsers[0]),
+    selectedUser: computed(() => (isAdminMode.value ? selectedUsers.value?.[0] : selectedWorkspaceUsers.value?.[0])),
     selectedIdx: computed(() => userPageStore.state.selectedIndices[0]),
     sortBy: 'key',
     sortDesc: true,
@@ -74,38 +88,34 @@ const handleEditTag = () => {
 const handleCloseTag = async () => {
     tableState.tagEditPageVisible = false;
 };
-const handleTagUpdate = async (newTags:Tags) => {
-    try {
-        tableState.loading = true;
-        await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>({
-            user_id: state.selectedUser.user_id || '',
-            tags: newTags,
-        });
+
+const { mutateAsync: updateUser, isPending: updateUserTagsLoading } = useMutation({
+    mutationFn: userAPI.update,
+    onSuccess: async (data) => {
+        console.log(data.tags);
         showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
         tableState.tagEditPageVisible = false;
-        state.items = convertUserTagsToKeyValueArray(newTags);
-        userPageStore.$patch((_state) => {
-            const cloneUsers = cloneDeep(_state.state.users);
-            cloneUsers[state.selectedIdx].tags = newTags;
-            _state.state.users = cloneUsers;
-
-            const cloneSelectedUser = cloneDeep(_state.state.selectedUser);
-            cloneSelectedUser.tags = newTags;
-            _state.state.selectedUser = cloneSelectedUser;
-        });
-        tableState.tags = newTags;
-    } catch (e) {
+        state.items = convertUserTagsToKeyValueArray(data.tags);
+        tableState.tags = data.tags;
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGetQueryKey.value });
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
-    } finally {
-        tableState.loading = false;
-    }
+    },
+});
+const handleTagUpdate = async (newTags:Tags) => {
+    await updateUser({
+        user_id: state.selectedUser?.user_id || '',
+        tags: newTags,
+    });
 };
 
 /* Watcher */
 watch([() => props.activeTab, () => state.selectedUser], async () => {
-    state.items = convertUserTagsToKeyValueArray(state.selectedUser.tags || {});
-    tableState.tags = state.selectedUser.tags || {};
-}, { immediate: true });
+    state.items = convertUserTagsToKeyValueArray(state.selectedUser?.tags || {});
+    tableState.tags = state.selectedUser?.tags || {};
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -140,11 +150,11 @@ watch([() => props.activeTab, () => state.selectedUser], async () => {
         />
         <transition name="slide-up">
             <tags-overlay v-if="tableState.tagEditPageVisible"
-                          :tags="tableState.tags"
-                          :resource-id="state.selectedUser.user_id"
+                          :tags="state.selectedUser?.tags"
+                          :resource-id="state.selectedUser?.user_id"
                           resource-type="identity.User"
                           resource-key="user_id"
-                          :loading="tableState.loading"
+                          :loading="updateUserTagsLoading"
                           @close="handleCloseTag"
                           @confirm="handleTagUpdate"
             />
