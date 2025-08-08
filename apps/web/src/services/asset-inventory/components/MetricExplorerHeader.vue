@@ -194,7 +194,7 @@ const { mutate: duplicateMetric } = useMutation({
         state.loadingDuplicate = false;
     },
 });
-const { mutateAsync: deleteMetric } = useMutation({
+const { mutateAsync: deleteMetric, isPending: isDeleteMetricPending } = useMutation({
     mutationFn: metricAPI.delete,
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
@@ -204,7 +204,7 @@ const { mutateAsync: deleteMetric } = useMutation({
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
     },
 });
-const { mutate: deleteMetricExample } = useMutation({
+const { mutate: deleteMetricExample, isPending: isDeleteMetricExamplePending } = useMutation({
     mutationFn: metricExampleAPI.delete,
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
@@ -404,6 +404,7 @@ const handleOpenEditQuery = () => {
         </p-heading-layout>
         <delete-modal :header-title="state.deleteModalTitle"
                       :visible.sync="state.metricDeleteModalVisible"
+                      :loading="isDeleteMetricPending || isDeleteMetricExamplePending"
                       :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
                       @confirm="handleDeleteMetric"
         />

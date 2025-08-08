@@ -5,6 +5,7 @@ import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { MenuAttachHandler } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { QueryKeyWithSuffix } from '@/query/core/query-key/types/query-key-type';
 import type {
@@ -33,18 +34,19 @@ export const generateMenuQueryHandler = (
 
 
         // Init and Set Default API Filters
-        const _apiQueryHelper = new ApiQueryHelper();
-        _apiQueryHelper.setFilters([{ k: idKey, v: [null, ''], o: '!=' }]);
+        const _defaultApiQueryHelper = new ApiQueryHelper();
+        _defaultApiQueryHelper.setFilters([{ k: idKey, v: [null, ''], o: '!=' }]);
         if (fixedFilters) {
             Object.entries(fixedFilters).forEach(([key, value]) => {
-                _apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
+                _defaultApiQueryHelper.addFilter({ k: key, v: value, o: '=' });
             });
         }
-        const defaultFilters = _apiQueryHelper.filters;
+        const defaultFilters = _defaultApiQueryHelper.filters;
 
 
         // Main Handler
-        return async (inputText: string, pageStart = 1, pageLimit = 10): Promise<ResourceMenuResponse<TDataModel>> => {
+        return async (inputText: string, pageStart = 1, pageLimit = 10, filters?: MenuItem[]): Promise<ResourceMenuResponse<TDataModel>> => {
+            const _apiQueryHelper = new ApiQueryHelper();
             // Set Default Filters
             _apiQueryHelper.setFilters(defaultFilters);
 
@@ -56,6 +58,11 @@ export const generateMenuQueryHandler = (
                     o: '' as ConsoleFilterOperator,
                 }));
                 _apiQueryHelper.setOrFilters(searchFilters);
+            }
+
+            // Set Additional Filters
+            if (filters) {
+                _apiQueryHelper.addOrFilter({ k: idKey, v: filters.map((d) => d.name as string), o: '=' });
             }
 
             // Set API Params
@@ -110,17 +117,18 @@ export const generateMenuQueryHandler = (
 
 
         // Init and Set Default API Filters
-        const _apiQueryHelper = new ApiQueryHelper();
-        _apiQueryHelper.setFilters([{ k: distinct, v: [null, ''], o: '!=' }]);
+        const _defaultApiQueryHelper = new ApiQueryHelper();
+        _defaultApiQueryHelper.setFilters([{ k: distinct, v: [null, ''], o: '!=' }]);
         if (fixedFilters) {
             Object.entries(fixedFilters).forEach(([key, value]) => {
-                _apiQueryHelper.addFilter({ k: key, v: value, o: '=' });
+                _defaultApiQueryHelper.addFilter({ k: key, v: value, o: '=' });
             });
         }
-        const defaultFilters = _apiQueryHelper.filters;
+        const defaultFilters = _defaultApiQueryHelper.filters;
 
         // Main Handler
         return async (inputText: string, pageStart = 1, pageLimit = 10, filters?: string[]): Promise<ResourceMenuResponse<string>> => {
+            const _apiQueryHelper = new ApiQueryHelper();
             // Set Default Filters
             _apiQueryHelper.setFilters(defaultFilters);
 

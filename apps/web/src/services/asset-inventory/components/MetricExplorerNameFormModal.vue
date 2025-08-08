@@ -117,7 +117,7 @@ const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery
 const { metricAPI } = useMetricApi();
 const { metricExampleAPI } = useMetricExampleApi();
 const queryClient = useQueryClient();
-const { mutate: createMetricExample } = useMutation({
+const { mutate: createMetricExample, isPending: isCreateMetricExamplePending } = useMutation({
     mutationFn: metricExampleAPI.create,
     onSuccess: async (data) => {
         queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
@@ -136,7 +136,7 @@ const { mutate: createMetricExample } = useMutation({
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
     },
 });
-const { mutate: updateMetricExampleName } = useMutation({
+const { mutate: updateMetricExampleName, isPending: isUpdateMetricExampleNamePending } = useMutation({
     mutationFn: metricExampleAPI.update,
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
@@ -149,7 +149,7 @@ const { mutate: updateMetricExampleName } = useMutation({
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
     },
 });
-const { mutate: updateMetricName } = useMutation({
+const { mutate: updateMetricName, isPending: isUpdateMetricNamePending } = useMutation({
     mutationFn: metricAPI.update,
     onSuccess: async () => {
         queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
@@ -219,6 +219,7 @@ watch(() => state.proxyVisible, (visible) => {
         backdrop
         :visible.sync="state.proxyVisible"
         :disabled="!isAllValid"
+        :loading="isCreateMetricExamplePending || isUpdateMetricExampleNamePending || isUpdateMetricNamePending"
         @confirm="handleFormConfirm"
     >
         <template #body>

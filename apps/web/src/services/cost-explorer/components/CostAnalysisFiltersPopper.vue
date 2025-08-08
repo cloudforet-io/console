@@ -70,12 +70,6 @@ const MANAGED_RESOURCE_ID_KEYS: string[] = [
 
 const getInitialSelectedItemsMap = (): Record<string, MenuItem[]> => ({});
 
-const props = withDefaults(defineProps<{
-    visible?: boolean;
-}>(), {
-    visible: false,
-});
-
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -115,6 +109,7 @@ const state = reactive({
         });
         return handlerMaps;
     }),
+    isSelectedInitiated: false,
 });
 const convertedOriginFilter = computed<Record<string, ConsoleFilterValue | ConsoleFilterValue[]>>(() => {
     const originFilters:ConsoleFilter[] = selectedQuerySet.value?.options?.filters ?? [];
@@ -174,6 +169,7 @@ const initSelectedFilters = (isReset = false) => {
         }
     });
     state.selectedItemsMap = _selectedItemsMap;
+    state.isSelectedInitiated = true;
 };
 
 /* Event */
@@ -232,7 +228,7 @@ watch(selectedQuerySet, (_selectedQuerySet) => {
             show-select-marker
             use-fixed-menu-style
             selection-highlight
-            :init-selected-with-handler="props.visible"
+            :init-selected-with-handler="state.isSelectedInitiated"
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
             :page-size="10"
