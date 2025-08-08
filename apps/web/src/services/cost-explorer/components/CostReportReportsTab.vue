@@ -86,7 +86,7 @@ const tableState = reactive({
             items: [
                 { name: 'issue_date', label: 'Issue Date' },
                 { name: 'report_number', label: 'Report Number' },
-                { name: 'workspace_id', label: 'Workspace' },
+                ...(isAdminMode.value ? [{ name: 'workspace_id', label: 'Workspace' }] : []),
             ],
         }] as KeyItemSet[],
     valueHandlerMap: {
