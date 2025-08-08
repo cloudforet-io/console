@@ -84,6 +84,7 @@ const {
     data: userList, totalCount: userTotalCount, isLoading: userIsLoading, refresh: userRefresh,
 } = useWorkspaceUserListPaginationQuery({
     params: computed(() => {
+        userListApiQueryHelper.setSort(filterState.sortKey, filterState.sortDesc);
         userListApiQueryHelper.setFilters([{ k: 'user_id', v: usersIdList.value, o: '' }, ...queryTagHelper.filters.value]);
 
         return {
