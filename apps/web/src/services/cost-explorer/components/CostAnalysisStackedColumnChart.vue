@@ -9,7 +9,7 @@ import type { BarSeriesOption } from 'echarts/charts';
 import type { EChartsType } from 'echarts/core';
 import { init } from 'echarts/core';
 import {
-    isEmpty, throttle,
+    throttle,
 } from 'lodash';
 
 import {
@@ -191,8 +191,6 @@ const getTotalData = (rawData: CostAnalyzeRawData[], accumulated: boolean) => {
     }];
 };
 const drawChart = (rawData: CostAnalyzeRawData[], updateLegend = false) => {
-    if (isEmpty(rawData)) return;
-
     if (costAnalysisPageState.chartGroupBy) {
         state.chartData = getGroupByData(rawData, props.accumulated);
     } else {
