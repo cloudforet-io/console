@@ -26,8 +26,6 @@ import {
 } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-import { useUserGroupListPaginationQuery } from '../composables/use-user-group-list-pagination-query';
-
 
 
 interface Props {
@@ -48,7 +46,6 @@ const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
 
 const userListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
-const userGroupListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_USERS_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
 
@@ -99,17 +96,6 @@ const {
     selectedUserGroup: computed(() => userGroupPageGetters.selectedUserGroups[0] as UserGroupModel),
 });
 
-const {
-    refresh: refreshUserGroupList,
-} = useUserGroupListPaginationQuery({
-    thisPage: computed(() => tableState.thisPage),
-    pageSize: computed(() => tableState.pageSize),
-    params: computed(() => ({
-        query: userGroupListApiQueryHelper.data,
-    })),
-});
-
-
 /* Component */
 const handleSelect = async (index) => {
     userGroupPageStore.setSelectedUserIdx(index);
@@ -140,7 +126,6 @@ const handleChange = async (options: any = {}) => {
 
 const handleRefresh = async () => {
     await userRefresh();
-    await refreshUserGroupList();
 };
 
 watch(() => userGroupPageGetters.selectedUserGroups[0].user_group_id, () => {
