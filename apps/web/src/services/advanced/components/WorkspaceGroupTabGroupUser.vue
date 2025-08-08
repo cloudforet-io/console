@@ -14,9 +14,6 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-user/schema/model';
 import type { WorkspaceGroupUpdateRoleParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update-role';
@@ -32,9 +29,10 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 import { useWorkspaceGroupRoleListQuery } from '@/services/advanced/composables/querys/use-workspace-group-role-list-query';
 import { useWorkspaceGroupUserListQuery } from '@/services/advanced/composables/querys/use-workspace-group-user-list-query';
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
-import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
+
+import { useWorkspaceGroupRoleListInfiniteQuery } from '../composables/querys/use-workspace-group-role-list-infinite-query';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -132,26 +130,46 @@ const filterSortUser = (users: WorkspaceGroupUser[]) : WorkspaceGroupUser[] => {
 
 const filteredWorkspaceGroupUserListData = computed(() => filterSortUser(workspaceGroupUserListData.value?.filter(filterSearchUser) ?? []));
 
-const {
-    loading, searchText: roleSearchText, menuList, selectedItems, handleClickShowMore,
-} = useSelectDropDownList<RoleModel>({
-    pageSize: 10,
-    transformer: (_role) => ({
-        label: _role.name,
-        name: _role.role_id,
-        role_type: _role.role_type,
-    }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-        query: {
-            ...apiQueryHelper.data,
-            filter: [
-                ...(apiQueryHelper.data.filter || []),
-                { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'not' },
-            ],
-        },
-    }),
+const roleSelectDropdownState = reactive({
+    searchText: '',
+    selectedItems: [],
 });
+
+const {
+    data: roleMenuListData,
+    isLoading: isRoleMenuListLoading,
+    isFetchingNextPage: isRoleMenuListFetchingNextPage,
+    fetchNextPage: fetchRoleMenuListNextPage,
+    hasNextPage: hasRoleMenuListNextPage,
+} = useWorkspaceGroupRoleListInfiniteQuery({
+    searchText: computed(() => roleSelectDropdownState.searchText),
+});
+
+const roleMenuList = computed<SelectDropdownMenuItem[]>(() => {
+    const roleItems = roleMenuListData.value?.pages?.flatMap((page) => page?.results ?? [])?.map((role) => ({
+        label: role.name,
+        name: role.role_id,
+        role_type: role.role_type,
+    })) ?? [];
+
+    const showMoreItem: SelectDropdownMenuItem = {
+        type: 'showMore',
+        name: 'Show More',
+    };
+
+    if (hasRoleMenuListNextPage.value) {
+        return [...roleItems, showMoreItem];
+    }
+
+    return roleItems;
+});
+
+const handleClickShowMore = () => {
+    if (hasRoleMenuListNextPage.value) {
+        fetchRoleMenuListNextPage();
+    }
+};
+
 
 const setupModal = (type) => {
     switch (type) {
@@ -331,10 +349,10 @@ onUnmounted(() => {
                         style-type="transparent"
                         class="role-select-dropdown"
                         :disabled="!hasReadWriteAccess"
-                        :menu="menuList"
-                        :selected.sync="selectedItems"
-                        :search-text.sync="roleSearchText"
-                        :loading="loading || isRoleListPending || isUpdatingRole"
+                        :menu="roleMenuList"
+                        :selected.sync="roleSelectDropdownState.selectedItems"
+                        :search-text.sync="roleSelectDropdownState.searchText"
+                        :loading="isRoleMenuListLoading || isRoleMenuListFetchingNextPage || isUpdatingRole"
                         disable-handler
                         :page-size="10"
                         @click-show-more="handleClickShowMore"
