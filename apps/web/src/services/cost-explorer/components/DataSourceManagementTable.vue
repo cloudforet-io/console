@@ -120,7 +120,7 @@ const {
     thisPage: computed(() => state.thisPage),
     pageSize: computed(() => state.pageSize),
 });
-const { costDataSourceAccountAnalyzeData, isLoading: isAnalyzeLoading } = useDataSourceAccountAnalyzeQuery({
+const { costDataSourceAccountAnalyzeData } = useDataSourceAccountAnalyzeQuery({
     query: {
         group_by: ['data_source_id'],
         fields: {
@@ -133,14 +133,14 @@ const { costDataSourceAccountAnalyzeData, isLoading: isAnalyzeLoading } = useDat
 });
 
 /* Util */
-const getLinkedAccountCount = (dataSourceId: string): string => {
+const getLinkedAccountCount = (dataSourceId: string): number => {
     const analyzeDataResults = costDataSourceAccountAnalyzeData.value?.results || [];
     const matchingItem = analyzeDataResults.find((entry) => entry.data_source_id === dataSourceId);
     if (matchingItem) {
         const linkedCount = matchingItem.workspaceList?.filter((id) => id !== null).length;
-        return `${linkedCount || 0} / `;
+        return linkedCount || 0;
     }
-    return '';
+    return 0;
 };
 
 /* Event Handler */
@@ -202,18 +202,23 @@ const handleChange = (options: any = {}) => {
                 />
             </template>
             <template #col-data_source_account_count-format="{value, item}">
-                <div class="col-data-source-account-count">
+                <div v-if="getLinkedAccountCount(item.data_source_id)"
+                     class="col-data-source-account-count"
+                >
                     <p>
-                        <span v-if="!isAnalyzeLoading">{{ getLinkedAccountCount(item.data_source_id) }}</span>
+                        <span>{{ getLinkedAccountCount(item.data_source_id) }} / </span>
                         <span>{{ value || 0 }}</span>
                     </p>
-                    <p-i v-if="item.linked_count !== item.data_source_account_count"
+                    <p-i v-if="value && getLinkedAccountCount(item.data_source_id) !== value"
                          class="menu-button"
                          :name="'ic_error-filled'"
                          height="0.875rem"
                          width="0.875rem"
                          :color="red[300]"
                     />
+                </div>
+                <div v-else>
+                    <span>{{ value || 0 }}</span>
                 </div>
             </template>
             <template #col-connected_workspace_count-format="{value}">
