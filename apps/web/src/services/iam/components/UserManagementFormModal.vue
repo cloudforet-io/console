@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -15,8 +16,10 @@ import type { RoleBindingListParameters } from '@/api-clients/identity/role-bind
 import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/update-role';
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
 import type { UserUpdateParameters } from '@/api-clients/identity/user/schema/api-verbs/update';
 import type { UserMfa, UserModel } from '@/api-clients/identity/user/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -65,7 +68,6 @@ const { roleListData: roles } = useRoleListQuery();
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
-    loading: false,
     mfaLoading: false,
     data: computed<UserListItemType>(() => selectedUsers.value?.[0] ?? {}),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
@@ -117,11 +119,14 @@ const buildUserInfoParams = (): UserManagementData => ({
     reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
 });
 
-/* API */
-const handleConfirm = async () => {
-    state.loading = true;
+const { userAPI } = useUserApi();
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { withSuffix: userGetQueryKey } = useServiceQueryKey('identity', 'user', 'get');
+const queryClient = useQueryClient();
 
-    try {
+const { mutateAsync: updateUser } = useMutation({
+    mutationFn: userAPI.update,
+    onSuccess: async () => {
         if (formState.isValidEmail) {
             await updateUserEmail();
             await verifyUserEmail();
@@ -143,17 +148,21 @@ const handleConfirm = async () => {
             await fetchRoleBinding();
         }
 
-        const userInfoParams = buildUserInfoParams();
-        await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
-
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGetQueryKey(state.data.user_id ?? '') });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_UPDATE_USER'), '');
         handleClose();
         emit('confirm');
-    } catch (e: any) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.USER.MAIN.MODAL.ALT_E_UPDATE_USER'));
-    } finally {
-        state.loading = false;
-    }
+    },
+});
+
+/* API */
+const handleConfirm = async () => {
+    const userInfoParams = buildUserInfoParams();
+    await updateUser(userInfoParams);
 };
 const fetchRoleBinding = async (item?: AddModalMenuItem) => {
     if (state.data.user_id === userStore.state.userId) return;
