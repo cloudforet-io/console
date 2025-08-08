@@ -46,7 +46,7 @@ const { workspaceUserListData: selectedWorkspaceUsers, userListData: selectedUse
 
 const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
 const { key: userGetQueryKey } = useServiceQueryKey('identity', 'user', 'get', {
-    contextKey: userPageState.selectedUserIds[0],
+    contextKey: computed(() => userPageState.selectedUserIds[0]),
 });
 
 const { userAPI } = useUserApi();
