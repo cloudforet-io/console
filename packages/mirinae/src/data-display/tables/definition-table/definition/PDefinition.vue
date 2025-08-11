@@ -41,7 +41,7 @@
                 <p-copy-button v-else
                                width="0.8rem"
                                height="0.8rem"
-                               :value="copyValueFormatter ? String(copyValueFormatter(data, $props)) : String(copyValue)"
+                               :value="copyValueFormatter ? String(copyValueFormatter(data, $props)) : Array.isArray(copyValue) ? copyValue.join(', ') : String(copyValue)"
                                auto-hide-icon
                 >
                     <slot name="default"
@@ -123,7 +123,7 @@ export default defineComponent({
             default: false,
         },
         copyValue: {
-            type: [String, Number],
+            type: [String, Number, Array],
             default: undefined,
         },
         copyValueFormatter: {
