@@ -3,6 +3,7 @@ import {
     computed, reactive, watch, ref,
 } from 'vue';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import {
@@ -13,13 +14,12 @@ import {
 import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
 import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
 import { useDomainStore } from '@/store/domain/domain-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UnifiedCostConfig } from '@/services/advanced/types/preferences-type';
 import BudgetLastThreeMonthCostTrendBarChart from '@/services/cost-explorer/components/BudgetLastThreeMonthCostTrendBarChart.vue';
@@ -136,18 +136,19 @@ const isValidPositiveNumber = (value: any): boolean => {
     return value !== '' && !Number.isNaN(num) && num > 0;
 };
 
-const fetchBudgetUsage = async (params: BudgetUsageListParameters) => {
-    try {
-        const { results } = await budgetUsageAPI.list(params);
-        state.existingBudgetUsageList = results ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
+const queryClient = useQueryClient();
+const { key } = useServiceQueryKey('cost-analysis', 'budget-usage', 'list');
+const fetchBudgetUsage = async (params: BudgetUsageListParameters) => queryClient.fetchQuery({
+    queryKey: key,
+    queryFn: () => budgetUsageAPI.list(params),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 3,
+});
+
 
 watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], async () => {
     if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
-        await fetchBudgetUsage({
+        const { results } = await fetchBudgetUsage({
             query: {
                 filter: [
                     budgetCreatePageState.scope.serviceAccount
@@ -179,6 +180,7 @@ watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMo
                 ],
             },
         });
+        state.existingBudgetUsageList = results ?? [];
     }
 }, { deep: true, immediate: true });
 
