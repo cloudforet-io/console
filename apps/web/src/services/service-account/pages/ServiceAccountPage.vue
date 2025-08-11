@@ -85,7 +85,11 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
 
-const { accountTableSchema, refetch: refetchAccountTableSchema } = useAccountTableSchema({
+const {
+    generalAccountTableSchema,
+    trustedAccountTableSchema,
+    refetch: refetchAccountTableSchema,
+} = useAccountTableSchema({
     isTrustedAccount: computed(() => serviceAccountSchemaState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
 });
 
@@ -107,7 +111,8 @@ const tableState = reactive({
     isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     schemaOptions: computed<DynamicLayoutOptions>(() => {
         // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
-        const _schemaOptions = accountTableSchema.value?.options as DynamicLayoutOptions ?? {};
+        const _schemaOptions = tableState.isTrustedAccount
+            ? (trustedAccountTableSchema.value?.options as DynamicLayoutOptions ?? {}) : (generalAccountTableSchema.value?.options as DynamicLayoutOptions ?? {});
         return state.isAgentModeAccount ? convertAgentModeOptions(_schemaOptions) : _schemaOptions;
     }),
     visibleCustomFieldModal: false,
@@ -155,7 +160,7 @@ const fetchOptionState = reactive({
 });
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = () => {
+const getQuery = (isTrustedAccount = false) => {
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
@@ -164,11 +169,12 @@ const getQuery = () => {
             ...tableState.adminModeFilter,
             ...tableState.searchFilters,
         ]);
-    const fields = accountTableSchema.value?.options?.fields;
+    const fields = isTrustedAccount
+        ? trustedAccountTableSchema.value?.options?.fields : generalAccountTableSchema.value?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
             ...fields.map((d) => d.key),
-            ...(tableState.isTrustedAccount ? ['trusted_account_id'] : ['service_account_id', 'trusted_account_id']),
+            ...(isTrustedAccount ? ['trusted_account_id'] : ['service_account_id', 'trusted_account_id']),
             'tags',
         );
     }
@@ -182,7 +188,7 @@ const {
     query: trustedAccountQuery,
 } = useTrustedAccountPaginationQuery({
     params: computed(() => ({
-        query: getQuery(),
+        query: getQuery(true),
     })),
     enabled: computed(() => tableState.isTrustedAccount),
     thisPage: computed(() => getThisPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)),
@@ -230,7 +236,9 @@ const typeOptionState = reactive({
 
 const searchFilter = new ApiQueryHelper();
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
-    computed<SearchSchema>(() => accountTableSchema.value?.options?.search as unknown as SearchSchema ?? []),
+    computed<SearchSchema>(() => (tableState.isTrustedAccount
+        ? (trustedAccountTableSchema.value?.options?.search as unknown as SearchSchema ?? [])
+        : (generalAccountTableSchema.value?.options?.search as unknown as SearchSchema ?? []))),
     'identity.ServiceAccount',
     computed(() => searchFilter.setFilters([
         { k: 'provider', v: state.selectedProvider, o: '=' },
@@ -259,7 +267,8 @@ const exportServiceAccountData = async () => {
     await downloadExcel({
         url: `/identity/${tableState.isTrustedAccount ? 'trusted-account' : 'service-account'}/list`,
         param: { query: getQuery() },
-        fields: dynamicFieldsToExcelDataFields(accountTableSchema.value?.options?.fields ?? []),
+        fields: dynamicFieldsToExcelDataFields(tableState.isTrustedAccount
+            ? trustedAccountTableSchema.value?.options?.fields ?? [] : generalAccountTableSchema.value?.options?.fields ?? []),
         file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
         timezone: state.timezone,
     });
@@ -299,7 +308,8 @@ const handleClickRow = (index) => {
     }).catch(() => {});
 };
 const handleDynamicLayoutFetch = (changed) => {
-    if (accountTableSchema.value === null) return;
+    if (tableState.isTrustedAccount
+        ? trustedAccountTableSchema.value === null : generalAccountTableSchema.value === null) return;
     fetchTableData(changed);
 };
 const handleVisibleCustomFieldModal = (visible) => {
@@ -402,7 +412,7 @@ watch(() => tableState.searchFilters, (searchFilters) => {
                     </p-button>
                 </template>
             </p-heading-layout>
-            <p-dynamic-layout v-if="accountTableSchema"
+            <p-dynamic-layout v-if="tableState.isTrustedAccount ? trustedAccountTableSchema : generalAccountTableSchema"
                               class="service-account-table"
                               type="query-search-table"
                               :options="tableState.schemaOptions"

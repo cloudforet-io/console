@@ -129,7 +129,8 @@ export const useAccountTableSchema = ({ isTrustedAccount }: UseAccountTableSchem
     });
 
     return {
-        accountTableSchema: computed<QuerySearchTableLayout|undefined>(() => (isTrustedAccount.value ? trustedAccountSchemaData.value : generalAccountSchemaData.value)),
+        generalAccountTableSchema: computed<QuerySearchTableLayout|undefined>(() => generalAccountSchemaData.value),
+        trustedAccountTableSchema: computed<QuerySearchTableLayout|undefined>(() => trustedAccountSchemaData.value),
         refetch: () => {
             if (isTrustedAccount.value) {
                 return refetchTrustedAccountUserConfigList();
