@@ -3,11 +3,14 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@cloudforet/mirinae';
 
 import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
@@ -36,7 +39,6 @@ const referenceMap = useAllReferenceDataModel();
 const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    loading: false,
     secretsCount: 0,
     headerTitle: computed(() => (state.isDuplicateJobs
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
@@ -79,6 +81,7 @@ const recentJob = computed<JobModel | undefined>(() => {
 });
 
 /* Query */
+const queryClient = useQueryClient();
 const { data: selectedCollectorData } = useCollectorGetQuery({
     collectorId: computed(() => collectorDataModalState.selectedCollectorId),
 });
@@ -101,6 +104,22 @@ const { data: secretListData } = useSecretListQuery(computed(() => {
     };
 }));
 
+/* Mutation */
+const { key: jobListQueryKey } = useServiceQueryKey('inventory', 'job', 'list');
+const { mutate: collectData, isPending: isCollecting } = useMutation({
+    mutationFn: collectorAPI.collect,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+        queryClient.invalidateQueries({ queryKey: jobListQueryKey.value });
+    },
+    onError: (error) => {
+        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+    },
+    onSettled: () => {
+        collectorDataModalStore.setVisible(false);
+    },
+});
+
 /* Components */
 const handleClickCancel = () => {
     collectorDataModalStore.setVisible(false);
@@ -108,20 +127,10 @@ const handleClickCancel = () => {
 const handleClickConfirm = async () => {
     if (!selectedCollectorData.value) throw new Error('[CollectorDataModal] selectedCollector is null');
 
-    state.loading = true;
-    try {
-        await collectorAPI.collect({
-            collector_id: selectedCollectorData.value.collector_id,
-            secret_id: collectorDataModalState.selectedSecret?.secret_id,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-        throw e;
-    } finally {
-        state.loading = false;
-        collectorDataModalStore.setVisible(false);
-    }
+    collectData({
+        collector_id: selectedCollectorData.value.collector_id,
+        secret_id: collectorDataModalState.selectedSecret?.secret_id,
+    });
 };
 
 
@@ -141,7 +150,7 @@ onUnmounted(() => {
         <p-button-modal :visible="collectorDataModalState.visible && !isJobListLoading"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
-                        :loading="state.loading"
+                        :loading="isCollecting"
                         :disabled="!secretListData?.total_count"
                         size="sm"
                         @confirm="handleClickConfirm"
