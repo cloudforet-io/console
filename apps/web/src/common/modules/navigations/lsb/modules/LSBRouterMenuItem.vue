@@ -10,6 +10,8 @@ import { PI, PLazyImg, PTooltip } from '@cloudforet/mirinae';
 
 import { SpaceRouter } from '@/router';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import type { MenuId } from '@/lib/menu/config';
 
@@ -31,6 +33,9 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+
 const itemEl = ref<HTMLElement | null>(null);
 const textEL = ref<HTMLElement | null>(null);
 
@@ -46,7 +51,13 @@ const isSelectedMenu = (selectedMenuRoute?: Location): boolean => {
     let currentPath = props.currentPath;
     if (!currentPath || !selectedMenuRoute) return false;
 
-    const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
+    const resolved = SpaceRouter.router.resolve({
+        name: selectedMenuRoute.name,
+        params: {
+            ...selectedMenuRoute.params,
+            workspaceId: userWorkspaceStoreGetters.currentWorkspaceId || '',
+        },
+    });
     if (!resolved) return false;
 
     if (currentPath.indexOf('?') > 0) {
