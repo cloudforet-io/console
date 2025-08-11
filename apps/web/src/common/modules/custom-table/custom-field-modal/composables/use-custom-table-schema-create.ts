@@ -19,7 +19,7 @@ import type {
 
 interface UseCustomTableSchemaCreateMutationOptions {
     userData: ComputedRef<{ userType: string, userId: string }>;
-    resourceType: ComputedRef<ResourceType>;
+    resourceType: ComputedRef<ResourceType|undefined>;
     provider: ComputedRef<string>;
     onSuccess?: (data: UserConfigModel<QuerySearchTableLayout>, variables: UserConfigCreateParameters) => void|Promise<void>;
     onError?: (error: Error, variables: UserConfigCreateParameters) => void|Promise<void>;

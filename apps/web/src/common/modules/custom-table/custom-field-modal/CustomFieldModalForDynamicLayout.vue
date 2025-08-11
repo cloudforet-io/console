@@ -20,6 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useCustomTableSchemaCreate } from '@/common/modules/custom-table/custom-field-modal/composables/use-custom-table-schema-create';
 import { useCustomTableSchemaGetQuery } from '@/common/modules/custom-table/custom-field-modal/composables/use-custom-table-schema-get-query';
 import { useCustomTableSchemaUpdate } from '@/common/modules/custom-table/custom-field-modal/composables/use-custom-table-schema-update';
 import { useServiceAccountTableSchemaGetQuery } from '@/common/modules/custom-table/custom-field-modal/composables/use-service-account-table-schema-get-query';
@@ -35,6 +36,7 @@ import type {
     QuerySearchTableLayout,
     ResourceType,
 } from '@/services/service-account/helpers/dynamic-ui-schema-generator/type';
+
 
 
 const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
@@ -256,6 +258,11 @@ const { updateCustomTableSchema: updateCustomTableSchemaMutation, isPending: isP
     resourceType: computed(() => props.resourceType),
     provider: computed(() => props.options.provider ?? ''),
 });
+const { createCustomTableSchema: createCustomTableSchemaMutation, isPending: isPendingCreateCustomTableSchema } = useCustomTableSchemaCreate({
+    userData: computed(() => ({ userType: storeState.userType ?? 'USER', userId: storeState.userId ?? '' })),
+    resourceType: computed(() => props.resourceType),
+    provider: computed(() => props.options.provider ?? ''),
+});
 
 const { mutateAsync: updateCloudServicePageSchema, isPending: isPendingUpdateCloudServicePageSchema } = useCloudServicePageSchemaUpdateMutation();
 const updatePageSchema = async () => {
@@ -278,7 +285,11 @@ const updatePageSchema = async () => {
 
     try {
         if (state.isServiceAccountTable && props.resourceType) {
-            await updateCustomTableSchemaMutation(data);
+            if (customTableSchema.value) {
+                await updateCustomTableSchemaMutation(data);
+            } else {
+                await createCustomTableSchemaMutation(data);
+            }
         } else {
             await updateCloudServicePageSchema({
                 resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType ?? '',
@@ -327,7 +338,7 @@ const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
 
 const isLoading = computed<boolean>(() => isFetchingServiceAccountTableSchema.value || isFetchingCustomTableSchema.value
     || isFetchingCloudServiceTableSchemaWithIncludeOptionalFields.value || isFetchingCloudServiceTableSchemaWithoutIncludeOptionalFields.value
-    || isPendingUpdateCustomTableSchema.value || isPendingUpdateCloudServicePageSchema.value);
+    || isPendingUpdateCustomTableSchema.value || isPendingUpdateCloudServicePageSchema.value || isPendingCreateCustomTableSchema.value);
 
 
 watch([
