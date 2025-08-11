@@ -35,7 +35,7 @@ import { workspaceStateFormatter } from '@/services/advanced/composables/refined
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import DataSourceManagementModal from '@/services/cost-explorer/components/DataSourceManagementModal.vue';
 import {
-    makeDataSourceDistinctValueHandler, makeDataSourceSyncValueHandler,
+    makeDataSourceDistinctValueHandler,
 } from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourceAccountListQuery } from '@/services/cost-explorer/composables/use-data-source-account-list-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
@@ -70,8 +70,6 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
-            { name: 'is_linked', label: 'Status' },
-            { name: 'is_sync', label: 'Sync' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
@@ -88,8 +86,6 @@ const tableState = reactive({
             name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', filters),
             account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', filters),
             workspace_id: makeDataSourceDistinctValueHandler(filters, storeState.workspaceList),
-            is_linked: makeDataSourceSyncValueHandler('is_linked', filters),
-            is_sync: makeDataSourceSyncValueHandler('is_sync', filters),
         };
     }),
     filterFields: computed(() => [
@@ -116,7 +112,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 /* Query */
-let linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+const linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 const {
     data: linkedAccountList,
     totalCount: linkedAccountListTotalCount,
@@ -125,14 +121,14 @@ const {
     isLoading,
 } = useDataSourceAccountListQuery({
     params: computed(() => {
-        if (tableState.selectedFilter[0] === 'all') {
-            linkedAccountListApiQueryHelper = new ApiQueryHelper();
-        } else {
-            linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: tableState.selectedFilter[0] === 'linked', o: '=' }]);
-        }
         linkedAccountListApiQueryHelper
             .setFilters(queryTagHelper.filters.value)
             .setSort(tableState.sortBy, tableState.sortDesc);
+
+        if (tableState.selectedFilter[0] !== 'all') {
+            linkedAccountListApiQueryHelper.addFilter({ k: 'is_linked', v: tableState.selectedFilter[0] === 'linked', o: '=' });
+        }
+
         return {
             data_source_id: dataSourcesPageState.selectedDataSourceId,
             query: linkedAccountListApiQueryHelper.data,

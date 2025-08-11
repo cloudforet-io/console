@@ -85,13 +85,11 @@ const tableState = reactive({
         items: [
             { name: 'name', label: 'Name' },
             { name: 'data_source_id', label: 'ID' },
-            { name: 'state', label: 'State' },
             { name: 'created_at', label: 'Registered Time', dataType: 'datetime' },
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         name: makeDistinctValueHandler('cost_analysis.DataSource', 'name'),
-        state: makeDistinctValueHandler('cost_analysis.DataSource', 'state'),
         data_source_id: makeDistinctValueHandler('cost_analysis.DataSource', 'data_source_id'),
         created_at: makeDistinctValueHandler('cost_analysis.DataSource', 'created_at'),
     })),
