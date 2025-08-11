@@ -191,7 +191,7 @@ const metricExampleListApiQueryHelper = new ApiQueryHelper();
 const { data: favoriteMetricExampleItems, isLoading: favoriteMetricExampleItemsLoading } = useMetricExampleListQuery({
     params: computed(() => {
         const _favoriteMetricExampleIds = favoriteGetters.metricExampleItems.map((item) => item.itemId);
-        metricExampleListApiQueryHelper.setFilters([{ k: 'metric_id', v: _favoriteMetricExampleIds, o: '=' }]);
+        metricExampleListApiQueryHelper.setFilters([{ k: 'example_id', v: _favoriteMetricExampleIds, o: '=' }]);
         return {
             query: metricExampleListApiQueryHelper.data,
         };
