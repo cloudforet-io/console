@@ -5,6 +5,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
+
 import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -311,6 +313,9 @@ const handleDynamicLayoutFetch = (changed) => {
     if (tableState.isTrustedAccount
         ? trustedAccountTableSchema.value === null : generalAccountTableSchema.value === null) return;
     fetchTableData(changed);
+    if (isEmpty(changed)) {
+        reloadTable();
+    }
 };
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
