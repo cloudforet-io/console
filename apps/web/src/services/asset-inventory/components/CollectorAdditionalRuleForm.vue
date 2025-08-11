@@ -66,7 +66,7 @@ interface AdditionalRuleConditionWithSubkey extends AdditionalRuleCondition {
     subkey?: string;
 }
 const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRuleConditionWithSubkey[] => {
-    const targetCondition = (!condition || condition.length === 0) ? [{
+    const targetCondition = !condition?.length ? [{
         key: DEFAULT_CONDITION_KEY,
         subkey: '',
         operator: 'eq',
