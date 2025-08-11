@@ -122,11 +122,7 @@ const {
 })));
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    if (state.isSchemaEmpty && !isLoadingPluginMetadata.value) {
-        emit('update:isValid', true);
-    } else {
-        emit('update:isValid', isValid);
-    }
+    emit('update:isValid', isValid);
     collectorFormStore.setOptions(value);
 };
 
@@ -135,6 +131,12 @@ const handleClickReloadButton = () => {
 };
 
 
+/* Watcher */
+watch(isLoadingPluginMetadata, (isLoading) => {
+    if (!isLoading && state.isSchemaEmpty) {
+        emit('update:isValid', true);
+    }
+});
 watch(() => collectorFormState.collectorId, async (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
