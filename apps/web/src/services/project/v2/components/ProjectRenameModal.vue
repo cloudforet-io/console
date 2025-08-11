@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -63,6 +64,8 @@ watch([visible, project], ([v, prj]) => {
 
 /* mutations */
 const { projectAPI } = useProjectApi();
+const queryClient = useQueryClient();
+const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
 const { mutateAsync: updateProject, isPending: isUpdatingProject } = useMutation({
     mutationFn: ({ projectId, name }: { projectId: string; name: string }) => projectAPI.update({
         project_id: projectId,
@@ -71,6 +74,7 @@ const { mutateAsync: updateProject, isPending: isUpdatingProject } = useMutation
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
         setQueryData(data);
+        queryClient.invalidateQueries({ queryKey: projectListQueryKey });
     },
     onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
