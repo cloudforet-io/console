@@ -65,21 +65,24 @@ const DEFAULT_CONDITION_KEY = props.provider ? COLLECTOR_RULE_CONDITION_KEY.clou
 interface AdditionalRuleConditionWithSubkey extends AdditionalRuleCondition {
     subkey?: string;
 }
-const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRuleConditionWithSubkey[] => (condition ?? [{
-    key: DEFAULT_CONDITION_KEY,
-    subkey: '',
-    operator: 'eq',
-    value: '',
-}]).map((c) => {
-    if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
-        return {
-            ...c,
-            key: c.key.split('.')[0] ?? c.key,
-            subkey: c.key.slice(4),
-        };
-    }
-    return c;
-});
+const convertToUiCondition = (condition?:AdditionalRuleCondition[]):AdditionalRuleConditionWithSubkey[] => {
+    const targetCondition = (!condition || condition.length === 0) ? [{
+        key: DEFAULT_CONDITION_KEY,
+        subkey: '',
+        operator: 'eq',
+        value: '',
+    }] : condition;
+    return targetCondition.map((c) => {
+        if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
+            return {
+                ...c,
+                key: c.key.split('.')[0] ?? c.key,
+                subkey: c.key.slice(4),
+            };
+        }
+        return c;
+    });
+};
 
 const convertToApiCondition = (condition:AdditionalRuleConditionWithSubkey[]):AdditionalRuleCondition[] => condition.map((c) => {
     if (c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.data) || c.key.startsWith(COLLECTOR_RULE_CONDITION_KEY.tags)) {
