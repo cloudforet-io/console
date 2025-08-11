@@ -16,7 +16,7 @@ export const useTrustedAccountSyncMutation = ({
     const { trustedAccountAPI } = useTrustedAccountApi();
     const queryClient = useQueryClient();
     const { withSuffix: withSuffixGet } = useServiceQueryKey('identity', 'service-account', 'get');
-    const { withSuffix: withSuffixList } = useServiceQueryKey('identity', 'service-account', 'list');
+    const { key: listQueryKey } = useServiceQueryKey('identity', 'service-account', 'list');
 
     return useMutation({
         mutationFn: (params: TrustedAccountSyncParameters) => {
@@ -25,7 +25,7 @@ export const useTrustedAccountSyncMutation = ({
         },
         onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: withSuffixGet(variables.trusted_account_id) });
-            queryClient.invalidateQueries({ queryKey: withSuffixList(variables.trusted_account_id) });
+            queryClient.invalidateQueries({ queryKey: listQueryKey.value });
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: async (error, variables) => {

@@ -18,7 +18,7 @@ export const useTrustedAccountDeleteMutation = ({
     const { trustedAccountAPI } = useTrustedAccountApi();
     const queryClient = useQueryClient();
     const { withSuffix: withSuffixGet } = useServiceQueryKey('identity', 'trusted-account', 'get');
-    const { withSuffix: withSuffixList } = useServiceQueryKey('identity', 'trusted-account', 'list');
+    const { key: listQueryKey } = useServiceQueryKey('identity', 'trusted-account', 'list');
 
     return useMutation({
         mutationFn: (params: TrustedAccountDeleteParameters) => {
@@ -27,7 +27,7 @@ export const useTrustedAccountDeleteMutation = ({
         },
         onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: withSuffixGet(variables.trusted_account_id) });
-            queryClient.invalidateQueries({ queryKey: withSuffixList(variables.trusted_account_id) });
+            queryClient.invalidateQueries({ queryKey: listQueryKey.value });
             if (onSuccess) await onSuccess(data, variables);
         },
         onError: async (error, variables) => {
