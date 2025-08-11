@@ -193,7 +193,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     state.thisPage = 1;
 });
 watch(isJobListSuccess, (isSuccess) => {
-    if (isSuccess && jobListTotalCount.value === 0) {
+    if (isSuccess && jobListTotalCount.value === 0 && state.selectedStatus === JOB_SELECTED_STATUS.ALL) {
         state.modalVisible = true;
     }
 });
