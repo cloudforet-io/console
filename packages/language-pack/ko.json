@@ -3210,6 +3210,7 @@
 				"NO_WORKSPACE": "워크스페이스 없음",
 				"OWNER": "소유자",
 				"PASSWORD": "비밀번호",
+				"PASSWORD_VALIDATION_INVALID": "비밀번호는 8자 이상, 소문자, 대문자, 숫자를 포함해야 합니다.",
 				"PASSWORD_SEND_LINK": "로컬 사용자에게 비밀번호 재설정 이메일 발송",
 				"REQUIRED_FIELD": "해당 정보를 입력해주세요.",
 				"ROLE_PLACEHOLDER": "워크스페이스 접근 역할(Role) 선택",

@@ -3210,6 +3210,7 @@
 				"NO_WORKSPACE": "ワークスペースなし",
 				"OWNER": "オーナー",
 				"PASSWORD": "パスワード",
+				"PASSWORD_VALIDATION_INVALID": "パスワードは8文字以上で、小文字、大文字、数字を含む必要があります。",
 				"PASSWORD_SEND_LINK": "ローカルユーザーにパスワードリセットメールを送信",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"ROLE_PLACEHOLDER": "ワークスペースアクセスロールを選択",

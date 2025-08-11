@@ -3210,6 +3210,7 @@
 				"NO_WORKSPACE": "No Workspace",
 				"OWNER": "Owner",
 				"PASSWORD": "Password",
+				"PASSWORD_VALIDATION_INVALID": "Password must be at least 8 characters with lowercase, uppercase, and number.",
 				"PASSWORD_SEND_LINK": "Send new local users a password reset link",
 				"REQUIRED_FIELD": "Required field",
 				"ROLE_PLACEHOLDER": "Select a workspace role",

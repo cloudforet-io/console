@@ -9,9 +9,6 @@ import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 import {
-    oneLowerCaseValidator,
-    oneNumberValidator,
-    oneUpperCaseValidator,
     samePasswordValidator,
 } from '@/lib/helper/user-validation-helper';
 
@@ -66,9 +63,11 @@ const {
 }, {
     password(value: string) {
         if (value === '') return '';
-        if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-        if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-        if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        if (!passwordRegex.test(value)) {
+            return i18n.t('IAM.USER.FORM.PASSWORD_VALIDATION_INVALID');
+        }
         return '';
     },
     passwordCheck(value: string) {
