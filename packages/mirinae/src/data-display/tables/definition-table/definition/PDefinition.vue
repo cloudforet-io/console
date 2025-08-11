@@ -41,7 +41,7 @@
                 <p-copy-button v-else
                                width="0.8rem"
                                height="0.8rem"
-                               :value="copyValueFormatter ? String(copyValueFormatter(data, $props)) : Array.isArray(copyValue) ? copyValue.join(', ') : String(copyValue)"
+                               :value="refinedCopyValue"
                                auto-hide-icon
                 >
                     <slot name="default"
@@ -166,10 +166,21 @@ export default defineComponent({
             }),
         });
 
+        const refinedCopyValue = computed(() => {
+            if (props.copyValueFormatter) {
+                return String(props.copyValueFormatter(props.data, props));
+            }
+            if (Array.isArray(props.copyValue)) {
+                return props.copyValue.join(', ');
+            }
+            return String(props.copyValue);
+        });
+
         const getArrayOfObjectDisplayData = (data) => JSON.stringify(data, undefined, 2);
 
         return {
             ...toRefs(state),
+            refinedCopyValue,
             getArrayOfObjectDisplayData,
         };
     },
