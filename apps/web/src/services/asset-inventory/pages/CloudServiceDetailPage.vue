@@ -315,7 +315,9 @@ const getQuery = () => {
     return apiQuery.data;
 };
 
-const { data: cloudServiceTableData, isLoading: isCloudServiceTableDataLoading, totalCount } = useCloudServicePaginationQuery({
+const {
+    data: cloudServiceTableData, isLoading: isCloudServiceTableDataLoading, totalCount, query: cloudServiceTableQuery,
+} = useCloudServicePaginationQuery({
     params: computed(() => {
         const query = cloneDeep(getQuery());
         query.filter = query.filter ? query.filter.concat(tableState.defaultSearchQuery) : tableState.defaultSearchQuery;
@@ -406,6 +408,10 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
     }
     if (changed.queryTags !== undefined) {
         queryTagsHelper.setQueryTags(changed.queryTags);
+    }
+    // Dynamic Layout Toolbox Refresh
+    if (isEmpty(changed)) {
+        cloudServiceTableQuery.refetch();
     }
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };

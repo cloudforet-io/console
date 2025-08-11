@@ -24,6 +24,10 @@ interface Props {
     pageSize?: number;
 }
 
+interface Emits {
+    (event: 'update-pagination', value: ToolboxOptions): void;
+    (event: 'refresh'): void;
+}
 
 const props = withDefaults(defineProps<Props>(), {
     hasNextPage: false,
@@ -33,9 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     pageSize: undefined,
 });
 
-const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
-    (event: 'refresh'): void;
-}>();
+const emit = defineEmits<Emits>();
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageGetters = cloudServicePageStore.getters;

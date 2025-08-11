@@ -54,6 +54,11 @@ interface Props {
     isServerPage?: boolean;
 }
 
+interface Emits {
+    (e: 'complete'): void;
+    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
+}
+
 type SelectedColumnMap = Record<string, DynamicField>;
 
 /**
@@ -77,9 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
     isServerPage: false,
 });
 
-const emit = defineEmits<{(e: 'complete'): void;
-    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
-}>();
+const emit = defineEmits<Emits>();
 
 
 const appContextStore = useAppContextStore();
@@ -117,7 +120,7 @@ const state = reactive({
     selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
     recommendedSequenceMap: computed<Record<string, number>>(() => {
         const orderMap: Record<string, number> = {};
-        state.availableColumns.forEach((d, i) => {
+        availableSchemaColumns.value.forEach((d, i) => {
             orderMap[d.key] = i;
         });
         return orderMap;

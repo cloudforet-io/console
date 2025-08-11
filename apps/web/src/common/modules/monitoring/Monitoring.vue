@@ -6,27 +6,21 @@ import { useRouter } from 'vue-router/composables';
 
 import dayjs from 'dayjs';
 import {
-    debounce, find, capitalize, chain, range, sortBy, get,
+    debounce, capitalize, range, sortBy,
 } from 'lodash';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
+    PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@cloudforet/mirinae';
 
-
-import { MONITORING_TYPE } from '@/api-clients/monitoring/data-source/schema/constants';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useMonitoringDataSourceGetQuery } from '@/common/modules/monitoring/composables/use-monitoring-data-source-get-query';
-import { useMonitoringDataSourceListQuery } from '@/common/modules/monitoring/composables/use-monitoring-data-source-list-query';
 import { useMonitoringMetricGetDataFetcher } from '@/common/modules/monitoring/composables/use-monitoring-metric-get-data-fetcher';
 import { useMonitoringMetricListQuery } from '@/common/modules/monitoring/composables/use-monitoring-metric-list-query';
-import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
     COLORS, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
@@ -36,27 +30,14 @@ import type {
     Metric, MetricChartData, StatItem,
 } from '@/common/modules/monitoring/type';
 
-
-interface DataToolType {
-    id: string;
-    name: string;
-    statisticsTypes: StatisticsType[];
-}
-
 const LOAD_LIMIT = 12;
 
 interface Props {
-    loading: boolean;
     resources: AvailableResource[];
-    selectedMetrics: Metric[];
-    dataSourceId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: false,
     resources: () => [],
-    selectedMetrics: () => [],
-    dataSourceId: undefined,
 });
 
 const router = useRouter();
@@ -65,14 +46,11 @@ const { getReferenceLocation } = useReferenceRouter();
 
 
 const state = reactive({
-    showLoader: computed(() => isLoadingMetrics.value || isLoadingDataSources.value || isLoadingDataSource.value),
+    showLoader: computed(() => isLoadingMetrics.value),
     timezone: computed(() => userStore.state.timezone),
     selectedTimeRange: '1h',
     selectedToolId: '',
-    statisticsTypes: computed(() => {
-        const tool = find(dataTools.value, { id: state.selectedToolId });
-        return tool ? tool.statisticsTypes : [STATISTICS_TYPE.AVERAGE];
-    }),
+    statisticsTypes: computed(() => [STATISTICS_TYPE.AVERAGE]),
     statItems: computed<StatItem[]>(() => state.statisticsTypes.map((d) => ({
         type: 'item', label: capitalize(d), name: d,
     }))),
@@ -83,32 +61,7 @@ const state = reactive({
     noData: false,
 });
 
-const dataTools = computed<DataToolType[]>(() => {
-    if (props.dataSourceId) {
-        return [{
-            id: props.dataSourceId,
-            name: dataSource.value?.name ?? '',
-            statisticsTypes: get(dataSource.value, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
-        }];
-    }
-    return chain(dataSources.value?.results)
-        .map((d) => ({
-            id: d.data_source_id,
-            name: d.name,
-            statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
-        })).compact().uniqBy('id')
-        .value();
-});
-const tools = computed(() => dataTools.value.map((d) => ({
-    name: d.id,
-    label: d.name,
-})));
-const metrics = computed(() => {
-    if (props.selectedMetrics && props.selectedMetrics.length > 0) {
-        return sortBy(props.selectedMetrics, (m) => m.name);
-    }
-    return sortBy(metricList.value?.metrics, (m) => m.name);
-});
+const metrics = computed(() => sortBy(metricList.value?.metrics, (m) => m.name));
 
 /* api */
 const setAvailableResources = () => {
@@ -121,21 +74,6 @@ const setAvailableResources = () => {
     state.availableResources = sortBy(resources, (m) => m.name);
 };
 
-const { data: dataSource, isFetching: isLoadingDataSource } = useMonitoringDataSourceGetQuery({
-    dataSourceId: computed(() => props.dataSourceId || ''),
-});
-
-const apiQuery = new ApiQueryHelper();
-const { data: dataSources, isFetching: isLoadingDataSources } = useMonitoringDataSourceListQuery({
-    params: computed(() => {
-        apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map((d) => d.provider) }]);
-        return {
-            monitoring_type: MONITORING_TYPE.METRIC,
-            query: apiQuery.data,
-        };
-    }),
-    enabled: computed(() => !props.dataSourceId),
-});
 
 const { data: metricList, isFetching: isLoadingMetrics } = useMonitoringMetricListQuery({
     params: computed(() => ({
@@ -216,14 +154,6 @@ const loadMoreMetricCharts = async () => {
     await listMetricCharts(start);
 };
 
-watch(dataTools, (_dataTools) => {
-    if (props.dataSourceId) {
-        state.selectedToolId = props.dataSourceId;
-    } else if (_dataTools.length > 0) {
-        state.selectedToolId = _dataTools[0].id;
-    }
-}, { immediate: true });
-
 watch(() => state.statisticsTypes, (types) => {
     if (types) state.selectedStat = types[0] || STATISTICS_TYPE.AVERAGE;
 }, { immediate: true });
@@ -232,7 +162,7 @@ watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, st
     if (timeRange && stat) listMetricCharts();
 }, { immediate: false });
 
-watch([() => state.selectedToolId, () => props.selectedMetrics, () => props.resources], async () => {
+watch([() => state.selectedToolId, () => props.resources], async () => {
     if (props.resources) {
         await listAll();
     }
@@ -242,14 +172,6 @@ watch([() => state.selectedToolId, () => props.selectedMetrics, () => props.reso
 
 <template>
     <div class="monitoring">
-        <section v-if="!props.dataSourceId && tools.length > 1"
-                 class="data-source-section"
-        >
-            <p-select-button-group class="data-source-wrapper"
-                                   :buttons="tools"
-                                   :selected.sync="state.selectedToolId"
-            />
-        </section>
         <section class="resource-section">
             <span class="title">
                 {{ $t('COMMON.MONITORING.RESOURCE') }}
@@ -271,7 +193,7 @@ watch([() => state.selectedToolId, () => props.selectedMetrics, () => props.reso
                               :style="{ backgroundColor: resource.color }"
                         />
                     </template>
-                    {{ legendFormatter(resource) }}
+                    {{ resource.name || resource.id }}
                 </p-link>
             </div>
         </section>

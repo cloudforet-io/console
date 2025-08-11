@@ -50,6 +50,7 @@ const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
 
 const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
     params: computed(() => ({
@@ -126,7 +127,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
     }
 
     if (provider) {
-        const icon = referenceMap.provider[provider]?.icon;
+        const icon = providerMap[provider]?.icon;
         if (icon) return assetUrlConverter(icon);
     }
 
@@ -142,7 +143,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
         >
             <div class="card-title-wrapper">
                 <div class="provider-title-wrapper">
-                    <span class="provider">{{ item.provider ? referenceMap.provider[item.provider]?.label || item.provider : '' }}</span>
+                    <span class="provider">{{ item.provider ? providerMap[item.provider]?.label || item.provider : '' }}</span>
                 </div>
                 <div class="service-group-wrapper">
                     <p-lazy-img width="1.25rem"

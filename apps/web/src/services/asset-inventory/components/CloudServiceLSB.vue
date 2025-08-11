@@ -53,6 +53,7 @@ const route = useRoute();
 const router = useRouter();
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
@@ -215,7 +216,7 @@ watch([
                         <p-lazy-img width="1rem"
                                     height="1rem"
                                     error-icon="ic_cloud-filled"
-                                    :src="referenceMap.provider[item.name]?.icon"
+                                    :src="providerMap[item.name]?.icon"
                                     class="mr-1"
                         /><span>{{ item.label }}</span>
                     </span>

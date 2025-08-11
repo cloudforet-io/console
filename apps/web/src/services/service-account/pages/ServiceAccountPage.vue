@@ -262,6 +262,14 @@ const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
     if (changed.queryTags !== undefined) {
         fetchOptionState.queryTags = changed.queryTags;
     }
+    // Dynamic Layout Toolbox Refresh
+    if (isEmpty(changed)) {
+        if (tableState.isTrustedAccount) {
+            trustedAccountQuery.refetch();
+        } else {
+            serviceAccountQuery.refetch();
+        }
+    }
 };
 
 /** API for Excel export * */
@@ -313,9 +321,6 @@ const handleDynamicLayoutFetch = (changed) => {
     if (tableState.isTrustedAccount
         ? trustedAccountTableSchema.value === null : generalAccountTableSchema.value === null) return;
     fetchTableData(changed);
-    if (isEmpty(changed)) {
-        reloadTable();
-    }
 };
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;

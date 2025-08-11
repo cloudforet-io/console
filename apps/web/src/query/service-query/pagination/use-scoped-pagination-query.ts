@@ -124,7 +124,7 @@ export const useScopedPaginationQuery = <TParams extends object, TPageData exten
     return {
         data: computed(() => query.data.value?.pages?.[thisPage.value - 1]),
         totalCount: computed(() => query.data.value?.pages?.[0]?.total_count ?? 0), // except for 'analyze' verb
-        more: computed(() => query.data.value?.pages?.[0]?.more ?? false), // for 'analyze' verb without 'total_count'
+        more: computed(() => query.data.value?.pages?.[thisPage.value - 1]?.more ?? false), // for 'analyze' verb without 'total_count'
         isReady: computed(() => !!query.data.value?.pages?.[thisPage.value - 1]),
         isLoading: computed(() => !query.data.value?.pages?.[thisPage.value - 1] && query.isFetchingNextPage.value),
         query,
