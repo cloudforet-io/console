@@ -50,14 +50,16 @@ export const useStatusOptionFormMutations = ({
                 color: form.color,
             });
 
-            await taskCategoryAPI.update({
+            const data = await taskCategoryAPI.update({
                 category_id: categoryId.value,
                 status_options: newStatusOptions,
                 force: true,
             });
+            return data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: taskCategoryWithSuffix(data.category_id) });
             showSuccessMessage('Task status option created successfully', '');
         },
         onError: (e) => {

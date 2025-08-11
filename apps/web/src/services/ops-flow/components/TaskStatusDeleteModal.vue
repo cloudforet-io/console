@@ -37,6 +37,7 @@ const { defaultStatusOption } = useDefaultStatusOption({ categoryStatusOptions, 
 /* delete status option */
 const { taskCategoryAPI } = useTaskCategoryApi();
 const { key: taskCategoryListQueryKey } = useServiceQueryKey('opsflow', 'task-category', 'list');
+const { withSuffix: taskCategoryWithSuffix } = useServiceQueryKey('opsflow', 'task-category', 'get');
 const queryClient = useQueryClient();
 const { mutateAsync: deleteStatusOption, isPending: isDeleting } = useMutation({
     mutationFn: () => {
@@ -54,8 +55,9 @@ const { mutateAsync: deleteStatusOption, isPending: isDeleting } = useMutation({
             force: true,
         });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: taskCategoryWithSuffix(data.category_id) });
         showSuccessMessage(_i18n.t('OPSFLOW.ALT_S_DELETE_TARGET', { target: _i18n.t('OPSFLOW.STATUS') }), '');
         taskCategoryPageStore.closeDeleteStatusModal();
     },
