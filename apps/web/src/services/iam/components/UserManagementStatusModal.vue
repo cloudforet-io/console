@@ -219,11 +219,13 @@ const handleClose = () => {
 
 const queryClient = useQueryClient();
 const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
 const { withSuffix: withSuffixUserGetQueryKey } = useServiceQueryKey('identity', 'user', 'get');
 
 const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
     onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
         userPageStore.setSelectedIndices([]);
     },
 });

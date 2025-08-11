@@ -333,6 +333,7 @@ const { mutateAsync: deleteRoleBinding, isPending: isDeletingRoleBinding } = use
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         closeRemoveModal();
         await userRefresh();
+        userPageStore.setSelectedIndices([]);
     },
     onError: (error) => {
         ErrorHandler.handleRequestError(error, error.message);
