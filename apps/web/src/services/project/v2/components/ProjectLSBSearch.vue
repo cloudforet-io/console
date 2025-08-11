@@ -33,17 +33,17 @@ const predicate: TreeNodeRoutePredicate = (to, curr) => to.params?.projectGroupO
         <template v-if="props.keyword">
             <template v-if="projectFilteredByKeyword.length">
                 <l-s-b-item v-for="project in projectFilteredByKeyword"
-                            :id="project.key"
-                            :key="project.key"
+                            :id="project.project_id"
+                            :key="project.project_id"
                             :name="project.name"
                             :link="{
                                 to: {
                                     name: PROJECT_ROUTE_V2._NAME,
-                                    params: { projectGroupOrProjectId: project.key }
+                                    params: { projectGroupOrProjectId: project.project_id }
                                 },
                                 predicate
                             }"
-                            :favorite-options="{ type: FAVORITE_TYPE.PROJECT, id: project.key }"
+                            :favorite-options="{ type: FAVORITE_TYPE.PROJECT, id: project.project_id }"
                             display-type="list"
                             icon="ic_project-filled"
                 >
