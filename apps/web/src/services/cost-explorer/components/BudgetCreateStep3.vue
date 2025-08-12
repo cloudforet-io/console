@@ -174,8 +174,8 @@ const createBudget = (type: 'skip' | 'create') => {
         </p-button>
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ALERT_RECIPIENTS')"
                        :help-text="`${$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.ADD_RECIPIENTS_TEXT')} ${budgetCreatePageState.budgetManager}
-                            ${referenceMap.user[budgetCreatePageState.budgetManager]?.name
-                       ? `(${referenceMap.user[budgetCreatePageState.budgetManager]?.name || budgetCreatePageState.budgetManager || ''})` : ''}`"
+                            ${referenceMap.workspaceUser[budgetCreatePageState.budgetManager]?.name
+                       ? `(${referenceMap.workspaceUser[budgetCreatePageState.budgetManager]?.name || budgetCreatePageState.budgetManager || ''})` : ''}`"
                        class="mt-8 flex flex-col gap-1"
                        required
         >
