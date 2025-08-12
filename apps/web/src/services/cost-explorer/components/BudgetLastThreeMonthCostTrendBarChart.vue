@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
+    watchEffect,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -9,16 +10,15 @@ import { init } from 'echarts/core';
 import type { EChartsType } from 'echarts/core';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PPaneLayout, PI } from '@cloudforet/mirinae';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { indigo } from '@/styles/colors';
 
+import { useUnifiedCostAnalyzeBudgetQuery } from '@/services/cost-explorer/composables/use-unified-cost-analyze-budget-query';
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
 const budgetCreatePageState = budgetCreatePageStore.state;
@@ -26,7 +26,6 @@ const budgetCreatePageState = budgetCreatePageStore.state;
 const chartContext = ref<HTMLElement|null>(null);
 
 const state = reactive({
-    data: {},
     xAxisData: computed(() => {
         const startDate = budgetCreatePageState.startMonth.length > 0
             ? dayjs.utc(budgetCreatePageState.startMonth[0]).subtract(1, 'year')
@@ -98,33 +97,28 @@ const processData = (results: any[]) => {
     }));
 };
 
-const fetchBudgetUsageAnalyze = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.unifiedCost.analyze({
-            query: {
-                start: dayjs.utc(budgetCreatePageState.startMonth[0]).subtract(1, 'year').format('YYYY-MM'),
-                end: dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(1, 'year').format('YYYY-MM'),
-                group_by: !budgetCreatePageState.scope.serviceAccount ? ['project_id', 'is_confirmed'] : ['project_id', 'service_account_id', 'is_confirmed'],
-                fields: {
-                    cost_trend: {
-                        key: `cost.${budgetCreatePageState.currency}`,
-                        operator: 'sum',
-                    },
-                },
-                granularity: 'MONTHLY',
-                field_group: ['date'],
-                filter: !budgetCreatePageState.scope.serviceAccount ? [
-                    { k: 'project_id', v: budgetCreatePageState.project, o: 'eq' },
-                ] : [
-                    { k: 'service_account_id', v: budgetCreatePageState.scope.serviceAccount, o: 'eq' },
-                ],
+const {
+    costAnalyzeData: unifiedCostAnalyzeData,
+} = useUnifiedCostAnalyzeBudgetQuery({
+    query: computed(() => ({
+        start: dayjs.utc(budgetCreatePageState.startMonth[0]).subtract(1, 'year').format('YYYY-MM'),
+        end: dayjs.utc(budgetCreatePageState.endMonth[0]).subtract(1, 'year').format('YYYY-MM'),
+        group_by: !budgetCreatePageState.scope.serviceAccount ? ['project_id', 'is_confirmed'] : ['project_id', 'service_account_id', 'is_confirmed'],
+        fields: {
+            cost_trend: {
+                key: `cost.${budgetCreatePageState.currency}`,
+                operator: 'sum',
             },
-        });
-        state.data = processData(results);
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
+        },
+        granularity: 'MONTHLY',
+        field_group: ['date'],
+        filter: !budgetCreatePageState.scope.serviceAccount ? [
+            { k: 'project_id', v: budgetCreatePageState.project, o: 'eq' },
+        ] : [
+            { k: 'service_account_id', v: budgetCreatePageState.scope.serviceAccount, o: 'eq' },
+        ],
+    })),
+});
 
 const drawChart = (data: any) => {
     if (isEmpty(data)) return;
@@ -147,13 +141,9 @@ const drawChart = (data: any) => {
     state.chart.setOption(state.chartOptions, true);
 };
 
-watch(() => state.data, () => {
-    drawChart(state.data);
-}, { deep: true, immediate: true });
-
-watch(() => budgetCreatePageState, async () => {
-    await fetchBudgetUsageAnalyze();
-}, { deep: true, immediate: true });
+watchEffect(() => {
+    drawChart(processData(unifiedCostAnalyzeData.value?.results || []));
+});
 </script>
 
 <template>
