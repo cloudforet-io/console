@@ -29,6 +29,7 @@ export const usePostListPaginationQuery = ({ params, thisPage, pageSize }: UsePo
         queryKey: postListPaginationQueryKey,
         queryFn: postAPI.list,
         params: postListPaginationQueryParams,
+        staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 2,
     }, {
         thisPage,
