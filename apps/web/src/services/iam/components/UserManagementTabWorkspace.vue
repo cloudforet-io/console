@@ -274,6 +274,7 @@ const { mutateAsync: updateRoleBinding } = useMutation({
         await queryClient.invalidateQueries({ queryKey: roleBindingListQueryKey.value });
     },
     onError: (e: any) => {
+        showErrorMessage(e.message, '');
         ErrorHandler.handleRequestError(e, e.message);
     },
 });
