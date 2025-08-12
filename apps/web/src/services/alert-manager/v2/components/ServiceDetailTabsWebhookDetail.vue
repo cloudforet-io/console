@@ -264,6 +264,11 @@ watch(() => tabState.activeWebhookDetailTab, (activeTab) => {
         queryClient.invalidateQueries({ queryKey: webhookErrorListQueryKey.value });
     }
 });
+watch(() => state.selectedPlugin, (selectedPlugin) => {
+    if (tabState.activeWebhookDetailTab === WEBHOOK_DETAIL_TABS.HELP && isEmpty(selectedPlugin?.docs)) {
+        tabState.activeWebhookDetailTab = WEBHOOK_DETAIL_TABS.DETAIL;
+    }
+});
 watch(() => webhookDetailData.value, async () => {
     if (isEmpty(state.webhookInfo)) return;
     if (!state.webhookInfo.plugin_info?.plugin_id) return;
