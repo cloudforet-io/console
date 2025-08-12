@@ -40,7 +40,7 @@ const userState = userStore.state;
 const emit = defineEmits<{(e: 'update-form', form: ScheduleSettingFormType): void; }>();
 
 const storeState = reactive({
-    timezone: computed(() => userState.timezone || 'UTC'),
+    timezone: props.scheduleForm?.TIMEZONE || userState.timezone || 'UTC',
 });
 const state = reactive({
     timezones: computed<SelectDropdownMenuItem[]>(() => map(timezoneList, (d) => ({
