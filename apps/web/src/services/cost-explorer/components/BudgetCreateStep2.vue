@@ -3,7 +3,6 @@ import {
     computed, reactive, watch, ref,
 } from 'vue';
 
-import { useQueryClient } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 
 import {
@@ -11,11 +10,10 @@ import {
     PDivider, PRadioGroup, PRadio, PPaneLayout, PTextInput, PBadge, PSelectCard,
 } from '@cloudforet/mirinae';
 
-import type { BudgetUsageListParameters } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/list';
-import type { BudgetUsageModel } from '@/api-clients/cost-analysis/budget-usage/schema/model';
 import { useBudgetUsageApi } from '@/api-clients/cost-analysis/budget/composables/use-budget-usage-api';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -66,13 +64,56 @@ const state = reactive({
     analyzedCostData: undefined,
     startSelectedForBudgetYear: false,
     endSelectedForBudgetYear: false,
-    existingBudgetUsageList: [] as BudgetUsageModel[],
 });
+
+const { key: budgetUsageListQueryKey, params: budgetUsageListQueryParams } = useServiceQueryKey('cost-analysis', 'budget-usage', 'list', {
+    params: computed(() => ({
+        query: {
+            filter: [
+                budgetCreatePageState.scope.serviceAccount
+                    ? {
+                        k: 'service_account_id',
+                        v: budgetCreatePageState.scope.serviceAccount,
+                        o: 'eq',
+                    }
+                    : {
+                        k: 'service_account_id',
+                        v: [null, ''],
+                        o: 'in',
+                    },
+                {
+                    k: 'project_id',
+                    v: budgetCreatePageState.project,
+                    o: 'eq',
+                },
+                {
+                    k: 'date',
+                    v: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
+                    o: 'gte',
+                },
+                {
+                    k: 'date',
+                    v: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
+                    o: 'lte',
+                },
+            ],
+        },
+    })),
+});
+
+const { data: budgetUsageList } = useScopedQuery({
+    queryKey: budgetUsageListQueryKey,
+    queryFn: () => budgetUsageAPI.list(budgetUsageListQueryParams.value),
+    select: (data) => data.results ?? [],
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 3,
+    enabled: true,
+}, ['WORKSPACE']);
 
 
 const isCycleEnabled = computed(() => budgetCreatePageState.startMonth.length > 0
     && budgetCreatePageState.endMonth.length > 0
-    && state.existingBudgetUsageList.length === 0);
+    && budgetUsageList.value?.length === 0);
 
 const emit = defineEmits<{(e: 'click-next'): void}>();
 
@@ -135,54 +176,6 @@ const isValidPositiveNumber = (value: any): boolean => {
     const num = Number(value);
     return value !== '' && !Number.isNaN(num) && num > 0;
 };
-
-const queryClient = useQueryClient();
-const { key } = useServiceQueryKey('cost-analysis', 'budget-usage', 'list');
-const fetchBudgetUsage = async (params: BudgetUsageListParameters) => queryClient.fetchQuery({
-    queryKey: key,
-    queryFn: () => budgetUsageAPI.list(params),
-    staleTime: 1000 * 60 * 2,
-    gcTime: 1000 * 60 * 3,
-});
-
-
-watch([() => budgetCreatePageState.startMonth, () => budgetCreatePageState.endMonth], async () => {
-    if (budgetCreatePageState.startMonth.length > 0 && budgetCreatePageState.endMonth.length > 0) {
-        const { results } = await fetchBudgetUsage({
-            query: {
-                filter: [
-                    budgetCreatePageState.scope.serviceAccount
-                        ? {
-                            k: 'service_account_id',
-                            v: budgetCreatePageState.scope.serviceAccount,
-                            o: 'eq',
-                        }
-                        : {
-                            k: 'service_account_id',
-                            v: [null, ''],
-                            o: 'in',
-                        },
-                    {
-                        k: 'project_id',
-                        v: budgetCreatePageState.project,
-                        o: 'eq',
-                    },
-                    {
-                        k: 'date',
-                        v: dayjs.utc(budgetCreatePageState.startMonth[0]).format('YYYY-MM'),
-                        o: 'gte',
-                    },
-                    {
-                        k: 'date',
-                        v: dayjs.utc(budgetCreatePageState.endMonth[0]).format('YYYY-MM'),
-                        o: 'lte',
-                    },
-                ],
-            },
-        });
-        state.existingBudgetUsageList = results ?? [];
-    }
-}, { deep: true, immediate: true });
 
 watch([() => state, () => budgetCreatePageState], () => {
     budgetCreatePageStore.setCurrency(state.selectedCurrency);
@@ -302,7 +295,7 @@ watch(() => [
         state.isContinueAble = false;
         return;
     }
-    if (state.existingBudgetUsageList.length > 0) {
+    if (budgetUsageList.value.length > 0) {
         state.isContinueAble = false;
         return;
     }
@@ -419,7 +412,7 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
         }
         if (budgetCreatePageState.startMonth.length === 0
             || budgetCreatePageState.endMonth.length === 0
-            || state.existingBudgetUsageList.length > 0) {
+            || budgetUsageList.value && budgetUsageList.value.length > 0) {
             budgetCreatePageState.time_unit = '';
         }
     }
@@ -469,7 +462,7 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
             </p>
             <div class="flex gap-6 mt-2 -mb-4">
                 <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.START_MONTH')"
-                               :invalid="state.existingBudgetUsageList.length > 0"
+                               :invalid="budgetUsageList && budgetUsageList.length > 0"
                                required
                                class="flex flex-col "
                 >
@@ -481,12 +474,12 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                     <p-datetime-picker data-type="yearToMonth"
                                        :selected-dates.sync="budgetCreatePageState.startMonth"
                                        :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.SELECT_MONTH')"
-                                       :invalid="state.existingBudgetUsageList.length > 0"
+                                       :invalid="budgetUsageList && budgetUsageList.length > 0"
                                        @close="handleStartMonthPickerClosed"
                     />
                 </p-field-group>
                 <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.END_MONTH')"
-                               :invalid="state.existingBudgetUsageList.length > 0"
+                               :invalid="budgetUsageList && budgetUsageList.length > 0"
                                required
                 >
                     <template #label-extra>
@@ -500,22 +493,22 @@ watch(() => budgetCreatePageState.startMonth[0], (newVal, oldVal) => {
                                        :min-date="budgetCreatePageState.startMonth.length > 0
                                            ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(1, 'month').format('YYYY-MM') : ''"
                                        :max-date="budgetCreatePageState.startMonth.length > 0 ? dayjs.utc(budgetCreatePageState.startMonth[0]).add(11, 'month').format('YYYY-MM') : ''"
-                                       :invalid="state.existingBudgetUsageList.length > 0 || (budgetCreatePageState.startMonth.length > 0
+                                       :invalid="budgetUsageList && budgetUsageList.length > 0 || (budgetCreatePageState.startMonth.length > 0
                                            && budgetCreatePageState.endMonth.length === 0)"
                     />
                 </p-field-group>
             </div>
-            <span v-if="state.existingBudgetUsageList.length > 0"
+            <span v-if="budgetUsageList && budgetUsageList.length > 0"
                   class="text-red-500 font-normal text-xs"
             >
                 {{ budgetCreatePageState.scope.type === 'project'
                     ? $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING1', {
                         project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
-                        month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
+                        month_list: budgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                     }) : $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT_DUPLICATED_WARNING2', {
                         project: referenceMap.project[budgetCreatePageState.project]?.name || budgetCreatePageState.project,
                         serviceAccount: referenceMap.serviceAccount[budgetCreatePageState.scope.serviceAccount]?.name || budgetCreatePageState.scope.serviceAccount,
-                        month_list: state.existingBudgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
+                        month_list: budgetUsageList.sort((a, b) => (a.date > b.date ? 1 : -1)).map(d => d.date)
                     }) }}
             </span>
             <div class="mt-2">
