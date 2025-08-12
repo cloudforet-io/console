@@ -84,6 +84,7 @@ watch(() => budgetCreatePageState, () => {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
     && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0
+    && budgetCreatePageState.name.length > 0 && !state.budgetNames.includes(budgetCreatePageState.name)
     ) {
         state.isContinueAble = true;
     } else {

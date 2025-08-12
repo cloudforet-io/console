@@ -9,6 +9,7 @@ export interface WorkspaceUserModel {
     name: string;
     state: UserState;
     email: string;
+    email_verified?: boolean;
     auth_type: AuthType;
     role_type: RoleType;
     language: string;
