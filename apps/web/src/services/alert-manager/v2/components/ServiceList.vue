@@ -180,10 +180,9 @@ const handleNavigateToDetail = (serviceId: string) => {
     }).catch(() => {});
 };
 
-// ✅ event listener to change healthy page size (6 -> 8) when window width is 1920px or more
 const handleResize = debounce(async () => {
     const width = window.innerWidth;
-    const newPageSize = width >= 1920 ? 8 : 6;
+    const newPageSize = width < 1920 ? 6 : 8;
 
     if (newPageSize !== serviceListPageStore.healthyPageSize) {
         const oldPageSize = serviceListPageStore.healthyPageSize;
@@ -193,7 +192,6 @@ const handleResize = debounce(async () => {
 
         serviceListPageStore.setHealthyPageSize(newPageSize);
         serviceListPageStore.setHealthyPage(newPage);
-        refreshHealthyList();
     }
 }, 100);
 
@@ -236,6 +234,18 @@ onMounted(async () => {
         refreshUnhealthyList(),
         refreshHealthyList(),
     ]);
+
+    const maxUnhealthy = Math.max(1, Math.ceil((unhealthyTotalCount.value || 0) / serviceListPageStore.unhealthyPageSize));
+    if (serviceListPageStore.unhealthyThisPage > maxUnhealthy) {
+        serviceListPageStore.setUnhealthyPage(maxUnhealthy);
+        await refreshUnhealthyList();
+    }
+
+    const maxHealthy = Math.max(1, Math.ceil((healthyTotalCount.value || 0) / serviceListPageStore.healthyPageSize));
+    if (serviceListPageStore.healthyThisPage > maxHealthy) {
+        serviceListPageStore.setHealthyPage(maxHealthy);
+        await refreshHealthyList();
+    }
 });
 
 window.addEventListener('resize', handleResize);

@@ -225,6 +225,9 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
 
 <style scoped lang="postcss">
 .service-list-content {
+    @apply grid w-full;
+    grid-template-columns: 1fr;
+    gap: 1rem;
     .collapsible-title {
         width: fit-content;
         height: 2rem;
@@ -242,8 +245,9 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
     .collapsible-contents {
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
-
-        @apply grid grid-cols-3 gap-4;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+        gap: 1rem;
     }
 
     @media (min-width: 120rem) {
@@ -286,7 +290,8 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
         }
     }
     .card {
-        min-width: 25rem;
+        width: 100%;
+        min-width: 0;
         padding: 1.25rem 1.5rem 1rem 1.5rem;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         .card-inner-wrapper {
