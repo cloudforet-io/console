@@ -77,12 +77,12 @@ describe('generateMenuQueryHandler', () => {
             expect(result.more).toBe(false);
         });
 
-        it('1-3. should handle fixedFilters correctly', async () => {
-            const configWithFixedFilters = {
+        it('1-3. should handle menuFilters correctly', async () => {
+            const configWithMenuFilters = {
                 ...listFetchConfig,
-                fixedFilters: { workspace_id: 'ws-123' },
+                menuFilters: [{ k: 'workspace_id', v: 'ws-123', o: '=' }],
             };
-            const listMenuHandler = generator.makeListMenuHandler(mockQueryKeyWithSuffix, configWithFixedFilters);
+            const listMenuHandler = generator.makeListMenuHandler(mockQueryKeyWithSuffix, configWithMenuFilters);
             mockListFetcher.mockResolvedValueOnce({ results: [], total_count: 0 });
 
             await listMenuHandler('test-input', 1, 10);

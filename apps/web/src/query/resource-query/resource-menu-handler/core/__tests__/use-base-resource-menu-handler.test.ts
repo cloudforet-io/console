@@ -2,6 +2,8 @@ import {
     describe, it, expect, vi, beforeEach,
 } from 'vitest';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { RESOURCE_MENU_FETCH_CONFIG } from '@/query/resource-query/resource-menu-handler/config/resource-menu-fetch-config';
 import * as generator from '@/query/resource-query/resource-menu-handler/core/menu-query-handler.generator';
 import { useBaseResourceMenuHandler } from '@/query/resource-query/resource-menu-handler/core/use-base-resource-menu-handler';
@@ -69,17 +71,17 @@ describe('useBaseResourceMenuHandler', () => {
         expect(statCallArg.distinct).toBe('provider');
     });
 
-    it('3. should pass fixedFilters to the correct handler generator', () => {
+    it('3. should pass menuFilters to the correct handler generator', () => {
         const { getResourceMenuHandler } = useBaseResourceMenuHandler({
             resourceType: 'project',
             fetchConfig,
         });
-        const fixedFilters = { workspace_id: 'ws-123' };
+        const menuFilters: ConsoleFilter[] = [{ k: 'workspace_id', v: 'ws-123', o: '=' }];
 
-        getResourceMenuHandler({ fixedFilters });
-        expect(mockMakeListMenuHandler.mock.calls[0][1].fixedFilters).toEqual(fixedFilters);
+        getResourceMenuHandler({ menuFilters });
+        expect(mockMakeListMenuHandler.mock.calls[0][1].menuFilters).toEqual(menuFilters);
 
-        getResourceMenuHandler({ dataKey: 'provider', fixedFilters });
-        expect(mockMakeStatMenuHandler.mock.calls[0][1].fixedFilters).toEqual(fixedFilters);
+        getResourceMenuHandler({ dataKey: 'provider', menuFilters });
+        expect(mockMakeStatMenuHandler.mock.calls[0][1].menuFilters).toEqual(menuFilters);
     });
 });
