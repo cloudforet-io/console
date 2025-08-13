@@ -98,9 +98,14 @@ const state = reactive({
         });
     }),
     isUnifiedCost: computed(() => costQuerySetState.isUnifiedCostOn),
-    primaryCostOptions: computed<Record<string, any>>(() => ({
-        ...(!state.isUnifiedCost && { data_source_id: costQuerySetState.selectedDataSourceId }),
-    })),
+    primaryCostOptions: computed<ConsoleFilter[]>(() => {
+        if (state.isUnifiedCost) return [];
+        return [{
+            k: 'data_source_id',
+            v: costQuerySetState.selectedDataSourceId ?? '',
+            o: '=',
+        }];
+    }),
     selectedItemsMap: {} as Record<string, MenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
@@ -123,28 +128,32 @@ const convertedOriginFilter = computed<Record<string, ConsoleFilterValue | Conso
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string, primaryQueryOptions: Record<string, any>): MenuAttachHandler => {
+const getMenuHandler = (groupBy: string, primaryQueryOptions: ConsoleFilter[]): MenuAttachHandler => {
     try {
-        const _queryOptions: Record<string, any> = {};
+        const _queryOptions: ConsoleFilter[] = [];
         if (groupBy === MANAGED_VARIABLE_MODELS.workspace.meta.idKey) {
-            _queryOptions.is_dormant = false;
+            _queryOptions.push({
+                k: 'is_dormant',
+                v: false,
+                o: '=',
+            });
         }
         if (!MANAGED_RESOURCE_ID_KEYS.includes(groupBy)) {
             if (state.isUnifiedCost) {
                 return resourceMenuHandlerMap.unifiedCost({
                     dataKey: groupBy,
-                    fixedFilters: primaryQueryOptions,
+                    menuFilters: primaryQueryOptions,
                 });
             }
             return resourceMenuHandlerMap.cost({
                 dataKey: groupBy,
-                fixedFilters: primaryQueryOptions,
+                menuFilters: primaryQueryOptions,
             });
         }
         const resourceKey = Object.values(RESOURCE_CONFIG_MAP).find((d) => d.idKey === groupBy)?.resourceKey;
         if (!resourceKey) return async () => ({ results: [] });
         return resourceMenuHandlerMap[resourceKey]?.({
-            fixedFilters: _queryOptions,
+            menuFilters: _queryOptions,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

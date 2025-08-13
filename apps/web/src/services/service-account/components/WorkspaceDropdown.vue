@@ -36,10 +36,10 @@ const workspaceMap = referenceMap.workspace;
 
 const state = reactive({
     workspaceMenuHandler: resourceMenuHandler.workspace({
-        fixedFilters: {
-            state: WORKSPACE_STATE.ENABLE,
-            is_dormant: false,
-        },
+        menuFilters: [
+            { k: 'state', v: WORKSPACE_STATE.ENABLE, o: '=' },
+            { k: 'is_dormant', v: false, o: '=' },
+        ],
     }),
     selected: computed<SelectDropdownMenuItem[]|undefined>(() => {
         if (!props.selected) return [];

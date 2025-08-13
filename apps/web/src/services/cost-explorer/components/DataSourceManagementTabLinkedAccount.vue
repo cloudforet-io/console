@@ -102,10 +102,10 @@ const tableState = reactive({
 });
 
 const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
-    fixedFilters: {
-        state: 'ENABLED',
-        is_dormant: false,
-    },
+    menuFilters: [
+        { k: 'state', v: 'ENABLED', o: '=' },
+        { k: 'is_dormant', v: false, o: '=' },
+    ],
 });
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });

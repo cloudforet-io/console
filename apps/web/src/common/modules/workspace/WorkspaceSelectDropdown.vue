@@ -39,9 +39,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 const workspaceHandler = computed(() => resourceMenuHandlerMap.workspace({
-    fixedFilters: {
-        state: 'ENABLED',
-    },
+    menuFilters: [{
+        k: 'state',
+        v: 'ENABLED',
+        o: '=',
+    }],
 }));
 
 

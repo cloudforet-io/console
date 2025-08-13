@@ -61,10 +61,10 @@ const isConfirmDisabled = computed(() => {
 });
 
 const workspaceMenuHandler = resourceMenuHandlerMap.workspace({
-    fixedFilters: {
-        state: 'ENABLED',
-        is_dormant: false,
-    },
+    menuFilters: [
+        { k: 'state', v: 'ENABLED', o: '=' },
+        { k: 'is_dormant', v: false, o: '=' },
+    ],
 });
 
 /* Query */

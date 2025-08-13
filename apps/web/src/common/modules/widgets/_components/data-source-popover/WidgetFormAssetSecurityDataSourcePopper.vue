@@ -33,25 +33,31 @@ const state = reactive({
     // category
     categoryMenuHandler: computed(() => resourceMenuHandlerMap.namespace({
         dataKey: 'group',
-        fixedFilters: {
-            category: props.dataSourceDomain,
-        },
+        menuFilters: [{
+            k: 'category',
+            v: props.dataSourceDomain,
+            o: '=',
+        }],
     })),
     categorySearchText: '',
     selectedCategory: undefined as undefined|string,
     // namespace
     namespaceMenuHandler: computed(() => (state.selectedCategory ? resourceMenuHandlerMap.namespace({
-        fixedFilters: {
-            group: state.selectedCategory,
-        },
+        menuFilters: [{
+            k: 'group',
+            v: state.selectedCategory,
+            o: '=',
+        }],
     }) : undefined)),
     namespaceSearchText: '',
     selectedNamespaceId: undefined as undefined|string,
     // metric
     metricMenuHandler: computed(() => (state.selectedNamespaceId ? resourceMenuHandlerMap.metric({
-        fixedFilters: {
-            namespace_id: state.selectedNamespaceId,
-        },
+        menuFilters: [{
+            k: 'namespace_id',
+            v: state.selectedNamespaceId,
+            o: '=',
+        }],
     }) : undefined)),
     metricSearchText: '',
 });

@@ -27,9 +27,11 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 const workspaceHandler = resourceMenuHandlerMap.workspace({
-    fixedFilters: {
-        is_dormant: false,
-    },
+    menuFilters: [{
+        k: 'is_dormant',
+        v: false,
+        o: '=',
+    }],
 });
 
 const state = reactive({

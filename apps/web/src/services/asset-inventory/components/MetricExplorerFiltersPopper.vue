@@ -4,6 +4,9 @@ import { useRoute } from 'vue-router/composables';
 
 import { cloneDeep, isEmpty } from 'lodash';
 
+import type {
+    ConsoleFilter,
+} from '@cloudforet/core-lib/query/type';
 import { PSelectDropdown, PTextButton } from '@cloudforet/mirinae';
 import type {
     AutocompleteHandler,
@@ -52,9 +55,13 @@ const state = reactive({
         label: d.name,
     }))),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
-    primaryMetricStatOptions: computed<Record<string, any>>(() => ({
-        metric_id: route.params.metricId,
-    })),
+    primaryMetricStatOptions: computed<ConsoleFilter[]>(() => [
+        {
+            k: 'metric_id',
+            v: route.params.metricId,
+            o: '=',
+        },
+    ]),
     handlerMap: computed<Record<string, AutocompleteHandler>>(() => {
         const handlerMaps = {};
         state.refinedMetricLabelKeysWithProjectGroup.forEach((labelKey: MetricLabelKey) => {
@@ -74,22 +81,26 @@ const { data: currentMetricExample } = useMetricExampleGetQuery({
 });
 
 /* Util */
-const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: Record<string, any>): MenuAttachHandler => {
+const getMenuHandler = (labelKey: MetricLabelKey, listQueryOptions: ConsoleFilter[]): MenuAttachHandler => {
     try {
-        const queryOptions: Record<string, any> = {};
+        const queryOptions: ConsoleFilter[] = [];
         if (labelKey.key === RESOURCE_CONFIG_MAP.workspace.idKey) {
-            queryOptions.is_dormant = false;
+            queryOptions.push({
+                k: 'is_dormant',
+                v: false,
+                o: '=',
+            });
         }
         if (isEmpty(labelKey.reference)) {
             return resourceMenuHandlerMap.metricData({
                 dataKey: labelKey.key,
-                fixedFilters: listQueryOptions,
+                menuFilters: listQueryOptions,
             });
         }
         const resourceKey = Object.values(RESOURCE_CONFIG_MAP).find((d) => d.idKey === labelKey.reference?.reference_key)?.resourceKey;
         if (!resourceKey) return async () => ({ results: [] });
         return resourceMenuHandlerMap[resourceKey]?.({
-            fixedFilters: queryOptions,
+            menuFilters: queryOptions,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

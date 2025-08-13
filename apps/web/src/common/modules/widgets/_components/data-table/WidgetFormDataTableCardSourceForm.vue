@@ -51,9 +51,11 @@ const costDataTypeMenuItems = computed<MenuItem[]>(() => {
 const assetTypeMenuHandler = computed<AutocompleteHandler>(() => {
     if (props.sourceType !== DATA_SOURCE_DOMAIN.ASSET) return () => ({ results: [] });
     return handlerMap.metric({
-        fixedFilters: {
-            namespace_id: props.parentSourceId,
-        },
+        menuFilters: [{
+            k: 'namespace_id',
+            v: props.parentSourceId,
+            o: '=',
+        }],
     });
 });
 

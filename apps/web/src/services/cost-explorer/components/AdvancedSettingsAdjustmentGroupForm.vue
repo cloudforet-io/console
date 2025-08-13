@@ -41,9 +41,11 @@ const differentCurrencyPolicyIds = computed<string[]>(() => {
     return Array.from(new Set(ids));
 });
 const workspaceMenuHandler = computed(() => resourceMenuHandlerMap.workspace({
-    fixedFilters: {
-        is_dormant: false,
-    },
+    menuFilters: [{
+        k: 'is_dormant',
+        v: false,
+        o: '=',
+    }],
 }));
 
 /* Event Handler */
