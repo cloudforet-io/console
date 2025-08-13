@@ -1,9 +1,10 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { MenuAttachHandler } from '@cloudforet/mirinae';
 
 /* Resource Menu Handler */
 export interface GetResourceMenuHandlerOptions {
     dataKey?: string;
-    fixedFilters?: Record<string, any>;
+    menuFilters?: ConsoleFilter[];
 }
 
 export interface GetResourceMenuHandler {

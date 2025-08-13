@@ -4,6 +4,7 @@ import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
 
+
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -14,11 +15,13 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { ToolboxTableOptions } from '@cloudforet/mirinae/types/data-display/tables/toolbox-table/type';
 
+import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { WorkspaceGroupUser } from '@/api-clients/identity/workspace-group-user/schema/model';
 import type { WorkspaceGroupUpdateRoleParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/update-role';
 import type { WorkspaceUser } from '@/api-clients/identity/workspace-group/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -31,8 +34,6 @@ import { useWorkspaceGroupUserListQuery } from '@/services/advanced/composables/
 import { useRoleFormatter, groupUserStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
-
-import { useWorkspaceGroupRoleListInfiniteQuery } from '../composables/querys/use-workspace-group-role-list-infinite-query';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
@@ -135,40 +136,7 @@ const roleSelectDropdownState = reactive({
     selectedItems: [],
 });
 
-const {
-    data: roleMenuListData,
-    isLoading: isRoleMenuListLoading,
-    isFetchingNextPage: isRoleMenuListFetchingNextPage,
-    fetchNextPage: fetchRoleMenuListNextPage,
-    hasNextPage: hasRoleMenuListNextPage,
-} = useWorkspaceGroupRoleListInfiniteQuery({
-    searchText: computed(() => roleSelectDropdownState.searchText),
-});
-
-const roleMenuList = computed<SelectDropdownMenuItem[]>(() => {
-    const roleItems = roleMenuListData.value?.pages?.flatMap((page) => page?.results ?? [])?.map((role) => ({
-        label: role.name,
-        name: role.role_id,
-        role_type: role.role_type,
-    })) ?? [];
-
-    const showMoreItem: SelectDropdownMenuItem = {
-        type: 'showMore',
-        name: 'Show More',
-    };
-
-    if (hasRoleMenuListNextPage.value) {
-        return [...roleItems, showMoreItem];
-    }
-
-    return roleItems;
-});
-
-const handleClickShowMore = () => {
-    if (hasRoleMenuListNextPage.value) {
-        fetchRoleMenuListNextPage();
-    }
-};
+const roleMenuHandler = useResourceMenuHandlerMap().role;
 
 
 const setupModal = (type) => {
@@ -244,8 +212,8 @@ const { mutateAsync: updateRoleMutation, isPending: isUpdatingRole } = useMutati
 });
 
 const handleSelectMenu = async (value:SelectDropdownMenuItem|string|number, userId: string) => {
-    if (typeof value === 'string' || typeof value === 'number') {
-        ErrorHandler.handleError(new Error('value is not a string or number'));
+    if (typeof value !== 'string') {
+        ErrorHandler.handleError(new Error('value have to be string'));
         return;
     }
     if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
@@ -255,7 +223,7 @@ const handleSelectMenu = async (value:SelectDropdownMenuItem|string|number, user
     updateRoleMutation({
         workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
         user_id: userId,
-        role_id: value.name,
+        role_id: value,
     });
 };
 
@@ -349,13 +317,10 @@ onUnmounted(() => {
                         style-type="transparent"
                         class="role-select-dropdown"
                         :disabled="!hasReadWriteAccess"
-                        :menu="roleMenuList"
-                        :selected.sync="roleSelectDropdownState.selectedItems"
+                        :handler="roleMenuHandler({ menuFilters: [{ k: 'state', v: ROLE_STATE.ENABLED, o: '=' }, { k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: '!=' }] })"
                         :search-text.sync="roleSelectDropdownState.searchText"
-                        :loading="isRoleMenuListLoading || isRoleMenuListFetchingNextPage || isUpdatingRole"
-                        disable-handler
+                        :loading="isUpdatingRole"
                         :page-size="10"
-                        @click-show-more="handleClickShowMore"
                         @select="handleSelectMenu($event, item.user_id)"
                     >
                         <template #dropdown-button>
@@ -367,7 +332,7 @@ onUnmounted(() => {
                         <!-- eslint-disable vue/no-template-shadow -->
                         <template #menu-item--format="{ item }">
                             <div class="role-menu-item">
-                                <img :src="useRoleFormatter(item.role_type).image"
+                                <img :src="useRoleFormatter(item.data.role_type).image"
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
@@ -377,7 +342,7 @@ onUnmounted(() => {
                                 >
                                     <span>{{ item.label }}</span>
                                 </p-tooltip>
-                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
+                                <span class="role-type">{{ useRoleFormatter(item.data.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>

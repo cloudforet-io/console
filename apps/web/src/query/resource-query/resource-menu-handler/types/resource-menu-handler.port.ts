@@ -1,3 +1,5 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 
@@ -16,13 +18,13 @@ export interface ResourceMenuHandlerListFetchConfig<TModelData extends Record<st
     fetcher: ResourceMenuHandlerListFetcher<TModelData>;
     idKey: string;
     only?: string[];
-    fixedFilters?: Record<string, any>;
+    menuFilters?: ConsoleFilter[];
     searchTargets?: string[];
 }
 
 export interface ResourceMenuHandlerStatFetchConfig {
     fetcher: ResourceMenuHandlerStatFetcher;
     distinct: string;
-    fixedFilters?: Record<string, any>;
+    menuFilters?: ConsoleFilter[];
     searchTargets?: string[];
 }

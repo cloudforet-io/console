@@ -2,7 +2,7 @@
 import type { QueryClient } from '@tanstack/query-core';
 
 import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
-import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter, ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { MenuAttachHandler } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
@@ -25,7 +25,7 @@ export const generateMenuQueryHandler = (
             fetcher,
             idKey,
             only,
-            fixedFilters,
+            menuFilters,
             searchTargets = [],
         } = fetchConfig;
 
@@ -35,12 +35,14 @@ export const generateMenuQueryHandler = (
 
         // Init and Set Default API Filters
         const _defaultApiQueryHelper = new ApiQueryHelper();
-        _defaultApiQueryHelper.setFilters([{ k: idKey, v: [null, ''], o: '!=' }]);
-        if (fixedFilters) {
-            Object.entries(fixedFilters).forEach(([key, value]) => {
-                _defaultApiQueryHelper.addFilter({ k: key, v: value, o: '=' });
-            });
+
+        const defaultMenuFilters:ConsoleFilter[] = [{ k: idKey, v: [null, ''], o: '!=' }];
+
+        if (menuFilters) {
+            defaultMenuFilters.push(...menuFilters);
         }
+        _defaultApiQueryHelper.setFilters(defaultMenuFilters);
+
         const defaultFilters = _defaultApiQueryHelper.filters;
 
 
@@ -109,7 +111,7 @@ export const generateMenuQueryHandler = (
         const {
             fetcher,
             distinct,
-            fixedFilters,
+            menuFilters,
         } = fetchConfig;
 
         const _queryKeyWithSuffix = queryKeyWithSuffix;
@@ -118,12 +120,14 @@ export const generateMenuQueryHandler = (
 
         // Init and Set Default API Filters
         const _defaultApiQueryHelper = new ApiQueryHelper();
-        _defaultApiQueryHelper.setFilters([{ k: distinct, v: [null, ''], o: '!=' }]);
-        if (fixedFilters) {
-            Object.entries(fixedFilters).forEach(([key, value]) => {
-                _defaultApiQueryHelper.addFilter({ k: key, v: value, o: '=' });
-            });
+
+        const defaultMenuFilters:ConsoleFilter[] = [{ k: distinct, v: [null, ''], o: '!=' }];
+
+        if (menuFilters) {
+            defaultMenuFilters.push(...menuFilters);
         }
+        _defaultApiQueryHelper.setFilters(defaultMenuFilters);
+
         const defaultFilters = _defaultApiQueryHelper.filters;
 
         // Main Handler

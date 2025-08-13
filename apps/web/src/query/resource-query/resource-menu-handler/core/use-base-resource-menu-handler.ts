@@ -34,7 +34,7 @@ export const useBaseResourceMenuHandler = <TModelData extends Record<string, any
     } = generateMenuQueryHandler(_queryClient);
 
 
-    const getResourceMenuHandler = ({ dataKey, fixedFilters }: GetResourceMenuHandlerOptions = {}): MenuAttachHandler => {
+    const getResourceMenuHandler = ({ dataKey, menuFilters }: GetResourceMenuHandlerOptions = {}): MenuAttachHandler => {
         let resultHandler: MenuAttachHandler;
 
         if (dataKey && fetchConfig.stat) {
@@ -44,7 +44,7 @@ export const useBaseResourceMenuHandler = <TModelData extends Record<string, any
             resultHandler = makeStatMenuHandler(statQueryKeyWithSuffix, {
                 fetcher: fetchConfig.stat,
                 distinct: dataKey,
-                fixedFilters,
+                menuFilters,
             });
         } else if (!dataKey && fetchConfig.list) {
             if (import.meta.env.DEV) {
@@ -57,7 +57,7 @@ export const useBaseResourceMenuHandler = <TModelData extends Record<string, any
                 idKey: resourceConfig.idKey,
                 only: resourceMenuFetchConfig.only,
                 searchTargets: resourceMenuFetchConfig.searchTargets,
-                fixedFilters,
+                menuFilters,
             });
         } else {
             throw new Error(`No fetch config found for resource type: ${resourceType}`);
