@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import {
-    onMounted, watch, computed, onBeforeUnmount,
+    onMounted, watch, computed,
 } from 'vue';
 import {
     useRoute, useRouter,
 } from 'vue-router/composables';
-
-import { debounce } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -180,23 +178,7 @@ const handleNavigateToDetail = (serviceId: string) => {
     }).catch(() => {});
 };
 
-const handleResize = debounce(async () => {
-    const width = window.innerWidth;
-    const newPageSize = width < 1920 ? 6 : 8;
-
-    if (newPageSize !== serviceListPageStore.healthyPageSize) {
-        const oldPageSize = serviceListPageStore.healthyPageSize;
-        const oldPage = serviceListPageStore.healthyThisPage;
-        const startIndex = (oldPage - 1) * oldPageSize;
-        const newPage = Math.floor(startIndex / newPageSize) + 1;
-
-        serviceListPageStore.setHealthyPageSize(newPageSize);
-        serviceListPageStore.setHealthyPage(newPage);
-    }
-}, 100);
-
 onMounted(async () => {
-    await handleResize();
     const { serviceName, unhealthyPage, healthyPage } = route.query;
 
     if (serviceName && typeof serviceName === 'string') {
@@ -248,11 +230,19 @@ onMounted(async () => {
     }
 });
 
-window.addEventListener('resize', handleResize);
 
-onBeforeUnmount(() => {
-    window.removeEventListener('resize', handleResize);
-});
+const handleColumnsChange = (payload: { type: 'alert'|'healthy', columns: number }) => {
+    if (payload.type !== 'healthy') return;
+    if (healthyLoading.value) return; // avoid changes during loading
+    const cols = payload.columns;
+    const rowsPerPage = 2;
+    const newPageSize = Math.max(1, cols * rowsPerPage);
+    if (newPageSize !== serviceListPageStore.healthyPageSize) {
+        serviceListPageStore.setHealthyPageSize(newPageSize);
+        serviceListPageStore.setHealthyPage(1); // reset to first page
+        refreshHealthyList();
+    }
+};
 
 watch(() => serviceListPageStore.unhealthyThisPage, (val) => {
     if (!queryTags.value.some((tag) => tag.key?.name === 'name')) {
@@ -336,6 +326,7 @@ watch(async () => route.query.serviceName, async (newServiceName: any) => {
                                           :list="unhealthyServiceList"
                                           type="alert"
                                           @navigate-to-detail="handleNavigateToDetail"
+                                          @columns-change="handleColumnsChange"
                     />
                     <div class="flex justify-center mt-4">
                         <p-pagination
@@ -361,6 +352,7 @@ watch(async () => route.query.serviceName, async (newServiceName: any) => {
                                           :list="healthyServiceList"
                                           type="healthy"
                                           @navigate-to-detail="handleNavigateToDetail"
+                                          @columns-change="handleColumnsChange"
                     />
                     <div class="flex justify-center mt-4">
                         <p-pagination v-if="healthyTotalCount > 0"

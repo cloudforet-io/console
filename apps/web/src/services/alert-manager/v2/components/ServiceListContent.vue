@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { useResizeObserver } from '@vueuse/core/index';
+import {
+    computed, reactive, ref,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import { debounce } from 'lodash';
 
 import {
     PSelectCard, PI, PLazyImg, PDivider, PTextButton,
@@ -17,14 +22,35 @@ import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/commo
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
+
 interface Props {
     list: ServiceModel[];
     type: 'alert' | 'healthy';
 }
 
+
 const props = withDefaults(defineProps<Props>(), {
     list: undefined,
     type: undefined,
+});
+
+const emit = defineEmits<{(e: 'columns-change', payload: { type: 'alert'|'healthy', columns: number }): void
+}>();
+
+const gridRef = ref<HTMLElement|null>(null);
+const lastCols = ref<number | null>(null);
+
+useResizeObserver(gridRef, (entries) => {
+    // ✅: when window size is changed, emit columns-change event
+    const el = entries[0]?.target as HTMLElement;
+    if (!el) return;
+    const cols = getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
+    if (cols > 0 && cols !== lastCols.value) {
+        lastCols.value = cols;
+        debounce(() => {
+            emit('columns-change', { type: props.type, columns: cols });
+        }, 50)();
+    }
 });
 
 const serviceDetailPageStore = useServiceDetailPageStore();
@@ -110,7 +136,9 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
             />
             <span>{{ state.title }}</span>
         </div>
-        <div class="collapsible-contents">
+        <div ref="gridRef"
+             class="collapsible-contents"
+        >
             <p-select-card v-for="(item, idx) in props.list"
                            :key="`service-item-${idx}`"
                            class="card"
@@ -225,9 +253,6 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
 
 <style scoped lang="postcss">
 .service-list-content {
-    @apply grid w-full;
-    grid-template-columns: 1fr;
-    gap: 1rem;
     .collapsible-title {
         width: fit-content;
         height: 2rem;
@@ -246,31 +271,16 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
         gap: 1rem;
+        justify-content: start;
+        align-items: stretch;
+        justify-items: stretch;
     }
 
     @media (min-width: 120rem) {
         .collapsible-contents {
             @apply grid grid-cols-4 gap-4;
-        }
-    }
-
-    @screen laptop {
-        .collapsible-contents {
-            @apply grid grid-cols-3 gap-4;
-        }
-    }
-
-    @screen tablet {
-        .collapsible-contents {
-            @apply grid grid-cols-2 gap-4;
-        }
-    }
-
-    @screen mobile {
-        .collapsible-contents {
-            @apply grid grid-cols-1 gap-4;
         }
     }
 
