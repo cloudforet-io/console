@@ -31,7 +31,7 @@ export const RESOURCE_MENU_FETCH_CONFIG: Record<ResourceKeyType, { only?: string
         searchTargets: ['name', 'provider', 'region_code'],
     },
     role: {
-        searchTargets: ['name'],
+        searchTargets: ['name', 'role_id', 'role_type'],
     },
     secret: {
         searchTargets: ['name', 'secret_id'],

@@ -14,7 +14,7 @@ import { useWorkspaceResourceMenuHandler } from '@/query/resource-query/resource
 import type { UseResourceMenuHandlerReturnType } from '@/query/resource-query/resource-menu-handler/types/resource-menu-handler.adaptor';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
-
+import { useRoleResourceMenuHandler } from './implementations/use-role-resource-menu-handler';
 
 
 export const resourceMenuHandlerMap: Record<ResourceKeyType, () => UseResourceMenuHandlerReturnType> = {
@@ -32,7 +32,7 @@ export const resourceMenuHandlerMap: Record<ResourceKeyType, () => UseResourceMe
     cloudServiceType: () => ({} as UseResourceMenuHandlerReturnType),
     // cloudServiceQuerySet: () => ({} as UseResourceMenuHandlerReturnType),
     collector: () => ({} as UseResourceMenuHandlerReturnType),
-    role: () => ({} as UseResourceMenuHandlerReturnType),
+    role: useRoleResourceMenuHandler,
     region: useRegionResourceMenuHandler,
     secret: () => ({} as UseResourceMenuHandlerReturnType),
     plugin: () => ({} as UseResourceMenuHandlerReturnType),
