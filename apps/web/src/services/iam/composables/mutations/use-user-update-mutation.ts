@@ -6,12 +6,14 @@ import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseUserUpdateMutationOptions {
+    onMutate?: (params: UserUpdateParameters) => Promise<void> | void;
     onSuccess?: (data: UserModel, variables: UserUpdateParameters) => Promise<void> | void;
     onError?: (error: Error, variables: UserUpdateParameters) => Promise<void> | void;
     onSettled?: (data: UserModel | undefined, error: Error | null, variables: UserUpdateParameters) => Promise<void> | void;
 }
 
 export const useUserUpdateMutation = ({
+    onMutate,
     onSuccess,
     onError,
     onSettled,
@@ -28,6 +30,9 @@ export const useUserUpdateMutation = ({
 
 
     return useMutation({
+        onMutate: async (params) => {
+            if (onMutate) await onMutate(params);
+        },
         mutationFn: (params: UserUpdateParameters) => {
             if (!params.user_id) {
                 if (import.meta.env.DEV) throw new Error('[useUserUpdateMutation.ts] User ID is required');
