@@ -7,18 +7,20 @@ import type { EscalationPolicyGetParameters } from '@/api-clients/alert-manager/
 import type { EscalationPolicyListParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/list';
 import type { EscalationPolicyUpdateParameters } from '@/api-clients/alert-manager/escalation-policy/schema/api-verbs/update';
 import type { EscalationPolicyModel } from '@/api-clients/alert-manager/escalation-policy/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useEscalationPolicyApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('alertManagerEscalationPolicy');
+
     const actions = {
-        create: SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>,
-        delete: SpaceConnector.clientV2.alertManager.escalationPolicy.delete<EscalationPolicyDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.alertManager.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.alertManager.escalationPolicy.delete<EscalationPolicyDeleteParameters>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters, EscalationPolicyModel>),
         get: SpaceConnector.clientV2.alertManager.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>,
         list: SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>,
-        update: SpaceConnector.clientV2.alertManager.escalationPolicy.update<EscalationPolicyUpdateParameters, EscalationPolicyModel>,
     };
 
     return {
         escalationPolicyAPI: actions,
     };
 };
-

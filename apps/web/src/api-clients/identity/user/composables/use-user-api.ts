@@ -11,18 +11,21 @@ import type { UserListParameters } from '@/api-clients/identity/user/schema/api-
 import type { UserUpdateParameters } from '@/api-clients/identity/user/schema/api-verbs/update';
 import type { UserVerifyEmailParameters } from '@/api-clients/identity/user/schema/api-verbs/verify-email';
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useUserApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('user');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>,
-        update: SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>,
-        delete: SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>),
         get: SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>,
         list: SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>,
-        enable: SpaceConnector.clientV2.identity.user.enable<UserEnableParameters, UserModel>,
-        disable: SpaceConnector.clientV2.identity.user.disable<UserDisableParameters, UserModel>,
-        disableMfa: SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters, UserModel>,
-        verifyEmail: SpaceConnector.clientV2.identity.user.verifyEmail<UserVerifyEmailParameters, UserModel>,
+        enable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.enable<UserEnableParameters, UserModel>),
+        disable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.disable<UserDisableParameters, UserModel>),
+        disableMfa: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters, UserModel>),
+        verifyEmail: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.user.verifyEmail<UserVerifyEmailParameters, UserModel>),
     };
 
     return {

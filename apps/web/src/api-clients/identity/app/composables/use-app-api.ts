@@ -12,17 +12,20 @@ import type { AppListParameters } from '@/api-clients/identity/app/schema/api-ve
 import type { AppStatParameters } from '@/api-clients/identity/app/schema/api-verbs/stat';
 import type { AppUpdateParameters } from '@/api-clients/identity/app/schema/api-verbs/update';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useAppApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('app');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.app.create<AppCreateParameters, AppModel>,
-        update: SpaceConnector.clientV2.identity.app.update<AppUpdateParameters, AppModel>,
-        delete: SpaceConnector.clientV2.identity.app.delete<AppDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.create<AppCreateParameters, AppModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.update<AppUpdateParameters, AppModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.delete<AppDeleteParameters>),
         get: SpaceConnector.clientV2.identity.app.get<AppGetParameters, AppModel>,
         list: SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>,
-        enable: SpaceConnector.clientV2.identity.app.enable<AppEnableParameters, AppModel>,
-        disable: SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>,
-        generateClientSecret: SpaceConnector.clientV2.identity.app.generateClientSecret<AppGenerateClientSecretParameters>,
+        enable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.enable<AppEnableParameters, AppModel>),
+        disable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>),
+        generateClientSecret: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.app.generateClientSecret<AppGenerateClientSecretParameters>),
         stat: SpaceConnector.clientV2.identity.app.stat<AppStatParameters, StatResponse>,
     };
 

@@ -8,14 +8,17 @@ import type { MetricListParameters } from '@/api-clients/inventory/metric/schema
 import type { MetricRunParameters } from '@/api-clients/inventory/metric/schema/api-verbs/run';
 import type { MetricUpdateParameters } from '@/api-clients/inventory/metric/schema/api-verbs/update';
 import type { MetricModel } from '@/api-clients/inventory/metric/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useMetricApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('metric');
+
     const actions = {
-        create: SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>,
-        delete: SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>),
         get: SpaceConnector.clientV2.inventory.metric.get<MetricGetParameters, MetricModel>,
-        run: SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>,
-        update: SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>,
+        run: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>),
         list: SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>,
     };
 

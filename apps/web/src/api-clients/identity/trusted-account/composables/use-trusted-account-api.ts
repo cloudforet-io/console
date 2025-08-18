@@ -11,19 +11,22 @@ import type { TrustedAccountSyncParameters } from '@/api-clients/identity/truste
 import type { TrustedAccountUpdateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update';
 import type { TrustedAccountUpdateSecretDataParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/update-secret-data';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 
 export const useTrustedAccountApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('trustedAccount');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>,
-        update: SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>,
-        delete: SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>),
         get: SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>,
         list: SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>,
         stat: SpaceConnector.clientV2.identity.trustedAccount.stat<TrustedAccountStatParameters, StatResponse>,
-        updateSecretData: SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>,
-        sync: SpaceConnector.clientV2.identity.trustedAccount.sync<TrustedAccountSyncParameters>,
+        updateSecretData: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>),
+        sync: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.trustedAccount.sync<TrustedAccountSyncParameters>),
     };
 
     return {
