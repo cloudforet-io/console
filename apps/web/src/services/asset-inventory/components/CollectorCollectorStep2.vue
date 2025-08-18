@@ -11,7 +11,6 @@
                                     @update-valid="handleChangeIsProviderValid"
             />
             <collector-version-form class="version-row"
-                                    get-versions-on-plugin-id-change
                                     @update-valid="handleChangeIsVersionValid"
             />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"

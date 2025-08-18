@@ -12,8 +12,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
-import type { NotificationModel } from '@/schema/notification/notification/model';
+import type { NotificationListParameters } from '@/api-clients/notification/notification/schema/api-verbs/list';
+import type { NotificationModel } from '@/api-clients/notification/notification/schema/model';
 
 import { SIDEBAR_TYPE } from '@/store/display/constant';
 import type {

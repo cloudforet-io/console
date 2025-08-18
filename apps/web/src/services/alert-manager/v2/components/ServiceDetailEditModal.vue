@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PTextarea,
@@ -12,8 +13,9 @@ import type { ServiceReferenceMap } from '@/store/reference/service-reference-st
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
+import { useServiceUpdateMutation } from '@/services/alert-manager/v2/composables/use-service-update-mutation';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -26,16 +28,19 @@ const props = withDefaults(defineProps<Props>(), {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
+
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const storeState = reactive({
     serviceListMap: computed<ServiceReferenceMap>(() => serviceDetailPageGetters.serviceReferenceMap),
-    service: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
 });
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    disabled: computed<boolean>(() => invalidState.name || (storeState.service.name === name.value && storeState.service.description === description.value)),
+    disabled: computed<boolean>(() => invalidState.name || (serviceData.value?.name === name.value && serviceData.value?.description === description.value)),
 });
 const {
     forms: {
@@ -46,8 +51,8 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    name: storeState.service.name,
-    description: storeState.service.description,
+    name: serviceData.value?.name || '',
+    description: serviceData.value?.description || '',
 }, {
     name(value: string) {
         if (!value) return ' ';
@@ -59,18 +64,18 @@ const {
     },
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        await serviceDetailPageStore.updateServiceDetailData({
-            name: name.value,
-            description: description.value || ' ',
-        });
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.service.service_id);
-    } finally {
-        state.loading = false;
+const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
+    onSettled: () => {
         handleClose();
-    }
+    },
+});
+
+const handleConfirm = async () => {
+    updateService({
+        service_id: serviceId.value,
+        name: name.value,
+        description: description.value || ' ',
+    });
 };
 const handleClose = () => {
     state.proxyVisible = false;
@@ -85,7 +90,7 @@ const handleClose = () => {
                     :backdrop="true"
                     :visible="state.proxyVisible"
                     :disabled="state.disabled"
-                    :loading="state.loading"
+                    :loading="updateServiceLoading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -111,7 +116,7 @@ const handleClose = () => {
                                class="input-form service-key"
                                required
                 >
-                    <p-text-input :value="storeState.service.service_key"
+                    <p-text-input :value="serviceData?.service_key"
                                   readonly
                                   block
                     />

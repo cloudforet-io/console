@@ -22,10 +22,10 @@ import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-t
 import { i18n } from '@/translations';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
-import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
-import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-query';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/data-table/use-widget-date-range';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/widget/use-widget-frame';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/widget/use-widget-load-query';
 import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { DATE_FORMAT } from '@/common/modules/widgets/_constants/widget-field-constant';
 import {

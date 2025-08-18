@@ -1,6 +1,6 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { AlertState } from '@/schema/monitoring/alert/type';
+import type { AlertState } from '@/api-clients/monitoring/alert/schema/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 

@@ -1,4 +1,4 @@
-import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

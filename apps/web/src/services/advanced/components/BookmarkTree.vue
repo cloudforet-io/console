@@ -4,9 +4,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PTreeView, PTextButton } from '@cloudforet/mirinae';
+import { PI, PTextButton, PTreeView } from '@cloudforet/mirinae';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
@@ -17,24 +16,21 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
-import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 const gnbStore = useGnbStore();
-const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
-const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-});
+const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
 
 const state = reactive({
     showMorePage: 1,
-    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.bookmarkFolderList)),
+    convertedList: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(bookmarkFolderListData.value)),
     bookmarkTreeData: computed<TreeNode[]>(() => state.convertedList.slice(0, 20 * state.showMorePage)),
     selectedTreeId: undefined as string|undefined,
     group: computed<string>(() => route.params.group),
@@ -42,7 +38,7 @@ const state = reactive({
     bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
         const allPaths: Breadcrumb[] = [];
         if (state.group) {
-            const workspaceItem = storeState.workspaceList.find((item) => item.workspace_id === state.group);
+            const workspaceItem = workspaceListData.value.find((item) => item.workspace_id === state.group);
             allPaths.push({
                 name: state.group === 'global' ? i18n.t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : workspaceItem?.name || '',
                 to: {
@@ -85,7 +81,7 @@ const state = reactive({
 });
 
 const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
-    const workspaceMap: { [key: string]: TreeNode } = storeState.workspaceList.flatMap((item) => item.workspace_id)
+    const workspaceMap: { [key: string]: TreeNode } = workspaceListData.value.flatMap((item) => item.workspace_id)
         .reduce((acc, cur) => {
             acc[cur] = {
                 id: cur,
@@ -172,7 +168,7 @@ const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[])
 watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
     gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
 }, { immediate: true });
-watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookmarkFolderList]) => {
+watch([() => route.params, () => bookmarkFolderListData.value], ([params, bookmarkFolderList]) => {
     let selectedTreeId: string|undefined = '';
     if (params.folder) {
         const selectedFolder = bookmarkFolderList.find((item) => item.name === params.folder);
@@ -208,12 +204,12 @@ watch([() => route.params, () => storeState.bookmarkFolderList], ([params, bookm
                                  height="0.875rem"
                             />
                             <workspace-logo-icon v-else
-                                                 :text="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(node.data.id, storeState.workspaceList)?.tags?.theme"
+                                                 :text="getWorkspaceInfo(node.data.id, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(node.data.id, workspaceListData)?.tags?.theme"
                                                  size="xxs"
                                                  class="workspace-logo-icon"
                             />
-                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, storeState.workspaceList)?.name || '' }}</span>
+                            <span class="text">{{ node.id === 'global' ? $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') : getWorkspaceInfo(node.data.name, workspaceListData)?.name || '' }}</span>
                         </div>
                         <div v-else
                              class="bookmark"

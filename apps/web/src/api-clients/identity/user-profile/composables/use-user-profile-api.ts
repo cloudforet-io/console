@@ -24,6 +24,7 @@ export const useUserProfileApi = () => {
         enableMfa: SpaceConnector.clientV2.identity.userProfile.enableMfa<UserProfileEnableMfaParameters, UserModel>,
         confirmMfa: SpaceConnector.clientV2.identity.userProfile.confirmMfa<UserProfileConfirmMfaParameters, UserModel>,
         getWorkspaces: SpaceConnector.clientV2.identity.userProfile.getWorkspaces<UserProfileGetWorkspacesParameters, any>,
+        getWorkspaceGroups: SpaceConnector.clientV2.identity.userProfile.getWorkspaceGroups<UserProfileGetWorkspacesParameters, any>,
     };
 
     return {

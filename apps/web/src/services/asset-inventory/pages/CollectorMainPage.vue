@@ -1,72 +1,58 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core';
 import {
-    computed, reactive, onMounted,
+    computed, onMounted,
 } from 'vue';
-
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PHeading, PDataLoader, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { SpaceRouter } from '@/router';
-import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
-import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
+import CollectorProviderList from '@/services/asset-inventory/components/CollectorProviderList.vue';
+import { useCollectorListQuery } from '@/services/asset-inventory/composables/use-collector-list-query';
+import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
+import { useCollectorMainPageStore } from '@/services/asset-inventory/stores/collector-main-page-store';
 import type {
     CollectorMainPageQuery,
     CollectorMainPageQueryValue,
 } from '@/services/asset-inventory/types/collector-main-page-type';
 
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
+const collectorMainPageStore = useCollectorMainPageStore();
+const collectorMainPageState = collectorMainPageStore.state;
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.state;
-const allReferenceStore = useAllReferenceStore();
-
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-});
-const state = reactive({
-    initLoading: true,
-    hasCollectorList: false,
-    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
-});
+const isAdminMode = computed(() => appContextGetters.isAdminMode);
 
 /* Url Query String */
 const urlFilterConverter = new QueryHelper();
-
 const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageState.selectedProvider = queryStringToString(query.provider) ?? 'all';
+    collectorMainPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageState.searchFilters = filters;
+        collectorMainPageStore.setSearchFilters(filters);
     }
 };
 
 const collectorMainPageQueryValue = computed<Required<CollectorMainPageQueryValue>>(() => ({
-    provider: collectorPageState.selectedProvider,
-    filters: collectorPageState.searchFilters,
+    provider: collectorMainPageState.selectedProvider,
+    filters: collectorMainPageState.searchFilters,
 }));
 
 watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
@@ -82,30 +68,28 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageState.selectedProvider = providerName;
+    collectorMainPageStore.setSelectedProvider(providerName);
 };
-
 
 /* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchCollectorCount = async () => {
-    try {
-        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
+const { isLoading, totalCount } = useCollectorListQuery({
+    params: computed(() => {
+        if (isAdminMode.value) {
+            collectorCountApiQueryHelper.setFilters([{ k: 'workspace_id', v: '*', o: '=' }]);
+        }
+        return {
             query: collectorCountApiQueryHelper.data,
-        });
-        state.hasCollectorList = (total_count ?? 0) > 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.initLoading = false;
-    }
-};
+        };
+    }),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
+});
 
 /* INIT */
-onMounted(async () => {
-    collectorPageStore.reset();
+onMounted(() => {
+    collectorMainPageStore.reset();
     setValuesFromUrlQueryString();
-    await fetchCollectorCount();
 });
 </script>
 
@@ -113,15 +97,16 @@ onMounted(async () => {
     <div class="collector-page">
         <p-heading-layout class="mb-6">
             <template #heading>
-                <p-heading use-total-count
-                           use-selected-count
-                           :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-                           :total-count="collectorPageState.totalCount"
+                <p-heading
+                    use-total-count
+                    use-selected-count
+                    :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+                    :total-count="totalCount"
                 />
             </template>
             <template #extra>
                 <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                    :to="{ name: isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME : ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"
@@ -133,18 +118,16 @@ onMounted(async () => {
             </template>
         </p-heading-layout>
         <p-data-loader
-            :data="state.hasCollectorList"
-            :loading="state.initLoading"
+            :data="totalCount > 0"
+            :loading="isLoading"
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div v-if="state.hasCollectorList && state.providerList.length > 1"
+            <div v-if="totalCount > 0"
                  class="collector-contents-wrapper"
             >
-                <provider-list
-                    :provider-list="state.providerList"
-                    :selected-provider="collectorPageState.selectedProvider"
-                    @change-provider="handleSelectedProvider"
+                <collector-provider-list :selected-provider="collectorMainPageState.selectedProvider"
+                                         @update:selected-provider="handleSelectedProvider"
                 />
                 <collector-contents />
             </div>

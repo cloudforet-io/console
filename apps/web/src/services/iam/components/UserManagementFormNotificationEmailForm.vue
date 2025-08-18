@@ -7,7 +7,6 @@ import {
     PFieldGroup, PTextInput, PTooltip, PI, PButton, PBadge,
 } from '@cloudforet/mirinae';
 
-import type { UserModel } from '@/api-clients/identity/user/schema/model';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -16,8 +15,9 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useUserGetQuery } from '@/services/iam/composables/use-user-get-query';
+import { useUserGetQuery } from '@/services/iam/composables/use-admin-user-get-query';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 
 const userPageStore = useUserPageStore();
@@ -34,7 +34,7 @@ const { data: userData, isLoading: isUserLoading } = useUserGetQuery({
 });
 
 const state = reactive({
-    data: computed<UserModel|undefined>(() => userData.value),
+    // data: computed<UserModel|undefined>(() => userData.value),
     loading: false,
     isEdit: false,
     isCollapsed: true,
@@ -48,7 +48,7 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    email: state.data?.email || '',
+    email: '',
 }, {
     email(value: string) { return !emailValidator(value) ? '' : i18n.t('IAM.USER.FORM.EMAIL_INVALID'); },
 });
@@ -86,7 +86,7 @@ const handleClickSend = async () => {
 };
 
 /* Watcher */
-watch(() => state.data?.email_verified, (value) => {
+watch(() => userData.value?.email_verified, (value) => {
     state.isValidEmail = value || false;
     if (email.value) {
         state.isEdit = !value;
@@ -107,7 +107,7 @@ watch(() => state.data?.email_verified, (value) => {
             <template #default="{invalid}">
                 <div class="input-form">
                     <!-- HACK: need to apply placeholder changes based on the distinction between open source and SaaS. -->
-                    <p-text-input :value="email"
+                    <p-text-input :value="userData?.email"
                                   :loading="isUserLoading"
                                   :invalid="invalid"
                                   placeholder="user@spaceone.io"

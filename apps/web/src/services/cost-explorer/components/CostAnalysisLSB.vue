@@ -5,15 +5,15 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PLazyImg, PSelectDropdown, PI, PToggleButton,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
+import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-context-menu-attach/use-context-menu-attach';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
@@ -30,7 +30,7 @@ import {
     yellow, gray,
 } from '@/styles/colors';
 
-
+import { useCostQuerySetQuery } from '@/services/cost-explorer/composables/use-cost-query-set-query';
 import {
     DEFAULT_UNIFIED_COST_CURRENCY, UNIFIED_COST_KEY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -43,9 +43,7 @@ const DATA_SOURCE_MENU_ID = 'data-source';
 const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
-const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
-const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const domainStore = useDomainStore();
@@ -53,23 +51,23 @@ const domainGetters = domainStore.getters;
 
 const router = useRouter();
 const route = useRoute();
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
 
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed<boolean>(() => userStore.state.roleType === 'DOMAIN_ADMIN'),
-    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
-    currentQueryMenuList: computed<LSBMenu>(() => costQuerySetState.costQuerySetList.map((d) => {
+    currentQueryMenuList: computed<LSBMenu>(() => (costQuerySetList.value || []).map((d) => {
         if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
             return {
                 type: 'item',
@@ -82,7 +80,7 @@ const state = reactive({
                 to: {
                     name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
-                        dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
+                        dataSourceId: costQuerySetState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                         costQuerySetId: d.cost_query_set_id,
                     },
                 },
@@ -99,7 +97,7 @@ const state = reactive({
             to: {
                 name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
-                    dataSourceId: storeState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
+                    dataSourceId: costQuerySetState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''),
                     costQuerySetId: d.cost_query_set_id,
                 },
             },
@@ -140,31 +138,35 @@ const state = reactive({
         ...state.queryMenuSet,
     ]),
 });
-
 const dataSourceState = reactive({
-    items: computed<MenuItem[]>(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
-        return Object.entries(dataSourceMap).map(([key, value]) => ({
-            name: key,
-            label: value.name,
-            imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
-        }));
+    selectedDataSourceId: computed<string>(() => costQuerySetState.selectedDataSourceId || ''),
+    dataSourceMenuHandler: computed<MenuAttachHandler>(() => resourceMenuHandlerMap.costDataSource()),
+});
+
+/* Query */
+const { costQuerySetList, managedCostQuerySets } = useCostQuerySetQuery({
+    data_source_id: computed(() => {
+        if (costQuerySetState.isUnifiedCostOn) return UNIFIED_COST_KEY;
+        return costQuerySetState.selectedDataSourceId || '';
     }),
-    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
+    isUnifiedCostOn: computed(() => costQuerySetState.isUnifiedCostOn),
+    selectedQuerySetId: computed(() => costQuerySetState.selectedQuerySetId),
 });
 
 const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
     && menu.type === MENU_ITEM_TYPE.ITEM);
 
-// s
-const handleSelectDataSource = (selected: string) => {
-    if (!selected) return;
-    costQuerySetStore.setSelectedDataSourceId(selected);
+
+/* Event Handler */
+const handleSelectDataSource = (selected: string | number | SelectDropdownMenuItem[]) => {
+    if (!selected || Array.isArray(selected)) return;
+    const selectedString = typeof selected === 'string' ? selected : selected.toString();
+    costQuerySetStore.setSelectedDataSourceId(selectedString);
     router.push({
         name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
-            dataSourceId: selected,
-            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
+            dataSourceId: selectedString,
+            costQuerySetId: managedCostQuerySets.value[0]?.cost_query_set_id,
         },
     }).catch(() => {});
 };
@@ -175,7 +177,7 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
         name: storeState.isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: value ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? UNIFIED_COST_KEY),
-            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
+            costQuerySetId: managedCostQuerySets.value[0]?.cost_query_set_id,
         },
     }).catch(() => {});
 };
@@ -199,30 +201,35 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
                     /><span>Unified Cost</span>
                 </div>
                 <p-select-dropdown class="select-options-dropdown"
-                                   :menu="dataSourceState.items"
-                                   :selected="dataSourceState.selected"
                                    :disabled="costQuerySetState.isUnifiedCostOn"
+                                   :handler="dataSourceState.dataSourceMenuHandler"
                                    use-fixed-menu-style
                                    is-fixed-width
+                                   :page-size="10"
                                    @update:selected="handleSelectDataSource"
                 >
-                    <template #dropdown-button="item">
-                        <div class="selected-wrapper">
-                            <p-lazy-img v-if="item && item.imageUrl"
-                                        class="selected-icon"
-                                        :src="item.imageUrl"
+                    <template #dropdown-button>
+                        <div v-if="dataSourceState.selectedDataSourceId"
+                             class="selected-wrapper"
+                        >
+                            <p-lazy-img class="selected-icon"
+                                        :src="referenceMap.plugin[referenceMap.costDataSource[dataSourceState.selectedDataSourceId]?.data?.plugin_info?.plugin_id ?? '']?.icon || 'error'"
                                         width="1rem"
                                         height="1rem"
                             />
-                            <p-i v-if="item && item.icon"
-                                 width="1rem"
-                                 height="1rem"
-                                 class="selected-icon"
-                                 name="ic_unified-cost"
-                            />
                             <span class="selected-text">
-                                {{ item?.label }}
+                                {{ referenceMap.costDataSource[dataSourceState.selectedDataSourceId]?.name }}
                             </span>
+                        </div>
+                    </template>
+                    <template #menu-item--format="{item}">
+                        <div class="data-source-menu-item">
+                            <p-lazy-img class="selected-icon"
+                                        :src="referenceMap.plugin[referenceMap.costDataSource[item.name]?.data?.plugin_info?.plugin_id ?? '']?.icon || 'error'"
+                                        width="1rem"
+                                        height="1rem"
+                            />
+                            <span class="label">{{ item.label }}</span>
                         </div>
                     </template>
                 </p-select-dropdown>
@@ -294,6 +301,11 @@ const handleSelectUnifiedCostToggle = (value: boolean) => {
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
     .selected-wrapper {
+        @apply flex items-center;
+        gap: 0.25rem;
+    }
+
+    .data-source-menu-item {
         @apply flex items-center;
         gap: 0.25rem;
     }

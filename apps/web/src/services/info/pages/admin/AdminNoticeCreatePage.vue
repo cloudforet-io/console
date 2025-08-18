@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue';
-
 import { PHeading } from '@cloudforet/mirinae';
 
 import NoticeForm from '@/services/info/components/NoticeForm.vue';
-import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
-
-const noticeDetailStore = useNoticeDetailStore();
-
-onBeforeMount(() => {
-    noticeDetailStore.reset();
-});
 </script>
 
 <template>

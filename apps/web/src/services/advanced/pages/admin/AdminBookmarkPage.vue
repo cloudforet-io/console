@@ -4,7 +4,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { at } from 'lodash';
+import { at, filter, indexOf } from 'lodash';
 
 import {
     PHeading, PButton, PContextMenu, PHeadingLayout,
@@ -15,26 +15,33 @@ import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
+import type { BookmarkModalType } from '@/common/components/bookmark/type/type';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import BookmarkManagementTable from '@/services/advanced/components/BookmarkManagementTable.vue';
+import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+const { bookmarkList } = useBookmarkListQuery();
 
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
-
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
-    selectedIndices: computed<number[]>(() => bookmarkPageGetters.selectedIndices),
+    selectedIndices: computed<number[]>(() => {
+        const selectedItems = at(bookmarkList.value, bookmarkPageState.selectedIndices);
+        const activeItems = filter(selectedItems, (i) => i.isGlobal);
+        const activeItemIndices: number[] = [];
+        activeItems.forEach((item) => {
+            const index = indexOf(bookmarkList.value, item);
+            if (index !== -1) activeItemIndices.push(index);
+        });
+        return activeItemIndices;
+    }),
 });
 const state = reactive({
     visibleMenu: false,
@@ -65,7 +72,7 @@ const handleSelectMenuItem = (value: MenuItem) => {
     state.visibleMenu = false;
 };
 const handleClickDeleteButton = () => {
-    const selectedItems = at(storeState.bookmarkList, storeState.selectedIndices);
+    const selectedItems = at(bookmarkList.value, storeState.selectedIndices);
     bookmarkStore.setSelectedBookmarks(selectedItems);
     bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);
 };

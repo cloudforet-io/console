@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import { USER_GROUP_MODAL_TYPE } from '@/services/iam/constants/user-group-constant';
+import { useQueryTags } from '@/common/composables/query-tags';
+
+import { useUserGroupListPaginationQuery } from '@/services/iam/composables/use-user-group-list-pagination-query';
+import { USER_GROUP_MODAL_TYPE, USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
 
 interface Props {
   hasReadWriteAccess?: boolean;
@@ -15,9 +20,24 @@ interface Props {
 const props = defineProps<Props>();
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.state;
 
-const totalCount = computed<number>(() => userGroupPageState.totalCount);
+const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS });
+const userGroupListApiQueryHelper = new ApiQueryHelper();
+
+const queryState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+
+const { totalCount: userGroupListTotalCount } = useUserGroupListPaginationQuery({
+    params: computed(() => {
+        userGroupListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
+        userGroupListApiQueryHelper.setFilters(queryTagHelper.filters.value);
+        return {
+            query: userGroupListApiQueryHelper.data,
+        };
+    }),
+});
 
 const handleCreateGroup = () => {
     userGroupPageStore.updateModalSettings({
@@ -35,7 +55,7 @@ const handleCreateGroup = () => {
                 <p-heading :title="$t('IAM.USER_GROUP.TITLE')"
                            use-selected-count
                            use-total-count
-                           :total-count="totalCount"
+                           :total-count="userGroupListTotalCount"
                 />
             </template>
             <template v-if="props.hasReadWriteAccess"

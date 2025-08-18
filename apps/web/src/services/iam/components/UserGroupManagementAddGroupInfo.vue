@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watchEffect } from 'vue';
+import {
+    computed, reactive, ref, watch, watchEffect,
+} from 'vue';
 
 import { PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
@@ -16,15 +18,37 @@ const userGroupReferenceState = userGroupReferenceStore.state;
 
 const emit = defineEmits(['update:values']);
 
+const isGroupNameEditedAsUpdate = ref<boolean>(false);
+
 const state = reactive({
     groupName: userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE ? '' : userGroupPageGetters.selectedUserGroups[0].name,
     description: userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.CREATE ? '' : userGroupPageGetters.selectedUserGroups[0].description,
     isGroupNameDuplicated: computed<boolean>(() => {
-        if (userGroupReferenceState.items && state.groupName && Object.values(userGroupReferenceState.items).map((d) => d.name).includes(state.groupName)) {
-            return true;
-        }
-        return false;
+        const inputName = state.groupName;
+        const isUpdateMode = userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE;
+        const originalName = userGroupPageGetters.selectedUserGroups[0]?.name;
+        const nameExists = userGroupReferenceState.items && Object.values(userGroupReferenceState.items).some((d) => d.name === inputName);
+
+        // description: In update mode, if the name hasn't been edited, it's not duplicated
+        if (isUpdateMode && !isGroupNameEditedAsUpdate.value) return false;
+
+        // description: Otherwise, mark as duplicate if name exists and is not the same as the original
+        return nameExists && (!isUpdateMode || inputName !== originalName);
     }),
+});
+
+watch(() => state.groupName, (nv, ov) => {
+    if (nv !== ov && userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE) {
+        isGroupNameEditedAsUpdate.value = true;
+    }
+}, { immediate: true });
+
+const isFormEdited = computed(() => {
+    if (userGroupPageState.modal.type === USER_GROUP_MODAL_TYPE.UPDATE) {
+        const original = userGroupPageGetters.selectedUserGroups[0];
+        return state.groupName !== original.name || state.description !== original.description;
+    }
+    return true;
 });
 
 watchEffect(() => {
@@ -32,6 +56,7 @@ watchEffect(() => {
         groupName: state.groupName,
         description: state.description,
         isGroupNameDuplicated: state.isGroupNameDuplicated,
+        isFormEdited: isFormEdited.value,
     });
 });
 

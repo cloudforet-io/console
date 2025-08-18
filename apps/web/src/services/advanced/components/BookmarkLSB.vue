@@ -5,12 +5,13 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PTextInput, PTextHighlighting, PEmpty,
+    PEmpty,
+    PTextHighlighting,
+    PTextInput,
 } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem } from '@/common/modules/navigations/lsb/type';
@@ -19,17 +20,12 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { gray } from '@/styles/colors';
 
 import BookmarkTree from '@/services/advanced/components/BookmarkTree.vue';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
-import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
-
-const bookmarkPageStore = useBookmarkPageStore();
-const bookmarkPageState = bookmarkPageStore.state;
 
 const route = useRoute();
 
-const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-});
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
 
 const state = reactive({
     bookmarkKeyword: '',
@@ -58,7 +54,7 @@ const state = reactive({
             id: 'bookmark',
         },
     ]),
-    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => storeState.bookmarkFolderList.filter((folder) => (folder.name as string)?.includes(state.bookmarkKeyword))
+    bookmarkFilteredByKeyword: computed<LSBItem[]>(() => bookmarkFolderListData.value.filter((folder) => (folder.name as string).toLowerCase().includes(state.bookmarkKeyword.toLowerCase()))
         .map((folder) => ({
             type: MENU_ITEM_TYPE.ITEM,
             label: folder.name,

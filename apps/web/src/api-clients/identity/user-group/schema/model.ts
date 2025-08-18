@@ -1,5 +1,5 @@
 import type { Tags } from '@/api-clients/_common/schema/model';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
 
 export interface UserGroupModel {
     user_group_id: string;

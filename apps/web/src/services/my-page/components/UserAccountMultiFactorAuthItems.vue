@@ -37,11 +37,11 @@ const storeState = reactive({
 const state = reactive({
     isVerified: computed<boolean>(() => storeState.mfa?.state === 'ENABLED'),
     currentType: computed<string|undefined>(() => userStore.state.mfa?.mfa_type || undefined),
-    isEnforced: computed<boolean>(() => !!userStore.state.mfa?.options?.enforce),
+    isEnforced: computed<boolean>(() => userStore.state.mfa?.options?.enforce === true),
 });
 
 const handleChange = async (isSelected: boolean, selected: MultiFactorAuthType) => {
-    if (props.readonlyMode || state.isEnforced) return;
+    if (props.readonlyMode) return;
     if (state.isEnforced && state.currentType !== selected) return;
     if (state.isVerified && state.currentType !== selected) {
         if (selected === MULTI_FACTOR_AUTH_TYPE.OTP) {
@@ -85,7 +85,7 @@ const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEv
         <p-select-card v-for="(item, idx) in MULTI_FACTOR_AUTH_ITEMS"
                        :key="`${item.type} - ${idx}`"
                        block
-                       :readonly="props.readonlyMode || state.isEnforced"
+                       :readonly="props.readonlyMode || (state.isEnforced && state.currentType !== item.type)"
                        :selected="state.isVerified ? state.currentType : undefined"
                        :disabled="state.isEnforced && state.currentType !== item.type"
                        :value="item.type"
@@ -122,7 +122,7 @@ const handleClickReSyncButton = async (type: MultiFactorAuthType, event: MouseEv
                     <p-button class="re-sync-button"
                               style-type="tertiary"
                               size="sm"
-                              :readonly="props.readonlyMode"
+                              :readonly="props.readonlyMode || (state.isEnforced && state.currentType !== item.type)"
                               @click="handleClickReSyncButton(item.type, $event)"
                     >
                         {{ $t('MY_PAGE.MFA.RESYNC') }}

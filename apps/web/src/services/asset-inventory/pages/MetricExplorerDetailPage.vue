@@ -10,10 +10,7 @@ import {
     PDivider,
 } from '@cloudforet/mirinae';
 
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
@@ -27,6 +24,8 @@ import MetricExplorerDataTable from '@/services/asset-inventory/components/Metri
 import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
 import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
 import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
+import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
@@ -38,36 +37,35 @@ const { breadcrumbs } = useBreadcrumbs();
 const route = useRoute();
 const router = useRouter();
 
-const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
-const storeState = reactive({
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
-        const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
-        const _targetMetric = metricExplorerPageState.metric;
+        const targetNamespace = referenceMap.namespace[currentMetric.value?.namespace_id || ''];
+        const _targetMetric = currentMetric.value;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
+                name: `[${targetNamespace?.name || currentMetric.value?.namespace_id}] ${currentMetricExample.value?.name ?? _targetMetric?.name}`,
                 path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
     metricFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC,
-        id: metricExplorerPageState.metric?.metric_id,
+        id: currentMetric.value?.metric_id,
     })),
     metricExampleFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC_EXAMPLE,
         id: route.params.metricExampleId,
     })),
+});
+const defaultMetricGroupByList = computed<string[]>(() => {
+    const defaultLabelKeys = currentMetric.value?.labels_info?.filter((d) => d.default) ?? [];
+    return defaultLabelKeys.map((d) => d.key);
 });
 
 /* Util */
@@ -87,20 +85,25 @@ const setQueryOptions = (urlQuery: MetricExplorerPageUrlQuery) => {
     metricExplorerPageStore.setRefreshMetricPeriodDropdown(true);
 };
 
-watch(() => route.params, async (params) => {
-    if (!params.metricId) return;
+/* Query */
+const { data: currentMetric, isLoading: currentMetricLoading } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
+const { data: currentMetricExample, isLoading: currentMetricExampleLoading } = useMetricExampleGetQuery({
+    metricExampleId: computed(() => route.params.metricExampleId),
+});
+
+watch([() => route.params, () => currentMetricLoading.value, () => currentMetricExampleLoading.value], async ([params, _currentMetricLoading, _currentMetricExampleLoading]) => {
+    if (!params.metricId || _currentMetricLoading || _currentMetricExampleLoading) return;
     metricExplorerPageStore.reset();
-    await metricExplorerPageStore.loadMetric(params.metricId);
     if (params.metricExampleId) {
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        const targetMetricExample = metricExplorerPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
-        metricExplorerPageStore.initMetricExampleOptions(targetMetricExample);
-    } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
-        metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
+        metricExplorerPageStore.initMetricExampleOptions(currentMetricExample.value);
+    } else if (defaultMetricGroupByList.value.length) {
+        metricExplorerPageStore.setSelectedGroupByList(defaultMetricGroupByList.value);
     }
 
     // case for Home landing page
-    if (params.groupBy && metricExplorerPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
+    if (params.groupBy && currentMetric.value?.labels_info?.find((d) => d.key === 'labels.Provider')) {
         const defaultFilters = { 'labels.Provider': [params.groupBy] };
         if (params.group) defaultFilters['labels.Cloud Service Group'] = [params.group];
         if (params.type) defaultFilters['labels.Cloud Service Type'] = [params.type];

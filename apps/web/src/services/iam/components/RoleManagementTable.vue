@@ -2,7 +2,6 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown, PButton, PBadge, PStatus,
@@ -28,12 +27,15 @@ import RoleDeleteModal
     from '@/services/iam/components/RoleDeleteModal.vue';
 import RoleStateUpdateModal from '@/services/iam/components/RoleStateUpdateModal.vue';
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleListPaginationQuery } from '@/services/iam/composables/use-role-list-pagination-query';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
 import {
     EXCEL_TABLE_FIELDS,
     ROLE_SEARCH_HANDLERS,
 } from '@/services/iam/constants/role-constant';
 import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
+
 
 interface Props {
     tableHeight?: number;
@@ -50,12 +52,49 @@ const rolePageState = rolePageStore.$state;
 
 const router = useRouter();
 
-const roleListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(rolePageState.pageStart).setPageLimit(rolePageState.pageLimit)
-    .setSort('is_managed', true);
+const roleListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: ROLE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
-let roleListApiQuery = roleListApiQueryHelper.data;
+
+/* Query */
+const queryState = reactive({
+    sortKey: 'is_managed',
+    sortDesc: true,
+});
+
+const pageState = reactive({
+    thisPage: 1,
+    pageLimit: 15,
+});
+
+const selectedRoleIds = computed<string[]>(() => rolePageState.selectedRoleIds);
+
+const { roleListData: selectedRoles } = useRoleListQuery(
+    computed(() => ({
+        query: {
+            filter: [{ k: 'role_id', v: selectedRoleIds.value, o: 'in' }],
+        },
+    })),
+);
+
+const {
+    data: roleList,
+    totalCount: roleTotalCount,
+    isLoading: isRoleListLoading,
+    refresh: refreshRoleList,
+} = useRoleListPaginationQuery({
+    params: computed(() => {
+        roleListApiQueryHelper
+            .setSort('is_managed', true)
+            .setFilters(queryTagHelper.filters.value);
+        roleListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
+        return {
+            query: roleListApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => pageState.thisPage),
+    pageSize: computed(() => pageState.pageLimit),
+});
 
 const storeState = reactive({
     timezone: computed<string>(() => userStore.state.timezone ?? 'UTC'),
@@ -85,13 +124,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.ROLE.EDIT'),
-        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
+        disabled: rolePageState.selectedIndices.length === 0 || selectedRoles.value.filter((item) => item.is_managed).length > 0,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.ROLE.DELETE'),
-        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
+        disabled: rolePageState.selectedIndices.length === 0 || selectedRoles.value.filter((item) => item.is_managed).length > 0,
     },
     { type: 'divider' },
     {
@@ -99,16 +138,16 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         name: 'enabled',
         label: i18n.t('IAM.ROLE.ENABLE'),
         disabled: rolePageState.selectedIndices.length === 0
-            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
-            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.DISABLED).length === 0,
+            || selectedRoles.value.filter((item) => item.is_managed).length > 0
+            || selectedRoles.value.filter((item) => item.state === ROLE_STATE.DISABLED).length === 0,
     },
     {
         type: 'item',
         name: 'disabled',
         label: i18n.t('IAM.ROLE.DISABLE'),
         disabled: rolePageState.selectedIndices.length === 0
-            || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0
-            || rolePageStore.selectedRoles.filter((item) => item.state === ROLE_STATE.ENABLED).length === 0,
+            || selectedRoles.value.filter((item) => item.is_managed).length > 0
+            || selectedRoles.value.filter((item) => item.state === ROLE_STATE.ENABLED).length === 0,
     },
 ]));
 
@@ -120,7 +159,7 @@ const handleEditRole = (id: string) => {
 const handleSelectDropdown = (name) => {
     switch (name) {
     case 'edit':
-        handleEditRole(rolePageStore.selectedRoles[0].role_id);
+        handleEditRole(selectedRoles.value[0].role_id);
         break;
     case 'delete':
         modalState.modalVisible = true;
@@ -137,29 +176,25 @@ const handleSelectDropdown = (name) => {
     }
 };
 const handleSelect = (index: number[]) => {
-    rolePageStore.$patch({ selectedIndices: index });
+    const selectedIds = index.map((i) => roleList.value?.[i]?.role_id).filter((id): id is string => id !== undefined);
+    rolePageStore.setSelectedIndices(index);
+    rolePageStore.setSelectedRoleIds(selectedIds);
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    roleListApiQuery = getApiQueryWithToolboxOptions(roleListApiQueryHelper, options) ?? roleListApiQuery;
     if (options.queryTags !== undefined) {
         queryTagHelper.setQueryTags(options.queryTags);
     }
-    if (options.pageStart !== undefined) rolePageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) rolePageStore.$patch({ pageLimit: options.pageLimit });
-    await getListRoles();
+    if (options.queryTags?.length === 0) {
+        rolePageStore.setSelectedRoleIds([]);
+        rolePageStore.setSelectedIndices([]);
+    }
+    if (options.sortBy !== undefined && options.sortDesc !== undefined) {
+        queryState.sortKey = options.sortBy;
+        queryState.sortDesc = options.sortDesc;
+    }
 };
 
 /* API */
-const getListRoles = async () => {
-    modalState.loading = true;
-    try {
-        roleListApiQueryHelper
-            .setFilters(queryTagHelper.filters.value);
-        await rolePageStore.listRoles({ query: roleListApiQuery });
-    } finally {
-        modalState.loading = false;
-    }
-};
 const handleExport = async () => {
     try {
         await downloadExcel({
@@ -175,11 +210,6 @@ const handleExport = async () => {
         ErrorHandler.handleError(e);
     }
 };
-
-/* Init */
-(() => {
-    getListRoles();
-})();
 </script>
 
 <template>
@@ -189,22 +219,24 @@ const handleExport = async () => {
                          selectable
                          sortable
                          exportable
-                         :loading="modalState.loading"
+                         :loading="isRoleListLoading"
                          disabled
-                         :items="rolePageState.roles"
+                         :items="roleList"
                          :select-index="rolePageState.selectedIndices"
                          :fields="state.fields"
                          sort-by="name"
                          :sort-desc="true"
-                         :total-count="rolePageState.totalCount"
+                         :total-count="roleTotalCount"
                          :key-item-sets="ROLE_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="ROLE_SEARCH_HANDLERS.valueHandlerMap"
                          :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px`}"
                          :get-row-selectable="getRowSelectable"
+                         :this-page.sync="pageState.thisPage"
+                         :page-size.sync="pageState.pageLimit"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshRoleList"
                          @export="handleExport"
         >
             <template v-if="props.hasReadWriteAccess"

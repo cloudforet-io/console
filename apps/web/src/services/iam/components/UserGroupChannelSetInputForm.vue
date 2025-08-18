@@ -1,21 +1,24 @@
 <script lang="ts" setup>
-import { onMounted, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { ComputedRef } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
-
-import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import UserGroupChannelAddFormData from '@/services/iam/components/UserGroupChannelAddFormData.vue';
+import { useUserGroupChannelGetQuery } from '@/services/iam/composables/use-user-group-channel-get-query';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
@@ -29,9 +32,9 @@ const userGroupPageState = userGroupPageStore.state;
 
 interface ChannelInfo {
   channelName: string;
-  channelData: Record<string, any>
+  schema: ComputedRef<JsonSchema>;
+  channelData: ComputedRef<Record<string, JsonSchema>>;
   channelInput: any;
-  selectedProtocolData: any;
 }
 
 interface UserModeInfo {
@@ -39,11 +42,32 @@ interface UserModeInfo {
   users: MenuItem[]
 }
 
+const protocolId = computed<string>(() => notificationChannelCreateFormState.selectedProtocol.protocol_id);
+
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+
+const { key: notificationProtocolQueryKey, params: notificationProtocolQueryParams } = useServiceQueryKey('alert-manager', 'notification-protocol', 'get', {
+    params: computed(() => ({
+        protocol_id: protocolId.value,
+    })),
+});
+
+
+const { userGroupChannelData } = useUserGroupChannelGetQuery();
+
+const { data: notificationProtocolData } = useScopedQuery({
+    queryKey: notificationProtocolQueryKey,
+    queryFn: () => notificationProtocolAPI.get(notificationProtocolQueryParams.value),
+    enabled: computed(() => !!protocolId.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+
 const state = reactive<ChannelInfo & UserModeInfo>({
     channelName: '',
-    channelData: {},
+    schema: computed(() => notificationProtocolData.value?.plugin_info.metadata.data.schema ?? {}),
+    channelData: computed(() => state.schema.properties || {}),
     channelInput: {},
-    selectedProtocolData: {},
     userMode: {},
     users: [],
 });
@@ -59,7 +83,7 @@ const {
     setForm,
     invalidState,
 } = useFormValidator({
-    channelName: userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE') ? '' : notificationChannelCreateFormState.channelName,
+    channelName: '',
 }, {
     channelName(value: string) {
         if (!value) return ' ';
@@ -71,31 +95,32 @@ const {
 });
 
 /* Component */
+watch(
+    () => userGroupChannelData.value?.name,
+    (name) => {
+        const isCreate = userGroupPageState.modal.title === i18n.t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE');
+        if (!isCreate) setForm('channelName', name ?? '');
+    },
+    { immediate: true },
+);
 const handleUpdateValid = (value: boolean) => {
     validateState.schemaValid = value;
 };
 
 /* Watcher */
-watch(() => channelName, (nv_channel_name) => {
+watch(channelName, (nv_channel_name) => {
     if (nv_channel_name) {
         emit('update-channel-name', nv_channel_name);
     }
 }, { immediate: true });
 
-watch(() => state.selectedProtocolData, (nv_selected_protocol_data) => {
-    if (nv_selected_protocol_data) {
-        const { schema } = nv_selected_protocol_data.plugin_info.metadata.data;
-        state.channelData = schema.properties;
-        //     store value. (not using both of them - will be deprecated one of them later)
-        notificationChannelCreateFormStore.$patch((_state) => {
-            _state.state.protocolSchemaForm = schema.properties;
-        });
-    }
-});
-
 watch(() => state.channelData, (nv_channel_data) => {
     if (nv_channel_data) {
         state.channelInput = Object.keys(nv_channel_data);
+        //     store value. (not using both of them - will be deprecated one of them later)
+        notificationChannelCreateFormStore.$patch((_state) => {
+            _state.state.protocolSchemaForm = nv_channel_data;
+        });
     }
 }, { deep: true, immediate: true });
 
@@ -106,24 +131,6 @@ watch(() => validateState, (nv_validate_state) => {
         emit('update-valid', false);
     }
 }, { deep: true, immediate: true });
-
-/* API */
-const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
-    try {
-        state.selectedProtocolData = await SpaceConnector.clientV2.alertManager.notificationProtocol.get<NotificationProtocolGetParameters, NotificationProtocolModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
-
-/* Mounted */
-onMounted(async () => {
-    if (notificationChannelCreateFormState.selectedProtocol) {
-        await fetchGetNotificationProtocol({
-            protocol_id: notificationChannelCreateFormState.selectedProtocol.protocol_id,
-        });
-    }
-});
 </script>
 
 <template>
@@ -141,6 +148,7 @@ onMounted(async () => {
             </template>
         </p-field-group>
         <user-group-channel-add-form-data v-if="userGroupPageState.modal.title === $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.TITLE')"
+                                          :schema="state.schema"
                                           @update-valid="handleUpdateValid"
         />
     </div>

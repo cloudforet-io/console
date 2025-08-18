@@ -1,4 +1,4 @@
-import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+import type { WebhookModel } from '@/api-clients/monitoring/webhook/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

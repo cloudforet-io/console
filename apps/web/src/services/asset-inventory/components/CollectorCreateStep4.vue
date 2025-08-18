@@ -54,17 +54,18 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient, useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PTextButton, PButtonModal,
 } from '@cloudforet/mirinae';
 
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
-import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { JobModel } from '@/schema/inventory/job/model';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { CollectorCreateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/create';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -85,7 +86,9 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 const appContextStore = useAppContextStore();
+const { collectorAPI } = useCollectorApi();
 const router = useRouter();
+
 const emit = defineEmits([
     'update:currentStep',
 ]);
@@ -108,47 +111,57 @@ const state = reactive<{
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
+/* Query */
+const queryClient = useQueryClient();
+const { key: collectorListQueryKey } = useServiceQueryKey('inventory', 'collector', 'list');
+const { mutate: createCollector } = useMutation({
+    mutationFn: (params: CollectorCreateParameters) => collectorAPI.create(params),
+    onMutate: () => { state.createLoading = true; },
+    onSuccess: (res: CollectorModel) => {
+        state.createdCollectorId = res?.collector_id;
+        state.visibleCreateCompleteModal = true;
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorListQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
+    },
+    onSettled: () => {
+        state.createLoading = false;
+    },
+});
+
 const handleClickPrevButton = () => {
     emit('update:currentStep', 3);
 };
 
 const handleClickCreateButton = async () => {
-    try {
-        state.createLoading = true;
-        const params: CollectorCreateParameters = {
-            name: collectorFormState.name,
-            provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
-            plugin_info: {
-                plugin_id: collectorFormState.repositoryPlugin?.plugin_id,
-                version: collectorFormState.version,
-                options: collectorFormState.options,
-                upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-            },
-            secret_filter: {
-                state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
-            },
-            schedule: {
-                state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
-                hours: collectorFormState.scheduleHours,
-            },
-            tags: collectorFormState.tags,
-            resource_group: state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
-        };
-        const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
-            service_accounts: collectorFormState.serviceAccounts,
-        } : {
-            exclude_service_accounts: collectorFormState.serviceAccounts,
-        };
-        Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
-        state.createdCollectorId = res?.collector_id;
-        state.visibleCreateCompleteModal = true;
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
-    } finally {
-        state.createLoading = false;
-    }
+    const params: CollectorCreateParameters = {
+        name: collectorFormState.name,
+        provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
+        plugin_info: {
+            plugin_id: collectorFormState.repositoryPlugin?.plugin_id,
+            version: collectorFormState.version,
+            options: collectorFormState.options,
+            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+        },
+        secret_filter: {
+            state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
+        },
+        schedule: {
+            state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
+            hours: collectorFormState.scheduleHours,
+        },
+        tags: collectorFormState.tags,
+        resource_group: state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+    };
+    const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
+        service_accounts: collectorFormState.serviceAccounts,
+    } : {
+        exclude_service_accounts: collectorFormState.serviceAccounts,
+    };
+    Object.assign(params.secret_filter ?? {}, serviceAccountParams);
+    await createCollector(params);
 };
 
 const handleClickOtherPluginButton = () => {
@@ -165,7 +178,7 @@ const handleConfirmCreateCollector = async () => {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
         if (state.createdCollectorId) {
-            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+            await collectorAPI.collect({
                 collector_id: state.createdCollectorId,
             });
         } else {

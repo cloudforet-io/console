@@ -2,9 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDataLoader, PDivider,
@@ -14,19 +12,15 @@ import {
 import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
-import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { PostModel } from '@/schema/board/post/model';
+import { POST_BOARD_TYPE } from '@/api-clients/board/post/schema/constant';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useNoticeStore } from '@/store/notice/notice-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import NoticeWorkspaceDropdown from '@/services/info/components/NoticeWorkspaceDropdown.vue';
+import { usePostListPaginationQuery } from '@/services/info/composables/use-post-list-pagination-query';
 import { ADMIN_INFO_ROUTE } from '@/services/info/routes/admin/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import type { WorkspaceDropdownMenuItem } from '@/services/info/types/notice-type';
@@ -43,8 +37,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    noticeItems: [] as PostModel[],
-    noticeItemTotalCount: 0,
     searchText: undefined as undefined | string,
     tools: computed<ValueItem[]>(() => ([
         { name: 'all', label: i18n.t('INFO.NOTICE.ALL_WORKSPACE') as string },
@@ -55,15 +47,30 @@ const state = reactive({
     queryFilter: [] as ConsoleFilter[],
 });
 
+const pagination = reactive({
+    thisPage: 1,
+    pageSize: NOTICE_ITEM_LIMIT,
+});
+
 /* Api */
-const noticeApiHelper = new ApiQueryHelper()
-    .setPage(1, NOTICE_ITEM_LIMIT)
-    .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+const noticeApiHelper = new ApiQueryHelper().setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
 
-const listNotice = async () => {
-    state.loading = true;
+const {
+    data: noticeItems, totalCount: noticeItemTotalCount, isLoading: isNoticeItemsLoading,
+} = usePostListPaginationQuery({
+    thisPage: computed(() => pagination.thisPage),
+    pageSize: computed(() => pagination.pageSize),
+    params: computed(() => {
+        noticeApiHelper.setFilters(state.queryFilter);
+        return {
+            query: noticeApiHelper.data,
+            board_type: POST_BOARD_TYPE.NOTICE,
+        };
+    }),
+});
 
-    if (state.searchText) {
+const setNoticeQueryFilter = async () => {
+    if (state.searchText !== undefined) {
         const titleFilter = state.queryFilter.findIndex((filter) => filter.k === 'title');
         if (titleFilter === -1) {
             state.queryFilter.push({ k: 'title', v: state.searchText, o: '' });
@@ -71,29 +78,12 @@ const listNotice = async () => {
             state.queryFilter[titleFilter].v = state.searchText;
         }
     }
-
-    noticeApiHelper.setFilters(state.queryFilter);
-
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: noticeApiHelper.data,
-            board_type: POST_BOARD_TYPE.NOTICE,
-        });
-        state.noticeItems = results ?? [];
-        state.noticeItemTotalCount = total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.noticeItems = [];
-        state.noticeItemTotalCount = 0;
-    } finally {
-        state.loading = false;
-    }
 };
 
 /* event */
 const handleToolboxChange = (options: ToolboxOptions = {}) => {
     if (options?.searchText !== undefined) state.searchText = options?.searchText;
-    listNotice();
+    setNoticeQueryFilter();
 };
 const handleClickNotice = (postId: string) => {
     const noticeDetailRouteName = storeState.isAdminMode ? ADMIN_INFO_ROUTE.NOTICE.DETAIL._NAME : INFO_ROUTE.NOTICE.DETAIL._NAME;
@@ -105,8 +95,7 @@ const handleClickNotice = (postId: string) => {
     }).catch(() => {});
 };
 const handlePageChange = (page: number) => {
-    noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
-    listNotice();
+    pagination.thisPage = page;
 };
 const handleClickToolButton = (value: string) => {
     if (value === state.selectedToolId) state.selectedToolId = undefined;
@@ -121,8 +110,6 @@ watch(() => state.selectedToolId, (selectedToolId) => {
     if (selectedToolId === 'all') {
         state.queryFilter = [{ k: 'workspace_id', v: ['*'], o: '=' }];
     } else state.queryFilter = [];
-
-    listNotice();
 });
 watch(() => state.selectedItems, (selectedItems) => {
     if (state.selectedToolId !== 'specific') return;
@@ -133,13 +120,11 @@ watch(() => state.selectedItems, (selectedItems) => {
     } else {
         state.queryFilter = [];
     }
-
-    listNotice();
 });
 
 (async () => {
     state.loading = true;
-    await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
+    await Promise.allSettled([noticeStore.fetchNoticeReadState(), setNoticeQueryFilter()]);
     state.loading = false;
 })();
 </script>
@@ -173,13 +158,13 @@ watch(() => state.selectedItems, (selectedItems) => {
             />
         </div>
         <p-divider />
-        <p-data-loader :data="state.noticeItems"
-                       :loading="state.loading"
+        <p-data-loader :data="noticeItems"
+                       :loading="state.loading || isNoticeItemsLoading"
                        :min-loading-time="1000"
                        class="notice-list-loader"
         >
             <ul class="list-wrapper">
-                <notice-list-item v-for="(item, index) in state.noticeItems"
+                <notice-list-item v-for="(item, index) in noticeItems"
                                   :key="`notice-${item.post_id}-${index}`"
                                   class="list-item"
                                   :post="item"
@@ -217,8 +202,8 @@ watch(() => state.selectedItems, (selectedItems) => {
             </template>
         </p-data-loader>
         <div class="pagination-wrapper">
-            <p-pagination :total-count="state.noticeItemTotalCount"
-                          :page-size="10"
+            <p-pagination :total-count="noticeItemTotalCount"
+                          :page-size="NOTICE_ITEM_LIMIT"
                           @change="handlePageChange"
             />
         </div>

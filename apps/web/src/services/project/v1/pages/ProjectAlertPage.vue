@@ -10,9 +10,9 @@ import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type
 
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { ProjectAlertConfigCreateParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/create';
+import type { ProjectAlertConfigListParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/list';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

@@ -4,11 +4,14 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal,
 } from '@cloudforet/mirinae';
 
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -21,7 +24,7 @@ import VerificationCodeForm from '@/common/components/mfa/components/Verificatio
 import { useUserProfileConfirmMfaMutation } from '@/common/components/mfa/composables/use-user-profile-confirm-mfa-mutation';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useMultiFactorAuthStore } from '@/services/my-page/stores/multi-factor-auth-store';
 
 interface Props {
@@ -69,15 +72,24 @@ const closeModal = () => {
     }
 };
 
+const queryClient = useQueryClient();
+const { userListKey: userListQueryKey } = useUserListQuery();
+const { key: userGetQueryKey } = useServiceQueryKey('identity', 'user', 'get', {
+    contextKey: computed(() => userStore.state.userId),
+});
+
 /* API */
 const { mutateAsync: confirmMfa, isPending: isConfirmingMfa } = useUserProfileConfirmMfaMutation({
-    onSuccess: (data: UserModel) => {
+    onSuccess: async (data: UserModel) => {
         showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_ENABLED'), '');
         userStore.setMfa(data.mfa ?? {});
         closeModal();
         isSentCode.value = false;
         validationState.verificationCode = '';
         if (props.reSync) multiFactorAuthStore.setEmailEnableModalVisible(true);
+
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGetQueryKey.value });
     },
     onError: (error: Error) => {
         ErrorHandler.handleError(error);

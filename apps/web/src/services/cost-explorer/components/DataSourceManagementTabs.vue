@@ -14,15 +14,11 @@ import DataSourceManagementTabDetailBaseInformation
     from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
 import DataSourceManagementTabLinkedAccount
     from '@/services/cost-explorer/components/DataSourceManagementTabLinkedAccount.vue';
-import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-
-const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageState = dataSourcesPageStore.state;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const storeState = reactive({
-    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
+const state = reactive({
+    activeTab: 'detail',
 });
 const tabState = reactive({
     tabs: computed(() => [
@@ -34,33 +30,33 @@ const tabState = reactive({
 });
 
 const handleChangeTab = (tab: string) => {
-    dataSourcesPageStore.setActiveTab(tab);
+    state.activeTab = tab;
 };
 </script>
 
 <template>
     <p-tab :tabs="tabState.tabs"
-           :active-tab="storeState.activeTab"
-           :class="storeState.activeTab"
+           :active-tab="state.activeTab"
+           :class="state.activeTab"
            class="data-source-management-tabs"
            @change="handleChangeTab"
     >
-        <template v-if="storeState.activeTab === 'detail'"
+        <template v-if="state.activeTab === 'detail'"
                   #detail
         >
             <data-source-management-tab-detail-base-information />
         </template>
-        <template v-else-if="storeState.activeTab === 'linked_account'"
+        <template v-else-if="state.activeTab === 'linked_account'"
                   #linked_account
         >
             <data-source-management-tab-linked-account :has-read-write-access="hasReadWriteAccess" />
         </template>
-        <template v-else-if="storeState.activeTab === 'data_collection_history'"
+        <template v-else-if="state.activeTab === 'data_collection_history'"
                   #data_collection_history
         >
             <data-source-management-tab-data-collection-history />
         </template>
-        <template v-else-if="storeState.activeTab === 'access_restriction'"
+        <template v-else-if="state.activeTab === 'access_restriction'"
                   #access_restriction
         >
             <data-source-management-tab-access-restriction :has-read-write-access="hasReadWriteAccess" />

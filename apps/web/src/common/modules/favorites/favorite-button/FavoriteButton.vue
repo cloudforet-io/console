@@ -8,7 +8,7 @@ import { PI } from '@cloudforet/mirinae';
 
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';

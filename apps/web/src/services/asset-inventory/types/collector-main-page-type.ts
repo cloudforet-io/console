@@ -6,9 +6,9 @@ import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
 import type {
     CollectorPluginInfo,
 
-} from '@/schema/inventory/collector/model';
-import type { Schedule } from '@/schema/inventory/collector/type';
-import type { JobStatus } from '@/schema/inventory/job/type';
+} from '@/api-clients/inventory/collector/schema/model';
+import type { Schedule } from '@/api-clients/inventory/collector/schema/type';
+import type { JobStatus } from '@/api-clients/inventory/job/schema/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
@@ -41,7 +41,6 @@ export interface CollectorItemInfo {
     historyLink: CollectorLink,
     detailLink: CollectorLink;
     schedule?: Schedule;
-    recentJobAnalyze?: JobAnalyzeStatus[];
     resourceGroup: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     hasJobList?: boolean
 }

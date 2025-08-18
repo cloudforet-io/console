@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
     PButtonModal, PFieldGroup, PI, PSelectDropdown, PTextInput,
@@ -10,6 +10,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectType } from '@/api-clients/identity/project/schema/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +22,7 @@ import { gray, indigo } from '@/styles/colors';
 
 import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
+
 
 const projectPageModalStore = useProjectPageModalStore();
 const visible = computed(() => projectPageModalStore.state.projectCreateModalVisible);
@@ -75,6 +77,8 @@ watch(visible, (v) => {
 });
 
 /* mutations */
+const queryClient = useQueryClient();
+const { key: projectListQueryKey } = useServiceQueryKey('identity', 'project', 'list');
 const { projectAPI } = useProjectApi();
 const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     mutationFn: ({ projectType, groupId, name }: { projectType: ProjectType, groupId?: string; name: string }) => projectAPI.create({
@@ -84,6 +88,7 @@ const { mutate: createProject, isPending: isCreatingProject } = useMutation({
     }),
     onSuccess: (data) => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
+        queryClient.invalidateQueries({ queryKey: projectListQueryKey });
         emit('created', data.project_id);
     },
     onError: (e) => {

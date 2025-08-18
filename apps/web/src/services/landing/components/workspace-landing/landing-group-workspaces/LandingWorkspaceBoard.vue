@@ -79,7 +79,6 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
         state.selectedPopoverItem = item.workspace_id;
         return;
     }
-    landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     if (state.redirectLocation) {
         router.replace({

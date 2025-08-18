@@ -14,8 +14,6 @@ import { MULTI_FACTOR_AUTH_TYPE } from '@/api-clients/identity/user-profile/sche
 import type { MultiFactorAuthType } from '@/api-clients/identity/user-profile/schema/type';
 import { i18n as _i18n } from '@/translations';
 
-import { ROOT_ROUTE } from '@/router/constant';
-
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -47,7 +45,7 @@ const {
 } = route.params as { mfaType: MultiFactorAuthType | undefined };
 
 const state = reactive({
-    isLocalLogin: computed<boolean>(() => userStore.state.authType === 'LOCAL'),
+    // isLocalLogin: computed<boolean>(() => userStore.state.authType === 'LOCAL'),
     myMFAType: computed<MultiFactorAuthType|undefined>(() => userStore.state.mfa?.mfa_type),
     isInvalidMfaType: computed<boolean>(() => state.myMFAType !== mfaTypeRouteParam || !state.myMFAType || !mfaTypeRouteParam),
     needToEnableMFA: computed<boolean>(() => {
@@ -112,16 +110,16 @@ const handleClickConfirmButton = async () => {
     });
 };
 
-onMounted(() => {
-    // Remove refresh token to prevent forced access to other pages
-    SpaceConnector.removeRefreshToken();
+const getSSOTokenFromUrl = (): string|undefined => {
+    const query = router.currentRoute.query;
+    return query.sso_access_token as string;
+};
 
-    if (!SpaceConnector.getAccessToken() || !state.needToEnableMFA || state.isInvalidMfaType) {
-        router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
-        return;
-    } if (!state.isLocalLogin) {
-        router.push({ name: ROOT_ROUTE._NAME });
-    }
+onMounted(() => {
+    const ssoAccessToken = getSSOTokenFromUrl();
+
+    if (!ssoAccessToken) return;
+    SpaceConnector.setToken(ssoAccessToken, '');
 });
 
 onBeforeUnmount(() => {

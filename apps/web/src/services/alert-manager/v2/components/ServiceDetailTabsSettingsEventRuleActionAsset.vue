@@ -12,10 +12,9 @@ import {
     PButton,
 } from '@cloudforet/mirinae';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type {
     EventRuleActionsType,
-} from '@/schema/alert-manager/event-rule/type';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -27,6 +26,7 @@ import type { DataSelectorItem } from '@/common/components/select/type';
 
 import { gray } from '@/styles/colors';
 
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleActionsToggleType,
@@ -42,11 +42,12 @@ const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
+const { eventRuleData } = useEventRuleGetQuery();
+
 const storeState = reactive({
     cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     provider: computed<ProviderReferenceMap>(() => allReferenceGetters.provider),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -94,7 +95,7 @@ const state = reactive({
 });
 
 const updateStateFromEventRuleInfo = (): void => {
-    const actions = storeState.eventRuleInfo.actions;
+    const actions = eventRuleData.value?.actions;
     if (!actions) return;
 
     if (actions.match_asset) {

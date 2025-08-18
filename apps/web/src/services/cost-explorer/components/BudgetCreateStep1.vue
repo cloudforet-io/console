@@ -1,31 +1,25 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, reactive, watch, watchEffect,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PButton,
+    PSelectDropdown,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
-import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
-import type { ServiceAccountListParameters } from '@/api-clients/identity/service-account/schema/api-verbs/list';
-import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
 import BudgetCreateManagerSelect from '@/services/cost-explorer/components/BudgetCreateManagerSelect.vue';
 import BudgetCreateScopeSelect from '@/services/cost-explorer/components/BudgetCreateScopeSelect.vue';
+import { useBudgetQuery } from '@/services/cost-explorer/composables/use-budget-query';
 import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
+
 
 
 const budgetCreatePageStore = useBudgetCreatePageStore();
@@ -37,15 +31,15 @@ interface BudgetCreateStep1State {
     isContinueAble: boolean;
     name: string;
     projectList: any[];
-    selectedProject: string;
-    serviceAccountList: string[];
-    budgetList: BudgetModel[];
-    budgetNames: string[];
-    existingProjectIds: string[];
+    selectedProject: ComputedRef<string>;
+    budgetNames: ComputedRef<string[]>;
+    existingProjectIds: ComputedRef<string[]>;
     existingBudgetYears: number[];
     projectInvalidText: ComputedRef<string|TranslateResult>;
     projectInvalid: ComputedRef<boolean>;
 }
+
+const { budgetList } = useBudgetQuery();
 
 const project = computed<ProjectReferenceMap>(() => allReferenceStore.getters.project);
 
@@ -54,11 +48,9 @@ const state = reactive<BudgetCreateStep1State>({
     isContinueAble: false,
     name: '',
     projectList: [],
-    selectedProject: '',
-    serviceAccountList: [],
-    budgetList: [],
-    budgetNames: [],
-    existingProjectIds: [],
+    selectedProject: computed(() => budgetCreatePageState.project),
+    budgetNames: computed(() => budgetList.value?.map((result) => result.name) ?? []),
+    existingProjectIds: computed(() => budgetList.value?.map((result) => result.project_id) ?? []),
     existingBudgetYears: [],
     projectInvalidText: computed<string|TranslateResult>(() => {
         if (budgetCreatePageState.scope.type === 'project'
@@ -70,12 +62,29 @@ const state = reactive<BudgetCreateStep1State>({
 
 const emit = defineEmits<{(e: 'click-next'): void, (e: 'click-cancel'): void }>();
 
+const handleUpdateName = (value: string) => {
+    budgetCreatePageStore.setName(value);
+};
+
+const handleNext = () => {
+    emit('click-next');
+};
+
+const handleCancel = () => {
+    emit('click-cancel');
+};
+
+const handleUpdateProject = (value: string) => {
+    budgetCreatePageStore.setProject(value);
+};
 
 watch(() => budgetCreatePageState, () => {
-    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project') {
+    if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'project'
+    && budgetCreatePageState.name.length > 0 && !state.budgetNames.includes(budgetCreatePageState.name)) {
         state.isContinueAble = true;
     } else if (budgetCreatePageState.name && budgetCreatePageState.project && budgetCreatePageState.scope.type === 'serviceAccount'
     && budgetCreatePageState.scope.serviceAccount && budgetCreatePageState.scope.serviceAccount.length > 0
+    && budgetCreatePageState.name.length > 0 && !state.budgetNames.includes(budgetCreatePageState.name)
     ) {
         state.isContinueAble = true;
     } else {
@@ -89,72 +98,14 @@ watch(() => project, () => {
         label: pj.label,
     }));
 }, { deep: true, immediate: true });
-
-const handleUpdateName = (value: string) => {
-    budgetCreatePageStore.setName(value);
-};
-
-const handleProjectId = (projectIds: string[]) => {
-    budgetCreatePageStore.setProject(projectIds[0]);
-};
-
-const handleNext = () => {
-    emit('click-next');
-};
-
-const handleCancel = () => {
-    emit('click-cancel');
-};
-
-const getServiceAccountIncludedinProjectInfo = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-            query: {
-                filter: [
-                    {
-                        k: 'project_id',
-                        v: budgetCreatePageState.project,
-                        o: 'eq',
-                    },
-                    {
-                        k: 'service_account_mgr_id',
-                        v: '',
-                        o: 'not',
-                    },
-                ],
-            },
-        });
-        state.serviceAccountList = results?.filter((result: any) => result.service_account_mgr_id)
-            .map((info:any) => info.service_account_mgr_id) ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
-
-const fetchBudget = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>();
-        state.budgetList = results;
-        state.budgetNames = results?.map((result) => result.name) ?? [];
-        state.existingProjectIds = results?.map((result) => result.project_id) ?? [];
-    } catch (error) {
-        ErrorHandler.handleError(error);
-    }
-};
-
-watch(() => budgetCreatePageState.project, async () => {
-    await getServiceAccountIncludedinProjectInfo();
-}, { deep: true, immediate: true });
-
-watchEffect(async () => {
-    await fetchBudget();
-});
 </script>
 
 <template>
     <div class="flex flex-col">
         <div class="contents-container">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
+                           :invalid="budgetCreatePageState.name.length < 0 || state.budgetNames.includes(budgetCreatePageState.name)"
+                           :invalid-text="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.NAME_INVALID_TEXT')"
                            required
             >
                 <p-text-input block
@@ -166,14 +117,17 @@ watchEffect(async () => {
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.PROJECT')"
                            required
             >
-                <!-- :invalid="!state.projectInvalid"
-                           :invalid-text="state.projectInvalidText" -->
-                <project-select-dropdown
-                    show-delete-all-button
-                    :project-group-selectable="false"
-                    :selected-project-ids="budgetCreatePageState.project ? [budgetCreatePageState.project] : []"
-                    hide-create-button
-                    @update:selected-project-ids="handleProjectId"
+                <p-select-dropdown
+                    :menu="state.projectList"
+                    :selected.sync="state.selectedProject"
+                    appearance-type="badge"
+                    use-fixed-menu-style
+                    show-select-marker
+                    is-filterable
+                    show-clear-selection
+                    :page-size="15"
+                    class="filterable-select-dropdown"
+                    @update:selected="handleUpdateProject"
                 />
             </p-field-group>
             <budget-create-scope-select />
@@ -187,6 +141,7 @@ watchEffect(async () => {
             </p-button>
             <p-button icon-right="ic_arrow-right"
                       :disabled="!state.isContinueAble"
+                      style-type="substitutive"
                       @click="handleNext"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE.CONTINUE') }}

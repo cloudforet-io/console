@@ -10,7 +10,7 @@ import {
     PRadio, PSelectButton, PSelectDropdown, PRadioGroup,
 } from '@cloudforet/mirinae';
 
-import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/schema/notification/type';
+import type { ChannelSchedule, ChannelScheduleDayOfWeek } from '@/api-clients/notification/type';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';

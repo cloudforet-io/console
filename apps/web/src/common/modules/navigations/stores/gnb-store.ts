@@ -9,8 +9,8 @@ import type { UserConfigListParameters } from '@/api-clients/config/user-config/
 import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
 import type { CostQuerySetListParameters } from '@/api-clients/cost-analysis/cost-query-set/schema/api-verbs/list';
 import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
-import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import type { MetricExampleListParameters } from '@/api-clients/inventory/metric-example/schema/api-verbs/list';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

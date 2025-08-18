@@ -12,15 +12,14 @@ import {
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
 import {
     PLink, PDataTable, PIconButton, PI, PButton, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { DataTableFieldType, DataTableField } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
-import type { CostReportDataAnalyzeParameters } from '@/api-clients/cost-analysis/cost-report-data/schema/api-verbs/analyze';
-import type { CostReportGetParameters } from '@/api-clients/cost-analysis/cost-report/schema/api-verbs/get';
+import { useCostReportApi } from '@/api-clients/cost-analysis/cost-report/composables/use-cost-report-api';
 import type { CostReportModel } from '@/api-clients/cost-analysis/cost-report/schema/model';
 import type { CostReportStatus } from '@/api-clients/cost-analysis/cost-report/schema/type';
 import { i18n, setI18nLocale } from '@/translations';
@@ -42,6 +41,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+import { useCostReportDataAnalyzeQuery } from '@/services/cost-explorer/composables/use-cost-report-data-analyze-query';
 
 
 const router = useRouter();
@@ -84,6 +84,7 @@ const props = withDefaults(defineProps<Props>(), {
 const chartContext = ref<HTMLElement|null>(null);
 const providerReferenceStore = useProviderReferenceStore();
 const domainStore = useDomainStore();
+const { costReportAPI } = useCostReportApi();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
@@ -101,15 +102,60 @@ const state = reactive({
     chartData: [] as Array<{ name: string; value: number | undefined; itemStyle: { color: string } }>,
     chart: null as EChartsType | null,
     printMode: false,
-    providerRawData: [] as CostReportDataAnalyzeResult[],
-    productRawData: [] as CostReportDataAnalyzeResult[],
-    projectRawData: [] as CostReportDataAnalyzeResult[],
     collapsedState: {} as Record<string, boolean>,
 });
 
 const ETC = config.get('COST_REPORT.ETC_CUSTOM_LABEL') ?? 'ETC';
 const currency = computed<Currency>(() => state.baseInfo?.currency ?? 'USD');
 const numberFormatterOption = computed<Intl.NumberFormatOptions>(() => ({ currency: currency.value, style: 'decimal', notation: 'standard' }));
+
+/* Query */
+const createBaseQueryParams = (_groupBy: string[], fieldGroup?: string[]): AnalyzeQuery|null => {
+    if (!state.baseInfo?.cost_report_config_id || !props.costReportId) return null;
+
+    return {
+        group_by: _groupBy,
+        fields: {
+            value_sum: {
+                key: `cost.${state.baseInfo?.currency}`,
+                operator: 'sum',
+            },
+        },
+        field_group: fieldGroup ?? [],
+        filter: [
+            {
+                k: 'cost_report_config_id',
+                v: state.baseInfo?.cost_report_config_id,
+                o: 'eq',
+            },
+            {
+                k: 'cost_report_id',
+                v: props.costReportId,
+                o: 'eq',
+            },
+        ],
+        sort: [{ key: 'value_sum', desc: true }, { key: 'value', desc: true }],
+    };
+};
+
+const providerQueryParams = computed<AnalyzeQuery|null>(() => createBaseQueryParams(['provider']));
+const productQueryParams = computed<AnalyzeQuery|null>(() => createBaseQueryParams(['provider', 'service_account_name', 'product', 'is_adjusted'], ['product']));
+const projectQueryParams = computed<AnalyzeQuery|null>(() => createBaseQueryParams(['project_name', 'product', 'is_adjusted'], ['product']));
+
+const { costReportDataAnalyzeData: providerData } = useCostReportDataAnalyzeQuery({
+    query: providerQueryParams,
+    isCostReportPage: false,
+});
+const { costReportDataAnalyzeData: productData } = useCostReportDataAnalyzeQuery({
+    query: productQueryParams,
+    isCostReportPage: false,
+});
+const { costReportDataAnalyzeData: projectData } = useCostReportDataAnalyzeQuery({
+    query: projectQueryParams,
+    isCostReportPage: false,
+});
+
+/* Computed */
 const totalCost = computed<number>(() => sum(costByProviderTableData.value.map((d) => d.value_sum)));
 const reportDateRange = computed<string>(() => {
     const baseDate = dayjs(state.baseInfo?.issue_date);
@@ -176,22 +222,29 @@ const costByProviderFields = computed<DataTableField[]>(() => ([
         sortable: false,
     },
 ]));
-const costByProductTableData = computed<CostReportDataAnalyzeResultByProduct>(() => getConvertedProductTableData(state.productRawData));
-const costByProviderTableData = computed<CostReportDataAnalyzeResult[]>(() => state.providerRawData);
-const costByProjectTableData = computed<CostReportDataAnalyzeResult[]>(() => state.projectRawData.filter((d) => !d.is_adjusted));
+const costByProductTableData = computed<CostReportDataAnalyzeResultByProduct>(() => getConvertedProductTableData(productData.value?.results || []));
+const costByProviderTableData = computed<CostReportDataAnalyzeResult[]>(() => providerData.value?.results || []);
+const costByProjectTableData = computed<CostReportDataAnalyzeResult[]>(() => (projectData.value?.results || []).filter((d) => !d.is_adjusted));
 const adjustedProviderData = computed<CostReportAdjustedDataAnalyzeResultByProvider>(() => {
     const results: CostReportAdjustedDataAnalyzeResultByProvider = {};
-    const adjustedData = state.productRawData.filter((d) => d.is_adjusted);
+    const adjustedData = (productData.value?.results || []).filter((d) => d.is_adjusted);
     adjustedData.forEach((d) => {
-        results[d.provider] = d.value_sum;
+        if (Array.isArray(d.value_sum)) {
+            results[d.provider] = d.value_sum;
+        }
     });
     return results;
 });
 const adjustedProjectData = computed<AdjustmentProductData>(() => {
-    const adjustedData = state.projectRawData.filter((d) => d.is_adjusted);
+    const adjustedData = (projectData.value?.results || []).filter((d) => d.is_adjusted);
     if (adjustedData.length === 0) return [];
-    return adjustedData[0].value_sum;
+    const valueSum = adjustedData[0].value_sum;
+    if (Array.isArray(valueSum)) {
+        return valueSum;
+    }
+    return [];
 });
+
 /* Util */
 const makeTableFields = (customField:DataTableFieldType, valueFieldName = 'value'): DataTableField[] => ([
     {
@@ -215,20 +268,23 @@ const getConvertedProductTableData = (rawData: CostReportDataAnalyzeResult[]): C
     const results: CostReportDataAnalyzeResultByProduct = {};
     const originalData = rawData.filter((d) => !d.is_adjusted);
     const providerGroupBy = groupBy(originalData, 'provider');
-    Object.entries(providerGroupBy).forEach(([provider, providerData]) => {
-        const accountGroupBy = groupBy(providerData, 'service_account_name');
+    Object.entries(providerGroupBy).forEach(([provider, providerDataItems]) => {
+        const accountGroupBy = groupBy(providerDataItems, 'service_account_name');
         Object.entries(accountGroupBy).forEach(([account, accountData]) => {
-            results[provider] = {
-                ...(results[provider] ?? {}),
-                [account]: accountData[0].value_sum?.sort((a, b) => b.value - a.value),
-            };
+            const valueSum = accountData[0].value_sum;
+            if (Array.isArray(valueSum)) {
+                results[provider] = {
+                    ...(results[provider] ?? {}),
+                    [account]: valueSum.sort((a, b) => b.value - a.value),
+                };
+            }
         });
     });
     return results;
 };
 const getFormattedProductTotalValue = (provider: string, serviceAccount: string): string => {
-    const productData = state.productRawData.find((d) => d.provider === provider && d.service_account_name === serviceAccount);
-    return currencyMoneyFormatter(productData?._total_value_sum ?? 0, numberFormatterOption.value) ?? '';
+    const productDataItem = (productData.value?.results || []).find((d) => d.provider === provider && d.service_account_name === serviceAccount);
+    return currencyMoneyFormatter(productDataItem?._total_value_sum ?? 0, numberFormatterOption.value) ?? '';
 };
 const getWarningTitle = (status: CostReportStatus): TranslateResult => {
     if (status === 'EXPIRED') return i18n.t('COMMON.COST_REPORT.EXPIRED_REPORT_TITLE');
@@ -240,7 +296,6 @@ const getWarningDescription = (status: CostReportStatus): TranslateResult => {
     if (status === 'ADJUSTING' || status === 'IN_PROGRESS') return i18n.t('COMMON.COST_REPORT.ADJUSTING_REPORT_DESCRIPTION');
     return '';
 };
-
 
 const drawChart = () => {
     state.chartData = costByProviderTableData.value.map((d) => ({
@@ -260,45 +315,12 @@ const fetchReportData = async () => {
     try {
         const { costReportId } = props;
         if (!costReportId) return;
-        state.baseInfo = await SpaceConnector.clientV2.costAnalysis.costReport.get<CostReportGetParameters, CostReportModel>({
+        state.baseInfo = await costReportAPI.get({
             cost_report_id: costReportId,
         });
     } catch (e: any) {
         ErrorHandler.handleError(e);
         await router.push({ name: ERROR_ROUTE.EXPIRED_LINK._NAME });
-    }
-};
-
-const fetchAnalyzeData = async (_groupBy: string[], fieldGroup?: string[]):Promise<AnalyzeResponse<CostReportDataAnalyzeResult>|undefined> => {
-    try {
-        return await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
-            query: {
-                group_by: _groupBy,
-                fields: {
-                    value_sum: {
-                        key: `cost.${state.baseInfo?.currency}`,
-                        operator: 'sum',
-                    },
-                },
-                field_group: fieldGroup ?? [],
-                filter: [
-                    {
-                        k: 'cost_report_config_id',
-                        v: state.baseInfo?.cost_report_config_id,
-                        o: 'eq',
-                    },
-                    {
-                        k: 'cost_report_id',
-                        v: props.costReportId,
-                        o: 'eq',
-                    },
-                ],
-                sort: [{ key: 'value_sum', desc: true }, { key: 'value', desc: true }],
-            },
-        });
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        return undefined;
     }
 };
 
@@ -312,20 +334,6 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
         state.isExpired = true;
         return false;
     }
-};
-
-const fetchTableData = async () => {
-    const results = await Promise.allSettled([
-        fetchAnalyzeData(['provider']),
-        fetchAnalyzeData(['provider', 'service_account_name', 'product', 'is_adjusted'], ['product']),
-        fetchAnalyzeData(['project_name', 'product', 'is_adjusted'], ['product']),
-    ]);
-    const [costByProvider, costByProduct, costByProject] = results
-        .filter((r) => r.status === 'fulfilled')
-        .map((r) => r.value);
-    state.providerRawData = costByProvider?.results ?? [];
-    state.productRawData = costByProduct?.results ?? [];
-    state.projectRawData = costByProject?.results ?? [];
 };
 
 const setMetaTag = () => {
@@ -370,13 +378,11 @@ const handleCollapseAll = () => {
     if (!isSucceeded) return;
     await fetchReportData();
     await setI18nLocale(props.language);
-    await fetchTableData();
     await providerReferenceStore.load();
     state.loading = false;
     drawChart();
     setRootTagStyle();
 })();
-
 </script>
 
 <template>
@@ -522,7 +528,7 @@ const handleCollapseAll = () => {
                         {{ $t('COMMON.COST_REPORT.COLLAPSE_ALL') }}
                     </p-button>
                 </div>
-                <div v-for="({ provider }, idx) in state.providerRawData"
+                <div v-for="({ provider }, idx) in costByProviderTableData"
                      :key="`${provider}-${idx}`"
                      class="mb-6"
                 >
@@ -531,7 +537,7 @@ const handleCollapseAll = () => {
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                                   class="table-header"
                     />
-                    <div v-for="([serviceAccount, productData], pIdx) in Object.entries(costByProductTableData[provider] ?? {})"
+                    <div v-for="([serviceAccount, _productData], pIdx) in Object.entries(costByProductTableData[provider] ?? {})"
                          :key="`${provider}-${serviceAccount}-${pIdx}`"
                     >
                         <div class="service-account-collapsible-wrapper"
@@ -549,7 +555,7 @@ const handleCollapseAll = () => {
                         </div>
                         <p-data-table v-if="!state.collapsedState[`${provider}-${serviceAccount}`]"
                                       :fields="costByProductFields"
-                                      :items="productData"
+                                      :items="_productData"
                                       :stripe="false"
                                       :selectable="false"
                                       :disable-copy="true"

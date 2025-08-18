@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import ejs from 'ejs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PI, PDivider, PButton, PCopyButton, PTooltip, PAvatar, PLazyImg,
+    PAvatar,
+    PButton, PCopyButton,
+    PDivider,
+    PI,
+    PLazyImg,
+    PTooltip,
 } from '@cloudforet/mirinae';
 
+import { useRoleBindingApi } from '@/api-clients/identity/role-binding/composables/use-role-binding-api';
 import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import DomainAdminImage from '@/assets/images/role/img_avatar_admin.png';
@@ -20,13 +26,14 @@ import UserImage from '@/assets/images/role/img_avatar_no-role.png';
 import SystemAdminImage from '@/assets/images/role/img_avatar_system-admin.png';
 import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useDomainStore } from '@/store/domain/domain-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { RoleReferenceMap } from '@/store/reference/role-reference-store';
 import { languages } from '@/store/user/constant';
 import { useUserStore } from '@/store/user/user-store';
 
@@ -38,6 +45,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
+
+
 
 interface Props {
     visible: boolean
@@ -55,10 +65,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
 const route = useRoute();
 const router = useRouter();
-const allReferenceStore = useAllReferenceStore();
 
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
-    roles: computed<RoleReferenceMap>(() => allReferenceStore.getters.role),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isUserMode: computed(() => appContextStore.getters.isUserMode),
     userIcon: computed<string>(() => {
@@ -78,7 +87,6 @@ const state = reactive({
         return 'User';
     }),
     userRoles: [] as RoleBindingModel[],
-    currentWorkspaceRole: computed<RoleBindingModel>(() => state.userRoles?.[0]),
     name: computed(() => userStore.state.name),
     email: computed(() => userStore.state.email),
     language: computed(() => userStore.getters.languageLabel),
@@ -111,6 +119,28 @@ const state = reactive({
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
+
+const roleBindingQueryHelper = new ApiQueryHelper();
+const { roleBindingAPI } = useRoleBindingApi();
+const { key: roleBindingQueryKey, params: roleBindingQueryParams } = useServiceQueryKey('identity', 'role-binding', 'list', {
+    params: computed(() => {
+        roleBindingQueryHelper.setFilters([{
+            k: 'user_id',
+            o: '=',
+            v: userStore.state.userId ?? '',
+        }]);
+        return {
+            query: roleBindingQueryHelper.data,
+        };
+    }),
+});
+const { data: roleBindingData } = useScopedQuery({
+    queryKey: roleBindingQueryKey,
+    queryFn: () => roleBindingAPI.list(roleBindingQueryParams.value),
+    enabled: !state.isUserMode && !!userStore.state.userId,
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['DOMAIN', 'WORKSPACE']);
 
 const setVisible = (visible: boolean) => {
     emit('update:visible', visible);
@@ -189,30 +219,6 @@ const handleClickSignOut = async () => {
     };
     await router.push(res);
 };
-const fetchUserRoles = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.roleBinding.list({
-            query: {
-                filter: [
-                    {
-                        k: 'user_id',
-                        o: 'eq',
-                        v: userStore.state.userId,
-                    },
-                ],
-            },
-        });
-        state.userRoles = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-watch(() => props.visible, (value) => {
-    if (value && !state.isUserMode) {
-        fetchUserRoles();
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -271,11 +277,11 @@ watch(() => props.visible, (value) => {
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
                     <span class="value">{{ state.visibleRoleType }}</span>
                 </div>
-                <div v-else-if="state.currentWorkspaceRole?.role_id"
+                <div v-else-if="roleBindingData?.results?.[0]?.role_id"
                      class="info-menu"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.roles[state.currentWorkspaceRole?.role_id]?.label ?? 'User' }}</span>
+                    <span class="value">{{ referenceMap.role[roleBindingData?.results?.[0]?.role_id]?.label || 'User' }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"

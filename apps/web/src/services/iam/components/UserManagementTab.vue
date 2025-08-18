@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PEmpty, PStatus, PTab, PDataTable, PBadge, PTooltip, PSelectDropdown, PTag,
@@ -14,12 +15,10 @@ import type {
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { RoleBindingUpdateRoleParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/update-role';
-import type { RoleBindingModel } from '@/api-clients/identity/role-binding/schema/model';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -37,9 +36,15 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingUpdateRoleMutation } from '@/services/iam/composables/use-role-binding-update-role-mutation';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
+import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_TABS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { ExtendUserListItemType } from '@/services/iam/types/user-type';
+import type { ExtendUserListItemType, UserListItemType } from '@/services/iam/types/user-type';
+
+
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -51,6 +56,8 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 const userStore = useUserStore();
+
+const selectedUsers = ref<UserListItemType[]>([]);
 
 const storeState = reactive({
     loginUserId: computed<string|undefined>(() => userStore.state.userId),
@@ -85,19 +92,58 @@ const singleItemTabState = reactive({
     ])),
     activeTab: USER_TABS.DETAIL,
     selectedIndex: computed(() => userPageState.selectedIndices[0]),
-    selectedUserId: computed(() => userPageState.users[singleItemTabState.selectedIndex].user_id),
 });
+
+const selectedUserIds = computed(() => userPageState.selectedUserIds ?? []);
+const { userListData, workspaceUserListData } = useUserListQuery(selectedUserIds);
+
+
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: userPageState.selectedUserIds, o: 'in' },
+            ],
+        },
+    })),
+});
+
+const { roleListData } = useRoleListQuery();
+
+const roleMap = computed<Record<string, RoleModel>>(() => {
+    const map: Record<string, RoleModel> = {};
+    roleListData.value?.forEach((role) => {
+        map[role.role_id] = role;
+    });
+    return map;
+});
+
 const multiItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
     activeTab: USER_TABS.DATA,
-    refinedUserItems: computed<ExtendUserListItemType[]>(() => userPageGetters.selectedUsers.map((user) => ({
-        ...user,
-        type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
-        last_accessed_at: user?.last_accessed_at,
-        tags: user?.tags ?? {},
-    }))),
+    refinedUserItems: computed<ExtendUserListItemType[]>(() => {
+        const _selectedUsers = userPageState.isAdminMode ? userListData.value : workspaceUserListData.value;
+        return _selectedUsers?.map((user) => {
+            let additionalFields: Record<string, any> = {};
+            if (!userPageState.isAdminMode) {
+                additionalFields = {
+                    role_binding: {
+                        name: roleMap.value[user?.role_binding_info?.role_id ?? '']?.name ?? '',
+                        type: user?.role_binding_info?.role_type ?? '',
+                    },
+                    user_group: userGroupListData.value.filter((group) => group.users?.includes(user.user_id ?? '')).map((group) => group.name),
+                };
+            }
+            return {
+                ...user,
+                type: user?.role_binding_info?.workspace_group_id ? 'Workspace Group' : 'Workspace',
+                last_accessed_at: user?.last_accessed_at,
+                ...additionalFields,
+            };
+        }) ?? [];
+    }),
 });
 
 const dropdownState = reactive({
@@ -107,19 +153,10 @@ const dropdownState = reactive({
     menuItems: [] as SelectDropdownMenuItem[],
 });
 
+
+
 /* API */
-const initUserData = async (user_id?: string) => {
-    if (!user_id) return;
-    if (userPageState.isAdminMode) {
-        await userPageStore.getUser({
-            user_id: user_id || '',
-        });
-    } else {
-        await userPageStore.getWorkspaceUser({
-            user_id: user_id || '',
-        });
-    }
-};
+const { roleAPI } = useRoleApi();
 const roleListApiQueryHelper = new ApiQueryHelper();
 
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
@@ -137,7 +174,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         });
     }
     try {
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        const { results } = await roleAPI.list({
             query: {
                 ...roleListApiQueryHelper.data,
                 filter: [
@@ -161,32 +198,46 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         results: dropdownState.menuItems,
     };
 };
-const handleSelectDropdownItem = async (value, rowIndex:number) => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
-            role_id: value || '',
-        });
+
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'role-binding', 'list');
+const { key: userGetQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'get', {
+    contextKey: computed(() => userPageState.selectedUserIds[0] ?? ''),
+});
+const queryClient = useQueryClient();
+
+const { mutateAsync: updateRoleBinding } = useRoleBindingUpdateRoleMutation({
+    onSuccess: async () => {
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageGetters.roleMap[response.role_id]?.name ?? '';
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: userGetQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, e.message);
+    },
+});
+const handleSelectDropdownItem = async (value, rowIndex:number) => {
+    updateRoleBinding({
+        role_binding_id: multiItemTabState.refinedUserItems[rowIndex]?.role_binding_info?.role_binding_id || '',
+        role_id: value || '',
+    }).then((response) => {
+        const roleName = roleMap.value[response.role_id]?.name ?? '';
         const originTableIndex = userPageState.selectedIndices[rowIndex];
-        userPageState.users[originTableIndex] = {
-            ...userPageState.users[originTableIndex],
+        selectedUsers.value[originTableIndex] = {
+            ...selectedUsers.value[originTableIndex],
             role_binding: {
                 name: roleName,
                 type: response.role_type,
             },
         };
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    }
+    });
 };
 
-/* Watcher */
-watch(() => userPageState.selectedIndices[0], (index) => {
-    const user_id = userPageState.users[index]?.user_id;
-    initUserData(user_id);
-});
+/* Watch */
+watch(() => selectedUsers.value, (val) => {
+    selectedUsers.value = val;
+}, { immediate: true });
 </script>
 
 <template>
@@ -196,9 +247,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess"
-                                            @refresh="initUserData"
-                />
+                <user-management-tab-detail :has-read-write-access="props.hasReadWriteAccess" />
             </template>
             <template #workspace>
                 <user-management-tab-workspace :active-tab="singleItemTabState.activeTab"
@@ -306,7 +355,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                                    :key="`${v}-${i}`"
                                    :deletable="false"
                             >
-                                {{ v.name }}
+                                {{ v }}
                             </p-tag>
                         </div>
                         <div v-else />

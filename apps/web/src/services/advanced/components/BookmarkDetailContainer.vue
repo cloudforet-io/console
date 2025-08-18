@@ -9,7 +9,10 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { at } from 'lodash';
 
 import {
-    PHeading, PButton, PContextMenu, PI, PIconButton, PStatus, PHeadingLayout,
+    PButton, PContextMenu,
+    PHeading,
+    PHeadingLayout,
+    PI, PIconButton, PStatus,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -18,13 +21,16 @@ import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
-import type { BookmarkModalType, BookmarkItem } from '@/common/components/bookmark/type/type';
+import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray } from '@/styles/colors';
 
 import { getWorkspaceInfo, workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
+import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import { useBookmarkPageStore } from '@/services/advanced/store/bookmark-page-store';
@@ -34,20 +40,19 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+const { bookmarkList } = useBookmarkListQuery();
 
 const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
-
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
 });
 const state = reactive({
     visibleMenu: false,
@@ -63,7 +68,7 @@ const state = reactive({
     ])),
     group: computed<string>(() => route.params.group),
     folder: computed<string>(() => route.params.folder),
-    selectedFolder: computed<BookmarkItem|undefined>(() => storeState.bookmarkFolderList.find((item) => item.name === state.folder)),
+    selectedFolder: computed<BookmarkItem|undefined>(() => bookmarkFolderListData.value.find((item) => item.name === state.folder)),
     headingTitle: computed<TranslateResult|string>(() => {
         if (state.folder) {
             return state.folder;
@@ -73,7 +78,7 @@ const state = reactive({
         }
         return state.workspaceInfo?.name || '';
     }),
-    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, storeState.workspaceList)),
+    workspaceInfo: computed<WorkspaceModel|undefined>(() => getWorkspaceInfo(state.group, workspaceListData.value)),
 });
 
 const hideMenu = () => {
@@ -109,7 +114,7 @@ const handleClickWorkspaceButton = () => {
     }).href, '_blank');
 };
 const handleClickDeleteButton = () => {
-    const selectedItems = at(storeState.bookmarkList, storeState.selectedIndices);
+    const selectedItems = at(bookmarkList.value, storeState.selectedIndices);
     bookmarkStore.setSelectedBookmarks(selectedItems);
     bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);
 };

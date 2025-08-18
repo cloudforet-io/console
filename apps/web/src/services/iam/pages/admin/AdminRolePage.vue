@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onUnmounted } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -10,8 +10,10 @@ import { usePageEditableStatus } from '@/common/composables/page-editable-status
 
 import RoleManagementTab from '@/services/iam/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/iam/components/RoleManagementTable.vue';
+import { useRoleListPaginationQuery } from '@/services/iam/composables/use-role-list-pagination-query';
 import { ADMIN_IAM_ROUTE } from '@/services/iam/routes/admin/route-constant';
 import { useRolePageStore } from '@/services/iam/store/role-page-store';
+
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
@@ -19,6 +21,18 @@ const rolePageState = rolePageStore.$state;
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
+
+/* Query */
+const {
+    totalCount: roleTotalCount,
+} = useRoleListPaginationQuery({
+    params: computed(() => ({
+        // TODO: apply as role management table component
+        query: {},
+    })),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 15),
+});
 
 /* Component */
 const handleCreateRole = () => {
@@ -38,7 +52,7 @@ onUnmounted(() => {
                 <p-heading :title="$t('IAM.ROLE.ROLE')"
                            use-selected-count
                            use-total-count
-                           :total-count="rolePageState.totalCount"
+                           :total-count="roleTotalCount"
                            :selected-count="rolePageState.selectedIndices.length"
                 />
             </template>

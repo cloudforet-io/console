@@ -6,8 +6,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 
 import { useProjectApi } from '@/api-clients/identity/project/composables/use-project-api';
 import type { ProjectGetParameters } from '@/api-clients/identity/project/schema/api-verbs/get';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 export const useProjectQuery = ({
     projectId,

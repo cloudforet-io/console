@@ -7,19 +7,15 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+
 import {
     ALERT_HISTORY_ACTION,
     ALERT_HISTORY_NOTIFICATION_STATE,
-} from '@/schema/alert-manager/alert/constants';
-import type { AlertHistoryModel, AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/schema/alert-manager/alert/type';
+} from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertHistoryModel } from '@/api-clients/alert-manager/alert/schema/model';
+import type { AlertHistoryActionType, AlertHistoryNotificationInfoType, AlertHistoryNotificationChannelInfoType } from '@/api-clients/alert-manager/alert/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { UserGroupReferenceMap } from '@/store/reference/user-group-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { copyAnyData } from '@/lib/helper/copy-helper';
@@ -30,19 +26,20 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { green, red } from '@/styles/colors';
 
 import { ALERT_CHANNEL_TABLE_FIELDS } from '@/services/alert-manager/v2/constants/alert-table-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import type { AlertHistoryNotificationItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
     type: AlertHistoryActionType;
     history?: AlertHistoryModel;
+    serviceId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     type: ALERT_HISTORY_ACTION.EVENT_PUSHED,
     history: undefined,
+    serviceId: '',
 });
 
 const TYPE = {
@@ -51,21 +48,11 @@ const TYPE = {
     USER: 'user_channels',
 } as const;
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
-
 const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 }>();
 
-const storeState = reactive({
-    pluginInfo: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    service: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    userGroup: computed<UserGroupReferenceMap>(() => allReferenceGetters.user_group),
-    user: computed<UserReferenceMap>(() => allReferenceGetters.user),
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     typeFields: computed<SelectDropdownMenuItem[]>(() => ([
@@ -89,13 +76,13 @@ const state = reactive({
 
         const refinedData = channelTypes.flatMap((type) => Object.entries(data[type] || {}).map(([name, channelInfo]) => {
             const info = channelInfo as AlertHistoryNotificationChannelInfoType;
-            let target = '';
+            let target: string | undefined = '';
             if (type === TYPE.SERVICE) {
-                target = storeState.service[storeState.alertInfo.service_id]?.label || storeState.alertInfo.service_id;
+                target = props.serviceId ? (referenceMap.service[props.serviceId]?.label || props.serviceId) : undefined;
             } else if (type === TYPE.USER_GROUP) {
-                target = storeState.userGroup[info.user_group_id || '']?.label || info.user_group_id;
+                target = info.user_group_id ? (referenceMap.userGroup[info.user_group_id]?.label || info.user_group_id) : undefined;
             } else if (type === TYPE.USER) {
-                target = storeState.user[info.user_id || '']?.label || info.user_id;
+                target = info.user_id ? (referenceMap.workspaceUser[info.user_id]?.label || info.user_id) : undefined;
             }
             return {
                 type,
@@ -189,7 +176,7 @@ const handleClickCopy = () => {
                         </template>
                         <template #col-name-format="{value, item}">
                             <div class="flex items-center gap-1">
-                                <p-lazy-img :src="assetUrlConverter(storeState.pluginInfo[item.plugin_id]?.icon || '')"
+                                <p-lazy-img :src="assetUrlConverter(referenceMap.plugin[item.plugin_id]?.icon || '')"
                                             width="1rem"
                                             height="1rem"
                                 />

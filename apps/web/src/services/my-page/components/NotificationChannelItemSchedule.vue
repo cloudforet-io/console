@@ -12,8 +12,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/project-channel/api-verbs/set-schedule';
-import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
+import type { ProjectChannelSetScheduleParameters } from '@/api-clients/notification/project-channel/schema/api-verbs/set-schedule';
+import type { UserChannelSetScheduleParameters } from '@/api-clients/notification/user-channel/schema/api-verbs/set-schedule';
 import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
@@ -88,6 +88,7 @@ const onChangeSchedule = async (scheduleSettingFormType: ScheduleSettingFormType
     state.isScheduleValid = true;
 };
 
+// note: notification.userChannel - v1
 const setUserChannelSchedule = async () => {
     try {
         if (!notificationItemState.userChannelId) throw new Error('User channel id is not defined');

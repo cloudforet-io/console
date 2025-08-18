@@ -1,38 +1,48 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PHeading, PCard, PI, PButton, PPaneLayout, PDivider,
 } from '@cloudforet/mirinae';
 
-import type { CollectorRuleChangeOrderParameters } from '@/schema/inventory/collector-rule/api-verbs/change-order';
-import type { CollectorRuleCreateParameters } from '@/schema/inventory/collector-rule/api-verbs/create';
-import type { CollectorRuleDeleteParameters } from '@/schema/inventory/collector-rule/api-verbs/delete';
-import type { CollectorRuleUpdateParameters } from '@/schema/inventory/collector-rule/api-verbs/update';
-import type { CollectorRuleModel } from '@/schema/inventory/collector-rule/model';
+import { useCollectorRuleApi } from '@/api-clients/inventory/collector-rule/composables/use-collector-rule-api';
+import type { CollectorRuleChangeOrderParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/change-order';
+import type { CollectorRuleCreateParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/create';
+import type { CollectorRuleDeleteParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/delete';
+import type { CollectorRuleUpdateParameters } from '@/api-clients/inventory/collector-rule/schema/api-verbs/update';
+import type { AdditionalRuleAction, AdditionalRuleCondition, CollectorRuleModel } from '@/api-clients/inventory/collector-rule/schema/model';
+import type { CollectorRuleConditionPolicy } from '@/api-clients/inventory/collector-rule/schema/type';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorAdditionalRuleContent from '@/services/asset-inventory/components/CollectorAdditionalRuleContent.vue';
-import CollectorAdditionalRuleEmptyCase
-    from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
+import CollectorAdditionalRuleEmptyCase from '@/services/asset-inventory/components/CollectorAdditionalRuleEmptyCase.vue';
 import CollectorAdditionalRuleForm from '@/services/asset-inventory/components/CollectorAdditionalRuleForm.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
-import {
-    useCollectorFormStore,
-} from '@/services/asset-inventory/stores/collector-form-store';
-import type { CollectorRuleForm } from '@/services/asset-inventory/types/type';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useCollectorRuleListQuery } from '@/services/asset-inventory/composables/use-collector-rule-list-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 
 
+const appContextStore = useAppContextStore();
+const { collectorRuleAPI } = useCollectorRuleApi();
 
-const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
-
+interface CollectorRuleForm {
+    collector_rule_id?: string;
+    conditions_policy: CollectorRuleConditionPolicy;
+    conditions: AdditionalRuleCondition[];
+    actions: AdditionalRuleAction;
+    options?: {
+        stop_processing: boolean;
+    };
+    order: number;
+}
 interface Props {
     collectorId?: string;
     hasReadWriteAccess?: boolean
@@ -43,73 +53,113 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    orderedCardData: computed<CollectorRuleModel[]>(() => {
-        const data = collectorFormState.additionalRules;
-        return data.sort((a, b) => a.order - b.order);
-    }),
-    isEmptyCase: computed<boolean>(() => collectorFormState.additionalRules.length === 0),
-    editModeCardOrder: 0,
-    collectorProvider: computed(() => collectorFormState.originCollector?.provider),
-    isAddCase: computed<boolean>(() => collectorFormState.originCollectorRules?.length === 0
-        || collectorFormState.originCollectorRules.length < collectorFormState.additionalRules.length),
-    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    isEditable: computed<boolean>(() => props.hasReadWriteAccess && state.editModeCardOrder === 0 && !state.isNotiVisible),
+    collectorRuleForm: undefined as CollectorRuleForm | undefined,
+    editModeCardOrder: undefined as number | undefined,
+});
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const noCollectorRules = computed<boolean>(() => originCollectorRules.value?.length === 0);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+const isEditable = computed<boolean>(() => props.hasReadWriteAccess && isEditableCollector.value);
+const isEditing = computed<boolean>(() => state.editModeCardOrder !== undefined);
+const mergedCollectorRules = computed<Array<CollectorRuleModel | CollectorRuleForm>>(() => { // originCollectorRules + collectorRuleForm
+    let rules = originCollectorRules.value ?? [];
+    if (state.collectorRuleForm) {
+        rules = [...rules, state.collectorRuleForm as CollectorRuleModel];
+    }
+    return rules.sort((a, b) => a.order - b.order);
 });
 
-const changeOrder = (targetData, clickedData, tempOrder) => {
-    if (targetData.order < clickedData.order) {
-        targetData.order = tempOrder;
-        clickedData.order = tempOrder - 1;
-    } else {
-        targetData.order = tempOrder;
-        clickedData.order = tempOrder + 1;
-    }
-};
-const handleClickUpButton = async (data:CollectorRuleModel) => {
-    const tempCardData = [...collectorFormState.additionalRules];
-    const tempOrder = data.order;
-    try {
-        changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
-        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
-            collector_rule_id: data.collector_rule_id,
-            order: tempOrder - 1,
-        });
+/* Utils */
+const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
+
+/* Query */
+const queryClient = useQueryClient();
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => props.collectorId),
+});
+const { data: originCollectorRules, collectorRuleListQueryKey } = useCollectorRuleListQuery({
+    collectorId: computed(() => props.collectorId),
+});
+
+/* Mutations */
+const { mutate: updateCollectorRule } = useMutation({
+    mutationFn: (params: CollectorRuleUpdateParameters) => {
+        if (!params.collector_rule_id) {
+            throw new Error('collector_rule_id is required');
+        }
+        return collectorRuleAPI.update(params);
+    },
+    onSuccess: async () => {
+        state.editModeCardOrder = undefined;
+        state.collectorRuleForm = undefined;
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_UPDATE_COLLECTOR_RULE'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_UPDATE_COLLECTOR_RULE'));
+    },
+});
+const { mutate: createCollectorRule } = useMutation({
+    mutationFn: (params: CollectorRuleCreateParameters) => {
+        if (!params.collector_id) {
+            throw new Error('collector_id is required');
+        }
+        return collectorRuleAPI.create(params);
+    },
+    onSuccess: async () => {
+        state.editModeCardOrder = undefined;
+        state.collectorRuleForm = undefined;
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_CREATE_COLLECTOR_RULE'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_CREATE_COLLECTOR_RULE'));
+    },
+});
+const { mutate: changeCollectorRuleOrder } = useMutation({
+    mutationFn: (params: CollectorRuleChangeOrderParameters) => {
+        if (!params.collector_rule_id) {
+            throw new Error('collector_rule_id is required');
+        }
+        return collectorRuleAPI.changeOrder(params);
+    },
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
-    } catch (e) {
-        changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
-    } finally {
-        collectorFormState.additionalRules = tempCardData;
-    }
-};
-const handleClickDownButton = async (data:CollectorRuleModel) => {
-    const tempCardData = [...collectorFormState.additionalRules];
-    const tempOrder = data.order;
-    try {
-        changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
-        await SpaceConnector.clientV2.inventory.collectorRule.changeOrder<CollectorRuleChangeOrderParameters>({
-            collector_rule_id: data.collector_rule_id,
-            order: tempOrder + 1,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_REORDER_COLLECTOR_RULES'), '');
-    } catch (e) {
-        changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_REORDER_COLLECTOR_RULES'));
-    } finally {
-        collectorFormState.additionalRules = tempCardData;
-    }
+    },
+});
+const { mutate: deleteCollectorRule } = useMutation({
+    mutationFn: (params: CollectorRuleDeleteParameters) => {
+        if (!params.collector_rule_id) {
+            throw new Error('collector_rule_id is required');
+        }
+        return collectorRuleAPI.delete(params);
+    },
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: collectorRuleListQueryKey.value });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
+    },
+    onError: (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
+    },
+});
+
+/* Event Handlers */
+const handleChangeOrder = async (order: number, direction: 'up' | 'down') => {
+    const targetData = originCollectorRules.value?.[order - 1];
+    changeCollectorRuleOrder({
+        collector_rule_id: targetData?.collector_rule_id || '',
+        order: direction === 'up' ? (order - 1) : (order + 1),
+    });
 };
 
-const handleClickDeleteButton = async (order:number) => {
-    try {
-        await SpaceConnector.clientV2.inventory.collectorRule.delete<CollectorRuleDeleteParameters>({
-            collector_rule_id: state.orderedCardData[order - 1].collector_rule_id,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_DELETE_COLLECTOR_RULE'), '');
-        await collectorFormStore.setOriginCollectorRules();
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_DELETE_COLLECTOR_RULE'));
-    }
+const handleClickDeleteButton = async (collectorRuleId: string) => {
+    deleteCollectorRule({
+        collector_rule_id: collectorRuleId,
+    });
 };
 
 const handleClickEditButton = (order: number) => {
@@ -117,64 +167,39 @@ const handleClickEditButton = (order: number) => {
 };
 
 const handleCancelSetRule = () => {
-    if (state.isAddCase) {
-        collectorFormState.additionalRules = collectorFormState.originCollectorRules;
-    }
-    state.editModeCardOrder = 0;
+    state.collectorRuleForm = undefined;
+    state.editModeCardOrder = undefined;
 };
-
 const handleClickAddEventRule = async () => {
-    collectorFormState.additionalRules = [...collectorFormState.additionalRules, { order: collectorFormState.additionalRules.length + 1 }];
-    state.editModeCardOrder = collectorFormState.additionalRules.length;
+    const newOrder = (originCollectorRules.value?.length ?? 0) + 1;
+    state.collectorRuleForm = {
+        conditions_policy: 'ALL',
+        conditions: [],
+        actions: {},
+        options: { stop_processing: false },
+        order: newOrder,
+    };
+    state.editModeCardOrder = newOrder;
 };
-const createCollectorRule = async (data:CollectorRuleForm) => {
-    try {
-        await SpaceConnector.clientV2.inventory.collectorRule.create<CollectorRuleCreateParameters>({
-            collector_id: collectorFormState.originCollector.collector_id,
-            conditions: data.conditions,
-            conditions_policy: data.conditions_policy,
-            actions: data.actions,
-            options: data.options,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_CREATE_COLLECTOR_RULE'), '');
-        await collectorFormStore.setOriginCollectorRules(props.collectorId);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_CREATE_COLLECTOR_RULE'));
-    }
-};
-
-const updateCollectorRule = async (data:CollectorRuleForm) => {
-    try {
-        if (!data.collector_rule_id) {
-            throw new Error('collector_rule_id is required');
-        }
-        await SpaceConnector.clientV2.inventory.collectorRule.update<CollectorRuleUpdateParameters>({
+const handleSaveRule = (data: CollectorRuleModel | CollectorRuleForm) => {
+    if (data.collector_rule_id) {
+        updateCollectorRule({
             collector_rule_id: data.collector_rule_id,
             conditions: data.conditions,
             conditions_policy: data.conditions_policy,
             actions: data.actions,
             options: data.options,
         });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_S_UPDATE_COLLECTOR_RULE'), '');
-        await collectorFormStore.setOriginCollectorRules(props.collectorId);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.COLLECTOR_RULE.ALT_E_UPDATE_COLLECTOR_RULE'));
-    }
-};
-const handleSetRule = async (data:CollectorRuleForm) => {
-    if (state.isAddCase) {
-        await createCollectorRule(data);
     } else {
-        await updateCollectorRule(data);
+        createCollectorRule({
+            collector_id: props.collectorId || '',
+            conditions: data.conditions,
+            conditions_policy: data.conditions_policy,
+            actions: data.actions,
+            options: data.options,
+        });
     }
-    state.editModeCardOrder = 0;
 };
-
-const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
-
-(async () => {
-    await collectorFormStore.setOriginCollectorRules(props.collectorId);
-})();
 </script>
 
 <template>
@@ -183,14 +208,14 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                    :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_RULE')"
                    heading-type="sub"
         />
-        <div v-if="state.isEmptyCase">
-            <collector-additional-rule-empty-case :is-editable="state.isEditable"
+        <div v-if="noCollectorRules && !isEditing">
+            <collector-additional-rule-empty-case :is-editable="isEditable && !isEditing"
                                                   @add-rule="handleClickAddEventRule"
             />
         </div>
         <div v-else>
             <div class="card-list-wrapper">
-                <p-card v-for="data in state.orderedCardData"
+                <p-card v-for="data in mergedCollectorRules"
                         :key="data.order"
                         :style-type="isEditModeByOrder(data.order) ? 'indigo400' :'gray100'"
                 >
@@ -199,10 +224,10 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                             <div class="left-part">
                                 <div v-if="!isEditModeByOrder(data.order)">
                                     <span class="order-text">#<strong>{{ data.order }}</strong></span>
-                                    <span v-if="state.isEditable"
+                                    <span v-if="isEditable && !isEditing"
                                           class="arrow-button"
                                           :class="{'disabled': data.order === 1}"
-                                          @click="handleClickUpButton(data)"
+                                          @click="handleChangeOrder(data.order, 'up')"
                                     >
                                         <p-i name="ic_arrow-up"
                                              width="1.5rem"
@@ -210,10 +235,10 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                              color="inherit transparent"
                                         />
                                     </span>
-                                    <span v-if="state.isEditable"
+                                    <span v-if="isEditable && !isEditing"
                                           class="arrow-button"
-                                          :class="{'disabled': (data.order === collectorFormState.originCollectorRules?.length)}"
-                                          @click="handleClickDownButton(data)"
+                                          :class="{'disabled': (data.order === (originCollectorRules?.length ?? 0))}"
+                                          @click="handleChangeOrder(data.order, 'down')"
                                     >
                                         <p-i name="ic_arrow-down"
                                              width="1.5rem"
@@ -226,11 +251,11 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                                     {{ $t('INVENTORY.COLLECTOR.EDIT_ADDITIONAL_RULE') }}
                                 </div>
                             </div>
-                            <div v-if="!isEditModeByOrder(data.order) && state.isEditable"
+                            <div v-if="isEditable && !isEditing && data.collector_rule_id"
                                  class="right-part"
                             >
                                 <span class="text-button delete"
-                                      @click="handleClickDeleteButton(data.order)"
+                                      @click="handleClickDeleteButton(data.collector_rule_id)"
                                 >
                                     {{ $t('PROJECT.EVENT_RULE.DELETE') }}
                                 </span>
@@ -255,8 +280,8 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                              class="edit-card"
                         >
                             <collector-additional-rule-form :data="data"
-                                                            :provider="state.collectorProvider"
-                                                            @click-done="handleSetRule"
+                                                            :provider="originCollectorData?.provider"
+                                                            @click-done="handleSaveRule"
                                                             @click-cancel="handleCancelSetRule"
                             />
                         </div>
@@ -272,7 +297,7 @@ const isEditModeByOrder = (order: number) => state.editModeCardOrder === order;
                 <p-button style-type="tertiary"
                           icon-left="ic_plus_bold"
                           class="add-event-rule-button"
-                          :disabled="!state.isEditable"
+                          :disabled="!isEditable || isEditing"
                           @click="handleClickAddEventRule"
                 >
                     {{ $t('INVENTORY.COLLECTOR.ADD_ADDITIONAL_RULE') }}

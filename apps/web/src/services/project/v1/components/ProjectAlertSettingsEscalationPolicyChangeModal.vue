@@ -13,14 +13,14 @@ import {
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';
+import type { EscalationPolicyCreateParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/create';
 import type {
     EscalationPolicyListParameters,
     EscalationPolicyListResponse,
-} from '@/schema/monitoring/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+} from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/list';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { ProjectAlertConfigUpdateParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/update';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';

@@ -28,7 +28,6 @@ const props = defineProps<{
     apiKeyItem?: AppModel;
 }>();
 const emit = defineEmits<{(event: 'visible', visible: boolean): void;
-    (event: 'clickButton'): void;
 }>();
 const endpointStore = useEndpointStore();
 const endpointGetters = endpointStore.getters;
@@ -60,10 +59,6 @@ const onClickDownloadFile = (fileType: FileType) => {
     if (fileType === FileType.YAML) a.download = 'spacectl_config';
     a.click();
     a.remove();
-};
-
-const onClickConfirm = () => {
-    emit('clickButton');
 };
 
 const makeJsonItem = () => {
@@ -100,7 +95,6 @@ watch(() => props.visible, async (visible) => {
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
                   :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"
-                  @clickButton="onClickConfirm"
     >
         <template #body>
             <article class="alert-wrapper">

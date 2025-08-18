@@ -2,13 +2,13 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !state.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorFormState.schedulePower || !isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
             <collector-schedule-form :hours-readonly="!state.isEditMode"
-                                     :readonly="!props.hasReadWriteAccess || !state.isEditableCollector"
+                                     :readonly="!props.hasReadWriteAccess || !isEditableCollector"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
             />
@@ -37,26 +37,29 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    reactive, watch, computed,
+} from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
-import CollectorScheduleForm
-    from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -67,11 +70,20 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const appContextStore = useAppContextStore();
+
+const { collectorAPI } = useCollectorApi();
+
 const state = reactive({
     isEditMode: false,
-    isEditableCollector: computed(() => collectorDetailPageStore.getters.isEditableCollector),
     updateLoading: false,
+});
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
@@ -83,7 +95,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
+    return collectorAPI.update(params);
 };
 
 const handleClickEdit = () => {
@@ -92,18 +104,17 @@ const handleClickEdit = () => {
 
 const handleClickCancel = () => {
     state.isEditMode = false;
-    collectorFormStore.resetSchedule(true);
+    collectorFormStore.resetSchedule(originCollectorData.value, true);
 };
 
 const handleClickSave = async () => {
     try {
         state.updateLoading = true;
-        const collector = await fetchCollectorUpdate();
-        await collectorFormStore.setOriginCollector(collector);
+        await fetchCollectorUpdate();
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
         state.isEditMode = false;
     } catch (error) {
-        collectorFormStore.resetSchedule();
+        collectorFormStore.resetSchedule(originCollectorData.value, true);
         ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     } finally {
         state.updateLoading = false;

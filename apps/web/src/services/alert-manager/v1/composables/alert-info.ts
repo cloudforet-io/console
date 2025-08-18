@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
+import type { AlertUpdateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

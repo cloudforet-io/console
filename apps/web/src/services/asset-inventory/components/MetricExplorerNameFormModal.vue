@@ -5,17 +5,14 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@cloudforet/mirinae';
 
-
-import type { MetricExampleCreateParameters } from '@/schema/inventory/metric-example/api-verbs/create';
-import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
-import type { MetricModel } from '@/schema/inventory/metric/model';
+import { useMetricExampleApi } from '@/api-clients/inventory/metric-example/composables/use-metric-example-api';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -25,6 +22,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
+import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
+import { useMetricExampleListQuery } from '@/services/asset-inventory/composables/use-metric-example-list-query';
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
+import { useMetricListQuery } from '@/services/asset-inventory/composables/use-metric-list-query';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -48,24 +49,22 @@ const route = useRoute();
 const gnbStore = useGnbStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     proxyVisible: useProxyValue<boolean>('visible', props, emit),
     existingNameList: computed<string[]>(() => {
         if (state.currentMetricExampleId) {
-            return metricExplorerPageState.metricExamples
-                .filter((d) => d.example_id !== state.currentMetricExampleId)
+            return namespaceMetricExamples.value
+                ?.filter((d) => d.example_id !== state.currentMetricExampleId)
                 .map((d) => d.name);
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
-            return metricExplorerPageGetters.metrics.map((d) => d.name);
+            return currentNamespaceMetrics.value?.map((d) => d.name) || [];
         }
-        return metricExplorerPageGetters.metrics
-            .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
-            .map((metric) => metric.name);
+        return currentNamespaceMetrics.value
+            ?.filter((d) => d.metric_id !== currentMetric.value?.metric_id)
+            .map((metric) => metric.name) || [];
     }),
     headerTitle: computed<TranslateResult>(() => {
         if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
@@ -96,11 +95,79 @@ const {
     },
 });
 
-/* Api */
-const createMetricExample = async () => {
-    try {
-        const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
-            metric_id: metricExplorerPageState.metric?.metric_id || '',
+/* Query */
+const { data: currentMetric, metricGetQueryKey } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
+});
+const { data: currentMetricExample, metricExampleGetQueryKey } = useMetricExampleGetQuery({
+    metricExampleId: computed(() => route.params.metricExampleId),
+});
+const { data: namespaceMetricExamples, metricExampleListQueryKey } = useMetricExampleListQuery({
+    params: computed(() => ({
+        namespace_id: metricExplorerPageState.selectedNamespaceId,
+    })),
+});
+const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery({
+    params: computed(() => ({
+        namespace_id: currentMetric.value?.namespace_id,
+    })),
+});
+
+/* Mutations */
+const { metricAPI } = useMetricApi();
+const { metricExampleAPI } = useMetricExampleApi();
+const queryClient = useQueryClient();
+const { mutate: createMetricExample, isPending: isCreateMetricExamplePending } = useMutation({
+    mutationFn: metricExampleAPI.create,
+    onSuccess: async (data) => {
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
+        state.proxyVisible = false;
+        await gnbStore.fetchMetricExample();
+        await router.replace({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            params: {
+                metricId: data.metric_id,
+                metricExampleId: data.example_id,
+            },
+        }).catch(() => {});
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
+    },
+});
+const { mutate: updateMetricExampleName, isPending: isUpdateMetricExampleNamePending } = useMutation({
+    mutationFn: metricExampleAPI.update,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: metricExampleGetQueryKey.value });
+        state.proxyVisible = false;
+        await gnbStore.fetchMetricExample();
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    },
+});
+const { mutate: updateMetricName, isPending: isUpdateMetricNamePending } = useMutation({
+    mutationFn: metricAPI.update,
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: metricListQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: metricGetQueryKey.value });
+        state.proxyVisible = false;
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+    },
+    onError: async (e) => {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    },
+});
+
+/* Event */
+const handleFormConfirm = async () => {
+    if (!isAllValid) return;
+    if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
+        createMetricExample({
+            metric_id: currentMetric.value?.metric_id || '',
             name: name.value,
             options: {
                 granularity: metricExplorerPageState.granularity,
@@ -111,59 +178,17 @@ const createMetricExample = async () => {
                 operator: metricExplorerPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
-        state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        await gnbStore.fetchMetricExample();
-        await router.replace({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
-            params: {
-                metricId: metricExample.metric_id,
-                metricExampleId: metricExample.example_id,
-            },
-        }).catch(() => {});
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
-    }
-};
-const updateMetricName = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: state.currentMetricId,
-            name: name.value,
-        });
-        state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    }
-};
-const updateMetricExampleName = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
-            example_id: state.currentMetricExampleId,
-            name: name.value,
-        });
-        state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        await gnbStore.fetchMetricExample();
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    }
-};
-
-/* Event */
-const handleFormConfirm = async () => {
-    if (!isAllValid) return;
-    if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
-        await createMetricExample();
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         if (state.currentMetricExampleId) {
-            await updateMetricExampleName();
+            updateMetricExampleName({
+                example_id: state.currentMetricExampleId,
+                name: name.value,
+            });
         } else {
-            await updateMetricName();
+            updateMetricName({
+                metric_id: state.currentMetricId,
+                name: name.value,
+            });
         }
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
         emit('save-as', name.value);
@@ -175,9 +200,9 @@ const handleFormConfirm = async () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible && props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         if (state.currentMetricExampleId) {
-            setForm('name', state.currentMetricExample?.name);
+            setForm('name', currentMetricExample.value?.name);
         } else {
-            setForm('name', metricExplorerPageState.metric?.name);
+            setForm('name', currentMetric.value?.name);
         }
     } else {
         initForm();
@@ -194,6 +219,7 @@ watch(() => state.proxyVisible, (visible) => {
         backdrop
         :visible.sync="state.proxyVisible"
         :disabled="!isAllValid"
+        :loading="isCreateMetricExamplePending || isUpdateMetricExampleNamePending || isUpdateMetricNamePending"
         @confirm="handleFormConfirm"
     >
         <template #body>

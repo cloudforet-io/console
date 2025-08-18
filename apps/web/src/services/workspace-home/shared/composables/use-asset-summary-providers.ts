@@ -3,9 +3,12 @@ import { computed } from 'vue';
 
 import dayjs from 'dayjs';
 
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import { useMetricDataApi } from '@/api-clients/inventory/metric-data/composables/use-metric-data-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import type { MetricDataAnalyzeParameters } from '@/api-clients/inventory/metric-data/schema/api-verbs/analyze';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
@@ -35,11 +38,11 @@ const useResourceMetricQuery = (resourceType: ResourceLabel, opts: {
 
     const { key, params } = useServiceQueryKey('inventory', 'metric-data', 'analyze', {
         contextKey: [mode.value, metricId],
-        params: computed(() => {
+        params: computed<MetricDataAnalyzeParameters>(() => {
             const today = dayjs.utc().format('YYYY-MM-DD');
-            const filter = projectIds?.value?.length ? [{
+            const filter: ApiFilter[] = projectIds?.value?.length ? [{
                 k: 'project_id', v: projectIds.value, o: 'in',
-            }] : undefined;
+            }] : [];
 
             return {
                 metric_id: metricId,

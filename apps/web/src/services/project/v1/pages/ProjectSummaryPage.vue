@@ -8,8 +8,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PI, PIconButton } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { ProjectAlertConfigListParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/list';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
 
 import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/composables/use-global-config-ui-affects-schema';
 import { MENU_ID } from '@/lib/menu/config';
@@ -20,7 +20,7 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import { gray, indigo } from '@/styles/colors';
 
-import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
+import CloudServices from '@/services/project/v1/components/CloudServices.vue';
 import ProjectSummaryAlertWidget from '@/services/project/v1/components/ProjectSummaryAlertWidget.vue';
 import ProjectSummaryAllSummaryWidget from '@/services/project/v1/components/ProjectSummaryAllSummaryWidget.vue';
 import ProjectSummaryBillingWidget from '@/services/project/v1/components/ProjectSummaryBillingWidget.vue';

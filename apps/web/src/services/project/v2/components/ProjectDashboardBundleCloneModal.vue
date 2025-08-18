@@ -27,8 +27,6 @@ import type { PublicFolderCreateParameters } from '@/api-clients/dashboard/publi
 import { usePublicWidgetApi } from '@/api-clients/dashboard/public-widget/composables/use-public-widget-api';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -38,7 +36,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray } from '@/styles/colors';
 
-import { getSharedDashboardLayouts } from '@/services/_shared/dashboard/core/helpers/dashboard-layout-template-helper';
+import { useDashboardLayoutSchema } from '@/services/_shared/dashboard/core/composables/use-dashboard-layout-schema';
 import { getSelectedDataTableItems } from '@/services/dashboards/helpers/dashboard-tree-data-helper';
 import { useDashboardTreeControlStore } from '@/services/dashboards/stores/dashboard-tree-control-store';
 import type { DashboardDataTableItem } from '@/services/dashboards/types/dashboard-folder-type';
@@ -83,10 +81,10 @@ const projectPageContext = useProjectPageContext({
     projectId,
 });
 const userStore = useUserStore();
-const allReferenceStore = useAllReferenceStore();
 const { publicDashboardAPI } = usePublicDashboardApi();
 const { publicFolderAPI } = usePublicFolderApi();
 const { publicWidgetAPI } = usePublicWidgetApi();
+const { getSharedDashboardLayouts } = useDashboardLayoutSchema();
 
 const visible = computed(() => projectDashboardModalState.dashboardBundleCloneModalVisible);
 const folderId = computed(() => projectDashboardModalState.targetId);
@@ -108,7 +106,6 @@ const {
     projectId,
 });
 const storeState = reactive({
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     userId: computed<string|undefined>(() => userStore.state.userId),
 });
 
@@ -270,7 +267,7 @@ const cloneDashboard = async (dashboardId: string, targetFolderId?: string) => {
 
     const _dashboardNameList = getDashboardNameList();
     const _dashboardWidgets = await listDashboardWidgets(_dashboard.dashboard_id);
-    const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets, storeState.costDataSource);
+    const _createdLayouts = await getSharedDashboardLayouts(_dashboard.layouts, _dashboardWidgets);
     const _createdDashboardParams: DashboardCreateParams = {
         name: getClonedName(_dashboardNameList, _dashboard.name),
         layouts: _createdLayouts,

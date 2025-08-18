@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -17,8 +17,7 @@ import type { ServiceAccountReferenceMap } from '@/store/reference/service-accou
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
-
+import { useSecurityCloudServiceTypeList } from '@/services/asset-inventory/composables/use-security-cloud-service-type-list';
 import CloudServiceDetailPage
     from '@/services/asset-inventory/pages/CloudServiceDetailPage.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -27,17 +26,15 @@ import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/ty
 import type { EmptyData } from '@/services/asset-inventory/types/type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
+
 const allReferenceStore = useAllReferenceStore();
 const securityPageStore = useSecurityPageStore();
-const securityPageGetters = securityPageStore.getters;
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
+const { cloudServiceTypeList, isLoading } = useSecurityCloudServiceTypeList();
 
 const storeState = reactive({
-    loading: computed(() => securityPageGetters.loading),
-    cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
-    selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
 });
@@ -72,22 +69,15 @@ const state = reactive({
     writableCollector: computed<boolean|undefined>(() => authorizationStore.getters.pageAccessPermissionMap[MENU_ID.COLLECTOR]?.write),
 });
 
-const initData = async () => {
-    await securityPageStore.fetchCloudServiceAnalyze();
-};
-
-const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
-
-watch(() => storeState.cloudServiceTypeList, () => {
+watch(cloudServiceTypeList, () => {
     if (state.pageParams?.name) {
-        securityPageStore.setSelectedCloudServiceType(state.pageParams.group, state.pageParams.name, state.pageParams.provider);
+        const cloudServiceType = cloudServiceTypeList.value.find((d) => d.group === state.pageParams?.group);
+        const selectedCloudServiceType = cloudServiceType?.items?.find((i) => i.name === state.pageParams?.name && i.provider === state.pageParams?.provider);
+        securityPageStore.setSelectedCloudServiceType(selectedCloudServiceType);
     } else {
-        securityPageStore.setSelectedCloudServiceType();
+        const cloudServiceType = cloudServiceTypeList.value?.[0]?.items?.[0];
+        securityPageStore.setSelectedCloudServiceType(cloudServiceType);
     }
-});
-
-onMounted(async () => {
-    await callApiWithGrantGuard();
 });
 
 onUnmounted(() => {
@@ -96,7 +86,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <cloud-service-detail-page v-if="storeState.loading || storeState.cloudServiceTypeList.length > 0"
+    <cloud-service-detail-page v-if="isLoading || cloudServiceTypeList.length > 0"
                                :is-security-page="true"
                                :provider="state.pageParams?.provider"
                                :group="state.pageParams?.group"

@@ -46,10 +46,8 @@ assetInventorySettingsStore.$onAction((action) => {
 
 onUnmounted(() => {
     cloudServiceLSBStore.init();
-    cloudServicePageStore.$dispose();
-    cloudServicePageStore.$reset();
-    cloudServiceDetailPageStore.$dispose();
-    cloudServiceDetailPageStore.$reset();
+    cloudServicePageStore.reset();
+    cloudServiceDetailPageStore.reset();
 });
 </script>
 
@@ -63,7 +61,7 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-else-if="route.meta.centeredLayout"
+        <centered-page-layout v-else-if="route.meta?.centeredLayout"
                               has-nav-bar
         >
             <router-view />

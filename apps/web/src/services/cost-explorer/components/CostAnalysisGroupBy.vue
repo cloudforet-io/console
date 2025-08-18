@@ -9,11 +9,11 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import {
     PSelectButton, PSelectDropdown,
 } from '@cloudforet/mirinae';
+import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
-import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -30,6 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 
 
@@ -41,6 +42,8 @@ interface GroupBySelectButtonItem {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -49,7 +52,7 @@ const storeState = reactive({
 });
 const { metadataAdditionalInfoItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
+    costDataSource: computed(() => storeState.costDataSource[costQuerySetState.selectedDataSourceId ?? '']),
 });
 const state = reactive({
     groupByItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -65,10 +68,13 @@ const state = reactive({
     })),
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
     selectedAdditionalGroupByMenu: [] as SelectDropdownMenuItem[],
-    dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
     groupByDropdownMenuItems: computed<MenuItem[]>(() => {
-        if (costAnalysisPageGetters.isUnifiedCost) return [];
+        if (costQuerySetState.isUnifiedCostOn) return [];
         return metadataAdditionalInfoItems.value.filter((d) => !d.visible);
+    }),
+    visibleGroupByItems: computed<MenuItem[]>(() => {
+        if (costQuerySetState.isUnifiedCostOn) return [];
+        return costAnalysisPageGetters.visibleGroupByItems;
     }),
 });
 
@@ -77,7 +83,8 @@ const resourceQueryHelper = new QueryHelper();
 const fetchSearchResources = getCancellableFetcher<object, {results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
 const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     try {
-        resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);
+        const _dataSourceId = costQuerySetState.selectedDataSourceId ?? '';
+        resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [_dataSourceId], o: '=' }]);
         const { status, response } = await fetchSearchResources({
             resource_type: 'cost_analysis.Cost',
             distinct_key: distinctKey,
@@ -176,7 +183,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-select-dropdown v-if="!costAnalysisPageGetters.isUnifiedCost"
+            <p-select-dropdown v-if="!costQuerySetState.isUnifiedCostOn"
                                :handler="tagsMenuHandler"
                                :selected.sync="state.selectedTagsMenu"
                                selection-label="Tags"

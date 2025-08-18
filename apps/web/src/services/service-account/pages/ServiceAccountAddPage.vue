@@ -2,28 +2,25 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation } from '@tanstack/vue-query';
+
 import {
     PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal, PLink, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
 
 import type { SchemaModel } from '@/api-clients/identity/schema/schema/model';
-import type { ServiceAccountCreateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/create';
-import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
+import { useServiceAccountApi } from '@/api-clients/identity/service-account/composables/use-service-account-api';
 import { ACCOUNT_TYPE } from '@/api-clients/identity/service-account/schema/constant';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
 import type { AccountType } from '@/api-clients/identity/service-account/schema/type';
-import type { TrustedAccountCreateParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/create';
-import type { TrustedAccountDeleteParameters } from '@/api-clients/identity/trusted-account/schema/api-verbs/detele';
+import { useTrustedAccountApi } from '@/api-clients/identity/trusted-account/composables/use-trusted-account-api';
 import type { TrustedAccountModel } from '@/api-clients/identity/trusted-account/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -36,6 +33,10 @@ import ServiceAccountBaseInformationForm
     from '@/services/service-account/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/service-account/components/ServiceAccountCredentialsForm.vue';
+import { useServiceAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-service-account-delete-mutation';
+import { useTrustedAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-trusted-account-delete-mutation';
+import { useTrustedAccountSyncMutation } from '@/services/service-account/composables/mutations/use-trusted-account-sync-mutation';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
@@ -46,24 +47,29 @@ import { useServiceAccountPageStore } from '@/services/service-account/stores/se
 import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/service-account/types/service-account-page-type';
 
+
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+const { serviceAccountAPI } = useServiceAccountApi();
+const { trustedAccountAPI } = useTrustedAccountApi();
 
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
 }>();
 const router = useRouter();
-const allReferenceStore = useAllReferenceStore();
+
+const referenceMap = useAllReferenceDataModel();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
     language: computed<string|undefined>(() => userStore.state.language),
 });
-
+const {
+    generalAccountSchema,
+    trustedAccountSchema,
+} = useServiceAccountProviderSchema();
 const state = reactive({
     isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     titleAccountName: computed(() => {
@@ -71,10 +77,10 @@ const state = reactive({
         return ACCOUNT_TYPE_BADGE_OPTION[formState.accountType].label;
     }),
     providerSchemaLoading: true,
-    providerSchemaData: computed<Partial<SchemaModel|undefined>>(
-        () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
+    providerSchemaData: computed<SchemaModel|undefined>(
+        () => (state.isTrustedAccount ? trustedAccountSchema.value : generalAccountSchema.value),
     ),
-    providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
+    providerIcon: computed(() => (props.provider ? referenceMap.provider[props.provider]?.icon : '')),
     description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
@@ -99,6 +105,22 @@ const formState = reactive({
     formLoading: false,
 });
 
+
+const { mutateAsync: createServiceAccountMutation } = useMutation({
+    mutationFn: serviceAccountAPI.create,
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+        throw error;
+    },
+});
+const { mutateAsync: createTrustedAccountMutation } = useMutation({
+    mutationFn: trustedAccountAPI.create,
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+        throw error;
+    },
+});
+
 const createAccount = async (): Promise<string|undefined> => {
     if (!props.provider) return undefined;
     const data = formState.baseInformationForm.customSchemaForm;
@@ -118,55 +140,73 @@ const createAccount = async (): Promise<string|undefined> => {
     }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
-    try {
-        if (!formState.baseInformationForm.accountName || !data) return undefined;
-        if (state.isTrustedAccount) {
-            res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
-                provider: props.provider,
-                name: formState.baseInformationForm.accountName,
-                data,
-                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-                secret_data: secretData,
-                resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
-                tags: formState.baseInformationForm.tags,
-                schedule: {
-                    state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
-                    hours: serviceAccountPageFormState.scheduleHours,
-                },
-                sync_options: {
-                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-                    azure_management_group_mapping_type: serviceAccountPageFormState.azureManagementGroupMappingType ?? undefined, // only for Azure
-                },
-                plugin_options: serviceAccountPageFormState.additionalOptions,
-            });
-        } else {
-            res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
-                provider: props.provider,
-                name: formState.baseInformationForm.accountName.trim(),
-                data,
-                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-                secret_data: secretData,
-                tags: formState.baseInformationForm.tags,
-                service_account_mgr_id: formState.baseInformationForm.serviceAccountManagerId,
-                trusted_account_id: attachedTrustedAccountId,
-                project_id: formState.baseInformationForm.projectForm?.selectedProjectId ?? '',
-            });
-        }
-        return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        throw e;
+    if (!formState.baseInformationForm.accountName || !data) return undefined;
+    if (state.isTrustedAccount) {
+        res = await createTrustedAccountMutation({
+            provider: props.provider,
+            name: formState.baseInformationForm.accountName,
+            data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
+            secret_data: secretData,
+            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
+            tags: formState.baseInformationForm.tags,
+            schedule: {
+                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                hours: serviceAccountPageFormState.scheduleHours,
+            },
+            sync_options: {
+                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                azure_management_group_mapping_type: serviceAccountPageFormState.azureManagementGroupMappingType ?? undefined, // only for Azure
+            },
+            plugin_options: serviceAccountPageFormState.additionalOptions,
+        });
+    } else {
+        res = await createServiceAccountMutation({
+            provider: props.provider,
+            name: formState.baseInformationForm.accountName.trim(),
+            data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
+            secret_data: secretData,
+            tags: formState.baseInformationForm.tags,
+            service_account_mgr_id: formState.baseInformationForm.serviceAccountManagerId,
+            trusted_account_id: attachedTrustedAccountId,
+            project_id: formState.baseInformationForm.projectForm?.selectedProjectId ?? '',
+        });
     }
+    return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
 };
 
+const { mutateAsync: deleteServiceAccountMutation } = useServiceAccountDeleteMutation({
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
+const { mutateAsync: deleteTrustedAccountMutation } = useTrustedAccountDeleteMutation({
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
+const { mutateAsync: syncTrustedAccountMutation } = useTrustedAccountSyncMutation({
+    onSuccess: () => {
+        state.createModal = false;
+        serviceAccountPageStore.initState();
+        router.push({
+            name: state.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
+            params: { serviceAccountId: state.createdAccountId },
+        }).catch(() => {});
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
 const deleteServiceAccount = async (serviceAccountId: string) => {
     if (state.isTrustedAccount) {
-        await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({
+        await deleteTrustedAccountMutation({
             trusted_account_id: serviceAccountId,
         });
     } else {
-        await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
+        await deleteServiceAccountMutation({
             service_account_id: serviceAccountId,
         });
     }
@@ -212,20 +252,12 @@ const handleChangeBaseInformationForm = (baseInformationForm) => {
     formState.baseInformationForm = baseInformationForm;
 };
 
+
+
 const handleSync = async () => {
-    try {
-        await SpaceConnector.clientV2.identity.trustedAccount.sync({
-            trusted_account_id: state.createdAccountId,
-        });
-        state.createModal = false;
-        serviceAccountPageStore.initState();
-        router.push({
-            name: state.isAdminMode ? ADMIN_SERVICE_ACCOUNT_ROUTE.DETAIL._NAME : SERVICE_ACCOUNT_ROUTE.DETAIL._NAME,
-            params: { serviceAccountId: state.createdAccountId },
-        }).catch(() => {});
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    await syncTrustedAccountMutation({
+        trusted_account_id: state.createdAccountId,
+    });
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
@@ -240,7 +272,7 @@ const handleRouteToServiceAccountDetailPage = () => {
     state.providerSchemaLoading = true;
     serviceAccountPageStore.initState();
     serviceAccountPageStore.setProvider(props.provider ?? '');
-    await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
+    serviceAccountSchemaStore.setCurrentProvider(props.provider ?? '');
     serviceAccountPageStore.$patch((_state) => {
         _state.state.serviceAccountType = props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL;
     });

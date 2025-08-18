@@ -1,0 +1,32 @@
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
+
+import { useSchemaApi } from '@/api-clients/identity/schema/composables/use-schema-api';
+import type { SchemaListParameters } from '@/api-clients/identity/schema/schema/api-verbs/list';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
+
+
+interface UseServiceAccountSchemaListQueryOptions {
+    params: ComputedRef<SchemaListParameters>;
+    enabled?: ComputedRef<boolean>;
+}
+
+export const useServiceAccountSchemaListQuery = ({ params, enabled }: UseServiceAccountSchemaListQueryOptions) => {
+    const { schemaAPI } = useSchemaApi();
+    const { key: schemaListKey, params: schemaListParams } = useServiceQueryKey('identity', 'schema', 'list', {
+        params,
+    });
+
+    return useScopedQuery({
+        queryKey: schemaListKey,
+        queryFn: () => schemaAPI.list(schemaListParams.value),
+        select: (data) => data?.results ?? [],
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 1, // 1 minutes
+        enabled: computed(() => {
+            if (enabled === undefined) return true;
+            return enabled.value;
+        }),
+    }, ['DOMAIN', 'WORKSPACE']);
+};

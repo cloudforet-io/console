@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader, PI,
 } from '@cloudforet/mirinae';
 
-import { SERVICE_CHANNEL_TYPE } from '@/schema/alert-manager/service-channel/constants';
-import type { ServiceChannelModel } from '@/schema/alert-manager/service-channel/model';
+import { SERVICE_CHANNEL_TYPE } from '@/api-clients/alert-manager/service-channel/schema/constants';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { getProtocolInfo } from '@/services/alert-manager/v2/composables/refined-table-data';
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
+import { useServiceChannelListQuery } from '@/services/alert-manager/v2/composables/use-service-channel-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 const ITEM_DEFAULT_WIDTH = 120 + 8;
 const DEFAULT_LEFT_PADDING = 16;
@@ -26,22 +26,22 @@ const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const itemEl = ref<null | HTMLElement>(null);
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
-const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
-    notificationProtocolList: computed<ProtocolCardItemType[]>(() => serviceDetailPageGetters.notificationProtocolList),
-    serviceChannelList: computed<ServiceChannelModel[]>(() => serviceDetailPageState.serviceChannelList.slice(0, 15)),
-});
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+
 const state = reactive({
     loading: true,
     pageStart: 0,
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
-    pageMax: computed<number>(() => Math.max(storeState.serviceChannelList.length - state.visibleCount, 0)),
+    pageMax: computed<number>(() => Math.max(serviceChannelListData.value.length - state.visibleCount, 0)),
 });
+
+const { serviceChannelListData, serviceChannelListFetching } = useServiceChannelListQuery(serviceId);
 
 const handleClickArrowButton = (increment: number) => {
     const element = {
@@ -55,32 +55,10 @@ const handleClickArrowButton = (increment: number) => {
     const marginLeft = increment * state.pageStart * element.defaultWidth;
     element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
-const getPluginIcon = (protocolId: string): string => {
-    const notificationProtocol = storeState.notificationProtocolList.find((item) => item.protocol_id === protocolId);
-    if (!notificationProtocol) return '';
-
-    return assetUrlConverter(notificationProtocol?.icon || '');
-};
 
 const handleRouteDetail = () => (
     serviceDetailPageStore.setCurrentTab(SERVICE_DETAIL_TABS.NOTIFICATIONS)
 );
-
-const fetchServiceChannelList = async (serviceId: string) => {
-    state.loading = true;
-    try {
-        await serviceDetailPageStore.fetchServiceChannelList(serviceId);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => storeState.serviceId, (serviceId) => {
-    if (!serviceId) return;
-    fetchServiceChannelList(serviceId);
-}, { immediate: true });
 </script>
 
 <template>
@@ -90,10 +68,10 @@ watch(() => storeState.serviceId, (serviceId) => {
                        size="lg"
                        font-weight="regular"
         />
-        <p-data-loader :loading="state.loading"
-                       :data="storeState.serviceChannelList"
+        <p-data-loader :loading="serviceChannelListFetching"
+                       :data="serviceChannelListData"
                        class="content flex-1 pt-2"
-                       :class="{ 'empty': !storeState.serviceChannelList.length }"
+                       :class="{ 'empty': !serviceChannelListData.length }"
         >
             <div ref="rowItemsWrapperRef"
                  class="row-items-wrapper"
@@ -101,7 +79,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                 <div ref="itemEl"
                      class="row-items-container"
                 >
-                    <div v-for="(item, idx) in storeState.serviceChannelList"
+                    <div v-for="(item, idx) in serviceChannelListData"
                          :key="`service-detail-notification-item-${idx}`"
                          class="item"
                     >
@@ -112,7 +90,7 @@ watch(() => storeState.serviceId, (serviceId) => {
                                  height="1.25rem"
                             />
                             <p-lazy-img v-else
-                                        :src="getPluginIcon(item.protocol_id)"
+                                        :src="assetUrlConverter(getProtocolInfo(item.protocol_id, notificationProtocolListData).icon || '')"
                                         width="1.25rem"
                                         height="1.25rem"
                             />

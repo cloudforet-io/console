@@ -1,34 +1,33 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 import type { RawLocation } from 'vue-router/types/router';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PBadge, PDefinitionTable, PPaneLayout, PLink, PTextButton,
+    PBadge, PDefinitionTable,
+    PLink,
+    PPaneLayout,
+    PTextButton,
 } from '@cloudforet/mirinae';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertSeverityType } from '@/schema/alert-manager/alert/type';
-import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
-import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
+import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertSeverityType } from '@/api-clients/alert-manager/alert/schema/type';
+import { useCloudServiceApi } from '@/api-clients/inventory/cloud-service/composables/use-cloud-service-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
+import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertDetailInfoTableDescription from '@/services/alert-manager/v2/components/AlertDetailInfoTableDescription.vue';
+import { useAlertGetQuery } from '@/services/alert-manager/v2/composables/use-alert-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 type BadgeInfo = {
@@ -36,23 +35,41 @@ type BadgeInfo = {
     styleType: string;
 };
 
-const alertDetailPageStore = useAlertDetailPageStore();
-const alertDetailPageState = alertDetailPageStore.state;
-const alertDetailPageGetters = alertDetailPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const userStore = useUserStore();
+const userState = userStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
+const referenceMap = useAllReferenceDataModel();
 
 const router = useRouter();
+const route = useRoute();
+
+const { alertData } = useAlertGetQuery(route.params.alertId as string);
 
 const queryHelper = new QueryHelper();
 
+const cloudServiceState = reactive({
+    id: '',
+    type: undefined as string | undefined,
+    params: computed(() => {
+        const [provider, group, name] = cloudServiceState.type.split('.');
+        if (cloudServiceState.type) {
+            return {
+                provider,
+                group,
+                name,
+                id: cloudServiceState.id,
+            };
+        }
+        return {
+            provider: cloudServiceData.value?.provider || provider,
+            group: cloudServiceData.value?.cloud_service_group || group,
+            name: cloudServiceData.value?.cloud_service_type || name,
+            id: cloudServiceData.value?.cloud_service_id || cloudServiceState.id,
+        };
+    }),
+});
 const storeState = reactive({
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    timezone: computed<string>(() => alertDetailPageGetters.timezone),
-    alertInfo: computed<AlertModel>(() => alertDetailPageState.alertInfo),
-    cloudServiceTypeInfo: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
-    serviceMap: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
+    timezone: computed<string>(() => userState.timezone || 'UTC'),
 });
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
@@ -60,7 +77,7 @@ const tableState = reactive({
         { name: 'description', label: i18n.t('ALERT_MANAGER.ALERTS.DESC'), disableCopy: true },
         { name: 'rule', label: i18n.t('ALERT_MANAGER.ALERTS.RULE'), disableCopy: true },
         { name: 'severity', label: i18n.t('ALERT_MANAGER.ALERTS.SEVERITY'), disableCopy: true },
-        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => storeState.alertInfo.triggered_by },
+        { name: 'triggered_by', label: i18n.t('ALERT_MANAGER.ALERTS.TRIGGERED_BY'), copyValueFormatter: () => alertData.value?.triggered_by },
         { name: 'service_id', label: i18n.t('ALERT_MANAGER.ALERTS.SERVICE'), disableCopy: true },
         { name: 'resources', label: i18n.t('ALERT_MANAGER.ALERTS.RESOURCE'), disableCopy: true },
         { name: 'created_at', label: i18n.t('ALERT_MANAGER.ALERTS.CREATED'), disableCopy: true },
@@ -72,7 +89,7 @@ const tableState = reactive({
 
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return storeState.webhook[id]?.label || id;
+        return referenceMap.alertManagerWebhook[id]?.label || id;
     }
     return id || '--';
 };
@@ -123,54 +140,45 @@ const createRouteParams = (params: {
     },
 });
 
-const handleRouteViewButton = async (id: string, type?: string) => {
-    const [provider, group, name] = type?.split('.') || [];
+const { cloudServiceAPI } = useCloudServiceApi();
+const { key: cloudServiceQueryKey, params: cloudServiceQueryParams } = useServiceQueryKey('inventory', 'cloud-service', 'get', {
+    params: computed(() => ({
+        cloud_service_id: cloudServiceState.id,
+    })),
+});
+const { data: cloudServiceData } = useScopedQuery({
+    queryKey: cloudServiceQueryKey,
+    queryFn: () => cloudServiceAPI.get(cloudServiceQueryParams.value),
+    enabled: !!cloudServiceState.id,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 10,
+}, ['WORKSPACE']);
 
+const handleRouteViewButton = async (id: string, type?: string) => {
     if (!type && !id) {
         console.warn('Invalid parameters: both id and type are missing');
         return;
     }
 
-    try {
-        const routeParams = type ? {
-            provider, group, name, id,
-        } : await (async () => {
-            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-                cloud_service_id: id,
-            });
-            return {
-                provider: response.provider,
-                group: response.cloud_service_group,
-                name: response.cloud_service_type,
-                id: response.cloud_service_id,
-            };
-        })();
+    cloudServiceState.id = id;
+    cloudServiceState.type = type;
 
-        window.open(router.resolve(createRouteParams(routeParams)).href, '_blank');
-    } catch (e) {
-        if (!type) {
-            ErrorHandler.handleError(e, true);
-            return;
-        }
-        window.open(router.resolve(createRouteParams({
-            provider, group, name, id,
-        })).href, '_blank');
-    }
+    await window.open(router.resolve(createRouteParams(cloudServiceState.params)).href, '_blank');
 };
 </script>
 
 <template>
     <p-pane-layout class="alert-detail-info-table overflow-hidden pb-10">
         <p-definition-table :fields="tableState.fields"
-                            :data="storeState.alertInfo"
+                            :data="alertData"
                             :skeleton-rows="10"
                             custom-key-width="10rem"
                             style-type="white"
                             block
         >
             <template #data-description>
-                <alert-detail-info-table-description :value="storeState.alertInfo.description"
-                                                     :alert-id="storeState.alertInfo.alert_id"
+                <alert-detail-info-table-description :value="alertData?.description || ''"
+                                                     :alert-id="alertData?.alert_id || ''"
                 />
             </template>
             <template #data-rule="{value}">
@@ -211,8 +219,8 @@ const handleRouteViewButton = async (id: string, type?: string) => {
                 <span>{{ getCreatedByNames(value) }}</span>
             </template>
             <template #data-service_id="{ value }">
-                <p-link v-if="storeState.serviceMap[value]?.label "
-                        :text="storeState.serviceMap[value]?.label"
+                <p-link v-if="referenceMap.service[value]?.label "
+                        :text="referenceMap.service[value]?.label"
                         :to="{
                             name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                             params: {
@@ -230,11 +238,11 @@ const handleRouteViewButton = async (id: string, type?: string) => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #data-acknowledged_at="{ value }">
-                <span v-if="storeState.alertInfo.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="alertData?.acknowledged_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-resolved_at="{ value }">
-                <span v-if="storeState.alertInfo.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
+                <span v-if="alertData?.resolved_at"> {{ iso8601Formatter(value, storeState.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-labels="{ value }">

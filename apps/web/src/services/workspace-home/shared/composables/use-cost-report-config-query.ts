@@ -3,8 +3,8 @@ import type { Ref } from 'vue';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 
 const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);

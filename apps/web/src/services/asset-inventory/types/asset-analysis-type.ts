@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { ManipulateType } from 'dayjs';
 
-import type { NamespaceCategory, NamespaceGroup } from '@/schema/inventory/namespace/type';
+import type { NamespaceCategory, NamespaceGroup } from '@/api-clients/inventory/namespace/schema/type';
 
 import type {
     GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,

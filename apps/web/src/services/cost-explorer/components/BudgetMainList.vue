@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue';
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 
@@ -10,45 +10,43 @@ import dayjs from 'dayjs';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter, Sort } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolboxTable, PSelectDropdown, PI, PProgressBar, PStatus, PLink,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { BudgetListParameters } from '@/api-clients/cost-analysis/budget/schema/api-verbs/list';
+import type { BudgetUsageAnalyzeResult } from '@/api-clients/cost-analysis/budget-usage/schema/api-verbs/analyze';
 import type { BudgetModel } from '@/api-clients/cost-analysis/budget/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
-import type { Currency } from '@/store/display/type';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import type { ListResponse } from '@/lib/variable-models/_base/types';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import ProjectLinkButton from '@/common/modules/project/ProjectLinkButton.vue';
 
 import BudgetDeleteCheckModal from '@/services/cost-explorer/components/BudgetDeleteCheckModal.vue';
 import BudgetMainToolset from '@/services/cost-explorer/components/BudgetMainToolset.vue';
+import { useBudgetListPaginationQuery } from '@/services/cost-explorer/composables/use-budget-list-pagination-query';
+import { useBudgetUsageQuery } from '@/services/cost-explorer/composables/use-budget-usage-query';
 import { BUDGET_SEARCH_HANDLERS } from '@/services/cost-explorer/constants/budget-constant';
 import { BUDGET_EXCEL_FIELDS } from '@/services/cost-explorer/constants/budget-table-constant';
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import { useBudgetCreatePageStore } from '@/services/cost-explorer/stores/budget-create-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
-
 
 
 interface Props {
@@ -56,14 +54,13 @@ interface Props {
 }
 
 interface BudgetMainListState {
-    budgets: BudgetModel[];
-    budgetUsages: {budget_id: string; name: string; budget: number; actual_spend: number; utilization: number; date: string; currency: Currency}[];
+    budgetUsages: BudgetUsageAnalyzeResult[];
     more: boolean;
     loading: boolean;
     modalVisible: boolean;
     queryFilters: ConsoleFilter[];
-    pageStart: number;
     pageLimit: number;
+    thisPage: number;
     period: Period;
     query: any;
     isExpiredBudgetsHidden: boolean;
@@ -72,6 +69,8 @@ interface BudgetMainListState {
     isDeleteable: ComputedRef<boolean>;
     selectedBudgetIds: string[];
     addRequests: any;
+    totalCount: number;
+    sorting: Sort;
 }
 
 interface BudgetQuery {
@@ -82,6 +81,9 @@ interface BudgetQuery {
     serviceAccountList: any[];
     utilization?: string;
 }
+
+/* Query */
+const { budgetUsageAPI } = useBudgetUsageQuery();
 
 const props = withDefaults(defineProps<Props>(), {
     modalVisible: false,
@@ -95,8 +97,6 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const appContextStore = useAppContextStore();
 const serviceAccountReferenceStore = useServiceAccountReferenceStore();
-const budgetCreatePageStore = useBudgetCreatePageStore();
-const budgetCreatePageState = budgetCreatePageStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
 const projectReferenceStore = useProjectReferenceStore();
@@ -104,15 +104,49 @@ const projectReferenceStore = useProjectReferenceStore();
 const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const timeZone = computed<string>(() => userState.timezone || '');
 
+const { key: budgetUsageAnalyzeQueryKey, params: budgetUsageAnalyzeParams } = useServiceQueryKey('cost-analysis', 'budget-usage', 'analyze', {
+    params: computed(() => {
+        if (isAdminMode.value) {
+            budgetUsageApiQueryHelper.addFilter({
+                k: 'resource_group',
+                v: RESOURCE_GROUP.WORKSPACE,
+            });
+        }
+
+        return {
+            query: {
+                group_by: ['budget_id', 'date', 'cost'],
+                fields: {
+                    actual_spend: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+                ...budgetUsageApiQueryHelper.data,
+            },
+        };
+    }),
+});
+
+const { data: budgetUsageAnalyzeData, refetch: refetchBudgetUsageAnalyze, isLoading: isBudgetUsageAnalyzeLoading } = useScopedQuery({
+    queryKey: budgetUsageAnalyzeQueryKey,
+    queryFn: () => budgetUsageAPI.analyze(budgetUsageAnalyzeParams.value),
+    select: (data) => data?.results ?? [],
+    initialData: { results: [] },
+    initialDataUpdatedAt: 0,
+    staleTime: 1000 * 60 * 5,
+    enabled: true,
+}, ['DOMAIN', 'WORKSPACE']);
+
+
 const state = reactive<BudgetMainListState>({
-    budgets: [],
-    budgetUsages: [],
+    budgetUsages: budgetUsageAnalyzeData.value || [],
     more: false,
     loading: false,
     modalVisible: false,
     queryFilters: queryHelper.setFiltersAsRawQueryString(currentRoute.query.filters).filters,
-    pageStart: 1,
-    pageLimit: 24,
+    thisPage: 1,
+    pageLimit: 15,
     period: {},
     query: undefined,
     isExpiredBudgetsHidden: false,
@@ -121,6 +155,8 @@ const state = reactive<BudgetMainListState>({
     isDeleteable: computed<boolean>(() => state.selectedIndex.length > 0),
     selectedBudgetIds: [],
     addRequests: undefined,
+    totalCount: 0,
+    sorting: { key: 'utilization_rate', desc: true },
 });
 
 const tableState = reactive({
@@ -175,7 +211,7 @@ const tableState = reactive({
             width: '7%',
         },
     ],
-    items: computed(() => (state.budgets || []).map((budget: BudgetModel) => {
+    items: computed(() => (budgetList.value || []).map((budget: BudgetModel) => {
         const startDate = dayjs.utc(budget.start, 'YYYY-MM');
         const endDate = dayjs.utc(budget.end, 'YYYY-MM');
         return {
@@ -216,31 +252,10 @@ const tableState = reactive({
     })),
 });
 
-const budgetApiQueryHelper = new ApiQueryHelper()
-    .setPage(state.pageStart, state.pageLimit)
-    .setSort('utilization_rate', true);
+const budgetApiQueryHelper = new ApiQueryHelper();
 
 const queryTagHelper = useQueryTags({ keyItemSets: BUDGET_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
-
-const handleModalVisible = (visible: boolean) => {
-    emit('update:select-month-modal-visible', visible);
-};
-
-const handleQuery = (query: BudgetQuery) => {
-    state.query = query;
-};
-
-const handleDeleteConfirm = async () => {
-    budgetCreatePageState.loading = true;
-    try {
-        await fetchBudgets();
-        await listBudgetUsages();
-    } finally {
-        state.selectedIndex = [];
-        budgetCreatePageState.loading = false;
-    }
-};
 
 const getBudgetFilters = (): ApiFilter[] => {
     const filters: ApiFilter[] = [];
@@ -333,61 +348,50 @@ const getBudgetFilters = (): ApiFilter[] => {
     return filters;
 };
 
-/* API */
-const fetchBudgetUsages = async () => {
-    try {
-        state.loading = true;
-        if (isAdminMode.value) {
-            budgetUsageApiQueryHelper.addFilter({
-                k: 'resource_group',
-                v: RESOURCE_GROUP.WORKSPACE,
-            });
-        }
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+const {
+    data: budgetList, isLoading: isBudgetListLoading, totalCount: budgetListTotalCount, refresh: refreshBudgetList,
+} = useBudgetListPaginationQuery({
+    thisPage: computed(() => state.thisPage),
+    pageSize: computed(() => state.pageLimit),
+    params: computed(() => {
+        const filters = getBudgetFilters();
+        const _queryHelper = new ApiQueryHelper();
+
+        _queryHelper.setFilters(state.queryFilters);
+        const originalQuery = _queryHelper.data;
+
+        const mergedFilters = [
+            ...(originalQuery.filter ?? []),
+            ...filters,
+        ];
+
+        return {
             query: {
-                group_by: ['budget_id', 'name', 'date', 'currency', 'limit'],
-                fields: {
-                    actual_spend: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                    budget: {
-                        key: 'limit',
-                        operator: 'sum',
-                    },
-                },
-                page: { limit: 200 },
-                ...budgetUsageApiQueryHelper.data,
+                ...originalQuery,
+                filter: mergedFilters,
+                sort: [state.sorting],
             },
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return { more: false, results: [] };
+        };
+    }),
+});
+
+const handleModalVisible = (visible: boolean) => {
+    emit('update:select-month-modal-visible', visible);
+};
+
+const handleQuery = (query: BudgetQuery) => {
+    state.query = query;
+};
+
+const handleDeleteConfirm = async () => {
+    try {
+        Promise.all([
+            refreshBudgetList(),
+            refetchBudgetUsageAnalyze(),
+        ]);
     } finally {
-        state.loading = false;
+        state.selectedIndex = [];
     }
-};
-
-
-const fetchBudgets = async () => {
-    if (state.loading) return;
-
-    const filters = getBudgetFilters();
-
-    const { results } = await SpaceConnector.clientV2.costAnalysis.budget.list<BudgetListParameters, ListResponse<BudgetModel>>({
-        query: {
-            filter: filters,
-            ...budgetApiQueryHelper.data,
-        },
-    });
-
-    state.budgets = results;
-};
-
-const listBudgetUsages = async () => {
-    const { more, results } = await fetchBudgetUsages();
-    state.budgetUsages = results ?? [];
-    state.more = !!more;
 };
 
 const getProjectName = (projectId: string): string|undefined => projectReferenceStore.getters.projectItems[projectId]?.label;
@@ -402,8 +406,6 @@ const handleDelete = () => {
 };
 
 const handleChange = async (options: any = {}) => {
-    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) {
         state.queryFilters = queryHelper.setFiltersAsQueryTag(options.queryTags).filters;
     }
@@ -412,22 +414,24 @@ const handleChange = async (options: any = {}) => {
         const key = options.sortBy ?? 'name';
         const desc = options.sortDesc ?? true;
         let budgetSortKey = key;
-        let usageSortKey = key;
 
         if (key === 'actualSpend') {
             budgetSortKey = 'name';
-            usageSortKey = 'utilization_rate';
         } else if (key === 'cycle') {
             budgetSortKey = 'time_unit';
         }
 
-        budgetApiQueryHelper.setSort(budgetSortKey, desc);
-        budgetUsageApiQueryHelper.setSort(usageSortKey, desc);
+        state.sorting = { key: budgetSortKey, desc };
     }
 
     budgetApiQueryHelper.setFilters(state.queryFilters);
-    await fetchBudgets();
-    await listBudgetUsages();
+};
+
+const handleRefresh = async () => {
+    Promise.all([
+        refreshBudgetList(),
+        refetchBudgetUsageAnalyze(),
+    ]);
 };
 
 const handleExportToExcel = async () => {
@@ -437,11 +441,11 @@ const handleExportToExcel = async () => {
             ...item,
             target: item.target.startsWith('project-') ? `Project: ${getProjectName(item.target)}` : `Service: ${getServiceAccountName(item.target)}`,
             cycle: item.cycle === 'TOTAL' ? i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.FIXED_TERM') : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MONTHLY'),
-            limit: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.limit}`,
-            actualSpend: `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
+            limit: `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${item.limit}`,
+            actualSpend: `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${Number(item.actualSpend).toFixed(3)}`,
             utilization_rate: `${item.utilization_rate}%`,
-            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
-                : `${CURRENCY_SYMBOL[state.budgets[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
+            remaining: item.remaining < 0 ? `-${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${Math.abs(item.remaining.toFixed(2)).toLocaleString()}`
+                : `${CURRENCY_SYMBOL[budgetList.value[idx].currency]} ${item.remaining.toFixed(2).toLocaleString()}`,
         })),
         file_name_prefix: FILE_NAME_PREFIX.budget,
         timezone: timeZone.value,
@@ -453,23 +457,17 @@ watch(() => state.query, async () => {
     state.addRequests = {
         project_id: state.query?.projectList ?? [],
     };
-    await fetchBudgets();
+    await refreshBudgetList();
 }, { deep: true, immediate: true });
 
 watch(() => state.selectedIndex, () => {
     state.selectedBudgetIds = [];
     if (state.selectedIndex.length > 0) {
         state.selectedIndex.forEach((i) => {
-            state.selectedBudgetIds.push(state.budgets[i].budget_id);
+            state.selectedBudgetIds.push(budgetList.value[i].budget_id);
         });
     }
 }, { immediate: true });
-
-/* Mounted */
-onMounted(async () => {
-    await fetchBudgets();
-    await listBudgetUsages();
-});
 </script>
 
 <template>
@@ -486,21 +484,25 @@ onMounted(async () => {
                              sortable
                              sort-desc
                              sort-by="utilization_rate"
-                             pagination-visible
                              exportable
                              search-type="query"
                              searchable
+                             :this-page.sync="state.thisPage"
+                             :page-size.sync="state.pageLimit"
+                             :total-count="budgetListTotalCount"
+                             :loading="isBudgetListLoading || isBudgetUsageAnalyzeLoading"
                              :select-index="state.selectedIndex"
                              :key-item-sets="BUDGET_SEARCH_HANDLERS"
                              :value-handler-map="tableState.valueHandlerMap"
                              :query-tags="queryTags"
                              @update:select-index="handleUpdateSelectIndex"
                              @change="handleChange"
-                             @refresh="handleChange()"
+                             @refresh="handleRefresh"
                              @export="handleExportToExcel"
             >
                 <template #toolbox-left>
-                    <p-select-dropdown placeholder="Action"
+                    <p-select-dropdown v-if="!isAdminMode"
+                                       placeholder="Action"
                                        :menu="tableState.actionMenus"
                                        :selected.sync="tableState.selectedActionItem"
                                        reset-selected-on-unmounted
@@ -513,7 +515,7 @@ onMounted(async () => {
                                 :to="{
                                     name: isAdminMode ? ADMIN_COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME : COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                                     params: {
-                                        budgetId: state.budgets[rowIndex].budget_id
+                                        budgetId: budgetList[rowIndex].budget_id
                                     }
                                 }"
                         >
@@ -525,7 +527,7 @@ onMounted(async () => {
                     <p class="flex gap-0.5"
                        :class="{ expired: item.state === 'EXPIRED' }"
                     >
-                        <span>{{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}</span>
+                        <span>{{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}</span>
                         <span>{{ Number(value).toLocaleString() }}</span>
                     </p>
                 </template>
@@ -568,7 +570,7 @@ onMounted(async () => {
                 </template>
                 <template #col-actualSpend-format="{item, value, rowIndex}">
                     <p :class="{ expired: item.state === 'EXPIRED' }">
-                        {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
+                        {{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}
                         {{ Number(value).toLocaleString() }}
                     </p>
                 </template>
@@ -586,7 +588,7 @@ onMounted(async () => {
                 </template>
                 <template #col-remaining-format="{item, value, rowIndex}">
                     <p :class="{exceeded: Number(value) < 0, expired: item.state === 'EXPIRED' }">
-                        {{ CURRENCY_SYMBOL[state.budgets[rowIndex].currency] }}
+                        {{ CURRENCY_SYMBOL[budgetList[rowIndex].currency] }}
                         {{ Math.abs(value.toFixed(2)).toLocaleString() }}
                     </p>
                 </template>

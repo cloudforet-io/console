@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/vue-query';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskListParameters } from '@/api-clients/opsflow/task/schema/api-verbs/list';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

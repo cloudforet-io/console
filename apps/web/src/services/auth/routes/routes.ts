@@ -74,6 +74,7 @@ export default [
                     isCentered: true,
                 },
                 props: (route) => ({
+                    ssoAccessToken: route.query.sso_access_token,
                     previousPath: route.query.previousPath,
                     redirectPath: route.query.redirectPath,
                 }),

@@ -9,7 +9,8 @@ import {
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
-import { useAlertDetailPageStore } from '@/services/alert-manager/v2/stores/alert-detail-page-store';
+import { useAlertUpdateMutation } from '@/services/alert-manager/v2/composables/use-alert-update-mutation';
+
 
 interface Props {
     value: string
@@ -20,8 +21,6 @@ const props = withDefaults(defineProps<Props>(), {
     alertId: '',
 });
 
-const alertDetailPageStore = useAlertDetailPageStore();
-
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const state = reactive({
@@ -29,11 +28,13 @@ const state = reactive({
     dataForUpdate: '',
 });
 
+const { mutate: alertUpdateMutate } = useAlertUpdateMutation();
+
 const handleClickEditModeButton = (value: boolean) => {
     state.isEditMode = value;
 };
-const handleClickSaveButton = async () => {
-    await alertDetailPageStore.updateAlertDetail({
+const handleClickSaveButton = () => {
+    alertUpdateMutate({
         alert_id: props.alertId,
         description: state.dataForUpdate || ' ',
     });

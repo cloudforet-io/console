@@ -10,7 +10,6 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-
 import { i18n } from '@/translations';
 
 import SelectBox from '@/common/components/select/SelectBox.vue';
@@ -19,6 +18,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { red } from '@/styles/colors';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
 import type {
     AttachedServiceAccount,
     AttachedServiceAccountType, ServiceAccountFilterOption,
@@ -61,8 +61,8 @@ const state = reactive({
         return !invalidState.selectedAttachedServiceAccount;
     }),
     handlerParams: computed(() => {
-        if (collectorFormState.collectorProvider) {
-            queryHelper.addFilter({ k: 'provider', v: collectorFormState.collectorProvider, o: '=' });
+        if (originCollectorData.value?.provider) {
+            queryHelper.addFilter({ k: 'provider', v: originCollectorData.value.provider, o: '=' });
         } else if (collectorFormState.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormState.provider, o: '=' });
         } else if (collectorFormState.repositoryPlugin?.provider) {
@@ -133,6 +133,11 @@ const {
     },
 });
 
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
+
 const handleChangeAttachedServiceAccountType = (selectedValue: AttachedServiceAccountType) => {
     collectorFormStore.$patch((_state) => {
         _state.state.attachedServiceAccountType = selectedValue;
@@ -156,11 +161,6 @@ const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOpt
 
 watch(() => isAllValid.value, (value) => {
     emit('update:isAttachedServiceAccountValid', value);
-}, { immediate: true });
-
-watch(() => collectorFormState.collectorId, (collectorId) => {
-    if (props.resetOnCollectorIdChange && !collectorId) return;
-    collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 watch(() => collectorFormState.provider, () => {

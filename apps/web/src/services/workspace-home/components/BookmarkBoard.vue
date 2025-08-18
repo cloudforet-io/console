@@ -5,7 +5,12 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PLazyImg, PI, PEmpty, PCheckbox, PBoardItem, PSelectDropdown,
+    PBoardItem,
+    PCheckbox,
+    PEmpty,
+    PI,
+    PLazyImg,
+    PSelectDropdown,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
@@ -23,6 +28,8 @@ import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
 import { blue, gray } from '@/styles/colors';
 
+import { useBookmarkFolderListQuery } from '@/services/workspace-home/composables/use-bookmark-folder-list-query';
+import { useBookmarkListQuery } from '@/services/workspace-home/composables/use-bookmark-list-query';
 import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { BookmarkType } from '@/services/workspace-home/types/workspace-home-type';
@@ -45,8 +52,10 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
 const authorizationStore = useAuthorizationStore();
+
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+const { bookmarkList, refreshBookmarkList } = useBookmarkListQuery();
 
 const storeState = reactive({
     isWorkspaceMember: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
@@ -56,8 +65,6 @@ const storeState = reactive({
     filterByFolder: computed<TranslateResult|undefined>(() => bookmarkState.filterByFolder),
 
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-    bookmarkFolderData: computed<BookmarkItem[]>(() => workspaceHomePageState.bookmarkFolderData),
-    bookmarkList: computed<BookmarkItem[]>(() => workspaceHomePageGetters.bookmarkList),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -121,12 +128,13 @@ const handleClickItem = (item) => {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK, false);
         } else {
             workspaceHomePageStore.setFileFullMode(true, item);
-            workspaceHomePageStore.fetchBookmarkList();
+            refreshBookmarkList();
         }
         return;
     }
     if (item.icon) {
         workspaceHomePageStore.setFullMode(true);
+        refreshBookmarkList();
     } else {
         window.open(item.link, '_blank');
     }
@@ -152,7 +160,7 @@ const checkSelectedId = (id?: string) => {
     <div class="bookmark-board"
          :class="{
              [props.isFullMode ? 'full-board' : 'collapsed-board']: true,
-             'no-data': storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0
+             'no-data': bookmarkFolderListData.length === 0 && bookmarkList.length === 0
          }"
     >
         <div v-if="props.boardList.length > 0"

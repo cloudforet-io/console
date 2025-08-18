@@ -4,8 +4,6 @@ import {
     watch,
 } from 'vue';
 
-import { useQuery } from '@tanstack/vue-query';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -19,10 +17,10 @@ import type { DataTableField } from '@cloudforet/mirinae/types/data-display/tabl
 import type { TaskCategoryModel } from '@/api-clients/opsflow/task-category/schema/model';
 import type { TaskTypeModel } from '@/api-clients/opsflow/task-type/schema/model';
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
 import { i18n } from '@/translations';
-
-import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useTimezoneDate } from '@/common/composables/timezone-date';
@@ -38,34 +36,32 @@ import {
 import type { TaskFilters } from '@/services/ops-flow/types/task-filters-type';
 
 
+
 const props = defineProps<{
     categoryId?: string;
     relatedAssets?: string[];
     tag?: string;
 }>();
 
-const userReferenceStore = useUserReferenceStore();
 const taskManagementTemplateStore = useTaskManagementTemplateStore();
+const referenceMap = useAllReferenceDataModel();
 
 /* toolbox */
 const search = ref<string>('');
 const pagination = reactive({
     page: 1,
     size: 15,
-    total: 0,
+    // total: 0,
 });
 const sort = reactive({
     key: 'created_at',
     desc: true,
 });
 const handleRefresh = () => {
-    refetch();
-    // refetch({ throwOnError: true, cancelRefetch: false });
+    query.refetch();
 };
 const handleChange = (options: ToolboxOptions) => {
     if (options.searchText !== undefined) search.value = options.searchText;
-    if (options.pageStart !== undefined) pagination.page = options.pageStart;
-    if (options.pageLimit !== undefined) pagination.size = options.pageLimit;
     if (options.sortBy !== undefined) sort.key = options.sortBy;
     if (options.sortDesc !== undefined) sort.desc = options.sortDesc;
 };
@@ -130,33 +126,30 @@ const { key: taskListQueryKey, params: taskListQueryParams } = useServiceQueryKe
     params: computed(() => ({
         query: taskListApiQuery.value,
     })),
+    pagination: true,
 });
+
 const {
-    data, error, refetch, isLoading,
-} = useQuery({
-    queryKey: computed(() => taskListQueryKey.value),
-    queryFn: async () => {
-        const res = await taskAPI.list(taskListQueryParams.value);
-        return {
-            results: res.results ?? [],
-            totalCount: res.total_count,
-        };
-    },
+    data, totalCount, isLoading, query,
+} = useScopedPaginationQuery({
+    queryKey: taskListQueryKey,
+    queryFn: taskAPI.list,
+    params: taskListQueryParams,
     enabled: computed(() => !isLoadingCategories.value && !isLoadingTaskTypes.value),
     refetchOnMount: true,
     // time control
     gcTime: 1000 * 60 * 2, // 2 minutes
     staleTime: 1000 * 30, // 30 seconds
-});
+}, {
+    thisPage: computed(() => pagination.page),
+    pageSize: computed(() => pagination.size),
+    verb: 'list',
+}, ['WORKSPACE']);
+
 const tasks = computed(() => data.value?.results);
-watch(error, (err) => {
+watch(query.error, (err) => {
     if (err) ErrorHandler.handleError(err);
 });
-watch(data, (d) => {
-    if (!d) return;
-    pagination.total = d.totalCount || 0;
-}, { immediate: true });
-
 
 /* table fields */
 const fields = computed<DataTableField[] >(() => [
@@ -237,8 +230,9 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
         <div class="px-4 pb-4">
             <p-toolbox class="mb-2"
                        :search-text="search"
-                       :page-size="pagination.size"
-                       :total-count="pagination.total"
+                       :this-page.sync="pagination.page"
+                       :page-size.sync="pagination.size"
+                       :total-count="totalCount"
                        @refresh="handleRefresh"
                        @change="handleChange"
             />
@@ -279,10 +273,10 @@ const { getTimezoneDate, getDuration } = useTimezoneDate();
                 />
             </template>
             <template #col-assignee-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.workspaceUser[value]?.label || referenceMap.workspaceUser[value]?.name || value }}
             </template>
             <template #col-created_by-format="{value}">
-                {{ userReferenceStore.getters.userItems[value]?.label || userReferenceStore.getters.userItems[value]?.name || value }}
+                {{ referenceMap.workspaceUser[value]?.label || referenceMap.workspaceUser[value]?.name || value }}
             </template>
             <template #col-created_at-format="{value}">
                 {{ getTimezoneDate(value) }}

@@ -4,12 +4,17 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
-    PToolboxTable, PLazyImg, PI, PDataLoader, PSelectDropdown, PLink, PSelectStatus,
+    PDataLoader,
+    PI,
+    PLazyImg,
+    PLink,
+    PSelectDropdown,
+    PSelectStatus,
+    PToolboxTable,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { KeyItemSet, ValueHandlerMap, ValueItem } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
 import { i18n } from '@/translations';
 
 import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
@@ -27,6 +32,9 @@ import {
 import {
     getWorkspaceInfo,
 } from '@/services/advanced/composables/refined-table-data';
+import { useBookmarkFolderListQuery } from '@/services/advanced/composables/use-bookmark-folder-list-query';
+import { useBookmarkListQuery } from '@/services/advanced/composables/use-bookmark-list-query';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { BOOKMARK_TYPE, PageSizeOptions } from '@/services/advanced/constants/bookmark-constant';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
@@ -42,20 +50,20 @@ const props = defineProps<Props>();
 const bookmarkStore = useBookmarkStore();
 const bookmarkPageStore = useBookmarkPageStore();
 const bookmarkPageState = bookmarkPageStore.state;
-const bookmarkPageGetters = bookmarkPageStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 
+const { workspaceListData } = useWorkspaceListQuery();
+const { bookmarkFolderListData } = useBookmarkFolderListQuery();
+const {
+    refresh: refreshBookmarkList, entireBookmarkList, bookmarkList, isFetchingSharedConfig,
+} = useBookmarkListQuery();
+
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkPageState.bookmarkFolderList),
-    bookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.bookmarkList),
-    entireBookmarkList: computed<BookmarkItem[]>(() => bookmarkPageGetters.entireBookmarkList),
-    workspaceList: computed<WorkspaceModel[]>(() => bookmarkPageState.workspaceList),
     selectedIndices: computed<number[]>(() => bookmarkPageState.selectedIndices),
     pageStart: computed<number>(() => bookmarkPageState.pageStart),
     pageLimit: computed<number>(() => bookmarkPageState.pageLimit),
-    loading: computed<boolean>(() => bookmarkPageState.loading),
     selectedType: computed<string>(() => bookmarkPageState.selectedType),
     searchFilter: computed<ConsoleFilter[]>(() => bookmarkPageState.searchFilter),
 });
@@ -65,11 +73,13 @@ const tableState = reactive({
             name: 'name',
             label: 'Name',
             type: 'item',
+            sortable: false,
         },
         {
             name: 'workspace_id',
             label: 'Scope',
             type: 'item',
+            sortable: false,
         },
         {
             name: 'link',
@@ -93,9 +103,9 @@ const tableState = reactive({
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeValueHandler(storeState.entireBookmarkList, 'name'),
-        scope: makeValueHandler(storeState.entireBookmarkList, 'scope'),
-        link: makeValueHandler(storeState.entireBookmarkList, 'link'),
+        name: makeValueHandler(entireBookmarkList.value, 'name'),
+        scope: makeValueHandler(entireBookmarkList.value, 'scope'),
+        link: makeValueHandler(entireBookmarkList.value, 'link'),
     })),
     typeField: computed<ValueItem[]>(() => ([
         { label: i18n.t('IAM.BOOKMARK.ALL') as string, name: 'All' },
@@ -109,15 +119,10 @@ const state = reactive({
 
 const getFolderInfo = (id: string): BookmarkItem|undefined => {
     if (!id) return undefined;
-    return storeState.bookmarkFolderList.find((i) => i.id === id);
+    return bookmarkFolderListData.value.find((i) => i.id === id);
 };
 const handleSelectType = (value: string) => {
     bookmarkPageStore.setSelectedType(value);
-    if (value === 'All') {
-        fetchBookmarkList();
-    } else {
-        fetchBookmarkList(value);
-    }
 };
 const handleUpdateSelectIndex = async (indices: number[]) => {
     bookmarkPageStore.setSelectedBookmarkIndices(indices);
@@ -126,7 +131,6 @@ const handleChange = (options: any = {}) => {
     if (options.queryTags !== undefined) {
         const filters = makeSearchQueryTagsHandler(options.queryTags);
         bookmarkPageStore.setBookmarkListSearchFilters(filters);
-        fetchBookmarkList();
     }
     if (options.pageStart !== undefined) {
         bookmarkPageStore.setBookmarkListPageStart(options.pageStart - 1);
@@ -200,22 +204,17 @@ const getDropdownMenu = (item: BookmarkItem) => {
     return defaultSets;
 };
 
-const fetchBookmarkList = async (selectedType?: string) => {
-    await bookmarkPageStore.fetchBookmarkList(selectedType);
-};
-
-watch(() => route.params, async () => {
-    bookmarkPageStore.setParams(undefined);
+watch(() => route.params, async (params) => {
+    bookmarkPageStore.setParams(params);
     await bookmarkPageStore.setSelectedBookmarkIndices([]);
     await bookmarkPageStore.setBookmarkListPageStart(0);
     await bookmarkPageStore.setSelectedType('All');
-    await fetchBookmarkList();
 }, { immediate: true });
 </script>
 
 <template>
     <section class="bookmark-management-table">
-        <p-data-loader :loading="storeState.loading"
+        <p-data-loader :loading="isFetchingSharedConfig"
                        class="data-loader-wrapper"
                        :data="true"
         >
@@ -230,13 +229,13 @@ watch(() => route.params, async () => {
                              :page-size-options="PageSizeOptions"
                              :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
-                             :total-count="bookmarkPageGetters.entireBookmarkList.length"
-                             :items="storeState.bookmarkList"
+                             :total-count="entireBookmarkList.length"
+                             :items="bookmarkList"
                              :key-item-sets="tableState.keyItemSets"
                              :value-handler-map="tableState.valueHandlerMap"
                              :get-row-selectable="getRowSelectable"
                              @change="handleChange"
-                             @refresh="fetchBookmarkList"
+                             @refresh="refreshBookmarkList"
                              @update:select-index="handleUpdateSelectIndex"
             >
                 <template v-if="!state.folder"
@@ -297,7 +296,7 @@ watch(() => route.params, async () => {
                             />
                             <span class="global">{{ $t('IAM.BOOKMARK.GLOBAL_BOOKMARK') }}</span>
                         </div>
-                        <p-link v-else-if="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.state === WORKSPACE_STATE.ENABLE"
+                        <p-link v-else-if="getWorkspaceInfo(item.workspaceId, workspaceListData)?.state === WORKSPACE_STATE.ENABLE"
                                 :to="{
                                     name: WORKSPACE_HOME_ROUTE._NAME,
                                     params: {
@@ -308,20 +307,20 @@ watch(() => route.params, async () => {
                                 new-tab
                                 class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, workspaceListData)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, workspaceListData)?.name }}</span>
                         </p-link>
                         <div v-else
                              class="workspace"
                         >
-                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name || ''"
-                                                 :theme="getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.tags?.theme"
+                            <workspace-logo-icon :text="getWorkspaceInfo(item.workspaceId, workspaceListData)?.name || ''"
+                                                 :theme="getWorkspaceInfo(item.workspaceId, workspaceListData)?.tags?.theme"
                                                  size="xs"
                             />
-                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, storeState.workspaceList)?.name }}</span>
+                            <span class="text">{{ getWorkspaceInfo(item.workspaceId, workspaceListData)?.name }}</span>
                         </div>
                         <div v-if="item.folder"
                              class="folder-wrapper"

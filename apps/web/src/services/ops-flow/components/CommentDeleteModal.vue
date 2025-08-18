@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { useCommentApi } from '@/api-clients/opsflow/comment/composables/use-comment-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { getParticle, i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

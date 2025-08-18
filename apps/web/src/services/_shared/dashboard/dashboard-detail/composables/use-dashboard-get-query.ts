@@ -12,9 +12,9 @@ import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/
 import type { PublicDashboardGetParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/get';
 import type { PublicDashboardUpdateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/update';
 import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import type { QueryKeyArray } from '@/query/query-key/_types/query-key-type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 const STALE_TIME = 1000 * 60 * 5;
 

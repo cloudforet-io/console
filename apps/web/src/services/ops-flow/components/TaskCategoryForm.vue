@@ -8,7 +8,7 @@ import {
 } from '@cloudforet/mirinae';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n, getParticle } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

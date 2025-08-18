@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldTitle, PIconButton, PLazyImg, PDivider, PTextButton, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { WebhookListParameters } from '@/schema/alert-manager/webhook/api-verbs/list';
-import type { WebhookModel } from '@/schema/alert-manager/webhook/model';
+import type { WebhookModel } from '@/api-clients/alert-manager/webhook/schema/model';
 
 import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useWebhookListQuery } from '@/services/alert-manager/v2/composables/use-webhook-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
@@ -29,16 +26,17 @@ const itemEl = ref<null | HTMLElement>(null);
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => serviceDetailPageGetters.pluginsReferenceMap),
-    serviceId: computed<string>(() => serviceDetailPageGetters.serviceInfo.service_id),
 });
 const state = reactive({
-    loading: true,
     pageStart: 0,
-    items: [] as WebhookModel[],
+    items: computed<WebhookModel[]>(() => webhookListData.value.slice(0, 15)),
     visibleCount: computed<number>(() => Math.floor((rowItemsWrapperWidth.value - DEFAULT_LEFT_PADDING) / ITEM_DEFAULT_WIDTH)),
     pageMax: computed<number>(() => Math.max(state.items.length - state.visibleCount, 0)),
 });
@@ -63,28 +61,7 @@ const handleClickWebhookItem = (id: string) => {
     serviceDetailPageStore.setSelectedWebhookId(id);
 };
 
-const fetchWebhookList = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
-            service_id: storeState.serviceId,
-            query: {
-                sort: [{ key: 'created_at', desc: true }],
-            },
-        });
-        state.items = (results || []).slice(0, 15);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-    } finally {
-        state.loading = false;
-    }
-};
-
-watch(() => storeState.serviceId, (serviceId) => {
-    if (!serviceId) return;
-    fetchWebhookList();
-}, { immediate: true });
+const { webhookListData, webhookListFetching } = useWebhookListQuery(serviceId);
 </script>
 
 <template>
@@ -98,7 +75,7 @@ watch(() => storeState.serviceId, (serviceId) => {
              class="row-items-wrapper"
              :class="{'empty': !state.items.length}"
         >
-            <p-data-loader :loading="state.loading"
+            <p-data-loader :loading="webhookListFetching"
                            :data="state.items"
             >
                 <div ref="itemEl"

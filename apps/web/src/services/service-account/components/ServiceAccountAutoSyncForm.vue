@@ -7,7 +7,9 @@ import { range } from 'lodash';
 import {
     PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,
 } from '@cloudforet/mirinae';
+import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -17,14 +19,15 @@ import ServiceAccountAutoSyncMappingMethod
     from '@/services/service-account/components/ServiceAccountAutoSyncMappingMethod.vue';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
 
-
 const MAX_TIME_COUNT = 2;
-
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const serviceAccountPageState = serviceAccountPageStore.state;
 const appContextStore = useAppContextStore();
 const userStore = useUserStore();
+
+const referenceMap = useAllReferenceDataModel();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -34,15 +37,16 @@ const state = reactive({
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
-        return serviceAccountPageStore.formState.scheduleHours.map((utcHour) => dayjs.utc()
+        return serviceAccountPageFormState.scheduleHours.map((utcHour) => dayjs.utc()
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
+    autoSyncAdditionalOptionsSchema: computed<JsonSchema|undefined>(() => referenceMap.provider[serviceAccountPageState.selectedProvider]?.data?.plugin_info?.metadata?.additional_options_schema),
     isScheduleHoursValid: computed(() => ((state.isAutoSyncEnabled) ? !!serviceAccountPageFormState.scheduleHours.length : true)),
     isAdditionalOptionsValid: false,
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
-        return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
+        return state.isScheduleHoursValid && (state.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
     }),
 });
 
@@ -102,22 +106,22 @@ watch(() => state.isAllValid, (isAllValid) => {
                              @change-toggle="handleChangeToggle"
             /><p>
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
-                    provider: serviceAccountPageStore.getters.selectedProviderItem.label,
+                    provider: referenceMap.provider[serviceAccountPageState.selectedProvider]?.label || serviceAccountPageState.selectedProvider,
                 }) }}
             </p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
             <service-account-auto-sync-mapping-method mode="UPDATE" />
-            <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
+            <div v-if="state.autoSyncAdditionalOptionsSchema">
                 <p-field-title label="Additional Options"
                                size="lg"
                                class="mb-2"
                 />
                 <p-pane-layout class="p-4 mb-8">
-                    <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                    <p-json-schema-form v-if="state.autoSyncAdditionalOptionsSchema"
                                         class="p-json-schema-form"
                                         :form-data="serviceAccountPageFormState.additionalOptions"
-                                        :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                        :schema="state.autoSyncAdditionalOptionsSchema"
                                         :language="state.language"
                                         @update:form-data="handleChangeAdditionalOptions"
                                         @validate="handleAdditionalOptionsValidate"

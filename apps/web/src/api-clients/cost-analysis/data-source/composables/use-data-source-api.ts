@@ -7,16 +7,7 @@ import type { CostDataSourceSyncParameters } from '@/api-clients/cost-analysis/d
 import type { CostDataSourceUpdatePermissionsParameters } from '@/api-clients/cost-analysis/data-source/schema/api-verbs/update-permissions';
 import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
 
-interface UseDataSourceApiReturn {
-    dataSourceAPI: {
-        get: (params: CostDataSourceGetParameters) => Promise<CostDataSourceModel>;
-        list: (params: CostDataSourceListParameters) => Promise<ListResponse<CostDataSourceModel>>;
-        sync: (params: CostDataSourceSyncParameters) => Promise<void>;
-        updatePermissions: (params: CostDataSourceUpdatePermissionsParameters) => Promise<CostDataSourceModel>;
-    }
-}
-
-export const useDataSourceApi = (): UseDataSourceApiReturn => {
+export const useDataSourceApi = () => {
     const actions = {
         get: SpaceConnector.clientV2.costAnalysis.dataSource.get<CostDataSourceGetParameters, CostDataSourceModel>,
         list: SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>,

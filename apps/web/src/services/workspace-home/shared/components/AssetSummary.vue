@@ -10,9 +10,6 @@ import {
 import { i18n } from '@/translations';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
-import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import type { PageAccessMap } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -21,6 +18,12 @@ import { objectToQueryString } from '@/lib/router-query-string';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
+import {
+    useWorkspaceHomeCollectorListQuery,
+} from '@/services/workspace-home/composables/use-workspace-home-collector-list-query';
+import {
+    useWorkspaceHomeServiceAccountListQuery,
+} from '@/services/workspace-home/composables/use-workspace-home-service-account-list-query';
 import AssetSummaryDailyUpdates from '@/services/workspace-home/shared/components/AssetSummaryDailyUpdates.vue';
 import AssetSummaryProvider from '@/services/workspace-home/shared/components/AssetSummaryProvider.vue';
 import EmptySummaryData from '@/services/workspace-home/shared/components/EmptySummaryData.vue';
@@ -40,20 +43,16 @@ const props = withDefaults(defineProps<{
     mode: 'workspace',
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const authorizationStore = useAuthorizationStore();
+const pageAccessPermissionMap = computed<PageAccessMap>(() => authorizationStore.getters.pageAccessPermissionMap);
 
-const storeState = reactive({
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
-    collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
-    pageAccessPermissionMap: computed<PageAccessMap>(() => authorizationStore.getters.pageAccessPermissionMap),
-});
+const { data: serviceAccountList } = useWorkspaceHomeServiceAccountListQuery();
+const { data: collectorList } = useWorkspaceHomeCollectorListQuery();
 const state = reactive({
-    isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
-    isNoServiceAccounts: computed<boolean>(() => !Object.keys(storeState.serviceAccounts).length),
-    writableServiceAccount: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.SERVICE_ACCOUNT]?.write),
-    writableServiceCollector: computed<boolean|undefined>(() => storeState.pageAccessPermissionMap[MENU_ID.COLLECTOR]?.write),
+    isNoCollectors: computed<boolean>(() => !collectorList.value?.length),
+    isNoServiceAccounts: computed<boolean>(() => !serviceAccountList.value?.length),
+    writableServiceAccount: computed<boolean|undefined>(() => pageAccessPermissionMap.value[MENU_ID.SERVICE_ACCOUNT]?.write),
+    writableServiceCollector: computed<boolean|undefined>(() => pageAccessPermissionMap.value[MENU_ID.COLLECTOR]?.write),
     emptyData: computed<EmptyData>(() => {
         let result;
         if (state.isNoServiceAccounts) {
@@ -73,7 +72,7 @@ const state = reactive({
         }
         return result;
     }),
-    accessLink: computed<boolean>(() => !isEmpty(storeState.pageAccessPermissionMap[MENU_ID.METRIC_EXPLORER])),
+    accessLink: computed<boolean>(() => !isEmpty(pageAccessPermissionMap.value[MENU_ID.METRIC_EXPLORER])),
 });
 
 const projectIds = computed(() => props.projectIds ?? []);

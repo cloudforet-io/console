@@ -7,8 +7,8 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 import {
     COLLECTOR_RULE_CONDITION_OPERATOR,
     COLLECTOR_RULE_CONDITION_OPERATOR_LABEL,
-} from '@/schema/inventory/collector-rule/constant';
-import type { CollectorRuleConditionOperator } from '@/schema/inventory/collector-rule/type';
+} from '@/api-clients/inventory/collector-rule/schema/constant';
+import type { CollectorRuleConditionOperator } from '@/api-clients/inventory/collector-rule/schema/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

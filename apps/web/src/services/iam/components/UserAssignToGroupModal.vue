@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep } from 'lodash';
 
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButtonModal } from '@cloudforet/mirinae';
 
-import type { UserGroupAddUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/add-users';
-import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import { useUserGroupApi } from '@/api-clients/identity/user-group/composables/use-user-group-api';
 import type { MembersType } from '@/api-clients/identity/user-group/schema/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -17,38 +17,58 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const state = reactive({
+const state = reactive<{
+    loading: boolean;
+    excludedSelectedIds: string[];
+    formattedMemberItems: Record<MembersType, string[]>;
+}>({
     loading: false,
     excludedSelectedIds: [],
-    formattedMemberItems: {} as Record<MembersType, string[]>,
+    formattedMemberItems: {},
+});
+
+const { userGroupAPI } = useUserGroupApi();
+const queryClient = useQueryClient();
+const { key: userGroupListQueryKey } = useServiceQueryKey('identity', 'user-group', 'list');
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { mutateAsync: addUsers, isPending: addUsersLoading } = useMutation({
+    mutationFn: userGroupAPI.addUsers,
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userGroupListQueryKey });
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey });
+        emit('confirm');
+        showSuccessMessage('', i18n.t('IAM.USER.ASSIGN_TO_USER_GROUP.SUCCESS_MESSAGE'));
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSettled: () => {
+        handleClose();
+    },
 });
 
 /* Component */
 const handleConfirm = async () => {
-    try {
-        state.loading = true;
-        const mappedUserGroupIds = state.formattedMemberItems.USER_GROUP;
-        const promises = mappedUserGroupIds.map(async (userGroupId) => {
-            await fetchAssignToUserGroup({
-                user_group_id: userGroupId,
-                users: userPageGetters.selectedUsers.map((selectedUser) => selectedUser.user_id),
-            });
+    const mappedUserGroupIds = state.formattedMemberItems.USER_GROUP;
+    const promises = mappedUserGroupIds.map(async (userGroupId) => {
+        await addUsers({
+            user_group_id: userGroupId,
+            users: selectedWorkspaceUsers.value?.map((selectedUser) => selectedUser.user_id),
         });
-        await Promise.all(promises);
-        emit('confirm');
-        showSuccessMessage('', i18n.t('IAM.USER.ASSIGN_TO_USER_GROUP.SUCCESS_MESSAGE'));
-    } finally {
-        state.loading = false;
-        handleClose();
-    }
+    });
+    await Promise.allSettled(promises);
 };
 
 const handleClose = () => {
@@ -62,19 +82,9 @@ const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.formattedMemberItems = value;
 };
 
-/* API */
-const fetchAssignToUserGroup = async (params: UserGroupAddUsersParameters) => {
-    try {
-        return await SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return {};
-    }
-};
-
 /* Watcher */
-watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_selected_users, nv_user_list]) => {
-    if (nv_selected_users.length === 1 && nv_user_list.length > 0 && Object.keys(nv_selected_users[0]).includes('userGroup')) {
+watch([() => selectedWorkspaceUsers.value, () => userPageState.users], ([nv_selected_users, nv_user_list]) => {
+    if (nv_selected_users?.length === 1 && nv_user_list.length > 0 && Object.keys(nv_selected_users[0]).includes('userGroup')) {
         state.excludedSelectedIds = nv_selected_users[0]?.user_group.map((userGroup) => userGroup.user_group_id);
     }
 }, { deep: true, immediate: true });
@@ -84,7 +94,7 @@ watch([() => userPageGetters.selectedUsers, () => userPageState.users], ([nv_sel
     <p-button-modal :header-title="userPageState.modal.title"
                     :visible="userPageState.modal.visible === 'assignToUserGroup'"
                     size="md"
-                    :loading="state.loading"
+                    :loading="addUsersLoading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"

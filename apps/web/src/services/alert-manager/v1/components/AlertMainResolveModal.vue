@@ -7,11 +7,11 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
-import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
-import type { NoteModel } from '@/schema/monitoring/note/model';
+import type { AlertUpdateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/update';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
+import type { NoteCreateParameters } from '@/api-clients/monitoring/note/schema/api-verbs/create';
+import type { NoteModel } from '@/api-clients/monitoring/note/schema/model';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

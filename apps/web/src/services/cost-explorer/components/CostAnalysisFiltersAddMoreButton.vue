@@ -21,6 +21,7 @@ import {
 
 import { UNIFIED_COST_KEY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 
 
@@ -31,15 +32,17 @@ const emit = defineEmits<{(e: 'disable-filter', value: string): void;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const { managedGroupByItems, additionalInfoGroupByItems, tagsFilterItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => storeState.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId ?? '']),
+    costDataSource: computed(() => storeState.costDataSource[costQuerySetState.selectedDataSourceId ?? '']),
 });
 
 const state = reactive({
@@ -61,7 +64,7 @@ const state = reactive({
     initiated: false,
     selectedItems: [] as MenuItem[],
     searchText: '',
-    dataSourceId: computed<string>(() => (costAnalysisPageGetters.isUnifiedCost ? UNIFIED_COST_KEY : (costAnalysisPageGetters.selectedDataSourceId ?? ''))),
+    dataSourceId: computed<string>(() => (costQuerySetState.isUnifiedCostOn ? UNIFIED_COST_KEY : (costQuerySetState.selectedDataSourceId ?? ''))),
 });
 
 const containerRef = ref<HTMLElement|null>(null);

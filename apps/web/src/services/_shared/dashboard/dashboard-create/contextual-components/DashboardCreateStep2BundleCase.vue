@@ -18,7 +18,7 @@ import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboar
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
 import type { PublicDashboardCreateParameters } from '@/api-clients/dashboard/public-dashboard/schema/api-verbs/create';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';

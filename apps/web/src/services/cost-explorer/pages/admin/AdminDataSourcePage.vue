@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -13,6 +13,7 @@ import { gray } from '@/styles/colors';
 
 import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
 import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
+import { useDataSourceListQuery } from '@/services/cost-explorer/composables/use-data-source-list-query';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
@@ -21,16 +22,12 @@ const userStore = useUserStore();
 
 const storeState = reactive({
     language: computed<string|undefined>(() => userStore.state.language),
-    totalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
-    selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
 });
 
-onMounted(() => {
-    dataSourcesPageStore.fetchDataSourceList();
-});
-
-onUnmounted(() => {
-    dataSourcesPageStore.reset();
+/* Query */
+const { totalCount } = useDataSourceListQuery({
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 15),
 });
 </script>
 
@@ -40,8 +37,8 @@ onUnmounted(() => {
             <template #heading>
                 <p-heading :title="$t('MENU.COST_EXPLORER_DATA_SOURCES')"
                            use-total-count
-                           :total-count="storeState.totalCount"
-                           :selected-count="storeState.selectedIndices ? 1 : undefined"
+                           :total-count="totalCount"
+                           :selected-count="dataSourcesPageState.selectedDataSourceId !== undefined ? 1 : undefined"
                 />
             </template>
             <template #extra>
@@ -70,7 +67,7 @@ onUnmounted(() => {
                     <data-source-management-table :table-height="height" />
                 </template>
             </p-horizontal-layout>
-            <data-source-management-tabs v-if="storeState.selectedIndices !== undefined" />
+            <data-source-management-tabs v-if="dataSourcesPageState.selectedDataSourceId !== undefined" />
             <span v-else
                   class="no-data"
             >

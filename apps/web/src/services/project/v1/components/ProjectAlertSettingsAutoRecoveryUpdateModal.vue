@@ -10,9 +10,9 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-import type { ProjectAlertConfigRecoveryMode } from '@/schema/monitoring/project-alert-config/type';
+import type { ProjectAlertConfigUpdateParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/update';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
+import type { ProjectAlertConfigRecoveryMode } from '@/api-clients/monitoring/project-alert-config/schema/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

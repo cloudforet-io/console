@@ -18,9 +18,9 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     monthlyCost: () => ({
         component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/monthly-cost/MonthlyCostWidget.vue'),
     }),
-    budgetUsageSummary: () => ({
-        component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
-    }),
+    // budgetUsageSummary: () => ({
+    //     component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
+    // }),
     costMap: () => ({
         component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-map/CostMapWidget.vue'),
     }),
@@ -37,12 +37,12 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     costByRegionMultiFields: () => ({
         component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/cost-by-region-multi-fields/CostByRegionMultiFieldsWidget.vue'),
     }),
-    budgetStatus: () => ({
-        component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
-    }),
-    budgetUsageByTarget: () => ({
-        component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTargetWidget.vue'),
-    }),
+    // budgetStatus: () => ({
+    //     component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
+    // }),
+    // budgetUsageByTarget: () => ({
+    //     component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTargetWidget.vue'),
+    // }),
     severityStatusByService: () => ({
         component: import('@/services/_shared/dashboard/dashboard-detail/legacy/widgets/asset-widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue'),
     }),

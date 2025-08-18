@@ -8,7 +8,7 @@ export const fetchFavicon = async (link: string): Promise<string|undefined> => {
         return undefined;
     }
 };
-const extractBaseURL = (url: string) => {
+export const extractBaseURL = (url: string) => {
     const parser = document.createElement('a');
     parser.href = url;
     return `${parser.protocol}//${parser.host}`;

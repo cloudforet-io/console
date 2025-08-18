@@ -10,14 +10,21 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useServiceAccountAgentStore } from '@/services/service-account/stores/service-account-agent-store';
+import { useServiceAccountAgent } from '@/services/service-account/composables/use-service-account-agent';
 
-const serviceAccountAgentStore = useServiceAccountAgentStore();
+const props = defineProps<{
+    serviceAccountId: string;
+}>();
+
 const userStore = useUserStore();
 
-const storeState = reactive({
-    agentInfo: computed(() => serviceAccountAgentStore.state.agentInfo),
-    timezone: computed<string|undefined>(() => userStore.state.timezone),
+const timezone = computed<string|undefined>(() => userStore.state.timezone);
+
+const {
+    agentData,
+    isLoading: isLoadingAgent,
+} = useServiceAccountAgent({
+    serviceAccountId: computed(() => props.serviceAccountId),
 });
 
 const state = reactive({
@@ -54,11 +61,11 @@ const state = reactive({
         ];
     }),
     data: computed(() => ({
-        cluster_name: storeState.agentInfo?.options?.cluster_name,
-        state: storeState.agentInfo?.last_accessed_at ? storeState.agentInfo?.state : 'DISABLED',
-        last_accessed_at: storeState.agentInfo?.last_accessed_at,
-        expired_at: storeState.agentInfo?.expired_at,
-        created_at: storeState.agentInfo?.created_at,
+        cluster_name: agentData.value?.options?.cluster_name,
+        state: agentData.value?.last_accessed_at ? agentData.value?.state : 'DISABLED',
+        last_accessed_at: agentData.value?.last_accessed_at,
+        expired_at: agentData.value?.expired_at,
+        created_at: agentData.value?.created_at,
     })),
 });
 
@@ -72,7 +79,7 @@ const connectedStatusFormatter = (value: string): StatusProps => ({
 <template>
     <p-data-loader class="service-account-connect-cluster-detail"
                    :data="state.data"
-                   :loading="false"
+                   :loading="isLoadingAgent"
     >
         <p-definition-table :fields="state.fields"
                             :data="state.data"
@@ -86,13 +93,13 @@ const connectedStatusFormatter = (value: string): StatusProps => ({
             <template v-if="state.data.last_accessed_at"
                       #data-last_accessed_at="item"
             >
-                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template #data-expired_at="item">
-                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template #data-created_at="item">
-                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
         </p-definition-table>
     </p-data-loader>

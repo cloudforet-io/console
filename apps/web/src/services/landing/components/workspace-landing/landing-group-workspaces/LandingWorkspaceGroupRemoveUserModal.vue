@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import { PTableCheckModal, PLink, PStatus } from '@cloudforet/mirinae';
 
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { MyWorkspaceGroupModel } from '@/api-clients/identity/user-profile/schema/model';
-import type { WorkspaceGroupUserRemoveParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/remove';
+import { useWorkspaceGroupUserApi } from '@/api-clients/identity/workspace-group-user/composables/use-workspace-group-user-api';
 import type { WorkspaceUser, WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
-
-import { useUserWorkspaceGroupStore } from '@/store/app-context/workspace/user-workspace-group-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -36,22 +34,21 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const userWorkspaceGroupStore = useUserWorkspaceGroupStore();
 const landingPageStore = useLandingPageStore();
-const landingPageStoreState = landingPageStore.state;
-const landingPageStoreGroupUserState = landingPageStore.groupUserTableState;
-
-const allReferenceStore = useAllReferenceStore();
+const landingPageState = landingPageStore.state;
+const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
 
 const state = reactive({
-    loading: false,
-    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const userTableFields = [{ name: 'user_id', label: 'User ID' },
     { name: 'user_name', label: 'Name' },
     { name: 'state', label: 'State' },
     { name: 'role_type', label: 'Group Role Type' }];
+
+/* Query */
+const queryClient = useQueryClient();
+const { key: workspaceGroupsQueryKey } = useServiceQueryKey('identity', 'user-profile', 'get-workspace-groups');
 
 const getUserRouteLocationByWorkspaceId = (item) => ({
     name: IAM_ROUTE.USER._NAME,
@@ -67,26 +64,24 @@ const getServiceAccountRouteLocationByWorkspaceId = (item) => ({
     },
 });
 
-
-const deleteGroupUsers = async () => {
-    state.loading = true;
-    try {
-        await SpaceConnector.clientV2.identity.workspaceGroupUser.remove<WorkspaceGroupUserRemoveParameters>({
-            workspace_group_id: landingPageStoreState.selectedWorkspaceGroup,
-            users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
-        });
-        await userWorkspaceGroupStore.load();
+/* Mutation */
+const { mutate: removeWorkspaceGroupUser, isPending: isLoading } = useMutation({
+    mutationFn: workspaceGroupUserAPI.remove,
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: workspaceGroupsQueryKey.value });
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_REMOVE_USERS'), '');
-        landingPageStoreGroupUserState.selectedIndices = [];
-    } catch (e) {
+    },
+    onError: (e) => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_E_REMOVE_USERS'));
-    } finally {
-        state.loading = false;
-    }
-};
+    },
+});
 
+/* Handlers */
 const handleConfirm = async () => {
-    await deleteGroupUsers();
+    await removeWorkspaceGroupUser({
+        workspace_group_id: landingPageState.selectedWorkspaceGroupId,
+        users: (props.removeUserList ?? []).map((item) => ({ user_id: item.user_id })),
+    });
     state.proxyVisible = false;
     emit('confirm');
 };
@@ -104,7 +99,7 @@ const handleCloseModal = () => {
                          :fields="userTableFields"
                          :items="props.removeUserList || []"
                          size="sm"
-                         :loading="state.loading"
+                         :loading="isLoading"
                          @confirm="handleConfirm"
                          @cancel="handleCloseModal"
                          @close="handleCloseModal"

@@ -1,27 +1,52 @@
-import type { ComputedRef } from 'vue';
+import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-interface UseUserGetQueryOptions {
-    userId: ComputedRef<string>;
-}
+import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
-export const useUserGetQuery = ({ userId }: UseUserGetQueryOptions) => {
+export const useUserGetQuery = (userId: Ref<string>) => {
     const { userAPI } = useUserApi();
-    const { key, params } = useServiceQueryKey('identity', 'user', 'get', {
+    const { workspaceUserAPI } = useWorkspaceUserApi();
+
+    const userPageStore = useUserPageStore();
+    const isAdminMode = computed<boolean>(() => userPageStore.state.isAdminMode);
+
+    const { key: userQueryKey, params: userQueryParams } = useServiceQueryKey('identity', 'user', 'get', {
+        contextKey: userId,
         params: computed(() => ({
             user_id: userId.value,
         })),
     });
 
-    return useScopedQuery({
-        queryKey: key,
-        queryFn: () => userAPI.get(params.value),
-        enabled: computed(() => !!userId.value),
-        // staleTime: 1000 * 60 * 5,
-        // gcTime: 1000 * 60 * 10,
+    const { key: workspaceUserQueryKey, params: workspaceUserQueryParams } = useServiceQueryKey('identity', 'workspace-user', 'get', {
+        contextKey: userId,
+        params: computed(() => ({
+            user_id: userId.value,
+        })),
+    });
+
+    const { data: userData } = useScopedQuery({
+        queryKey: userQueryKey,
+        queryFn: () => userAPI.get(userQueryParams.value),
+        gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 30,
+        enabled: computed(() => isAdminMode.value),
     }, ['DOMAIN']);
+
+    const { data: workspaceUserData } = useScopedQuery({
+        queryKey: workspaceUserQueryKey,
+        queryFn: () => workspaceUserAPI.get(workspaceUserQueryParams.value),
+        gcTime: 1000 * 60 * 2,
+        staleTime: 1000 * 30,
+        enabled: computed(() => !isAdminMode.value),
+    }, ['WORKSPACE']);
+
+    return {
+        userData,
+        workspaceUserData,
+    };
 };

@@ -14,7 +14,6 @@ import type { ValueItem } from '@cloudforet/mirinae/types/controls/search/query-
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -37,8 +36,6 @@ interface Props {
     isFocused: boolean;
     focusingDirection: string;
 }
-
-const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<Props>(), {
     isFocused: false,
@@ -71,7 +68,6 @@ const getTabHeaderHeight = () => {
 
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
-    cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
 });
 
 const state = reactive({

@@ -2,28 +2,28 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !isEditable"
                                          @click-edit="handleClickEdit"
         />
 
         <div v-if="!state.isEditMode"
              class="contents-wrapper"
         >
-            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
-                                          :collector="collectorFormState.originCollector"
+            <collector-detail-plugin-info :plugin="pluginData"
+                                          :collector="originCollectorData"
             />
-            <plugin-summary-cards :collector="collectorFormState.originCollector"
-                                  :recent-jobs="state.recentJobs"
-                                  :history-link="collectorJobStore.hasJobs ? props.historyLink : undefined"
+            <plugin-summary-cards :collector="originCollectorData"
+                                  :recent-jobs="recentJobsData?.results"
+                                  :history-link="props.historyLink"
             />
-            <collector-tags :tags="collectorFormState.originCollector?.tags" />
+            <collector-tags :tags="originCollectorData?.tags" />
         </div>
 
         <div v-if="state.isEditMode"
              class="collector-base-info-edit"
         >
-            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
-                                          :collector="collectorFormState.originCollector"
+            <collector-detail-plugin-info :plugin="pluginData"
+                                          :collector="originCollectorData"
                                           show-minimal
             />
             <collector-version-form @update-valid="handleUpdateIsVersionValid" />
@@ -33,7 +33,7 @@
             <div class="button-group">
                 <p-button style-type="tertiary"
                           size="lg"
-                          :disabled="state.updateLoading"
+                          :disabled="isUpdating"
                           @click="handleClickCancel"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
@@ -42,7 +42,7 @@
                           size="lg"
                           class="save-changes-button"
                           :disabled="!state.isAllValid"
-                          :loading="state.updateLoading"
+                          :loading="isUpdating"
                           @click="handleClickSave"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -54,24 +54,24 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import dayjs from 'dayjs';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { JobModel } from '@/schema/inventory/job/model';
-import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
-import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import { UPGRADE_MODE } from '@/api-clients/plugin/plugin/constant';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -83,36 +83,34 @@ import CollectorDetailSectionHeader from '@/services/asset-inventory/components/
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { useInventoryJobListQuery } from '@/services/asset-inventory/composables/use-inventory-job-list-query';
+import { usePluginGetQuery } from '@/services/asset-inventory/composables/use-plugin-get-query';
+import { usePluginGetVersionsQuery } from '@/services/asset-inventory/composables/use-plugin-get-versions-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
-import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
-
 
 const props = defineProps<{
-    historyLink: Location
+    historyLink?: Location
     hasReadWriteAccess?: boolean
 }>();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
+const appContextStore = useAppContextStore();
 
-const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
-
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    collectorPluginInfo: computed<CollectorModel['plugin_info']|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
-    repositoryPlugin: null as null|PluginModel,
-    isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
+    collectorPluginInfo: computed<CollectorModel['plugin_info']|null>(() => originCollectorData.value?.plugin_info ?? null),
+    isCollectorAutoUpgrade: computed<boolean>(() => originCollectorData.value?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {
         const version = state.collectorPluginInfo?.version;
         if (!version) return false;
-        const latestVersion = collectorFormState.versions[0];
+        const latestVersion = pluginVersionsData.value?.[0];
         if (latestVersion) return latestVersion === version;
         return false;
     }),
-    recentJobs: computed<JobModel[]|null>(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
@@ -122,42 +120,68 @@ const state = reactive({
             || (state.collectorPluginInfo.upgrade_mode === UPGRADE_MODE.AUTO) !== collectorFormState.autoUpgrade;
     }),
     isTagsUpdated: computed<boolean>(() => {
-        if (!collectorFormState.originCollector) return false;
-        return JSON.stringify(collectorFormState.originCollector.tags) !== JSON.stringify(collectorFormState.tags);
+        if (!originCollectorData.value) return false;
+        return JSON.stringify(originCollectorData.value.tags) !== JSON.stringify(collectorFormState.tags);
     }),
     isAllValid: computed(() => (state.isPluginUpdated || state.isTagsUpdated) && state.isVersionValid && state.isTagsValid),
-    updateLoading: false,
+});
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const collectorPluginId = computed<string|undefined>(() => originCollectorData.value?.plugin_info?.plugin_id ?? collectorFormState.repositoryPlugin?.plugin_id);
+const isEditable = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+const isUpdating = computed<boolean>(() => isUpdateCollectorPending.value || isUpdateCollectorPluginPending.value);
+
+/* Query */
+const {
+    data: originCollectorData, collectorGetQueryKey,
+} = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
+const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
+const recentJobsQueryHelper = new ApiQueryHelper();
+const { data: recentJobsData } = useInventoryJobListQuery({
+    params: computed(() => {
+        recentJobsQueryHelper.setFilters([
+            { k: 'collector_id', v: collectorFormState.collectorId ?? '', o: '=' },
+            { k: 'created_at', v: fiveDaysAgo, o: '>' },
+        ]);
+        return {
+            query: recentJobsQueryHelper.data,
+        };
+    }),
+});
+const { data: pluginVersionsData } = usePluginGetVersionsQuery({
+    pluginId: computed(() => collectorPluginId.value ?? ''),
+});
+const { data: pluginData } = usePluginGetQuery({
+    pluginId: computed(() => collectorPluginId.value ?? ''),
 });
 
+/* Mutation */
+const queryClient = useQueryClient();
+const { mutateAsync: updateCollector, isPending: isUpdateCollectorPending } = useMutation({
+    mutationFn: collectorAPI.update,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    },
+    onError: (e) => {
+        collectorFormStore.initForm(originCollectorData.value);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    },
+});
+const { mutateAsync: updateCollectorPlugin, isPending: isUpdateCollectorPluginPending } = useMutation({
+    mutationFn: collectorAPI.updatePlugin,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    },
+    onError: (e) => {
+        collectorFormStore.initForm(originCollectorData.value);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    },
+});
 
-const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormState.collectorId,
-        version: collectorFormState.version,
-        upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-    };
-    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
-};
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameters = {
-        collector_id: collectorFormState.collectorId,
-        tags: collectorFormState.tags,
-    };
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
-};
-const getRepositoryPlugin = async (pluginId: string) => {
-    try {
-        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
-            plugin_id: pluginId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-
+/* Event Handler */
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -170,44 +194,26 @@ const handleUpdateIsTagsValid = (isValid: boolean) => {
 };
 
 const handleClickCancel = () => {
-    collectorFormStore.resetForm();
+    collectorFormStore.initForm(originCollectorData.value);
     state.isEditMode = false;
 };
 const handleClickSave = async () => {
     if (!state.isAllValid) return;
-    try {
-        state.updateLoading = true;
-        let collector: CollectorModel|undefined;
-        if (state.isPluginUpdated) {
-            collector = await fetchCollectorPluginUpdate();
-        }
-        if (state.isTagsUpdated) {
-            const result = await fetchCollectorUpdate();
-            if (collector) collector = { ...collector, ...result };
-            else collector = result;
-        }
-        if (!collector) throw new Error('collector is undefined'); // collector must be defined if all valid
-        collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
-    } catch (e) {
-        collectorFormStore.resetVersion();
-        collectorFormStore.resetAutoUpgrade();
-        collectorFormStore.resetTags();
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
-    } finally {
-        state.updateLoading = false;
-        state.isEditMode = false;
+    if (state.isPluginUpdated) {
+        await updateCollectorPlugin({
+            collector_id: collectorFormState.collectorId ?? '',
+            version: collectorFormState.version,
+            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+        });
     }
+    if (state.isTagsUpdated) {
+        await updateCollector({
+            collector_id: collectorFormState.collectorId ?? '',
+            tags: collectorFormState.tags,
+        });
+    }
+    state.isEditMode = false;
 };
-
-watch(() => collectorFormState.pluginId, async (pluginId) => {
-    if (pluginId) await collectorFormStore.getVersions(pluginId);
-}, { immediate: true });
-
-watch(() => state.collectorPluginInfo, async (pluginInfo) => {
-    if (pluginInfo?.plugin_id) await getRepositoryPlugin(pluginInfo.plugin_id);
-}, { immediate: true });
-
 </script>
 
 <style lang="postcss" scoped>

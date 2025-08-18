@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDivider,
     PFieldGroup,
@@ -17,25 +17,22 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 import type { InputItem } from '@cloudforet/mirinae/types/controls/input/text-input/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import { ALERT_STATUS } from '@/schema/alert-manager/alert/constants';
-import type { AlertStatusType } from '@/schema/alert-manager/alert/type';
-import type { EscalationPolicyListParameters } from '@/schema/alert-manager/escalation-policy/api-verbs/list';
-import type { EscalationPolicyModel } from '@/schema/alert-manager/escalation-policy/model';
-import { EVENT_RULE_URGENCY } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import { ALERT_STATUS } from '@/api-clients/alert-manager/alert/schema/constants';
+import type { AlertStatusType } from '@/api-clients/alert-manager/alert/schema/type';
+import { EVENT_RULE_URGENCY } from '@/api-clients/alert-manager/event-rule/schema/constants';
 import type {
     EventRuleActionsType,
     EventRuleUrgencyType,
-} from '@/schema/alert-manager/event-rule/type';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { TagItem } from '@/common/modules/tags/type';
 
 import { gray } from '@/styles/colors';
 
+import { useEscalationPolicyListQuery } from '@/services/alert-manager/v2/composables/use-escalation-policy-list-query';
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
     EventRuleActionsToggleType,
@@ -45,14 +42,19 @@ import type {
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
+const { eventRuleData } = useEventRuleGetQuery();
+const { serviceData } = useServiceGetQuery(serviceId);
+const defaultEscalationPolicyId = computed<string>(() => serviceData.value?.escalation_policy_id || '');
+
 const storeState = reactive({
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -94,7 +96,10 @@ const state = reactive({
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.HIGH'), name: EVENT_RULE_URGENCY.HIGH },
         { label: i18n.t('ALERT_MANAGER.EVENT_RULE.LOW'), name: EVENT_RULE_URGENCY.LOW },
     ]),
-    escalationPolicyDropdownList: [] as SelectDropdownMenuItem[],
+    escalationPolicyDropdownList: computed<SelectDropdownMenuItem[]>(() => escalationPolicyListData.value.map((item) => ({
+        name: item.escalation_policy_id,
+        label: item.name,
+    }))),
 
     selectedActions: {
         change_title: false,
@@ -106,13 +111,13 @@ const state = reactive({
     title: '',
     selectedStatus: ALERT_STATUS.TRIGGERED as AlertStatusType,
     selectedUrgencyRadio: EVENT_RULE_URGENCY.HIGH as EventRuleUrgencyType,
-    selectedEscalationPolicyId: storeState.service.escalation_policy_id,
+    selectedEscalationPolicyId: defaultEscalationPolicyId.value,
     labels: [] as InputItem[],
     additionalInfoTags: [{ key: '', value: '' }] as TagItem[],
 });
 
 const updateStateFromEventRuleInfo = (): void => {
-    const actions = storeState.eventRuleInfo.actions;
+    const actions = eventRuleData.value?.actions;
     if (!actions) return;
 
     if (actions.change_title) {
@@ -158,7 +163,7 @@ const handleUpdateToggle = (action: string, value: boolean) => {
             state.selectedUrgencyRadio = EVENT_RULE_URGENCY.HIGH;
         }
         if (action === 'change_escalation_policy') {
-            state.selectedEscalationPolicyId = storeState.service.escalation_policy_id;
+            state.selectedEscalationPolicyId = defaultEscalationPolicyId.value;
         }
     }
 };
@@ -182,20 +187,11 @@ const handleInputTagValue = (idx, val) => {
     state.additionalInfoTags = _items;
 };
 
-const fetchEscalationPolicyList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
-            service_id: storeState.service.service_id,
-        });
-        state.escalationPolicyDropdownList = (results || []).map((item) => ({
-            name: item.escalation_policy_id,
-            label: item.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.escalationPolicyDropdownList = [];
-    }
-};
+const { escalationPolicyListData } = useEscalationPolicyListQuery({
+    params: computed(() => ({
+        service_id: serviceId.value,
+    })),
+});
 
 watch([
     () => state.selectedActions,
@@ -236,10 +232,6 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
             change_escalation_policy: false,
         };
     }
-}, { immediate: true });
-watch(() => storeState.service.service_id, (id) => {
-    if (!id) return;
-    fetchEscalationPolicyList();
 }, { immediate: true });
 </script>
 

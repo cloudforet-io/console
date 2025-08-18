@@ -1,4 +1,4 @@
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

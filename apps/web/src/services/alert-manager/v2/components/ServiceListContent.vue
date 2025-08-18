@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { useResizeObserver } from '@vueuse/core/index';
+import {
+    computed, reactive, ref,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import { debounce } from 'lodash';
 
 import {
     PSelectCard, PI, PLazyImg, PDivider, PTextButton,
 } from '@cloudforet/mirinae';
 
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
-
 
 import { gray, green } from '@/styles/colors';
 
@@ -22,28 +22,44 @@ import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/commo
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 
+
 interface Props {
     list: ServiceModel[];
     type: 'alert' | 'healthy';
 }
+
 
 const props = withDefaults(defineProps<Props>(), {
     list: undefined,
     type: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const emit = defineEmits<{(e: 'columns-change', payload: { type: 'alert'|'healthy', columns: number }): void
+}>();
+
+const gridRef = ref<HTMLElement|null>(null);
+const lastCols = ref<number | null>(null);
+
+useResizeObserver(gridRef, (entries) => {
+    // ✅: when window size is changed, emit columns-change event
+    const el = entries[0]?.target as HTMLElement;
+    if (!el) return;
+    const cols = getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
+    if (cols > 0 && cols !== lastCols.value) {
+        lastCols.value = cols;
+        debounce(() => {
+            emit('columns-change', { type: props.type, columns: cols });
+        }, 50)();
+    }
+});
+
 const serviceDetailPageStore = useServiceDetailPageStore();
 
 const route = useRoute();
 const router = useRouter();
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    escalationPolicy: computed<EscalationPolicyReferenceMap>(() => allReferenceGetters.escalationPolicy),
-});
+const referenceMap = useAllReferenceDataModel();
+
 const state = reactive({
     isCollapsed: false,
     title: computed<TranslateResult>(() => {
@@ -54,13 +70,12 @@ const state = reactive({
     }),
 });
 
-const getEscalationPolicyLabel = (id: string): string => storeState.escalationPolicy[id]?.label || '';
+const getEscalationPolicyLabel = (id: string): string => referenceMap.alertManagerEscalationPolicy[id]?.label || '';
 const getWebhookIcon = (id: string): string|undefined => {
-    const webhook = storeState.webhook[id]?.data;
+    const webhook = referenceMap.alertManagerWebhook[id]?.data;
     if (!webhook) return undefined;
-    return storeState.plugins[webhook.plugin_info.plugin_id]?.icon || '';
+    return referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon || '';
 };
-
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
@@ -121,7 +136,9 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
             />
             <span>{{ state.title }}</span>
         </div>
-        <div class="collapsible-contents">
+        <div ref="gridRef"
+             class="collapsible-contents"
+        >
             <p-select-card v-for="(item, idx) in props.list"
                            :key="`service-item-${idx}`"
                            class="card"
@@ -253,31 +270,17 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
     .collapsible-contents {
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
-
-        @apply grid grid-cols-3 gap-4;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+        gap: 1rem;
+        justify-content: start;
+        align-items: stretch;
+        justify-items: stretch;
     }
 
     @media (min-width: 120rem) {
         .collapsible-contents {
             @apply grid grid-cols-4 gap-4;
-        }
-    }
-
-    @screen laptop {
-        .collapsible-contents {
-            @apply grid grid-cols-3 gap-4;
-        }
-    }
-
-    @screen tablet {
-        .collapsible-contents {
-            @apply grid grid-cols-2 gap-4;
-        }
-    }
-
-    @screen mobile {
-        .collapsible-contents {
-            @apply grid grid-cols-1 gap-4;
         }
     }
 
@@ -297,7 +300,8 @@ const handleClickEscalationPolicy = (id: string, escalationPolicyId: string) => 
         }
     }
     .card {
-        min-width: 25rem;
+        width: 100%;
+        min-width: 0;
         padding: 1.25rem 1.5rem 1rem 1.5rem;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         .card-inner-wrapper {

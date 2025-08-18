@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
 import type { UserDisableMfaParameters } from '@/api-clients/identity/user/schema/api-verbs/disable-mfa';
 import type { UserModel } from '@/api-clients/identity/user/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseUserMfaDisableMutationOptions {
     onSuccess?: (data: UserModel, variables: UserDisableMfaParameters) => Promise<void> | void;

@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { ServiceAccountCreateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/create';
 import type { ServiceAccountDeleteParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele';
 import type { ServiceAccountDeleteSecretDataParameters } from '@/api-clients/identity/service-account/schema/api-verbs/detele-secret-data';
@@ -19,7 +20,7 @@ export const useServiceAccountApi = () => {
         delete: SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>,
         get: SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>,
         list: SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>,
-        stat: SpaceConnector.clientV2.identity.serviceAccount.stat<ServiceAccountStatParameters, any>,
+        stat: SpaceConnector.clientV2.identity.serviceAccount.stat<ServiceAccountStatParameters, StatResponse>,
         updateSecretData: SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>,
         deleteSecretData: SpaceConnector.clientV2.identity.serviceAccount.deleteSecretData<ServiceAccountDeleteSecretDataParameters>,
     };

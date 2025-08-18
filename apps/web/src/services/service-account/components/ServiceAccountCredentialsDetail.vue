@@ -8,19 +8,18 @@ import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-s
 import type { DynamicField } from '@cloudforet/mirinae/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 
+import type { SecretModel } from '@/api-clients/secret/secret/schema/model';
+import type { TrustedSecretModel } from '@/api-clients/secret/trusted-secret/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
-import type { SecretModel } from '@/schema/secret/secret/model';
-import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 
 import { useReferenceFieldFormatter } from '@/lib/reference/use-reference-field-formatter';
 
-import { useServiceAccountSchemaStore } from '@/services/service-account/stores/service-account-schema-store';
+import { useServiceAccountProviderSchema } from '@/services/service-account/composables/use-service-account-provider-schema';
 
 
 interface Props {
@@ -37,25 +36,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'edit'): void;
 }>();
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
-});
-const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const { getReferenceLocation } = useReferenceRouter();
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
+const referenceMap = useAllReferenceDataModel();
+
+const { currentProviderSchemaList } = useServiceAccountProviderSchema();
+const credentialJsonSchema = computed<JsonSchema|undefined>(() => currentProviderSchemaList.value.find((schema) => (schema.schema_id === props.credentialData.schema_id))?.schema);
 
 const state = reactive({
     attachedTrustedAccount: computed(() => {
-        if (props.attachedTrustedAccountId) return storeState.trustedAccounts[props.attachedTrustedAccountId];
+        if (props.attachedTrustedAccountId) return referenceMap.trustedAccount[props.attachedTrustedAccountId];
         return undefined;
     }),
-    credentialJsonSchema: computed<JsonSchema>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList.find((schema) => (schema.schema_id === props.credentialData.schema_id))?.schema),
     convertedCredentialData: computed(() => {
         const convertedData = { ...props.credentialData };
-        Object.keys(state.credentialJsonSchema?.properties ?? {}).forEach((k) => {
+        Object.keys(credentialJsonSchema.value?.properties ?? {}).forEach((k) => {
             convertedData[k] = '••••••••••••••••••••';
         });
         if (props.attachedTrustedAccountId && 'trusted_secret_id' in convertedData) {
@@ -76,7 +73,7 @@ const state = reactive({
                 options: { link, disable_copy: true },
             });
         }
-        Object.entries(state.credentialJsonSchema?.properties ?? {}).forEach(([k, v]) => {
+        Object.entries(credentialJsonSchema.value?.properties ?? {}).forEach(([k, v]) => {
             fields.push({
                 key: k,
                 name: v?.title ?? k,

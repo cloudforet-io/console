@@ -1,28 +1,24 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PSelectCard, PI,
 } from '@cloudforet/mirinae';
 
-import type { ServiceUpdateParameters } from '@/schema/alert-manager/service/api-verbs/update';
-import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/schema/alert-manager/service/constants';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
-import type { NotificationUrgencyType, RecoveryModeType } from '@/schema/alert-manager/service/type';
+import { NOTIFICATION_URGENCY, RECOVERY_MODE } from '@/api-clients/alert-manager/service/schema/constants';
+import type { NotificationUrgencyType, RecoveryModeType, ServiceOptionsType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { red } from '@/styles/colors';
 
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
+import { useServiceUpdateMutation } from '@/services/alert-manager/v2/composables/use-service-update-mutation';
 import { SERVICE_SETTING_CARD } from '@/services/alert-manager/v2/constants/common-constant';
-import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { ServiceDetailSettingCardType, Service } from '@/services/alert-manager/v2/types/alert-manager-type';
+import type { ServiceDetailSettingCardType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 interface Props {
     visible: boolean;
@@ -45,16 +41,14 @@ const props = withDefaults(defineProps<Props>(), {
     type: undefined,
 });
 
-const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
+const { serviceData } = useServiceGetQuery(serviceId);
 
 const emit = defineEmits<{(e: 'update:visible'): void; }>();
 
-const storeState = reactive({
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-});
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     modalInfo: computed<ModalInfoTYpe>(() => {
         switch (props.type) {
@@ -88,34 +82,29 @@ const state = reactive({
     selectedOption: undefined as string | undefined,
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-    try {
-        const options = storeState.serviceInfo.options;
-        if (props.type === SERVICE_SETTING_CARD.AUTO_RECOVERY) {
-            options.recovery_mode = state.selectedOption as RecoveryModeType;
-        } else if (props.type === SERVICE_SETTING_CARD.NOTIFICATION_POLICY) {
-            options.notification_urgency = state.selectedOption as NotificationUrgencyType;
-        }
-
-        await SpaceConnector.clientV2.alertManager.service.update<ServiceUpdateParameters, ServiceModel>({
-            service_id: storeState.serviceInfo.service_id,
-            options,
-        });
-        showSuccessMessage(i18n.t('ALERT_MANAGER.SERVICE.ALT_S_UPDATE_SERVICE'), '');
-        await serviceDetailPageStore.fetchServiceDetailData(storeState.serviceInfo.service_id);
+const { mutate: updateService, isPending: updateServiceLoading } = useServiceUpdateMutation({
+    onSuccess: async () => {
         state.proxyVisible = false;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = false;
+    },
+});
+const handleConfirm = async () => {
+    const options = serviceData.value?.options || {} as ServiceOptionsType;
+    if (props.type === SERVICE_SETTING_CARD.AUTO_RECOVERY) {
+        options.recovery_mode = state.selectedOption as RecoveryModeType;
+    } else if (props.type === SERVICE_SETTING_CARD.NOTIFICATION_POLICY) {
+        options.notification_urgency = state.selectedOption as NotificationUrgencyType;
     }
+
+    updateService({
+        service_id: serviceId.value,
+        options,
+    });
 };
 
 watch(() => props.type, (type) => {
     state.selectedOption = type === SERVICE_SETTING_CARD.NOTIFICATION_POLICY
-        ? storeState.serviceInfo.options.notification_urgency
-        : storeState.serviceInfo.options.recovery_mode;
+        ? serviceData.value?.options?.notification_urgency || NOTIFICATION_URGENCY.ALL
+        : serviceData.value?.options?.recovery_mode || RECOVERY_MODE.MANUAL;
 }, { immediate: true });
 </script>
 
@@ -126,7 +115,7 @@ watch(() => props.type, (type) => {
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="state.proxyVisible"
-                    :loading="state.loading"
+                    :loading="updateServiceLoading"
                     @confirm="handleConfirm"
     >
         <template #body>

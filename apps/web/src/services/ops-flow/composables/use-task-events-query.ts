@@ -6,7 +6,7 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useEventApi } from '@/api-clients/opsflow/event/composables/use-event-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

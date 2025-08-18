@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 import { useQueryClient } from '@tanstack/vue-query';
 
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 

@@ -90,7 +90,7 @@ const handleConfirmPasswordCheckModal = async () => {
                 user_id: passwordFormState.userId,
                 password: passwordFormState.password,
             },
-        }, { skipAuthRefresh: true });
+        }, { skipAuthRefresh: true } as any);
         if (result.status === 'succeed') {
             if (!!result.response.access_token && !!result.response.refresh_token) {
                 passwordFormState.certifiedPassword = passwordFormState.password;
@@ -104,7 +104,9 @@ const handleConfirmPasswordCheckModal = async () => {
             }
         }
     } catch (e: any) {
-        if (e.message.startsWith(' MFA is required.')) { // MFA activated CASE
+        const message = e.message || '';
+        if (message.startsWith(' MFA is required.') || message.includes(' MFA is not activated.')) {
+            // MFA activated CASE OR MFA not activated CASE - both should proceed successfully
             passwordFormState.certifiedPassword = passwordFormState.password;
             passwordFormState.isTokenChecked = true;
             passwordFormState.invalidText = '';

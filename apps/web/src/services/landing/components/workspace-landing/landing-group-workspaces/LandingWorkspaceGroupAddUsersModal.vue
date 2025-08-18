@@ -1,25 +1,18 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { debounce } from 'lodash';
+import { useMutation } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PIconButton, PAvatar, PTextInput, PScopedNotification,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import { useRoleApi } from '@/api-clients/identity/role/composables/use-role-api';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
-import type { RoleListBasicRoleParameters } from '@/api-clients/identity/role/schema/api-verbs/list-basic-role';
-import type { BasicRoleModel, RoleModel } from '@/api-clients/identity/role/schema/model';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
 import type { MyWorkspaceGroupModel } from '@/api-clients/identity/user-profile/schema/model';
-import type { WorkspaceGroupUserAddParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/add';
-import type { WorkspaceGroupUserFindParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/find';
-import type {
-    WorkspaceGroupUserModel,
-    WorkspaceGroupUserSummaryModel,
-} from '@/api-clients/identity/workspace-group-user/schema/model';
+import { useWorkspaceGroupUserApi } from '@/api-clients/identity/workspace-group-user/composables/use-workspace-group-user-api';
 import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
 import { i18n } from '@/translations';
 
@@ -31,6 +24,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { USER_STATE } from '@/services/iam/constants/user-constant';
+import { useWorkspaceGroupUserFindPaginationQuery } from '@/services/landing/composables/use-workspace-group-user-find-pagination-query';
+
 
 const emit = defineEmits<{(e: 'confirm'): void;
     (e: 'update:visible'): void;
@@ -41,10 +36,12 @@ interface Props {
     visible: boolean;
 }
 
+const { roleAPI } = useRoleApi();
+const { workspaceGroupUserAPI } = useWorkspaceGroupUserApi();
+
 const props = defineProps<Props>();
 
 const state = reactive({
-    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     isAllValid: computed(() => roleSelectedItems.value.length > 0 && userDropdownState.selectedItems.length > 0),
 });
@@ -58,7 +55,7 @@ const {
         name: _role.role_id,
         role_type: _role.role_type,
     }),
-    fetcher: (apiQueryHelper) => SpaceConnector.clientV2.identity.role.listBasicRole<RoleListBasicRoleParameters, ListResponse<BasicRoleModel>>({
+    fetcher: (apiQueryHelper) => roleAPI.listBasicRole({
         query: {
             ...apiQueryHelper.data,
             filter: [
@@ -77,25 +74,31 @@ const resetState = () => {
     userDropdownState.selectedItems = [];
 };
 
-const handleConfirm = async () => {
-    try {
-        state.loading = true;
-        if (!props.workspaceGroup?.workspace_group_id) throw Error('Invalid Workspace Group Id.');
-        await SpaceConnector.clientV2.identity.workspaceGroupUser.add<WorkspaceGroupUserAddParameters, WorkspaceGroupUserModel>({
-            workspace_group_id: props.workspaceGroup?.workspace_group_id,
-            users: userDropdownState.selectedItems.map((item) => ({
-                user_id: item, role_id: roleSelectedItems.value[0]?.name,
-            })),
-        });
+/* Mutation */
+const { mutateAsync: addWorkspaceGroupUser, isPending: isAddingWorkspaceGroupUser } = useMutation({
+    mutationFn: workspaceGroupUserAPI.add,
+    onSuccess: () => {
         showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
         emit('confirm');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSettled: () => {
         resetState();
         state.proxyVisible = false;
-        state.loading = false;
-    }
+    },
+});
+
+/* Handlers */
+const handleConfirm = async () => {
+    if (!props.workspaceGroup?.workspace_group_id) throw Error('Invalid Workspace Group Id.');
+    addWorkspaceGroupUser({
+        workspace_group_id: props.workspaceGroup?.workspace_group_id,
+        users: userDropdownState.selectedItems.map((item) => ({
+            user_id: item, role_id: roleSelectedItems.value[0]?.name,
+        })),
+    });
 };
 
 const handleCloseModal = () => {
@@ -108,8 +111,7 @@ const handleRemoveUser = (item: string) => {
 };
 // userFind logic
 const userDropdownState = reactive({
-    userList: [] as WorkspaceGroupUserSummaryModel[],
-    menuList: computed(() => userDropdownState.userList.map((user) => ({
+    menuList: computed<MenuItem[]>(() => userList.value?.results?.map((user) => ({
         label: user.user_id,
         name: user.user_id,
         disabled: userDropdownState.selectedItems.includes(user.user_id),
@@ -117,31 +119,20 @@ const userDropdownState = reactive({
     inputSelectedItem: [] as MenuItem[],
     selectedItems: [] as string[],
     searchText: '',
-    loading: false,
-    pageLimit: 10,
 });
-const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
-    userDropdownState.loading = true;
 
-    try {
-        if (!props.workspaceGroup?.workspace_group_id) throw Error('Invalid Workspace Group Id.');
-        const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
-            workspace_group_id: props.workspaceGroup?.workspace_group_id,
-            keyword: userDropdownState.searchText,
-            state: USER_STATE.ENABLE,
-            page: {
-                start: 0,
-                limit: userDropdownState.pageLimit,
-            },
-        });
-        return results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    } finally {
-        userDropdownState.loading = false;
-    }
-};
+/* Query */
+const { data: userList } = useWorkspaceGroupUserFindPaginationQuery({
+    params: computed(() => ({
+        workspace_group_id: props.workspaceGroup?.workspace_group_id || '',
+        keyword: userDropdownState.searchText,
+        state: USER_STATE.ENABLE,
+    })),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 10),
+});
+
+/* Handlers */
 const handleEnter = (user: [MenuItem]) => {
     const selectedUser = user[0]?.name;
     const isExistUser = userDropdownState.selectedItems.find((selectedItem:string) => selectedItem === selectedUser);
@@ -149,21 +140,13 @@ const handleEnter = (user: [MenuItem]) => {
     userDropdownState.selectedItems.push(selectedUser);
     userDropdownState.inputSelectedItem = [];
 };
-
-(async () => {
-    userDropdownState.userList = await fetchUserFindList();
-})();
-
-watch(() => userDropdownState.searchText, debounce(async () => {
-    userDropdownState.userList = await fetchUserFindList() || [];
-}, 300));
 </script>
 
 <template>
     <p-button-modal class="workspace-group-add-users-modal"
                     :header-title="$t('IAM.WORKSPACE_GROUP.MODAL.ADD_USERS_TITLE', { name: props.workspaceGroup?.name })"
                     :visible="props.visible"
-                    :loading="state.loading"
+                    :loading="isAddingWorkspaceGroupUser"
                     size="sm"
                     :disabled="!state.isAllValid"
                     @confirm="handleConfirm"

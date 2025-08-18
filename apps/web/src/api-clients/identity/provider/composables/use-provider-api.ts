@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
+import type { StatResponse } from '@/api-clients/_common/schema/api-verbs/stat';
 import type { ProviderCreateParameters } from '@/api-clients/identity/provider/schema/api-verbs/create';
 import type { ProviderDeleteParameters } from '@/api-clients/identity/provider/schema/api-verbs/delete';
 import type { ProviderGetParameters } from '@/api-clients/identity/provider/schema/api-verbs/get';
@@ -17,7 +18,7 @@ export const useProviderApi = () => {
         delete: SpaceConnector.clientV2.identity.provider.delete<ProviderDeleteParameters>,
         get: SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>,
         list: SpaceConnector.clientV2.identity.provider.list<ProviderListParameters, ListResponse<ProviderModel>>,
-        stat: SpaceConnector.clientV2.identity.provider.stat<ProviderStatParameters, any>,
+        stat: SpaceConnector.clientV2.identity.provider.stat<ProviderStatParameters, StatResponse>,
     };
 
     return {

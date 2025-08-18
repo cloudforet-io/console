@@ -21,10 +21,10 @@ const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage
 const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
 const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
 
-const AdminCollectorMainPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorMainPage.vue');
+const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const AdminCollectorCreatePage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorCreatePage.vue');
 const AdminCollectorHistoryPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorHistoryPage.vue');
-const AdminCollectHistoryJobPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectHistoryJobPage.vue');
+const CollectHistoryJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
 const AdminCollectorDetailPage = () => import('@/services/asset-inventory/pages/admin/AdminCollectorDetailPage.vue');
 
 
@@ -120,7 +120,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                     path: '/',
                     name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
                     props: true,
-                    component: AdminCollectorMainPage as any,
+                    component: CollectorMainPage as any,
                 },
                 {
                     path: 'create',
@@ -143,7 +143,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                             name: ADMIN_ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                             meta: { label: ({ params }) => params.jobId, copiable: true },
                             props: true,
-                            component: AdminCollectHistoryJobPage as any,
+                            component: CollectHistoryJobPage as any,
                         },
                     ],
                 },

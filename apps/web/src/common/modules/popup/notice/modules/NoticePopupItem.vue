@@ -6,7 +6,7 @@ import {
 } from '@cloudforet/mirinae';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { PostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/api-clients/board/post/schema/model';
 
 import { useNoticeStore } from '@/store/notice/notice-store';
 import { useUserStore } from '@/store/user/user-store';

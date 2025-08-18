@@ -15,17 +15,17 @@ import {
     gray, indigo, peacock, red,
 } from '@/styles/colors';
 
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
-const budgetpageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetpageStore.$state;
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
 
 
 interface Props {
     data: any;
+    budgetId: string;
 }
 
 const props = defineProps<Props>();
+
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
 
 const chartContext = ref<HTMLElement|null>(null);
 
@@ -81,18 +81,7 @@ const state = reactive({
             },
         },
         legend: {
-            show: true,
-            left: '40px',
-            bottom: 0,
-            selectedMode: false,
-            formatter: (name) => name,
-            textStyle: {
-                rich: {
-                    'Planned Budget': {
-                        lineHeight: 10,
-                    },
-                },
-            },
+            show: false,
         },
         xAxis: {
             type: 'category',
@@ -154,7 +143,7 @@ const drawChart = (rawData: {
         accumulatedData.push(accumulatedValue);
     });
 
-    const threshold = Number(budgetPageState.budgetData?.limit ?? 0);
+    const threshold = Number(budgetData.value?.limit ?? 0);
 
     const accumulatedBelow: (number | null)[] = [];
     const accumulatedAbove: (number | null)[] = [];
@@ -231,22 +220,49 @@ const drawChart = (rawData: {
     }, true);
 };
 
-watch([() => state.data, () => budgetPageState], () => {
+watch([() => state.data], () => {
     drawChart(state.data);
 }, { deep: true, immediate: true });
 </script>
 
 <template>
-    <div class="chart-wrapper">
-        <div ref="chartContext"
-             class="chart"
-        />
+    <div>
+        <div class="chart-wrapper">
+            <div ref="chartContext"
+                 class="chart"
+            />
+        </div>
+        <div class="legend-custom">
+            <div class="flex items-center gap-1">
+                <img src="/images/budget-charts/ic_planned_budget.svg"
+                     alt="Planned Budget"
+                >
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.PLANNED_BUDGET') }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <img src="/images/budget-charts/ic_actual_spend.svg"
+                     alt="Actual Spend"
+                >
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_USAGE_TREND.ACTUAL_SPEND') }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <img src="/images/budget-charts/ic_accumulated_usage_under.svg"
+                     alt="Accumulated Usage (under Planned Budget)"
+                >
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.ACCUMULATED_USAGE_UNDER') }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <img src="/images/budget-charts/ic_accumulated_usage_over.svg"
+                     alt="Accumulated Usage (over Planned Budget)"
+                >
+                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BASE_INFORMATION.ACCUMULATED_USAGE_OVER') }}</span>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .chart-wrapper {
-    @apply mb-6;
     height: 17rem;
     overflow-x: auto;
 
@@ -254,6 +270,15 @@ watch([() => state.data, () => budgetPageState], () => {
         height: 100%;
         min-width: 62.5rem;
         width: 100%;
+    }
+}
+
+.legend-custom {
+    @apply flex gap-4 mb-6 ml-4 font-normal text-xs text-gray-700;
+
+    @screen mobile {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 </style>

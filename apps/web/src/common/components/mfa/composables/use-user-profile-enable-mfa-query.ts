@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/vue-query';
 
 import { useUserProfileApi } from '@/api-clients/identity/user-profile/composables/use-user-profile-api';
 import type { UserProfileEnableMfaParameters } from '@/api-clients/identity/user-profile/schema/api-verbs/enable-mfa';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UserUserProfileEnableMfaQueryOptions {
     params: ComputedRef<UserProfileEnableMfaParameters>;

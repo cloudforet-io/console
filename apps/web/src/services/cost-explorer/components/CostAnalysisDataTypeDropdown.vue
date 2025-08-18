@@ -12,6 +12,7 @@ import type {
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type { DisplayDataType } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -22,15 +23,16 @@ interface MenuItem extends SelectDropdownMenuItem {
 const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.state;
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.state;
 
 const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     targetCostDataSource: computed<CostDataSourceItems|undefined>(() => {
-        if (!costAnalysisPageGetters.selectedDataSourceId) return undefined;
-        return costAnalysisPageGetters.isUnifiedCost ? undefined : storeState.costDataSource[costAnalysisPageGetters.selectedDataSourceId];
+        if (!costQuerySetState.selectedDataSourceId) return undefined;
+        return costQuerySetState.isUnifiedCostOn ? undefined : storeState.costDataSource[costQuerySetState.selectedDataSourceId];
     }),
     additionalMenuItems: computed<MenuItem[]>(() => {
         if (state.targetCostDataSource) {

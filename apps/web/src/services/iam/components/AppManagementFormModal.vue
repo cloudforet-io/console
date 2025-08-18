@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { cloneDeep } from 'lodash';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,10 +17,14 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
 import type { Tags } from '@/api-clients/_common/schema/model';
 import type { ResourceGroupType } from '@/api-clients/_common/schema/type';
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
+import type { AppCreateParameters } from '@/api-clients/identity/app/schema/api-verbs/create';
+import type { AppUpdateParameters } from '@/api-clients/identity/app/schema/api-verbs/update';
 import type { AppModel } from '@/api-clients/identity/app/schema/model';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -39,16 +43,24 @@ interface AppDropdownMenuItem extends SelectDropdownMenuItem {
     role_type?: string;
 }
 
+interface Props {
+    selectedApp: AppModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedApp: () => ({}) as AppModel,
+});
+
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
+const appPageState = appPageStore.state;
 
 const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 }>();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isEdit: computed(() => appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
+    isEdit: computed(() => appPageState.modalInfo.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
 });
 const state = reactive({
     activeProject: false,
@@ -74,6 +86,33 @@ const validationState = reactive({
     invalidText: '' as TranslateResult | string,
 });
 
+const { appAPI } = useAppApi();
+const queryClient = useQueryClient();
+const { key: appListBaseQueryKey } = useServiceQueryKey('identity', 'app', 'list');
+const { mutate: createAppMutate, isPending: createAppMutateLoading } = useMutation({
+    mutationFn: (params: AppCreateParameters) => appAPI.create(params),
+    onSuccess: (data) => {
+        emit('confirm', data);
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
+        appPageStore.setModalVisible('apiKey', true);
+        handleClose();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+const { mutate: updateAppMutate, isPending: updateAppMutateLoading } = useMutation({
+    mutationFn: (params: AppUpdateParameters) => appAPI.update(params),
+    onSuccess: () => {
+        emit('confirm');
+        queryClient.invalidateQueries({ queryKey: appListBaseQueryKey.value });
+        handleClose();
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 /* Component */
 const menuHandler = async (inputText: string) => {
     await fetchListRoles(inputText);
@@ -82,11 +121,8 @@ const menuHandler = async (inputText: string) => {
     };
 };
 const handleClose = () => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.form = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    appPageStore.resetModalInfo();
+    appPageStore.setModalVisible('form', false);
     initState();
 };
 const handleChangeInput = (event) => {
@@ -126,8 +162,8 @@ const handleSelectItem = (item: AppDropdownMenuItem) => {
     formState.role = item;
 };
 const setFormState = () => {
-    formState.name = appPageStore.selectedApp.name;
-    formState.tags = appPageStore.selectedApp.tags as Tags;
+    formState.name = props.selectedApp.name;
+    formState.tags = props.selectedApp.tags as Tags;
     formState.selectedTags = getInputItemsFromTagKeys(formState.tags);
 };
 const handleSelectedProject = (projectTreeNodeData: ProjectTreeNodeData[]) => {
@@ -196,42 +232,32 @@ const fetchListRoles = async (inputText: string) => {
         dropdownState.loading = false;
     }
 };
-const handleConfirm = async () => {
-    try {
-        if (storeState.isEdit) {
-            await appPageStore.updateApp({
-                app_id: appPageStore.selectedApp.app_id,
-                name: formState.name,
-                tags: formState.tags,
-            });
-            emit('confirm');
-        } else {
-            const isProject = formState.selectedProjectId?.includes('project');
-            const isProjectGroup = formState.selectedProjectId?.includes('pg');
-            let resourceGroup:ResourceGroupType;
-            if (storeState.isAdminMode) {
-                resourceGroup = RESOURCE_GROUP.DOMAIN;
-            } else {
-                resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
-            }
 
-            const res = await appPageStore.createApp({
-                name: formState.name,
-                role_id: formState.role.name,
-                tags: formState.tags,
-                resource_group: resourceGroup,
-                project_id: isProject ? formState.selectedProjectId : undefined,
-                project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
-            });
-            emit('confirm', res);
-            appPageStore.$patch((_state) => {
-                _state.modal.visible.apiKey = true;
-                _state.modal = cloneDeep(_state.modal);
-            });
+const handleConfirm = async () => {
+    if (storeState.isEdit) {
+        updateAppMutate({
+            app_id: props.selectedApp.app_id,
+            name: formState.name,
+            tags: formState.tags,
+        });
+    } else {
+        const isProject = formState.selectedProjectId?.includes('project');
+        const isProjectGroup = formState.selectedProjectId?.includes('pg');
+        let resourceGroup:ResourceGroupType;
+        if (storeState.isAdminMode) {
+            resourceGroup = RESOURCE_GROUP.DOMAIN;
+        } else {
+            resourceGroup = (isProject || isProjectGroup) ? RESOURCE_GROUP.PROJECT : RESOURCE_GROUP.WORKSPACE;
         }
-        handleClose();
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
+
+        createAppMutate({
+            name: formState.name,
+            role_id: formState.role.name,
+            tags: formState.tags,
+            resource_group: resourceGroup,
+            project_id: isProject ? formState.selectedProjectId : undefined,
+            project_group_id: isProjectGroup ? formState.selectedProjectId : undefined,
+        });
     }
 };
 
@@ -246,15 +272,15 @@ watch(() => storeState.isEdit, (isEdit) => {
 <template>
     <div>
         <p-button-modal class="app-management-form-modal"
-                        :header-title="appPageState.modal.title"
+                        :header-title="appPageState.modalInfo.title"
                         size="sm"
                         :fade="true"
                         :backdrop="true"
-                        :visible="appPageState.modal.visible.form"
+                        :visible="appPageState.modalVisible.form"
                         :disabled="storeState.isEdit
                             ? formState.name === ''
                             : formState.name === '' || dropdownState.selectedMenuItems.length === 0 || (state.activeProject && state.selectedProjects.length === 0)"
-                        :loading="appPageState.modal.loading"
+                        :loading="createAppMutateLoading || updateAppMutateLoading"
                         @confirm="handleConfirm"
                         @cancel="handleClose"
                         @close="handleClose"

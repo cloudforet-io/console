@@ -10,7 +10,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 

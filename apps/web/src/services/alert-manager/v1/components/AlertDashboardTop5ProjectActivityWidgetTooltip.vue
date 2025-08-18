@@ -13,8 +13,8 @@ import {
 } from '@cloudforet/mirinae';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
-import type { AlertModelV1 } from '@/schema/monitoring/alert/model';
+import type { AlertListParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/list';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 
 import { useUserStore } from '@/store/user/user-store';
 

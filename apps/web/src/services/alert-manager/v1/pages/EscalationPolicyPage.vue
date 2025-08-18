@@ -17,17 +17,17 @@ import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { EscalationPolicyDeleteParameters } from '@/schema/monitoring/escalation-policy/api-verbs/delete';
+import type { EscalationPolicyDeleteParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/delete';
 import type {
     EscalationPolicyListParameters,
     EscalationPolicyListResponse,
-} from '@/schema/monitoring/escalation-policy/api-verbs/list';
-import type { EscalationPolicySetDefaultParameters } from '@/schema/monitoring/escalation-policy/api-verbs/set-default';
+} from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/list';
+import type { EscalationPolicySetDefaultParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/set-default';
 import {
     ESCALATION_POLICY_FINISH_CONDITION,
     ESCALATION_POLICY_RESOURCE_GROUP,
-} from '@/schema/monitoring/escalation-policy/constant';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+} from '@/api-clients/monitoring/escalation-policy/schema/constants';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -45,6 +45,7 @@ import EscalationPolicyDataTable from '@/services/alert-manager/v1/components/Es
 import EscalationPolicyFormModal from '@/services/alert-manager/v1/components/EscalationPolicyFormModal.vue';
 import { ACTION } from '@/services/alert-manager/v1/constants/alert-constant';
 import type { ActionMode } from '@/services/alert-manager/v1/types/alert-type';
+
 
 interface Item extends Omit<EscalationPolicyModel, 'name'> {
     name: {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { debouncedWatch } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
+
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -12,16 +13,15 @@ import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { ROLE_STATE, ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-verbs/list';
 import type { RoleModel } from '@/api-clients/identity/role/schema/model';
-import type { WorkspaceGroupUserFindParameters } from '@/api-clients/identity/workspace-group-user/schema/api-verbs/find';
-import type { WorkspaceGroupUserSummaryModel } from '@/api-clients/identity/workspace-group-user/schema/model';
-import type { WorkspaceGroupAddUsersParameters } from '@/api-clients/identity/workspace-group/schema/api-verbs/add-users';
-import type { WorkspaceGroupModel } from '@/api-clients/identity/workspace-group/schema/model';
+import { useWorkspaceGroupApi } from '@/api-clients/identity/workspace-group/composables/use-workspace-group-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useWorkspaceGroupUserFindQuery } from '@/services/advanced/composables/querys/use-workspace-group-user-find-query';
 import { useSelectDropDownList } from '@/services/advanced/composables/use-select-drop-down-list';
 import { WORKSPACE_GROUP_MODAL_TYPE } from '@/services/advanced/constants/workspace-group-constant';
 import { useWorkspaceGroupPageStore } from '@/services/advanced/store/workspace-group-page-store';
@@ -30,7 +30,6 @@ import { USER_STATE } from '@/services/iam/constants/user-constant';
 
 const workspaceGroupPageStore = useWorkspaceGroupPageStore();
 const workspaceGroupPageState = workspaceGroupPageStore.state;
-const workspaceGroupPageGetters = workspaceGroupPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void}>();
 
@@ -61,8 +60,7 @@ const {
 });
 
 const userDropdownState = reactive({
-    userList: [] as WorkspaceGroupUserSummaryModel[],
-    menuList: computed(() => userDropdownState.userList.map((user) => ({
+    menuList: computed(() => workspaceGroupUserFindList.value?.map((user) => ({
         label: user.user_id,
         name: user.user_id,
         disabled: userDropdownState.selectedItems.includes(user.user_id),
@@ -77,33 +75,82 @@ const userDropdownState = reactive({
 const resetState = () => {
     roleSelectedItems.value = [];
     userDropdownState.searchText = '';
-    userDropdownState.menuList = [];
+};
+
+const { workspaceGroupAPI } = useWorkspaceGroupApi();
+const { key: workspaceGroupListBaseQueryKey } = useServiceQueryKey('identity', 'workspace-group', 'list');
+const { key: workspaceGroupListUserQueryKey } = useServiceQueryKey('identity', 'workspace-group-user', 'list');
+const queryClient = useQueryClient();
+
+const { mutateAsync: addUsersMutation, isPending: isAddUsersPending } = useMutation({
+    mutationFn: workspaceGroupAPI.addUsers,
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
+        if (workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupCreateModal) {
+            workspaceGroupPageStore.reset();
+        }
+        if (workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupUsersTab) {
+            resetState();
+        }
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListBaseQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: workspaceGroupListUserQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        resetState();
+        workspaceGroupPageStore.closeModal();
+    },
+});
+
+const newWorkspaceGroupConfirmFlow = async (workspaceGroupId?: string) => {
+    if (!workspaceGroupId) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
+    await addUsersMutation({
+        workspace_group_id: workspaceGroupId,
+        users: userDropdownState.selectedItems.map((item) => ({
+            user_id: item, role_id: roleSelectedItems.value[0]?.name,
+        })),
+    });
+};
+
+const selectedWorkspaceGroupConfirmFlow = async () => {
+    if (!workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) {
+        ErrorHandler.handleError(new Error('workspaceGroupId is not defined'));
+        return;
+    }
+    await addUsersMutation({
+        workspace_group_id: workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id,
+        users: userDropdownState.selectedItems.map((item) => ({
+            user_id: item, role_id: roleSelectedItems.value[0]?.name,
+        })),
+    });
 };
 
 const handleConfirm = async () => {
     try {
-        state.loading = true;
-        await SpaceConnector.clientV2.identity.workspaceGroup.addUsers<WorkspaceGroupAddUsersParameters, WorkspaceGroupModel>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
-            users: userDropdownState.selectedItems.map((item) => ({
-                user_id: item, role_id: roleSelectedItems.value[0]?.name,
-            })),
-        });
-        showSuccessMessage(i18n.t('IAM.WORKSPACE_GROUP.MODAL.ALT_S_ADD_USERS'), '');
-        await workspaceGroupPageStore.fetchWorkspaceGroups({ blockSelectedIndicesReset: true });
-        await workspaceGroupPageStore.listWorkspaceGroupUsers();
+        if (workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupCreateModal) {
+            await newWorkspaceGroupConfirmFlow(workspaceGroupPageState.modalAdditionalData?.workspaceGroupId);
+        } else {
+            await selectedWorkspaceGroupConfirmFlow();
+        }
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
         resetState();
         workspaceGroupPageStore.closeModal();
-        state.loading = false;
     }
 };
 
-const handleCloseModal = () => {
+const handleCloseModal = async () => {
     resetState();
+    if (!workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupUsersTab) {
+        workspaceGroupPageStore.reset();
+    }
     workspaceGroupPageStore.closeModal();
 };
 
@@ -111,27 +158,21 @@ const handleRemoveUser = (item: string) => {
     userDropdownState.selectedItems = userDropdownState.selectedItems.filter((selectedItem) => selectedItem !== item);
 };
 
-const fetchUserFindList = async ():Promise<WorkspaceGroupUserSummaryModel[]> => {
-    userDropdownState.loading = true;
-    try {
-        if (!(workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId)) throw Error('Invalid Workspace Group Id.');
-        const { results } = await SpaceConnector.clientV2.identity.workspaceGroupUser.find<WorkspaceGroupUserFindParameters, ListResponse<WorkspaceGroupUserSummaryModel>>({
-            workspace_group_id: workspaceGroupPageGetters.selectedWorkspaceGroupId ?? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId,
-            keyword: userDropdownState.searchText,
-            state: USER_STATE.ENABLE,
-            page: {
-                start: 0,
-                limit: userDropdownState.pageLimit,
-            },
-        });
-        return results ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    } finally {
-        userDropdownState.loading = false;
-    }
-};
+const isNewWorkspaceGroup = computed(() => workspaceGroupPageState.modalAdditionalData?.isOpenByWorkspaceGroupCreateModal);
+
+const { data: workspaceGroupUserFindList } = useWorkspaceGroupUserFindQuery({
+    params: computed(() => ({
+        workspace_group_id: (isNewWorkspaceGroup.value
+            ? workspaceGroupPageState.modalAdditionalData?.workspaceGroupId
+            : workspaceGroupPageState.selectedWorkspaceGroup?.workspace_group_id) ?? '',
+        keyword: userDropdownState.searchText,
+        state: USER_STATE.ENABLE,
+        page: {
+            start: 0,
+            limit: userDropdownState.pageLimit,
+        },
+    })),
+});
 
 const handleEnter = (user: [MenuItem]) => {
     const selectedUser = user[0]?.name;
@@ -141,23 +182,13 @@ const handleEnter = (user: [MenuItem]) => {
     userDropdownState.inputSelectedItem = [];
 };
 
-debouncedWatch(() => userDropdownState.searchText, async () => {
-    userDropdownState.userList = await fetchUserFindList() || [];
-}, { debounce: 300 });
-
-watch(() => workspaceGroupPageState.modal.visible, async (visible) => {
-    if (visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS) {
-        userDropdownState.selectedItems = [];
-        userDropdownState.userList = await fetchUserFindList() || [];
-    }
-});
 </script>
 
 <template>
     <p-button-modal class="workspace-group-add-users-modal"
                     :header-title="workspaceGroupPageState.modal.title"
                     :visible="workspaceGroupPageState.modal.visible === WORKSPACE_GROUP_MODAL_TYPE.ADD_USERS"
-                    :loading="state.loading"
+                    :loading="isAddUsersPending"
                     size="sm"
                     :disabled="!state.isAllValid"
                     @confirm="handleConfirm"

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 import { usePackageApi } from '@/api-clients/identity/package/composables/use-package-api';
 import type { PackageModel } from '@/api-clients/identity/package/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 
 export const usePackagesQuery = (ops?: {

@@ -1,52 +1,23 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { computed, reactive } from 'vue';
 
 import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
-import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
-import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
-import type { MetricModel } from '@/schema/inventory/metric/model';
-import type { MetricLabelKey } from '@/schema/inventory/metric/type';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { ReferenceMap } from '@/store/reference/type';
-
-// import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
-import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 
 import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
-    NamespaceSubItemType,
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
-    const appContextStore = useAppContextStore();
-    const allReferenceStore = useAllReferenceStore();
-    const _state = reactive({
-        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    });
     const state = reactive({
-        selectedNamespace: undefined as NamespaceSubItemType|undefined,
-        // data
-        metricLoading: false,
+        selectedNamespaceId: undefined as string|undefined,
         refreshMetricData: false,
-        metric: undefined as MetricModel|undefined,
-        metricExamples: [] as MetricExampleModel[],
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
@@ -60,44 +31,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
         refreshMetricPeriodDropdown: false,
-        periodText: undefined as string|undefined,
         // trigger
         metricInitiated: false,
     });
     const getters = reactive({
-        namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
-        metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
-        refinedMetricLabelKeys: computed<MetricLabelKey[]>(() => {
-            if (!state.metric?.labels_info?.length) return [];
-            if (_state.isAdminMode) {
-                return state.metric.labels_info;
-            }
-            return state.metric.labels_info?.filter((d) => d.key !== 'workspace_id');
-        }),
-        defaultMetricGroupByList: computed<string[]>(() => {
-            const defaultLabelKeys = state.metric?.labels_info?.filter((d) => d.default) ?? [];
-            return defaultLabelKeys.map((d) => d.key);
-        }),
-        // below is the map of reference store for each reference label key
-        labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
-            const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
-            state.metric?.labels_info?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
-                const _fieldName = d.key.replace('labels.', '');
-                _labelKeysMap[_fieldName] = d;
-            });
-
-            const _storeMap: Record<string, ReferenceMap> = {};
-            Object.values(_labelKeysMap).forEach((labelKey) => {
-                const _resourceType = labelKey.reference?.resource_type;
-                const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS)
-                    .find((d) => (d.meta?.resourceType === _resourceType));
-                if (targetModelConfig) {
-                    const _refinedKey = labelKey.key.replace('labels.', '');
-                    _storeMap[_refinedKey] = allReferenceStore.getters[targetModelConfig.key];
-                }
-            });
-            return _storeMap; // e.g. { 'Region': {...}, 'project_id': {...} }
-        }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([groupBy, filterItems]) => {
@@ -111,12 +48,15 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             });
             return results;
         }),
-        isRealtimeChart: computed<boolean>(() => ![CHART_TYPE.LINE, CHART_TYPE.LINE_AREA].includes(state.selectedChartType)),
+        isRealtimeChart: computed<boolean>(() => {
+            const realtimeChartTypes: ChartType[] = [CHART_TYPE.LINE, CHART_TYPE.LINE_AREA];
+            return !realtimeChartTypes.includes(state.selectedChartType);
+        }),
     });
 
     /* Mutations */
-    const setSelectedNamespace = (namespace?: NamespaceSubItemType) => {
-        state.selectedNamespace = namespace;
+    const setSelectedNamespaceId = (namespaceId?: string) => {
+        state.selectedNamespaceId = namespaceId;
     };
     const setSelectedChartType = (chartType: ChartType) => {
         state.selectedChartType = chartType;
@@ -154,13 +94,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setRefreshMetricPeriodDropdown = (refresh: boolean) => {
         state.refreshMetricPeriodDropdown = refresh;
     };
-    const setPeriodText = (periodText: string) => {
-        state.periodText = periodText;
-    };
 
     /* Actions */
     const reset = () => {
-        state.metric = undefined;
         state.refreshMetricPeriodDropdown = false;
         state.metricInitiated = false;
         //
@@ -183,38 +119,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             state.relativePeriod = _options?.relative_period;
         } else state.relativePeriod = undefined;
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
-        if (_options?.filters) state.filters = cloneDeep(metricExample?.options?.filters);
+        if (_options?.filters) state.filters = cloneDeep(_options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;
         state.refreshMetricPeriodDropdown = true;
-    };
-    const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
-    const loadMetric = async (metricId: string) => {
-        state.metricLoading = true;
-        try {
-            const { status, response } = await loadMetricFetcher<MetricGetParameters, MetricModel>({
-                metric_id: metricId,
-            });
-            if (status === 'succeed') {
-                state.metric = response;
-                state.metricLoading = false;
-            }
-        } catch (e) {
-            state.metric = undefined;
-            state.metricLoading = false;
-            console.error(e);
-        }
-    };
-    const loadMetricExamples = async (namespaceId?: string) => {
-        if (!namespaceId) return;
-        try {
-            const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
-                namespace_id: namespaceId,
-            });
-            state.metricExamples = res.results || [];
-        } catch (e) {
-            state.metricExamples = [];
-            console.error(e);
-        }
     };
     const openMetricQueryFormSidebar = (mode: QueryFormMode) => {
         state.metricQueryFormMode = mode;
@@ -223,13 +130,11 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
     const actions = {
         reset,
-        loadMetric,
-        loadMetricExamples,
         openMetricQueryFormSidebar,
         initMetricExampleOptions,
     };
     const mutations = {
-        setSelectedNamespace,
+        setSelectedNamespaceId,
         setGranularity,
         setPeriod,
         setRelativePeriod,
@@ -241,7 +146,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setShowMetricQueryFormSidebar,
         setRefreshMetricPeriodDropdown,
         setSelectedChartType,
-        setPeriodText,
         setMetricInitiated,
     };
 

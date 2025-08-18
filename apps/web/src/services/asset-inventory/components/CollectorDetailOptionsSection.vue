@@ -2,12 +2,12 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || state.isCollectorOptionsSchemaEmpty || !isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
                             :fields="state.fields"
-                            :loading="state.loading"
+                            :loading="isOriginCollectorLoading"
                             :data="state.collectorOptions"
                             style-type="white"
         >
@@ -39,7 +39,7 @@
             <p-button v-if="state.isEditMode"
                       style-type="tertiary"
                       size="lg"
-                      :disabled="state.isUpdating"
+                      :disabled="isUpdateCollectorPluginPending"
                       @click="handleClickCancel"
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
@@ -47,7 +47,7 @@
             <p-button v-if="state.isEditMode"
                       style-type="primary"
                       size="lg"
-                      :loading="state.isUpdating"
+                      :loading="isUpdateCollectorPluginPending"
                       class="save-changes-button"
                       @click="handleClickSave"
             >
@@ -60,18 +60,19 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButton, PPaneLayout, PDefinitionTable, PEmpty,
 } from '@cloudforet/mirinae';
 import type { JsonSchema } from '@cloudforet/mirinae/types/controls/forms/json-schema-form/type';
 import type { DefinitionField } from '@cloudforet/mirinae/types/data-display/tables/definition-table/type';
 
-
-import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { CollectorOptions } from '@/schema/inventory/collector/type';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { CollectorOptions } from '@/api-clients/inventory/collector/schema/type';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -79,8 +80,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
 
 const props = defineProps<{
     hasReadWriteAccess?: boolean
@@ -88,12 +91,13 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const appContextStore = useAppContextStore();
+
+const { collectorAPI } = useCollectorApi();
 
 const state = reactive({
-    loading: computed<boolean>(() => !collectorFormState.originCollector),
-    collectorOptions: computed<CollectorOptions>(() => collectorFormState.originCollector?.plugin_info?.options ?? {}),
-    collectorOptionsSchema: computed<JsonSchema>(() => collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {
+    collectorOptions: computed<CollectorOptions>(() => originCollectorData.value?.plugin_info?.options ?? {}),
+    collectorOptionsSchema: computed<JsonSchema>(() => originCollectorData.value?.plugin_info?.metadata?.options_schema ?? {
         type: 'object',
         properties: {},
     }),
@@ -116,17 +120,35 @@ const state = reactive({
     }),
     isEditMode: false,
     isOptionsValid: false,
-    isUpdating: false,
+});
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
+
+/* Query */
+const {
+    data: originCollectorData, collectorGetQueryKey, isLoading: isOriginCollectorLoading,
+} = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
 });
 
-const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
-    if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameters = {
-        collector_id: collectorFormState.collectorId,
-        options: collectorFormState.options,
-    };
-    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
-};
+/* Mutation */
+const queryClient = useQueryClient();
+const {
+    mutateAsync: updateCollectorPlugin, isPending: isUpdateCollectorPluginPending,
+} = useMutation({
+    mutationFn: collectorAPI.updatePlugin,
+    onSuccess: () => {
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR_OPTIONS'), '');
+        state.isEditMode = false;
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+    },
+    onError: (e) => {
+        collectorFormStore.setOptions(originCollectorData.value?.plugin_info?.options ?? {});
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR_OPTIONS'));
+    },
+});
+
+/* Event Handler */
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -140,18 +162,10 @@ const handleClickCancel = () => {
 };
 
 const handleClickSave = async () => {
-    try {
-        state.isUpdating = true;
-        const collector = await fetchCollectorPluginUpdate();
-        collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR_OPTIONS'), '');
-        state.isEditMode = false;
-    } catch (error) {
-        collectorFormStore.resetOptions();
-        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR_OPTIONS'));
-    } finally {
-        state.isUpdating = false;
-    }
+    await updateCollectorPlugin({
+        collector_id: collectorFormState.collectorId ?? '',
+        options: collectorFormState.options,
+    });
 };
 
 </script>

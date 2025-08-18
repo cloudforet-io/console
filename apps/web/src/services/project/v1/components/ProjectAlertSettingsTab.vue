@@ -13,16 +13,16 @@ import {
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
 import { RESOURCE_GROUP } from '@/api-clients/_common/schema/constant';
-import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
-import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
-import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
-import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
-import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { EscalationPolicyGetParameters } from '@/api-clients/monitoring/escalation-policy/schema/api-verbs/get';
+import type { EscalationPolicyModel } from '@/api-clients/monitoring/escalation-policy/schema/model';
+import type { EventRuleListParameters } from '@/api-clients/monitoring/event-rule/schema/api-verbs/list';
+import type { EventRuleModel } from '@/api-clients/monitoring/event-rule/schema/model';
+import type { ProjectAlertConfigGetParameters } from '@/api-clients/monitoring/project-alert-config/schema/api-verbs/get';
+import type { ProjectAlertConfigModel } from '@/api-clients/monitoring/project-alert-config/schema/model';
 import type {
     ProjectAlertConfigNotiUrgency,
     ProjectAlertConfigRecoveryMode,
-} from '@/schema/monitoring/project-alert-config/type';
+} from '@/api-clients/monitoring/project-alert-config/schema/type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

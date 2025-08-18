@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PDoubleCheckModal, PButtonModal, PLink, PStatus,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceDeleteParameters } from '@/api-clients/identity/workspace/schema/api-verbs/delete';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -30,34 +34,50 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'refresh'): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
-const allReferenceStore = useAllReferenceStore();
+const workspacePageState = workspacePageStore.state;
 
 const storeState = reactive({
-    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageStore.selectedWorkspaces[0]),
+    selectedWorkspace: computed<WorkspaceModel>(() => workspacePageState.selectedWorkspace),
 });
+
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     headerTitle: computed(() => `${_i18n.t('IAM.WORKSPACES.DELETE_WORKSPACE')}`),
     selectedWorkspaceName: computed(() => storeState.selectedWorkspace?.name || ''),
-    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
-    relatedTrustedAccount: computed(() => state.trustedAccounts[storeState.selectedWorkspace?.trusted_account_id]?.data ?? {}),
+    relatedTrustedAccount: computed(() => {
+        if (!storeState.selectedWorkspace?.trusted_account_id) return {};
+        return referenceMap.trustedAccount[storeState.selectedWorkspace.trusted_account_id]?.data ?? {};
+    }),
     isSyncedAccount: computed(() => storeState.selectedWorkspace?.is_managed && state.relatedTrustedAccount?.schedule?.state === 'ENABLED'),
 });
 
-const handleConfirm = async () => {
-    try {
-        await SpaceConnector.clientV2.identity.workspace.delete<WorkspaceDeleteParameters>({
-            workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
-        });
-        state.proxyVisible = false;
-        emit('refresh');
-    } catch (e) {
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { mutate: deleteWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceDeleteParameters) => workspaceAPI.delete(params),
+    onSuccess: async () => {
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
+        showSuccessMessage(_i18n.t('IAM.WORKSPACES.ALT_S_DELETE_WORKSPACE'), '');
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
+    },
+    onError: (e) => {
         ErrorHandler.handleError(e, true);
-    }
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+
+const handleConfirm = () => {
+    deleteWorkspaceMutation({
+        workspace_id: storeState.selectedWorkspace?.workspace_id ?? '',
+    });
 };
 </script>
 

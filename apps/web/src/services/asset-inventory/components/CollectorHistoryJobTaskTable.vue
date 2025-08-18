@@ -3,19 +3,16 @@ import {
     computed, onActivated, onDeactivated, reactive, watch,
 } from 'vue';
 
-
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@cloudforet/mirinae';
+import type { KeyItemSet } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
-import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -28,8 +25,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useInventoryJobTaskListQuery } from '@/services/asset-inventory/composables/use-inventory-job-task-list-query';
 import {
     statusIconColorFormatter,
     statusIconFormatter,
@@ -37,6 +33,7 @@ import {
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { JOB_SELECTED_STATUS, JOB_TASK_STATE } from '@/services/asset-inventory/types/collector-history-page-type';
+
 
 interface Props {
     jobId: string;
@@ -77,12 +74,14 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const userStore = useUserStore();
+
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 
 const { getReferenceLocation } = useReferenceRouter();
@@ -90,7 +89,6 @@ const { getReferenceLocation } = useReferenceRouter();
 const state = reactive({
     loading: false,
     timezone: computed<string|undefined>(() => userStore.state.timezone),
-    items: [] as ({duration: string} & JobTaskModel)[],
     selectedStatus: 'ALL',
     //
     selectIndex: [],
@@ -98,9 +96,13 @@ const state = reactive({
     pageStart: 1,
     sortBy: '',
     sortDesc: true,
-    totalCount: 0,
     searchTags: [],
 });
+const items = computed(() => (jobTasksData.value?.results ?? []).map((jobTask) => ({
+    ...jobTask,
+    started_at: iso8601Formatter(jobTask.started_at, state.timezone) || '--',
+    duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone) || '--',
+})));
 
 const querySearchHandlers = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -156,7 +158,8 @@ const getQuery = () => {
 
 /* Components */
 const handleSelect = (selectedIndexes: number) => {
-    emit('select', state.items[selectedIndexes[0]]);
+    if (!items.value || !items.value.length) return;
+    emit('select', items.value[selectedIndexes[0]]);
 };
 const handleChange = async (options: any = {}) => {
     if (options.sortBy !== undefined) {
@@ -166,41 +169,26 @@ const handleChange = async (options: any = {}) => {
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) state.searchTags = options.queryTags;
-
-    await getJobTasks();
 };
 
-/* API */
-const getJobTasks = async () => {
-    state.loading = true;
-    try {
-        const res = await SpaceConnector.clientV2.inventory.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
-            query: getQuery(),
-            job_id: props.jobId,
-        });
-        state.totalCount = res.total_count ?? 0;
-        state.items = (res.results ?? []).map((jobTask) => ({
-            ...jobTask,
-            started_at: iso8601Formatter(jobTask.started_at, state.timezone) || '--',
-            duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone) || '--',
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-        state.totalCount = 0;
-    }
-    state.loading = false;
-};
+/* Query */
+const {
+    jobTaskListData: jobTasksData, isLoading: isLoadingJobTasks, totalCount, refetch: refetchJobTasks,
+} = useInventoryJobTaskListQuery({
+    params: computed(() => ({
+        job_id: props.jobId,
+        query: getQuery(),
+    })),
+    thisPage: computed(() => getThisPage(state.pageStart, state.pageLimit)),
+    pageSize: computed(() => state.pageLimit),
+});
 
 /* Init */
 const initStates = () => {
-    state.totalCount = 0;
-    state.items = [];
     state.pageLimit = 15;
     state.pageStart = 1;
     state.sortBy = '';
     state.sortDesc = true;
-    state.totalCount = 0;
     state.searchTags = [];
     state.selectIndex = [];
     state.selectedStatus = 'ALL';
@@ -210,11 +198,9 @@ let stopSelectStatusWatch;
 
 onActivated(async () => {
     initStates();
-    await getJobTasks();
 
     stopSelectStatusWatch = watch(() => state.selectedStatus, () => {
         state.pageStart = 1;
-        getJobTasks();
     });
 });
 
@@ -227,14 +213,14 @@ onDeactivated(() => {
     <p-toolbox-table selectable
                      sortable
                      search-type="query"
-                     :loading="state.loading"
+                     :loading="isLoadingJobTasks"
                      :fields="storeState.isAdminMode ? adminFields : fields"
-                     :items="state.items"
+                     :items="items"
                      :select-index.sync="state.selectIndex"
                      :sort-by="state.sortBy"
                      :sort-desc="state.sortDesc"
                      :page-size="state.pageLimit"
-                     :total-count="state.totalCount"
+                     :total-count="totalCount"
                      :query-tags="state.searchTags"
                      :key-item-sets="querySearchHandlers.keyItemSets"
                      :value-handler-map="querySearchHandlers.valueHandlerMap"
@@ -242,7 +228,7 @@ onDeactivated(() => {
                      :excel-visible="false"
                      :timezone="state.timezone"
                      @change="handleChange"
-                     @refresh="handleChange()"
+                     @refresh="refetchJobTasks"
                      @select="handleSelect"
     >
         <template #toolbox-top>
@@ -282,7 +268,7 @@ onDeactivated(() => {
                     }"
                     action-icon="internal-link"
                     new-tab
-                    :text="storeState.workspaces[value]?.label"
+                    :text="referenceMap.workspace[value]?.label || value"
             />
         </template>
         <template #col-project_id-format="{ value, item }">

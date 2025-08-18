@@ -7,9 +7,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import { ALERT_SEVERITY } from '@/schema/alert-manager/alert/constants';
-import { EVENT_RULE_CONDITIONS_POLICY } from '@/schema/alert-manager/event-rule/constant';
-import type { EventRuleConditionsType } from '@/schema/alert-manager/event-rule/type';
+import { ALERT_SEVERITY } from '@/api-clients/alert-manager/alert/schema/constants';
+import { EVENT_RULE_CONDITIONS_POLICY } from '@/api-clients/alert-manager/event-rule/schema/constants';
+import type { EventRuleConditionsType } from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';

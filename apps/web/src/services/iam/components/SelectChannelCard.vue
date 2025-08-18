@@ -3,34 +3,40 @@ import { computed, reactive } from 'vue';
 
 import { PSelectCard, PLazyImg } from '@cloudforet/mirinae';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
-import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
-const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.state;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-});
-
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
-        label: protocol.name,
-        value: protocol.protocol_id,
-    }))),
     selectedProtocol: {},
 });
+
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list');
+
+const { data: notificationProtocolList } = useScopedQuery({
+    queryKey: notificationProtocolListQueryKey,
+    queryFn: async () => notificationProtocolAPI.list(),
+    select: (data) => data?.results || [],
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+
+const notificationProtocolCardList = computed(() => (notificationProtocolList.value || []).map((item) => ({
+    label: item.name,
+    value: item.protocol_id,
+    icon: referenceMap.plugin[item.plugin_info.plugin_id]?.icon || '',
+})));
 
 /* Component */
 const handleSelectChannel = (selectedProtocol) => {
@@ -46,7 +52,7 @@ const handleSelectChannel = (selectedProtocol) => {
 
 <template>
     <div class="select-channel-card">
-        <p-select-card v-for="(channel, idx) in state.protocolList"
+        <p-select-card v-for="(channel, idx) in notificationProtocolCardList"
                        :key="`channel-${idx}`"
                        v-model="state.selectedProtocol"
                        :selected="state.selectedProtocol"

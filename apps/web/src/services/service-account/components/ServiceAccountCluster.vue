@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
     PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
-import type { AgentModel } from '@/api-clients/identity/agent/schema/model';
 import { i18n as _i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red } from '@/styles/colors';
 
@@ -17,7 +18,11 @@ import ServiceAccountAddClusterScriptField
     from '@/services/service-account/components/ServiceAccountAddClusterScriptField.vue';
 import ServiceAccountClusterDetail
     from '@/services/service-account/components/ServiceAccountClusterDetail.vue';
-import { useServiceAccountAgentStore } from '@/services/service-account/stores/service-account-agent-store';
+import { useServiceAccountAgentDeleteMutation } from '@/services/service-account/composables/mutations/agent/use-service-account-agent-delete-mutation';
+import { useServiceAccountAgentDisableMutation } from '@/services/service-account/composables/mutations/agent/use-service-account-agent-disable-mutation';
+import { useServiceAccountAgentEnableMutation } from '@/services/service-account/composables/mutations/agent/use-service-account-agent-enable-mutation';
+import { useServiceAccountAgentRegenerateMutation } from '@/services/service-account/composables/mutations/agent/use-service-account-agent-regenerate-mutation';
+import { useServiceAccountAgent } from '@/services/service-account/composables/use-service-account-agent';
 
 interface Props {
     serviceAccountId: string;
@@ -27,18 +32,18 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
 });
-const serviceAccountAgentStore = useServiceAccountAgentStore();
-
-const storeState = reactive({
-    loading: computed(() => serviceAccountAgentStore.state.loading),
-    isAgentCreated: computed(() => serviceAccountAgentStore.getters.isAgentCreated),
-    isClusterConnected: computed(() => serviceAccountAgentStore.getters.isClusterConnected),
-    agentData: computed<AgentModel|undefined>(() => serviceAccountAgentStore.state.agentInfo),
+const {
+    agentData,
+    isLoading: isLoadingAgent,
+    isAgentCreated,
+    isClusterConnected,
+} = useServiceAccountAgent({
+    serviceAccountId: computed(() => props.serviceAccountId),
 });
 
 const state = reactive({
-    title: computed(() => (storeState.isAgentCreated ? _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CLUSTER_DETAIL_HEADER') : _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER_HEADER'))),
-    isClusterActive: computed(() => (storeState.agentData?.state === 'ENABLED')),
+    title: computed(() => (isAgentCreated.value ? _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CLUSTER_DETAIL_HEADER') : _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER_HEADER'))),
+    isClusterActive: computed(() => (agentData.value?.state === 'ENABLED')),
 });
 
 const modalState = reactive({
@@ -60,36 +65,55 @@ const handleOpenClusterConnectionModal = () => {
 const handleOpenReconnectModal = () => {
     modalState.reconnectModalVisible = true;
 };
+
+const { mutate: regenerateAgent, isPending: isRegeneratingAgent } = useServiceAccountAgentRegenerateMutation({
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+});
 const handleOpenRegenerateClusterModal = async () => {
     modalState.reconnectModalVisible = false;
     modalState.addClusterModalType = 'REGENERATE';
     modalState.addClusterModalVisible = true;
-    await serviceAccountAgentStore.regenerateAgent(props.serviceAccountId);
+    regenerateAgent({ service_account_id: props.serviceAccountId });
 };
 const handleOpenDeleteClusterModal = () => {
     modalState.deleteClusterModalVislble = true;
 };
+
+const { mutateAsync: enableAgent, isPending: isEnablingAgent } = useServiceAccountAgentEnableMutation();
+const { mutateAsync: disableAgent, isPending: isDisablingAgent } = useServiceAccountAgentDisableMutation();
+
+
 const handleConfirmClusterConnection = async () => {
-    if (state.isClusterActive) {
-        await serviceAccountAgentStore.disableAgent(props.serviceAccountId);
-    } else {
-        await serviceAccountAgentStore.enableAgent(props.serviceAccountId);
+    try {
+        if (state.isClusterActive) {
+            await disableAgent({ service_account_id: props.serviceAccountId });
+        } else {
+            await enableAgent({ service_account_id: props.serviceAccountId });
+        }
+    } catch (error) {
+        ErrorHandler.handleError(error);
+    } finally {
+        modalState.connectionModalVisible = false;
     }
-    modalState.connectionModalVisible = false;
-};
-const handleConfirmDeleteCluster = async () => {
-    await serviceAccountAgentStore.deleteAgent(props.serviceAccountId);
-    modalState.deleteClusterModalVislble = false;
 };
 
-onMounted(async () => {
-    await serviceAccountAgentStore.getAgent(props.serviceAccountId);
+const { mutate: deleteAgent, isPending: isDeletingAgent } = useServiceAccountAgentDeleteMutation({
+    onError: (error) => {
+        ErrorHandler.handleError(error);
+    },
+    onSuccess: () => {
+        modalState.deleteClusterModalVislble = false;
+    },
 });
+const handleConfirmDeleteCluster = () => {
+    deleteAgent({ service_account_id: props.serviceAccountId });
+};
 
-onUnmounted(() => {
-    serviceAccountAgentStore.setAgentInfo(undefined);
-});
-
+const isLoading = computed(() => (
+    isLoadingAgent.value || isRegeneratingAgent.value || isEnablingAgent.value || isDisablingAgent.value || isDeletingAgent.value
+));
 
 </script>
 
@@ -104,10 +128,10 @@ onUnmounted(() => {
             </template>
             <template #extra>
                 <div class="h-full pt-8 px-4 pb-4">
-                    <div v-if="storeState.isAgentCreated"
+                    <div v-if="isAgentCreated"
                          class="button-wrapper"
                     >
-                        <p-button v-if="storeState.isClusterConnected"
+                        <p-button v-if="isClusterConnected"
                                   style-type="tertiary"
                                   @click="handleOpenClusterConnectionModal"
                         >
@@ -130,10 +154,12 @@ onUnmounted(() => {
             </template>
         </p-heading-layout>
 
-        <p-data-loader :loading="storeState.loading"
+        <p-data-loader :loading="isLoading"
                        class="content-wrapper"
         >
-            <service-account-cluster-detail v-if="storeState.isAgentCreated" />
+            <service-account-cluster-detail v-if="isAgentCreated"
+                                            :service-account-id="props.serviceAccountId"
+            />
             <div v-else
                  class="not-been-connected-yet"
             >
@@ -184,7 +210,7 @@ onUnmounted(() => {
                 <p class="reconnect-description">
                     <i18n path="INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT_DESCRIPTION">
                         <template #cluster>
-                            <strong>{{ storeState.agentData?.options?.cluster_name }}</strong>
+                            <strong>{{ agentData?.options?.cluster_name }}</strong>
                         </template>
                     </i18n>
                 </p>
@@ -206,7 +232,7 @@ onUnmounted(() => {
                               modal-size="md"
                               :visible.sync="modalState.deleteClusterModalVislble"
                               :header-title="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_CLUSTER_MODAL_TEXT')"
-                              :verification-text="storeState.agentData?.options?.cluster_name"
+                              :verification-text="agentData?.options?.cluster_name"
                               @confirm="handleConfirmDeleteCluster"
         >
             <template #middle-contents>

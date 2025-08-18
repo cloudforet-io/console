@@ -17,9 +17,11 @@ import type { MappingItem } from '@/common/components/mapping-method/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import WorkspaceDropdown from '@/services/service-account/components/WorkspaceDropdown.vue';
+import { useServiceAccountDetail } from '@/services/service-account/composables/use-service-account-detail';
 import { CSP_AUTO_SYNC_OPTIONS_MAP, WORKSPACE_MAPPING_OPTIONS_MAP } from '@/services/service-account/constants/auto-sync-options-contant';
 import type { ServiceAccountStoreFormState } from '@/services/service-account/stores/service-account-page-store';
 import { useServiceAccountPageStore } from '@/services/service-account/stores/service-account-page-store';
+
 
 type FormData = Partial<Pick<ServiceAccountStoreFormState, 'selectedSingleWorkspace' | 'skipProjectGroup' | 'azureManagementGroupMappingType'>>;
 type MappingMethodOptionType = {
@@ -29,9 +31,14 @@ type MappingMethodOptionType = {
 };
 
 type WorkspaceMapping = (typeof WORKSPACE_MAPPING_OPTIONS_MAP)[keyof typeof WORKSPACE_MAPPING_OPTIONS_MAP];
+interface Props {
+    mode: 'UPDATE'|'READ';
+    serviceAccountId?: string;
+}
 
-const props = withDefaults(defineProps<{mode:'UPDATE'|'READ'}>(), {
+const props = withDefaults(defineProps<Props>(), {
     mode: 'UPDATE',
+    serviceAccountId: undefined,
 });
 
 const serviceAccountPageStore = useServiceAccountPageStore();
@@ -40,6 +47,12 @@ const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
+
+const {
+    serviceAccountData,
+} = useServiceAccountDetail({
+    serviceAccountId: computed(() => props.serviceAccountId),
+});
 
 const state = reactive({
     selectedWorkspace: computed<string|undefined>(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? undefined),
@@ -60,8 +73,8 @@ const state = reactive({
     formData: computed<FormData>(() => convertToMappingMethodDTO(state.isDomainForm, state.workspaceMapping, state.projectGroupMapping, state.selectedWorkspace)),
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
-    isCreatePage: computed(() => serviceAccountPageState.originServiceAccountItem?.resource_group === undefined),
+    isResourceGroupDomain: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === 'DOMAIN'),
+    isCreatePage: computed<boolean>(() => (serviceAccountData.value as TrustedAccountModel)?.resource_group === undefined),
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
     mappingItems: computed<MappingItem[]>(() => {
         if (state.isDomainForm) {
@@ -196,9 +209,9 @@ watch(() => state.formData, (formData) => {
     });
 });
 
-watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
-    if (item) {
-        const _item = item as TrustedAccountModel;
+watch(serviceAccountData, (_serviceAccountData) => {
+    if (_serviceAccountData) {
+        const _item = _serviceAccountData as TrustedAccountModel;
         convertToMappingMethodClientEntity(_item);
     }
 }, { immediate: true });

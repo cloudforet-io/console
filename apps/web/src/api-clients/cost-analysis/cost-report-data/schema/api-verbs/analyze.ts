@@ -1,5 +1,7 @@
+import type { AnalyzeQuery } from '@cloudforet/core-lib/space-connector/type';
+
 export interface CostReportDataAnalyzeParameters {
-    query?: any;
+    query?: AnalyzeQuery;
     cost_report_config_id?: string;
     is_confirmed?: boolean;
     product?: string;

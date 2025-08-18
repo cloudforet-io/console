@@ -9,7 +9,7 @@ import {
 } from '@cloudforet/mirinae';
 
 
-import type { WebhookUpdateParameters } from '@/schema/monitoring/webhook/api-verbs/update';
+import type { WebhookUpdateParameters } from '@/api-clients/monitoring/webhook/schema/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

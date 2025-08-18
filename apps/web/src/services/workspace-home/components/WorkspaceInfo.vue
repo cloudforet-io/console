@@ -4,13 +4,21 @@ import Vue, {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButton, PHeading, PI, PTextButton, PHeadingLayout,
+    PButton, PHeading,
+    PHeadingLayout,
+    PI, PTextButton,
 } from '@cloudforet/mirinae';
 
+import { useAppApi } from '@/api-clients/identity/app/composables/use-app-api';
+import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
+import { useWorkspaceUserApi } from '@/api-clients/identity/workspace-user/composables/use-workspace-user-api';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -31,39 +39,60 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-
-interface Props {
-    accessUserMenu: boolean;
-    accessAppMenu: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    accessUserMenu: false,
-    accessAppMenu: false,
-});
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const userPageStore = useUserPageStore();
 const appPageStore = useAppPageStore();
 const appContextStore = useAppContextStore();
-const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageState = workspaceHomePageStore.state;
 const authorizationStore = useAuthorizationStore();
 
 const router = useRouter();
 
-
 const storeState = reactive({
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
-    appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
 });
+const accessState = reactive({
+    isWorkspaceOwner: computed<boolean>(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    accessUserMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]) && accessState.isWorkspaceOwner),
+    accessAppMenu: computed<boolean>(() => !isEmpty(authorizationStore.getters.pageAccessPermissionMap[MENU_ID.APP]) && accessState.isWorkspaceOwner),
+});
+
+
+const { workspaceUserAPI } = useWorkspaceUserApi();
+const { appAPI } = useAppApi();
+const workspaceUserListQueryHelper = new ApiQueryHelper().setCountOnly();
+const appListQueryHelper = new ApiQueryHelper().setCountOnly();
+const { key: workspaceUserListQueryKey, params: workspaceUserListQueryParams } = useServiceQueryKey('identity', 'workspace-user', 'list', {
+    params: computed(() => ({
+        workspace_id: userWorkspaceGetters.currentWorkspaceId,
+        query: workspaceUserListQueryHelper.data,
+    })),
+});
+const { key: appListQueryKey, params: appListQueryParams } = useServiceQueryKey('identity', 'app', 'list', {
+    params: computed(() => ({
+        workspace_id: userWorkspaceGetters.currentWorkspaceId,
+        query: appListQueryHelper.data,
+    })),
+});
+const { data: workspaceUserListCount } = useScopedQuery({
+    queryKey: workspaceUserListQueryKey,
+    queryFn: () => workspaceUserAPI.list(workspaceUserListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+    enabled: computed(() => accessState.accessUserMenu),
+}, ['WORKSPACE']);
+const { data: appListData } = useScopedQuery({
+    queryKey: appListQueryKey,
+    queryFn: () => appAPI.list(appListQueryParams.value),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+    enabled: computed(() => accessState.accessAppMenu),
+}, ['WORKSPACE']);
 
 const handleActionButton = (type: string) => {
     if (type === 'invite' || type === 'user') {
@@ -97,12 +126,8 @@ const actionWorkspace = (type: string, workspaceId: string) => {
 const routerToCreateApp = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.APP._NAME }).catch(() => {});
     if (isOpenModal) {
-        appPageStore.$patch((_state) => {
-            _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
-            _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
-            _state.modal.visible.form = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
+        appPageStore.setModalInfo(APP_DROPDOWN_MODAL_TYPE.CREATE, i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string);
+        appPageStore.setModalVisible('form', true);
     }
 };
 const routerToWorkspaceUser = (isOpenModal: boolean) => {
@@ -148,7 +173,7 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                           class="desc"
                     >{{ state.selectedWorkspace.tags?.description }}</span>
                     <div class="info-cnt-wrapper">
-                        <div v-if="props.accessUserMenu"
+                        <div v-if="accessState.accessUserMenu"
                              class="info-cnt"
                         >
                             <p-i name="ic_service_user"
@@ -157,17 +182,17 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                  color="inherit"
                             />
                             <p-text-button @click="handleActionButton('user')">
-                                {{ storeState.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
+                                {{ workspaceUserListCount?.total_count || 0 }} {{ $t('HOME.INFO_USERS') }}
                             </p-text-button>
                         </div>
-                        <p-i v-if="props.accessAppMenu && props.accessUserMenu"
+                        <p-i v-if="accessState.accessAppMenu && accessState.accessUserMenu"
                              name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
                              :color="gray[500]"
                              class="dot"
                         />
-                        <div v-if="props.accessAppMenu"
+                        <div v-if="accessState.accessAppMenu"
                              class="info-cnt"
                         >
                             <p-i name="ic_service_app"
@@ -176,12 +201,12 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
                                  color="inherit"
                             />
                             <p-text-button @click="handleActionButton('app')">
-                                {{ storeState.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
+                                {{ appListData?.total_count || 0 }} {{ $t('HOME.INFO_APPS') }}
                             </p-text-button>
                         </div>
                     </div>
                 </template>
-                <template v-if="props.accessUserMenu && authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]?.write"
+                <template v-if="accessState.accessUserMenu && authorizationStore.getters.pageAccessPermissionMap[MENU_ID.USER]?.write"
                           #extra
                 >
                     <p-button style-type="tertiary"

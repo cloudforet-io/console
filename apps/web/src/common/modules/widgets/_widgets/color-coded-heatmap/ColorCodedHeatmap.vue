@@ -14,10 +14,10 @@ import { i18n } from '@/translations';
 
 import WidgetCustomLegend from '@/common/modules/widgets/_components/WidgetCustomLegend.vue';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/use-widget-data-table-query';
-import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget-date-range';
-import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget-frame';
-import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/use-widget-load-query';
+import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-query';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/data-table/use-widget-date-range';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/widget/use-widget-frame';
+import { useWidgetLoadQuery } from '@/common/modules/widgets/_composables/widget/use-widget-load-query';
 import {
     getReferenceLabel,
 } from '@/common/modules/widgets/_helpers/widget-date-helper';

@@ -5,8 +5,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
 import type { ProjectGroupGetParameters } from '@/api-clients/identity/project-group/schema/api-verbs/get';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 export const useProjectGroupQuery = ({
     projectGroupId,

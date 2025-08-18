@@ -1,26 +1,31 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import BudgetUsageTrendTotalChart from '@/services/cost-explorer/components/BudgetUsageTrendTotalChart.vue';
 import BudgetUsageTrendTotalTable from '@/services/cost-explorer/components/BudgetUsageTrendTotalTable.vue';
-import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+import { useBudgetGetQuery } from '@/services/cost-explorer/composables/use-budget-get-query';
+import { useBudgetUsageQuery } from '@/services/cost-explorer/composables/use-budget-usage-query';
 
-const budgetPageStore = useBudgetDetailPageStore();
-const budgetPageState = budgetPageStore.$state;
+interface Props {
+    budgetId: string;
+}
+
+const props = defineProps<Props>();
+
+const { budgetData } = useBudgetGetQuery(computed(() => props.budgetId));
+const { budgetUsageAPI } = useBudgetUsageQuery();
 
 const state = reactive({
-    budgetData: computed(() => budgetPageState.budgetData),
+    budgetData: computed(() => budgetData.value),
     data: [],
 });
 
 const fetchBudgetUsageAnalyze = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
-            budget_id: state.budgetData?.budget_id,
+        const { results } = await budgetUsageAPI.analyze({
+            budget_id: props.budgetId,
             query: {
                 group_by: ['name', 'date', 'currency'],
                 fields: {
@@ -49,7 +54,11 @@ watch(() => state.budgetData, async () => {
 
 <template>
     <div>
-        <budget-usage-trend-total-chart :data="state.data" />
-        <budget-usage-trend-total-table :data="state.data" />
+        <budget-usage-trend-total-chart :data="state.data"
+                                        :budget-id="props.budgetId"
+        />
+        <budget-usage-trend-total-table :data="state.data"
+                                        :budget-id="props.budgetId"
+        />
     </div>
 </template>

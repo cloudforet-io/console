@@ -10,16 +10,17 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider, PTooltip } from '@cloudforet/mirinae';
 
+import type { CloudServiceTypeModel } from '@/api-clients/inventory/cloud-service-type/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { arrayToQueryString, objectToQueryString } from '@/lib/router-query-string';
 
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
+import { useCloudServiceTypeListQuery } from '@/services/asset-inventory/composables/use-cloud-service-type-list-query';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
@@ -27,6 +28,7 @@ import { useCloudServicePageStore } from '@/services/asset-inventory/stores/clou
 import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { CloudServiceDetailPageUrlQuery } from '@/services/asset-inventory/types/cloud-service-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
+
 
 interface Props {
     item: CloudServiceAnalyzeResult;
@@ -44,20 +46,24 @@ const props = withDefaults(defineProps<Props>(), {
 
 const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
 
+const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
+    params: computed(() => ({
+        query: { only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'] },
+    })),
+});
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
-        const res: Record<string, CloudServiceTypeItem> = {};
-        Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
-            res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
+        const res: Record<string, CloudServiceTypeModel> = {};
+        cloudServiceTypeList.value?.forEach((item) => {
+            res[`${item.provider}:${item.group}:${item.name}`] = item;
         });
         return res;
     }),
@@ -116,12 +122,12 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
 
     if (cloudServiceType && provider && group) {
         const key = `${provider}:${group}:${cloudServiceType}`;
-        const icon = state.cloudServiceTypeToItemMap[key]?.icon;
+        const icon = state.cloudServiceTypeToItemMap[key]?.tags?.['spaceone:icon'];
         if (icon) return assetUrlConverter(icon);
     }
 
     if (provider) {
-        const icon = state.providers[provider]?.icon;
+        const icon = providerMap[provider]?.icon;
         if (icon) return assetUrlConverter(icon);
     }
 
@@ -137,7 +143,7 @@ const getImageUrl = (item: CloudServiceAnalyzeResult) => {
         >
             <div class="card-title-wrapper">
                 <div class="provider-title-wrapper">
-                    <span class="provider">{{ (item.provider && state.providers[item.provider]) ? state.providers[item.provider].label : item.provider }}</span>
+                    <span class="provider">{{ item.provider ? providerMap[item.provider]?.label || item.provider : '' }}</span>
                 </div>
                 <div class="service-group-wrapper">
                     <p-lazy-img width="1.25rem"

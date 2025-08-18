@@ -1,28 +1,26 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { useQueryClient } from '@tanstack/vue-query';
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeadingLayout, PHeading, PButton, PToolboxTable, PBadge, PLazyImg,
 } from '@cloudforet/mirinae';
 
-import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { NotificationProtocolGetParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/get';
-import type { NotificationProtocolListParameters } from '@/schema/alert-manager/notification-protocol/api-verbs/list';
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { UserGroupChannelGetParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/get';
-import type { UserGroupChannelListParameters } from '@/schema/alert-manager/user-group-channel/api-verbs/list';
-import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/schema/alert-manager/user-group-channel/constants';
-import type { UserGroupChannelModel } from '@/schema/alert-manager/user-group-channel/model';
+import { useNotificationProtocolApi } from '@/api-clients/alert-manager/notification-protocol/composables/use-notification-protocol-api';
+import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
+import { USER_GROUP_CHANNEL_SCHEDULE_TYPE } from '@/api-clients/alert-manager/user-group-channel/schema/constants';
 import type {
     UserGroupChannelScheduleInfoType,
-} from '@/schema/alert-manager/user-group-channel/type';
+} from '@/api-clients/alert-manager/user-group-channel/schema/type';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-scoped-pagination-query';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -31,15 +29,17 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import type { DayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { useUserGroupChannelGetQuery } from '@/services/iam/composables/use-user-group-channel-get-query';
 import {
     USER_GROUP_CHANNELS_SEARCH_HANDLERS,
     USER_GROUP_MODAL_TYPE,
 } from '@/services/iam/constants/user-group-constant';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+
 
 interface Props {
   hasReadWriteAccess: boolean;
@@ -50,20 +50,13 @@ const props = defineProps<Props>();
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
-
-const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
-
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
-const channelListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(userGroupPageState.userGroupChannels.pageStart)
-    .setSort('name', true);
-const channelListApiQuery = channelListApiQueryHelper.data;
+const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_CHANNELS_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
-
 
 interface ChannelItem {
   name: string;
@@ -76,29 +69,70 @@ interface ChannelItem {
 const isDeleteAble = ref<boolean>(false);
 const isScheduleTagged = ref<boolean>(false);
 
+const paginationState = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+const filterState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+
+const queryClient = useQueryClient();
+const { userGroupChannelAPI } = useUserGroupChannelApi();
+
+const channelListApiQueryHelper = new ApiQueryHelper();
+const { key: userGroupChannelListQueryKey, params: userGroupChannelListQueryParams } = useServiceQueryKey('alert-manager', 'user-group-channel', 'list', {
+    params: computed(() => {
+        channelListApiQueryHelper.setFilters([...queryTagHelper.filters.value]);
+        return {
+            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
+            query: {
+                ...channelListApiQueryHelper.data,
+                sort: [{ key: filterState.sortKey, desc: filterState.sortDesc }],
+            },
+        };
+    }),
+    pagination: true,
+});
+const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCount, isLoading: userGroupChannelListFetching } = useScopedPaginationQuery({
+    queryKey: userGroupChannelListQueryKey,
+    queryFn: userGroupChannelAPI.list,
+    params: userGroupChannelListQueryParams,
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+    enabled: computed(() => !!userGroupPageGetters.selectedUserGroups[0].user_group_id),
+}, {
+    thisPage: computed(() => paginationState.thisPage),
+    pageSize: computed(() => paginationState.pageSize),
+    verb: 'list',
+}, ['DOMAIN', 'WORKSPACE']);
+
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
-
 
 const tableState = reactive({
     fields: computed(() => [
         { name: 'name', label: 'Name', width: '350px' },
         { name: 'channel_id', label: 'Channel', width: '240px' },
-        { name: 'day', label: 'Day', width: '327px' },
-        { name: 'time', label: 'Time', width: '116px' },
-        { name: 'timeZone', label: 'Time Zone', width: '250px' },
+        {
+            name: 'day', label: 'Day', width: '327px', sortable: false,
+        },
+        {
+            name: 'time', label: 'Time', width: '116px', sortable: false,
+        },
+        {
+            name: 'timeZone', label: 'Time Zone', width: '250px', sortable: false,
+        },
     ]),
-    items: computed<ChannelItem[]>(() => {
-        const channels = userGroupPageState.userGroupChannels.list ?? [];
-        return channels.map((channel) => ({
-            name: channel.name,
-            channel_id: channel.protocol_id,
-            day: channel.schedule,
-            time: channel.schedule,
-            timeZone: channel.schedule.TIMEZONE,
-        }));
-    }),
+    items: computed<ChannelItem[]>(() => (userGroupChannelListData.value?.results || []).map((channel) => ({
+        name: channel.name,
+        channel_id: channel.protocol_id,
+        day: channel.schedule,
+        time: channel.schedule,
+        timeZone: channel.schedule.TIMEZONE,
+    }))),
     valueHandlerMap: computed(() => ({
         name: makeDistinctValueHandler(
             'alert_manager.UserGroupChannel',
@@ -117,11 +151,7 @@ const tableState = reactive({
 const state = reactive({
     loading: false,
     channelName: '',
-    protocolList: computed<{ icon: string; label: string; value: string; }[]>(() => userGroupPageState.protocolList?.map((protocol) => ({
-        icon: storeState.plugins[protocol.plugin_info.plugin_id]?.icon || '',
-        label: protocol.name,
-        value: protocol.protocol_id,
-    })) ?? []),
+    protocols: [],
     dayMapping: computed<Record<DayType, TranslateResult>>(() => ({
         MON: i18n.t('COMMON.SCHEDULE_SETTING.MON'),
         TUE: i18n.t('COMMON.SCHEDULE_SETTING.TUE'),
@@ -133,51 +163,41 @@ const state = reactive({
     })),
 });
 
-const totalCount = ref(0);
+const { notificationProtocolAPI } = useNotificationProtocolApi();
+const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-manager', 'notification-protocol', 'list');
+
+const { data: notificationProtocolListData } = useScopedQuery({
+    queryKey: notificationProtocolListQueryKey,
+    queryFn: async () => notificationProtocolAPI.list(),
+    select: (data) => data.results?.map((i) => ({
+        plugin_info: i.plugin_info,
+        name: i.name,
+        protocol_id: i.protocol_id,
+        icon: storeState.plugins[i.plugin_info.plugin_id]?.icon || '',
+    })),
+    enabled: computed(() => Object.keys(storeState.plugins).length > 0),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30,
+}, ['DOMAIN', 'WORKSPACE']);
+
+const { userGroupChannelData } = useUserGroupChannelGetQuery();
 
 /* Component */
-const fetchListUserGroupChannel = async (params: UserGroupChannelListParameters) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.userGroupChannel.list<UserGroupChannelListParameters, ListResponse<UserGroupChannelModel>>(params);
-        userGroupPageState.userGroupChannels.list = results;
-        totalCount.value = results?.length ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
+const refreshUserGroupChannelList = () => {
+    queryClient.invalidateQueries({ queryKey: userGroupChannelListQueryKey.value });
 };
+const getProtocolInfo = (id: string) => notificationProtocolListData.value?.find((i) => i.protocol_id === id);
 
 const handleChange = async (options: any = {}) => {
-    let value;
-    if (options.queryTags) {
-        value = options.queryTags.map((tag) => {
-            if (tag.key.name === 'schedule') {
-                isScheduleTagged.value = true;
-                return tag.value.name;
-            }
-            return '';
-        });
-    }
-    const filteredApiQueryHelper = new ApiQueryHelper();
-    const filteredApiQuery = filteredApiQueryHelper.setFilters([
-        { k: 'schedule.SCHEDULE_TYPE', v: value, o: '=' },
-    ]).data;
-
-    if (options.pageStart !== undefined) userGroupPageState.userGroupChannels.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) userGroupPageState.userGroupChannels.pageLimit = options.pageLimit;
-    try {
-        state.loading = true;
-        await fetchListUserGroupChannel({
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            query: isScheduleTagged.value
-                ? filteredApiQuery : getApiQueryWithToolboxOptions(channelListApiQueryHelper, options),
-        });
-    } finally {
-        state.loading = false;
+    if (options.sortBy !== undefined) filterState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) filterState.sortDesc = options.sortDesc;
+    if (options.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
     }
 };
 
 const handleSelect = async (index: number[]) => {
-    userGroupPageState.userGroupChannels.selectedIndices = index;
+    userGroupPageStore.selectedUserGroupChannelIdx(index);
 };
 
 const handleUpdateModal = async (modalType: string) => {
@@ -188,24 +208,19 @@ const handleUpdateModal = async (modalType: string) => {
             themeColor: 'primary1',
         });
     } else if (modalType === 'edit') {
-        const result = await fetchGetUserGroupChannel({
-            channel_id: userGroupPageGetters.selectedUserGroupChannel[0].channel_id,
-        });
-        if (result) {
+        if (userGroupChannelData.value) {
             const {
                 protocol_id, schedule, name,
-            } = result;
+            } = userGroupChannelData.value;
 
             if (protocol_id) {
-                const protocolResult = await fetchGetNotificationProtocol({
-                    protocol_id,
-                });
+                const protocolResult = notificationProtocolListData.value?.find((protocol) => protocol.protocol_id === protocol_id);
 
-                if (protocolResult && storeState.plugins[protocolResult.plugin_info.plugin_id] !== undefined) {
+                if (protocolResult && storeState.plugins[protocolResult?.plugin_info.plugin_id] !== undefined) {
                     notificationChannelCreateFormStore.$patch((_state) => {
                         _state.state.selectedProtocol.protocol_id = protocol_id;
-                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult.plugin_info.plugin_id]?.icon || '';
-                        _state.state.selectedProtocol.name = protocolResult.name;
+                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult?.plugin_info.plugin_id]?.icon || '';
+                        _state.state.selectedProtocol.name = protocolResult?.name as string;
                         _state.state.channelName = name;
                         _state.state.scheduleInfo = {
                             SCHEDULE_TYPE: schedule.SCHEDULE_TYPE,
@@ -298,23 +313,9 @@ watch(isScheduleTagged, (nv_scheduled_tag) => {
     }
 }, { immediate: true });
 
-watch(() => userGroupPageGetters.selectedUserGroups, () => {
-    if (userGroupPageGetters.selectedUserGroups && userGroupPageGetters.selectedUserGroups[0].notification_channel) {
-        return userGroupPageGetters.selectedUserGroups[0].notification_channel.length;
-    }
-    return 0;
-}, { deep: true, immediate: true });
-
-watch(() => userGroupPageGetters.selectedUserGroups, async (nv_selected_user_group, ov_selected_user_group) => {
-    if (nv_selected_user_group !== ov_selected_user_group && nv_selected_user_group[0].user_group_id) {
-        try {
-            state.loading = true;
-            await fetchListUserGroupChannel({ user_group_id: nv_selected_user_group[0].user_group_id, query: channelListApiQuery });
-        } finally {
-            state.loading = false;
-        }
-    }
-}, { deep: true, immediate: true });
+watch(() => userGroupPageGetters.selectedUserGroups[0].user_group_id, () => {
+    refreshUserGroupChannelList();
+}, { immediate: true });
 
 watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChannel], ([nv_items, nv_selected_item]) => {
     if (nv_items.length > 0 && nv_selected_item.length === 1) {
@@ -323,49 +324,13 @@ watch([() => tableState.items, () => userGroupPageGetters.selectedUserGroupChann
         isDeleteAble.value = false;
     }
 }, { deep: true, immediate: true });
-
-/* API */
-const fetchGetNotificationProtocol = async (params: NotificationProtocolGetParameters) => {
-    try {
-        return await SpaceConnector.clientV2.alertManager.notificationProtocol.get<NotificationProtocolGetParameters, NotificationProtocolModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return null;
+watch(() => userGroupChannelListData.value?.results, (data) => {
+    if (data) {
+        userGroupPageStore.setSelectedUserGroupChannel(data);
     }
-};
+}, { immediate: true });
 
 
-const fetchGetUserGroupChannel = async (params: UserGroupChannelGetParameters): Promise<UserGroupChannelModel | undefined> => {
-    try {
-        return await SpaceConnector.clientV2.alertManager.userGroupChannel.get<UserGroupChannelGetParameters, UserGroupChannelModel>(params);
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-        return undefined;
-    }
-};
-
-const fetchNotificationProtocolList = async (params: NotificationProtocolListParameters) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.alertManager.notificationProtocol.list<NotificationProtocolListParameters, ListResponse<NotificationProtocolModel>>(params);
-        userGroupPageState.protocolList = results;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    }
-};
-
-/* Mounted */
-onMounted(async () => {
-    if (userGroupPageGetters.selectedUserGroups[0].user_group_id) {
-        await fetchListUserGroupChannel({
-            user_group_id: userGroupPageGetters.selectedUserGroups[0].user_group_id,
-            query: channelListApiQuery,
-        });
-    }
-});
-
-onMounted(async () => {
-    await fetchNotificationProtocolList({});
-});
 </script>
 
 <template>
@@ -374,7 +339,7 @@ onMounted(async () => {
             <template #heading>
                 <p-heading heading-type="sub"
                            use-total-count
-                           :total-count="totalCount"
+                           :total-count="userGroupChannelListTotalCount"
                            :title="i18n.t('IAM.USER_GROUP.TAB.NOTIFICATION_CHANNEL.TITLE')"
                 />
             </template>
@@ -411,33 +376,29 @@ onMounted(async () => {
                          searchable
                          selectable
                          sortable
-                         sort-desc
-                         :loading="state.loading"
+                         :loading="userGroupChannelListFetching"
                          :multi-select="false"
                          :key-item-sets="USER_GROUP_CHANNELS_SEARCH_HANDLERS"
                          :query-tags="queryTags"
+                         :this-page.sync="paginationState.thisPage"
+                         :page-size.sync="paginationState.pageSize"
+                         :total-count="userGroupChannelListTotalCount"
                          :value-handler-map="tableState.valueHandlerMap"
                          :select-index="userGroupPageState.userGroupChannels.selectedIndices"
                          :fields="tableState.fields"
                          :items="tableState.items"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshUserGroupChannelList"
         >
             <template #col-channel_id-format="{value}">
-                <div v-for="(protocol, idx) in state.protocolList"
-                     :key="`${protocol}-${idx}`"
-                >
-                    <div v-if="protocol.value === value"
-                         class="flex items-center gap-2"
-                    >
-                        <p-lazy-img :src="assetUrlConverter(protocol.icon)"
-                                    width="1rem"
-                                    height="1rem"
-                                    error-icon="ic_notification-protocol_envelope"
-                        />
-                        <p>{{ protocol.label }}</p>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <p-lazy-img :src="assetUrlConverter(getProtocolInfo(value)?.icon || '')"
+                                width="1rem"
+                                height="1rem"
+                                error-icon="ic_notification-protocol_envelope"
+                    />
+                    <p>{{ getProtocolInfo(value)?.name }}</p>
                 </div>
             </template>
             <template #col-day-format="{value}">

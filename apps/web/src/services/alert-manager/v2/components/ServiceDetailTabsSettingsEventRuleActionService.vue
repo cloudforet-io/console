@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldGroup,
@@ -11,15 +12,15 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
 import type {
     EventRuleActionsType,
-} from '@/schema/alert-manager/event-rule/type';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+} from '@/api-clients/alert-manager/event-rule/schema/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useEventRuleGetQuery } from '@/services/alert-manager/v2/composables/use-event-rule-get-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import type {
@@ -31,14 +32,18 @@ const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
+const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
+
 const { width } = useWindowSize();
 
 const emit = defineEmits<{(e: 'change-form', form: EventRuleActionsType): void}>();
 
+const { eventRuleData } = useEventRuleGetQuery();
+const { serviceData } = useServiceGetQuery(serviceId);
+
 const storeState = reactive({
-    service: computed<ServiceModel>(() => serviceDetailPageState.serviceInfo),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
     serviceDropdownList: computed<SelectDropdownMenuItem[]>(() => Object.values(allReferenceGetters.service).map((i) => ({
         name: i.name,
         label: i.label,
@@ -56,7 +61,7 @@ const state = reactive({
 });
 
 const updateStateFromEventRuleInfo = (): void => {
-    const actions = storeState.eventRuleInfo.actions;
+    const actions = eventRuleData.value?.actions;
     if (!actions) return;
 
     if (actions.change_service) {
@@ -66,7 +71,7 @@ const updateStateFromEventRuleInfo = (): void => {
 
 const handleUpdateToggle = (action: string, value: boolean) => {
     if (value) {
-        state.selectedServiceId = storeState.service.service_id;
+        state.selectedServiceId = serviceId.value;
     } else {
         state.selectedServiceId = undefined;
     }
@@ -124,11 +129,11 @@ watch(() => storeState.isEventRuleEditMode, (isEditMode) => {
                                         :to="{
                                             name: ALERT_MANAGER_ROUTE.SERVICE.DETAIL._NAME,
                                             params: {
-                                                serviceId: storeState.service.service_id,
+                                                serviceId: serviceId,
                                             },
                                         }"
                                 >
-                                    {{ storeState.service.name }}
+                                    {{ serviceData?.name }}
                                 </p-link>
                             </p>
                         </div>

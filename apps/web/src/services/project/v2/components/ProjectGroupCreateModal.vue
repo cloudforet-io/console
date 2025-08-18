@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { PButtonModal, PFieldGroup, PTextInput } from '@cloudforet/mirinae';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

@@ -4,12 +4,11 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { AlertModel } from '@/schema/alert-manager/alert/model';
-import type { AlertGetParameters } from '@/schema/monitoring/alert/api-verbs/get';
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
+import type { AlertGetParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/get';
+import type { AlertUpdateParameters } from '@/api-clients/monitoring/alert/schema/api-verbs/update';
+import type { AlertModelV1 } from '@/api-clients/monitoring/alert/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 interface UpdateAlertPayload {
     alertId: string;
@@ -18,12 +17,12 @@ interface UpdateAlertPayload {
 
 export const useAlertPageStore = defineStore('page-alert', () => {
     const state = reactive({
-        alertData: null as Partial<AlertModel>|null,
+        alertData: null as Partial<AlertModelV1>|null,
     });
     const actions = {
         async getAlertData(alertId: string): Promise<void|Error> {
             try {
-                state.alertData = await SpaceConnector.clientV2.monitoring.alert.get<AlertGetParameters, AlertModel>({
+                state.alertData = await SpaceConnector.clientV2.monitoring.alert.get<AlertGetParameters, AlertModelV1>({
                     alert_id: alertId,
                 });
             } catch (e: any) {
@@ -33,7 +32,7 @@ export const useAlertPageStore = defineStore('page-alert', () => {
         },
         async updateAlertData({ alertId, updateParams }: UpdateAlertPayload): Promise<void|Error> {
             try {
-                state.alertData = await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModel>({
+                state.alertData = await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModelV1>({
                     ...updateParams,
                     alert_id: alertId,
                 });
@@ -42,7 +41,7 @@ export const useAlertPageStore = defineStore('page-alert', () => {
                 throw e;
             }
         },
-        async setAlertData(alertData: AlertModel): Promise<void|Error> {
+        async setAlertData(alertData: AlertModelV1): Promise<void|Error> {
             state.alertData = alertData;
         },
 

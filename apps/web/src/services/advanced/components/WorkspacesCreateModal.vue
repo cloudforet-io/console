@@ -3,27 +3,34 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
 import type { WorkspaceCreateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/api-clients/identity/workspace/schema/api-verbs/update';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import getRandomId from '@/lib/random-id-generator';
 
-import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
+import { useBookmarkLinkCreateMutation } from '@/common/components/bookmark/composables/use-bookmark-link-create-mutation';
+import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
+import { BOOKMARK_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 interface Props {
     visible: boolean;
@@ -37,13 +44,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', workspaceInfo: { id: string, name: string }): void;
-    (e: 'refresh'): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+const workspacePageState = workspacePageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
-const bookmarkStore = useBookmarkStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -57,29 +62,25 @@ const state = reactive({
     themes: WORKSPACE_LOGO_ICON_THEMES,
 });
 
-const handleClickTheme = (theme: string) => {
-    state.selectedTheme = theme;
-};
-
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
-            const isChanged = state.name !== workspacePageStore.selectedWorkspaces[0].name
-                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description
-                || state.selectedTheme !== workspacePageStore.selectedWorkspaces[0].tags?.theme;
+            const isChanged = state.name !== workspacePageState.selectedWorkspace.name
+                || state.description !== workspacePageState.selectedWorkspace.tags?.description
+                || state.selectedTheme !== workspacePageState.selectedWorkspace.tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
     }),
     isDuplicatedName: computed(() => {
         if (props.createType === 'EDIT') {
-            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspaces[0].name).some((workspace) => workspace.name === state.name);
+            return workspaceListData.value.filter((workspace) => workspace.name !== workspacePageState.selectedWorkspace.name).some((workspace) => workspace.name === state.name);
         }
-        return workspacePageState.workspaces.some((workspace) => workspace.name === state.name);
+        return workspaceListData.value.some((workspace) => workspace.name === state.name);
     }),
     nameInvalidText: computed(() => {
         if (props.createType === 'EDIT') {
-            if (state.name === workspacePageStore.selectedWorkspaces[0].name) return undefined;
+            if (state.name === workspacePageState.selectedWorkspace.name) return undefined;
         }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
@@ -89,42 +90,93 @@ const validationState = reactive({
     nameInvalid: computed(() => state.name !== undefined && !!validationState.nameInvalidText),
 });
 
-const handleConfirm = async () => {
-    try {
-        if (props.createType === 'EDIT') {
-            await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters>({
-                workspace_id: workspacePageStore.selectedWorkspaces[0].workspace_id,
-                name: state.name ?? '',
-                tags: {
-                    ...workspacePageStore.selectedWorkspaces[0].tags,
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully updated'), '');
-        } else {
-            const response = await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>({
-                name: state.name ?? '',
-                tags: {
-                    description: state.description ?? '',
-                    theme: state.selectedTheme ?? 'blue',
-                },
-            });
-            showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            await bookmarkStore.createDefaultBookmark({
-                workspaceId: response.workspace_id,
-            });
-            emit('confirm', {
-                id: response.workspace_id,
-                name: response.name,
-            });
-        }
+const queryClient = useQueryClient();
+const { workspaceAPI } = useWorkspaceApi();
+const { key: workspaceListBaseQueryKey } = useServiceQueryKey('identity', 'workspace', 'list');
+const { workspaceListData } = useWorkspaceListQuery();
+const { mutate: createWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceCreateParameters) => workspaceAPI.create(params),
+    onSuccess: async (data) => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_CREATE_WORKSPACE'), '');
         await userWorkspaceStore.load();
+        workspacePageStore.setSelectedIndex(undefined);
+        workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
+        createDefaultBookmark(data.workspace_id);
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
+        emit('confirm', {
+            id: data.workspace_id,
+            name: data.name,
+        });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+const { mutate: updateWorkspaceMutation } = useMutation({
+    mutationFn: (params: WorkspaceUpdateParameters) => workspaceAPI.update(params),
+    onSuccess: async () => {
+        showSuccessMessage(i18n.t('IAM.WORKSPACES.ALT_S_UPDATE_WORKSPACE'), '');
+        await userWorkspaceStore.load();
+        queryClient.invalidateQueries({ queryKey: workspaceListBaseQueryKey.value });
+    },
+    onError: (e) => {
+        ErrorHandler.handleError(e, true);
+    },
+    onSettled: () => {
+        state.proxyVisible = false;
+    },
+});
+const { mutate: createBookmarkLink } = useBookmarkLinkCreateMutation({
+    type: computed(() => BOOKMARK_TYPE.WORKSPACE),
+});
+
+const createDefaultBookmark = async (workspaceId: string) => {
+    try {
+        DEFAULT_BOOKMARK.map(async (item) => {
+            await createBookmarkLink({
+                name: `console:bookmark:undefined:${item.name as string || ''}-${getRandomId()}`,
+                data: {
+                    name: item.name as string || '',
+                    folder: undefined,
+                    link: item.link || '',
+                    imgIcon: item.imgIcon,
+                    workspaceId,
+                    isGlobal: false,
+                },
+                resource_group: 'WORKSPACE',
+                workspace_id: workspaceId,
+            });
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
-    } finally {
-        emit('refresh');
-        state.proxyVisible = false;
+    }
+};
+const handleClickTheme = (theme: string) => {
+    state.selectedTheme = theme;
+};
+
+const handleConfirm = async () => {
+    if (props.createType === 'EDIT') {
+        await updateWorkspaceMutation({
+            workspace_id: workspacePageState.selectedWorkspace.workspace_id,
+            name: state.name ?? '',
+            tags: {
+                ...workspacePageState.selectedWorkspace.tags,
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
+    } else {
+        await createWorkspaceMutation({
+            name: state.name ?? '',
+            tags: {
+                description: state.description ?? '',
+                theme: state.selectedTheme ?? 'blue',
+            },
+        });
     }
 };
 
@@ -135,9 +187,9 @@ watch(() => props.visible, (visible) => {
         state.description = '';
         state.selectedTheme = 'blue';
     } else {
-        state.name = workspacePageStore.selectedWorkspaces[0].name;
-        state.description = workspacePageStore.selectedWorkspaces[0].tags?.description ?? '';
-        state.selectedTheme = workspacePageStore.selectedWorkspaces[0].tags?.theme ?? 'blue';
+        state.name = workspacePageState.selectedWorkspace.name;
+        state.description = workspacePageState.selectedWorkspace.tags?.description ?? '';
+        state.selectedTheme = workspacePageState.selectedWorkspace.tags?.theme ?? 'blue';
     }
 }, { immediate: true });
 

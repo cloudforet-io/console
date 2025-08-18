@@ -4,18 +4,15 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { get } from 'lodash';
-
 import {
     PRadioGroup, PRadio, PLazyImg,
 } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
@@ -24,15 +21,21 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import CloudServiceLSBDropdownMenuItem from '@/services/asset-inventory/components/CloudServiceLSBDropdownMenuItem.vue';
+import { useCloudServiceDetailLSBMenuSet } from '@/services/asset-inventory/composables/use-cloud-service-detail-menu-set';
+import {
+    useCloudServiceProviderListQuery,
+} from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
+import { useCloudServiceTypeListQuery } from '@/services/asset-inventory/composables/use-cloud-service-type-list-query';
 import {
     CLOUD_SERVICE_FILTER_KEY,
     CLOUD_SERVICE_GLOBAL_FILTER_KEY, UNIDENTIFIED_PROVIDER,
 } from '@/services/asset-inventory/constants/cloud-service-constant';
+import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+
 
 const PROJECT_MENU_ID = 'project';
 const SERVICE_ACCOUNT_MENU_ID = 'service-account';
@@ -43,19 +46,22 @@ const REGION_MENU_ID = 'region';
 
 const appContextStore = useAppContextStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
-const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
+const cloudServicePageState = cloudServicePageStore.state;
 const authorizationStore = useAuthorizationStore();
 
 const route = useRoute();
 const router = useRouter();
 
+const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentGrantInfo: computed(() => authorizationStore.state.currentGrantInfo),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+});
+const { data: providerList } = useCloudServiceProviderListQuery();
+
+const { menuSet: cloudServiceDetailMenuSet } = useCloudServiceDetailLSBMenuSet({
+    params: computed(() => route.params as CloudServiceDetailPageParams),
 });
 const state = reactive({
     currentPath: computed(() => route.fullPath),
@@ -98,34 +104,6 @@ const state = reactive({
             id: REGION_MENU_ID,
         },
     ])),
-    cloudServiceDetailMenuSet: computed<LSBItem[]>(() => {
-        const selectedItem = cloudServiceDetailPageState.cloudServiceTypeList[0];
-        const results: LSBItem[] = [
-            {
-                type: MENU_ITEM_TYPE.DIVIDER,
-            },
-            {
-                type: MENU_ITEM_TYPE.BUTTON_TITLE,
-                label: state.detailPageParams.group,
-                id: selectedItem?.group,
-                isBackLink: true,
-                to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
-                titleIcon: get(selectedItem, ['tags', 'spaceone:icon'], ''),
-            },
-        ];
-        cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
-            results.push({
-                type: MENU_ITEM_TYPE.ITEM,
-                label: d.name,
-                id: d.cloud_service_type_key,
-                to: {
-                    name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: { ...state.detailPageParams, name: d.name },
-                },
-            });
-        });
-        return results;
-    }),
     menuSet: computed<LSBMenu[]>(() => [
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
@@ -143,55 +121,64 @@ const state = reactive({
             type: MENU_ITEM_TYPE.SLOT,
             id: SERVICE_ACCOUNT_MENU_ID,
         },
-        ...state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet,
+        ...(state.isCloudServiceDetailPage ? cloudServiceDetailMenuSet.value : state.cloudServiceMainMenuSet),
     ]),
 });
 const providerState = reactive({
     contextMenuItems: computed(() => [
         { name: 'all', label: 'All', icon: undefined },
-        ...Object.keys(storeState.providers).map((k) => ({
-            label: storeState.providers[k].label,
-            name: storeState.providers[k].key,
+        ...(providerList.value || []).map((item) => ({
+            label: item.alias || item.name,
+            name: item.provider,
         })),
     ]),
     selectedItem: computed(() => {
         if (UNIDENTIFIED_PROVIDER === cloudServicePageState.selectedProvider) return UNIDENTIFIED_PROVIDER;
-        const item = storeState.providers[cloudServicePageState.selectedProvider];
-        if (item) {
-            return storeState.providers[cloudServicePageState.selectedProvider].key;
+        const selelcted = referenceMap.provider[cloudServicePageState.selectedProvider];
+        if (selelcted) {
+            return selelcted.key;
         } return 'all';
     }),
 });
 
-const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) => {
-    cloudServiceDetailPageStore.setProviderGroupName(params);
-    await cloudServiceDetailPageStore.listCloudServiceTypeData();
-};
+const { data: cloudServiceTypeList } = useCloudServiceTypeListQuery({
+    params: computed(() => ({
+        query: getCloudServiceTypeQuery(route.params.provider, route.params.group),
+    })),
+    enabled: computed(() => !!route.params.provider && !!route.params.group && !!route.params.name),
+});
 
-const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
+const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams, name: string) => {
     await router.replace({
         name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: params.provider,
             group: params.group,
-            name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
+            name,
         },
         query: route.query,
     }).catch(() => {
     });
-    await cloudServiceDetailPageStore.setSelectedCloudServiceType();
 };
 const handleSelectProvider = (selected: string) => {
     if (!selected) return;
+    const selectedProvider = providerList.value?.find((item) => item.provider === selected);
+    if (!selectedProvider && selected !== UNIDENTIFIED_PROVIDER) {
+        cloudServicePageStore.setSelectedProvider('all');
+        return;
+    }
     cloudServicePageStore.setSelectedProvider(selected);
 };
 
 /* Watchers */
-watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async ([params, grantInfo]) => {
+watch([
+    () => state.detailPageParams,
+    () => storeState.currentGrantInfo,
+    () => cloudServiceTypeList.value,
+], async ([params, grantInfo, _cloudServiceTypeList]) => {
     if (grantInfo?.scope === 'USER') return;
     if (!params) return;
-    await initCloudServiceDetailLSB(params);
-    if (!params.name) await routeToFirstCloudServiceType(params);
+    if (!params.name && _cloudServiceTypeList?.[0]?.name) await routeToFirstCloudServiceType(params, _cloudServiceTypeList[0].name);
 }, { immediate: true });
 </script>
 
@@ -229,7 +216,7 @@ watch([() => state.detailPageParams, () => storeState.currentGrantInfo], async (
                         <p-lazy-img width="1rem"
                                     height="1rem"
                                     error-icon="ic_cloud-filled"
-                                    :src="storeState.providers[item.name]?.icon"
+                                    :src="providerMap[item.name]?.icon"
                                     class="mr-1"
                         /><span>{{ item.label }}</span>
                     </span>

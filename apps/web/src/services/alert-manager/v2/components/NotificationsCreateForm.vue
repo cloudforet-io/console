@@ -7,12 +7,9 @@ import {
 } from '@cloudforet/mirinae';
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
-import type { NotificationProtocolModel } from '@/schema/alert-manager/notification-protocol/model';
-import type { MembersType } from '@/schema/alert-manager/service/type';
+import type { MembersType } from '@/api-clients/alert-manager/service/schema/type';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 import { useUserStore } from '@/store/user/user-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -22,6 +19,7 @@ import ScheduleSettingForm from '@/common/components/schedule-setting-form/Sched
 import { useFormValidator } from '@/common/composables/form-validator';
 import UserSelectDropdown from '@/common/modules/user/UserSelectDropdown.vue';
 
+import { useNotificationProtocolListQuery } from '@/services/alert-manager/v2/composables/use-notification-protocol-list-query';
 import { useServiceCreateFormStore } from '@/services/alert-manager/v2/stores/service-create-form-store';
 import type { CreatedNotificationInfoType, UserRadioType, ProtocolCardItemType } from '@/services/alert-manager/v2/types/alert-manager-type';
 
@@ -29,17 +27,15 @@ const serviceCreateFormStore = useServiceCreateFormStore();
 const serviceCreateFormState = serviceCreateFormStore.state;
 const userStore = useUserStore();
 const userState = userStore.state;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const { width } = useWindowSize();
 
+const { notificationProtocolListData } = useNotificationProtocolListQuery();
+
 const storeState = reactive({
     language: computed<string|undefined>(() => userState.language),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
     createdServiceMembers: computed<Record<MembersType, string[]>>(() => serviceCreateFormState.createdService.members),
     selectedProtocolType: computed<ProtocolCardItemType>(() => serviceCreateFormState.selectedProtocol),
-    protocolList: computed<NotificationProtocolModel[]>(() => serviceCreateFormState.protocolList),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -63,7 +59,7 @@ const state = reactive({
     selectedRadioIdx: 0,
     selectedMemberIds: [] as string[],
     selectedMemberItems: {} as Record<MembersType, string[]>,
-    notificationChannelList: computed<SelectDropdownMenuItem[]>(() => storeState.protocolList.map((i) => ({
+    notificationChannelList: computed<SelectDropdownMenuItem[]>(() => notificationProtocolListData.value.map((i) => ({
         name: i.protocol_id,
         label: i.name,
     }))),
@@ -102,9 +98,9 @@ const {
 });
 
 const getPluginIcon = (id: string): string => {
-    const item = storeState.protocolList.find((i) => i.protocol_id === id);
+    const item = notificationProtocolListData.value.find((i) => i.protocol_id === id);
     if (!item) return '';
-    return storeState.plugins[item.plugin_info.plugin_id]?.icon || '';
+    return item?.icon || '';
 };
 const handleFormattedSelectedIds = (value: Record<MembersType, string[]>) => {
     state.selectedMemberItems = value;

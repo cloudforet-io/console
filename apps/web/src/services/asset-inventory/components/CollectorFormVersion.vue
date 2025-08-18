@@ -40,24 +40,21 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { usePluginGetVersionsQuery } from '@/services/asset-inventory/composables/use-plugin-get-versions-query';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
 
-const props = defineProps<{
-    getVersionsOnPluginIdChange?: boolean;
-}>();
-
 const emit = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
 const state = reactive({
-    pluginId: computed<string|undefined>(() => collectorFormState.pluginId),
-    versionItems: computed<MenuItem[]>(() => collectorFormState.versions.map((value, index) => {
+    versionItems: computed<MenuItem[]>(() => pluginVersionsData.value?.map((value, index) => {
         if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
         return { type: 'item', label: value, name: value };
-    })),
+    }) || []),
     versionInvalidText: computed<TranslateResult>(() => {
         const value = collectorFormState.version;
         if (!value?.length) {
@@ -67,18 +64,27 @@ const state = reactive({
     }),
     isVersionValid: computed(() => !state.versionInvalidText || collectorFormState.autoUpgrade),
 });
+const collectorPluginId = computed<string|undefined>(() => originCollectorData.value?.plugin_info?.plugin_id ?? collectorFormState.repositoryPlugin?.plugin_id);
+
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
+const { data: pluginVersionsData, isLoading: isLoadingPluginVersions } = usePluginGetVersionsQuery({
+    pluginId: computed(() => collectorPluginId.value ?? ''),
+});
 
 const initSelectedVersion = () => {
-    if (collectorFormState.originCollector) {
-        const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
-        const originVersion = collectorFormState.originCollector?.plugin_info?.version;
+    if (originCollectorData.value) {
+        const originAutoUpgrade = originCollectorData.value?.plugin_info?.upgrade_mode === 'AUTO';
+        const originVersion = originCollectorData.value?.plugin_info?.version;
         collectorFormStore.$patch((_state) => {
-            _state.state.version = originVersion ?? collectorFormState.versions[0] ?? '';
+            _state.state.version = originVersion ?? pluginVersionsData.value?.[0] ?? '';
             _state.state.autoUpgrade = originAutoUpgrade ?? true;
         });
     } else {
         collectorFormStore.$patch((_state) => {
-            _state.state.version = collectorFormState.versions[0] ?? '';
+            _state.state.version = pluginVersionsData.value?.[0] ?? '';
             _state.state.autoUpgrade = true;
         });
     }
@@ -92,7 +98,7 @@ const handleChangeVersion = (value: string) => {
 const handleClickAutoUpgrade = () => {
     collectorFormStore.setAutoUpgrade(!collectorFormState.autoUpgrade);
     if (collectorFormState.autoUpgrade) {
-        collectorFormStore.setVersion(collectorFormState.versions[0] ?? '');
+        collectorFormStore.setVersion(pluginVersionsData.value?.[0] ?? '');
     }
 };
 
@@ -101,9 +107,8 @@ watch(() => state.isVersionValid, (value) => {
 }, { immediate: true });
 
 // get version list when pluginId changed and init selected version
-watch(() => state.pluginId, async (pluginId) => {
-    if (!pluginId) return;
-    if (props.getVersionsOnPluginIdChange) await collectorFormStore.getVersions(pluginId);
+watch([() => collectorPluginId.value, () => isLoadingPluginVersions.value], async ([pluginId, isLoading]) => {
+    if (!pluginId || isLoading) return;
     initSelectedVersion();
 }, { immediate: true });
 </script>

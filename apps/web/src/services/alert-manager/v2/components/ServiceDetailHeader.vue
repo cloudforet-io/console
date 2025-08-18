@@ -7,8 +7,7 @@ import {
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
-import { MEMBERS_TYPE } from '@/schema/alert-manager/service/constants';
+import { MEMBERS_TYPE } from '@/api-clients/alert-manager/service/schema/constants';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -20,28 +19,27 @@ import { gray } from '@/styles/colors';
 import ServiceDetailDeleteModal from '@/services/alert-manager/v2/components/ServiceDetailDeleteModal.vue';
 import ServiceDetailEditModal from '@/services/alert-manager/v2/components/ServiceDetailEditModal.vue';
 import ServiceDetailMemberModal from '@/services/alert-manager/v2/components/ServiceDetailMemberModal.vue';
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
+import { useServiceGetQuery } from '@/services/alert-manager/v2/composables/use-service-get-query';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
 import { useServiceListPageStore } from '@/services/alert-manager/v2/stores/service-list-page-store';
-import type { Service } from '@/services/alert-manager/v2/types/alert-manager-type';
 
 type ModalType = 'edit' | 'delete' | 'member' | 'alert';
 
 const serviceDetailPageStore = useServiceDetailPageStore();
-const serviceDetailPageState = serviceDetailPageStore.state;
-const serviceDetailPageGetters = serviceDetailPageStore.getters;
 
 const serviceListPageStore = useServiceListPageStore();
 
 const router = useRouter();
 const route = useRoute();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
-const storeState = reactive({
-    eventRuleList: computed<EventRuleModel[]>(() => serviceDetailPageState.eventRuleList),
-    serviceInfo: computed<Service>(() => serviceDetailPageGetters.serviceInfo),
-});
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const { serviceData } = useServiceGetQuery(serviceId);
+
 const state = reactive({
     isSettingMode: computed<boolean>(() => route.query?.mode !== 'eventRule'),
     menuItems: computed<MenuItem[]>(() => [
@@ -59,7 +57,7 @@ const state = reactive({
     ]),
     headingTitle: computed(() => {
         if (state.isSettingMode) {
-            return storeState.serviceInfo.name || '';
+            return serviceData.value?.name || '';
         }
         return i18n.t('ALERT_MANAGER.EVENT_RULE.TITLE');
     }),
@@ -134,7 +132,7 @@ const handleGoBackButton = () => {
                         </template>
                     </p-heading>
                 </template>
-                <template v-if="hasReadWriteAccess && !state.isSettingMode && storeState.eventRuleList.length > 0"
+                <template v-if="hasReadWriteAccess && !state.isSettingMode && eventRuleListData.length > 0"
                           #extra
                 >
                     <p-button icon-left="ic_plus_bold"
@@ -156,13 +154,13 @@ const handleGoBackButton = () => {
                          width="0.75rem"
                          height="0.75rem"
                     />
-                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
+                    <span>{{ serviceData?.members?.[MEMBERS_TYPE.USER_GROUP]?.length }}</span>
                     <span>{{ $t('ALERT_MANAGER.SERVICE.USER_GROUP') }}</span>
                     <span> / </span>
-                    <span>{{ storeState.serviceInfo.members[MEMBERS_TYPE.USER]?.length }}</span>
+                    <span>{{ serviceData?.members?.[MEMBERS_TYPE.USER]?.length }}</span>
                     <span>{{ $t('ALERT_MANAGER.SERVICE.MEMBERS') }}</span>
                 </div>
-                <p-i v-if="storeState.serviceInfo?.description"
+                <p-i v-if="serviceData?.description"
                      name="ic_dot"
                      width="0.125rem"
                      height="0.125rem"
@@ -173,9 +171,9 @@ const handleGoBackButton = () => {
                     <p-tooltip position="bottom"
                                tag="p"
                                class="desc truncate"
-                               :contents="storeState.serviceInfo?.description || ''"
+                               :contents="serviceData?.description || ''"
                     >
-                        {{ storeState.serviceInfo?.description }}
+                        {{ serviceData?.description }}
                     </p-tooltip>
                 </p>
             </div>

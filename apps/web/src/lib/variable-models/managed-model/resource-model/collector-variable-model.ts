@@ -1,4 +1,4 @@
-import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';

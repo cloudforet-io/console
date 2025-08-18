@@ -5,7 +5,7 @@ import {
 import type { FolderDeleteParams } from '@/api-clients/dashboard/_types/folder-type';
 import { usePrivateFolderApi } from '@/api-clients/dashboard/private-folder/composables/use-private-folder-api';
 import { usePublicFolderApi } from '@/api-clients/dashboard/public-folder/composables/use-public-folder-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseDashboardFolderDeleteMutationOptions {
     onSuccess?: (data: unknown, variables: FolderDeleteParams) => void|Promise<void>;

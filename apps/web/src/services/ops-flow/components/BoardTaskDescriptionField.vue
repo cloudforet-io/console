@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import { PCollapsiblePanel } from '@cloudforet/mirinae';
 
-import type { FileModel } from '@/schema/file-manager/model';
+import type { FileModel } from '@/api-clients/file-manager/schema/model';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import { useEditorContentTransformer } from '@/common/composables/editor-content-transformer';

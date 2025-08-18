@@ -8,7 +8,7 @@ import {
     PSelectCard, PButton, PLink, PLazyImg, PDataLoader,
 } from '@cloudforet/mirinae';
 
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

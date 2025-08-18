@@ -3,8 +3,8 @@ import type { Ref } from 'vue';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useProjectGroupApi } from '@/api-clients/identity/project-group/composables/use-project-group-api';
-import { useScopedQuery } from '@/query/composables/use-scoped-query';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
 export const useProjectGroupsQuery = (ops?: { enabled: Ref<boolean> }) => {
     const { projectGroupAPI } = useProjectGroupApi();

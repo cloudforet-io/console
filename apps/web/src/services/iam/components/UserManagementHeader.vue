@@ -1,15 +1,24 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHeading, PButton, PHeadingLayout } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
+import { useQueryTags } from '@/common/composables/query-tags';
+
+import { useUserListPaginationQuery } from '@/services/iam/composables/use-user-list-pagination-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
+import { USER_MODAL_TYPE, USER_SEARCH_HANDLERS } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+
+
 
 interface Props {
     hasReadWriteAccess?: boolean;
@@ -17,17 +26,40 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const queryTagHelper = useQueryTags({ keyItemSets: USER_SEARCH_HANDLERS.keyItemSets });
+const userListApiQueryHelper = new ApiQueryHelper();
+
+const queryState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+const {
+    totalCount: userTotalCount,
+} = useUserListPaginationQuery({
+    params: computed(() => {
+        userListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
+        userListApiQueryHelper.setFilters(queryTagHelper.filters.value);
+        return {
+            query: userListApiQueryHelper.data,
+        };
+    }),
+    thisPage: computed(() => 1),
+    pageSize: computed(() => 15),
+});
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
 const userPageGetters = userPageStore.getters;
 
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
+
 const route = useRoute();
 
 const state = reactive({
     selectedUsersType: computed<'OnlyWorkspaceGroupUser'|'OnlyWorkspaceUser'|'Mixed'>(() => {
-        const selectedUsers = userPageGetters.selectedUsers;
-        const userTypeList = selectedUsers.map((user) => (user.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser'));
+        const userTypeList = selectedWorkspaceUsers.value?.map((user) => (user?.role_binding_info?.workspace_group_id ? 'workspaceGroupUser' : 'workspaceUser')) ?? [];
         if (userTypeList.includes('workspaceGroupUser') && userTypeList.includes('workspaceUser')) return 'Mixed';
         if (userTypeList.includes('workspaceGroupUser')) return 'OnlyWorkspaceGroupUser';
         return 'OnlyWorkspaceUser';
@@ -106,7 +138,7 @@ watch(() => route.query, (query) => {
                 <p-heading :title="$t('IAM.USER.TITLE')"
                            use-selected-count
                            use-total-count
-                           :total-count="userPageState.totalCount"
+                           :total-count="userTotalCount"
                            :selected-count="userPageState.selectedIndices.length"
                 />
             </template>
@@ -125,13 +157,13 @@ watch(() => route.query, (query) => {
                          class="toolbox"
                     >
                         <p-button style-type="tertiary"
-                                  :disabled="userPageGetters.selectedUsers.length === 0"
+                                  :disabled="selectedWorkspaceUsers === undefined"
                                   @click="handleClickButton(USER_MODAL_TYPE.ASSIGN)"
                         >
                             {{ $t('IAM.USER.ASSIGN_TO_USER_GROUP.TITLE') }}
                         </p-button>
                         <p-button style-type="negative-secondary"
-                                  :disabled="userPageGetters.selectedUsers.length === 0"
+                                  :disabled="selectedWorkspaceUsers === undefined"
                                   @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                         >
                             {{ $t('IAM.USER.REMOVE') }}

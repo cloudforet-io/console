@@ -7,13 +7,13 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { isEmpty } from 'lodash';
+
 import {
     PButton, PPopover, PBadge, PTooltip, PIconButton,
 } from '@cloudforet/mirinae';
 
-
-import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/run';
+import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -28,6 +28,8 @@ import type { Granularity } from '@/services/asset-inventory/types/asset-analysi
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const { metricAPI } = useMetricApi();
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -45,10 +47,18 @@ const state = reactive({
         return count;
     }),
 });
+const periodText = computed<string>(() => {
+    if (isEmpty(metricExplorerPageState.period)) {
+        return '';
+    } if (metricExplorerPageGetters.isRealtimeChart) {
+        return metricExplorerPageState.period.start;
+    }
+    return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+});
 
 /* Api */
 const runMetric = async () => {
-    await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
+    await metricAPI.run({
         metric_id: state.currentMetricId,
     });
 };
@@ -115,7 +125,7 @@ watch(() => route.params, async () => {
             </div>
             <div class="right-part">
                 <span class="period-text">
-                    {{ metricExplorerPageState.periodText }}
+                    {{ periodText }}
                 </span>
                 <p-tooltip :contents="$t('INVENTORY.METRIC_EXPLORER.UPDATE_WITH_THE_LATEST_DATA')"
                            position="bottom"

@@ -1,31 +1,35 @@
 <script lang="ts" setup>
-import { ref, watch, watchEffect } from 'vue';
+import {
+    computed, watchEffect,
+} from 'vue';
 
 import type { ScheduleSettingFormType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import ScheduleSettingForm from '@/common/components/schedule-setting-form/ScheduleSettingForm.vue';
 
+import { useUserGroupChannelGetQuery } from '@/services/iam/composables/use-user-group-channel-get-query';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
+import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
+
+const userGroupPageStore = useUserGroupPageStore();
+const userGroupPageGetters = userGroupPageStore.getters;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 const notificationChannelCreateFormState = notificationChannelCreateFormStore.state;
 
-const scheduleSettingTypeData = ref<ScheduleSettingFormType>();
+const channelId = computed(() => userGroupPageGetters.selectedUserGroupChannel?.[0]?.channel_id ?? '');
+
+const { userGroupChannelData } = useUserGroupChannelGetQuery();
 
 /* Component */
 const handleScheduleForm = (value: ScheduleSettingFormType) => {
-    scheduleSettingTypeData.value = value;
+    notificationChannelCreateFormStore.updateScheduleInfo(value);
 };
 
-watch(() => notificationChannelCreateFormState.scheduleInfo, (nv_schedule_info) => {
-    if (nv_schedule_info) {
-        scheduleSettingTypeData.value = nv_schedule_info;
-    }
-}, { deep: true, immediate: true });
-
 watchEffect(() => {
-    notificationChannelCreateFormStore.$patch((_state) => {
-        _state.state.scheduleInfo = scheduleSettingTypeData.value;
-    });
+    if (userGroupChannelData.value?.schedule) {
+        notificationChannelCreateFormStore.updateScheduleInfo(userGroupChannelData.value.schedule);
+    }
 });
 </script>
 
@@ -35,7 +39,8 @@ watchEffect(() => {
             {{ $t('IAM.USER_GROUP.MODAL.CREATE_CHANNEL.DESC.SCHEDULE.TITLE') }}
         </p>
         <schedule-setting-form
-            :schedule-form="scheduleSettingTypeData"
+            :key="channelId"
+            :schedule-form="notificationChannelCreateFormState.scheduleInfo"
             @update-form="handleScheduleForm"
         />
     </div>

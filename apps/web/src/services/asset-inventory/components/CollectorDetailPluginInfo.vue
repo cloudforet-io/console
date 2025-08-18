@@ -4,8 +4,8 @@ import { computed, defineProps, reactive } from 'vue';
 import { PLink, PDivider, PFieldTitle } from '@cloudforet/mirinae';
 
 
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
+import type { PluginModel } from '@/api-clients/repository/plugin/schema/model';
 
 import CollectorPluginContents from '@/services/asset-inventory/components/CollectorPluginContents.vue';
 

@@ -1,23 +1,29 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
+    watch,
 } from 'vue';
 
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PToolboxTable, PSelectDropdown } from '@cloudforet/mirinae';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@cloudforet/mirinae/types/inputs/context-menu/type';
 
+import { useUserGroupChannelApi } from '@/api-clients/alert-manager/user-group-channel/composables/use-user-group-channel-api';
+import type { UserGroupChannelModel } from '@/api-clients/alert-manager/user-group-channel/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { useUserGroupListPaginationQuery } from '@/services/iam/composables/use-user-group-list-pagination-query';
 import { USER_GROUP_MODAL_TYPE, USER_GROUP_SEARCH_HANDLERS } from '@/services/iam/constants/user-group-constant';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
 
 interface Props {
   tableHeight: number;
@@ -32,21 +38,23 @@ const props = withDefaults(defineProps<Props>(), {
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 
-const userGroupListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(userGroupPageState.pageStart)
-    .setPageLimit(userGroupPageState.pageLimit)
-    .setSort('name', true);
-let userGroupListApiQuery = userGroupListApiQueryHelper.data;
+const userGroupListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
 const queryTagHelper = useQueryTags({ keyItemSets: USER_GROUP_SEARCH_HANDLERS });
 const { queryTags } = queryTagHelper;
 
-const storeState = reactive({
-    loading: computed<boolean>(() => userGroupPageState.loading),
-});
+const { userGroupChannelAPI } = useUserGroupChannelApi();
+const { key: userGroupChannelListQueryKey, params: userGroupChannelListQueryParams } = useServiceQueryKey('alert-manager', 'user-group-channel', 'list');
+const { data: userGroupChannelListData } = useScopedQuery({
+    queryKey: userGroupChannelListQueryKey,
+    queryFn: async () => userGroupChannelAPI.list(userGroupChannelListQueryParams.value),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['DOMAIN', 'WORKSPACE']);
 
 const state = reactive({
-    userGroupItems: computed(() => userGroupPageState.userGroups.map((userGroup) => ({
+    userGroupItems: computed(() => userGroupListData.value?.map((userGroup) => ({
         ...userGroup,
+        notification_channel: countChannelsByUserGroupId(userGroupChannelListData.value?.results || [], userGroup.user_group_id || ''),
     }))),
 });
 
@@ -65,6 +73,8 @@ const tableState = reactive({
         created: makeDistinctValueHandler('identity.UserGroup', 'created_at', 'datetime'),
         tags: makeDistinctValueHandler('identity.UserGroup', 'tags', 'object'),
     })),
+    thisPage: 1,
+    pageSize: 15,
 });
 
 const editState = reactive({
@@ -92,21 +102,50 @@ const dropdownState = reactive({
     ]),
 });
 
+const queryState = reactive({
+    sortKey: 'name',
+    sortDesc: true,
+});
+
+/* pagination query */
+const {
+    data: userGroupListData, totalCount: userGroupListTotalCount, isLoading: userGroupListLoading, refresh: refreshUserGroupList,
+} = useUserGroupListPaginationQuery({
+    thisPage: computed(() => tableState.thisPage),
+    pageSize: computed(() => tableState.pageSize),
+    params: computed(() => {
+        userGroupListApiQueryHelper.setSort(queryState.sortKey, queryState.sortDesc);
+        userGroupListApiQueryHelper.setFilters(queryTagHelper.filters.value);
+        return {
+            query: userGroupListApiQueryHelper.data,
+        };
+    }),
+});
+
 /* Component */
-const handleSelect = async (index) => {
-    userGroupPageState.selectedIndices = index;
+const countChannelsByUserGroupId = (channels: UserGroupChannelModel[], targetId: string): number => {
+    const grouped = channels.reduce<Record<string, UserGroupChannelModel[]>>((acc, item) => {
+        const groupId = item.user_group_id;
+        if (!acc[groupId]) acc[groupId] = [];
+        acc[groupId].push(item);
+        return acc;
+    }, {});
+
+    return grouped[targetId]?.length ?? 0;
+};
+const handleSelect = async (index: number[]) => {
+    userGroupPageStore.setSelectedUserGroupIds(index.map((i) => state.userGroupItems[i].user_group_id ?? ''));
+    userGroupPageStore.setSelectedIndices(index);
 };
 
 const handleChange = async (options: any = {}) => {
-    userGroupListApiQuery = getApiQueryWithToolboxOptions(userGroupListApiQueryHelper, options) ?? userGroupListApiQuery;
     if (options.queryTags !== undefined) {
-        userGroupPageStore.$patch((_state) => {
-            _state.state.searchFilters = userGroupListApiQueryHelper.filters;
-        });
+        queryTagHelper.setQueryTags(options.queryTags);
     }
-    if (options.pageStart !== undefined) userGroupPageState.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) userGroupPageState.pageLimit = options.pageLimit;
-    await fetchUserGroupList();
+    if (options.sortBy !== undefined && options.sortDesc !== undefined) {
+        queryState.sortKey = options.sortBy;
+        queryState.sortDesc = options.sortDesc;
+    }
 };
 
 const handleSelectDropdown = async (inputText: string) => {
@@ -137,20 +176,11 @@ const handleSelectDropdown = async (inputText: string) => {
     }
 };
 
-/* API */
-const fetchUserGroupList = async () => {
-    userGroupPageState.loading = true;
-    try {
-        await userGroupPageStore.listUserGroups({ query: userGroupListApiQuery });
-    } finally {
-        userGroupPageState.loading = false;
+watch(() => userGroupListData.value, (data) => {
+    if (data && data.length > 0) {
+        userGroupPageStore.setUserGroup(data);
     }
-};
-
-/* Mounted */
-onMounted(async () => {
-    await fetchUserGroupList();
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -162,18 +192,20 @@ onMounted(async () => {
                          multi-select
                          sort-desc
                          sort-by="name"
-                         :total-count="userGroupPageState.totalCount"
+                         :total-count="userGroupListTotalCount"
                          :fields="tableState.fields"
                          :items="state.userGroupItems"
                          :select-index="userGroupPageState.selectedIndices"
                          :key-item-sets="USER_GROUP_SEARCH_HANDLERS"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
-                         :loading="storeState.loading"
+                         :loading="userGroupListLoading"
                          :style="{height: `${props.tableHeight}px`}"
+                         :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshUserGroupList"
         >
             <template v-if="props.hasReadWriteAccess"
                       #toolbox-left
@@ -186,7 +218,7 @@ onMounted(async () => {
                 />
             </template>
             <template #col-notification_channel-format="{value}">
-                {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}
+                {{ value }}
             </template>
             <template #col-users-format="{value}">
                 {{ Array.isArray(value) && value.length > 0 ? value.length : 0 }}

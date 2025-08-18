@@ -9,8 +9,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLink } from '@cloudforet/mirinae';
 import { isNotEmpty } from '@cloudforet/utils';
 
-import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
-import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
+import type { EventRuleModel } from '@/api-clients/monitoring/event-rule/schema/model';
+import type { EventRuleActions, EventRuleOptions } from '@/api-clients/monitoring/event-rule/schema/type';
 import { i18n as _i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';

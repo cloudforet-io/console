@@ -1,46 +1,57 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { cloneDeep, map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PStatus, PButtonModal, PDataTable, PBadge,
+    PButtonModal, PDataTable, PBadge, PStatus,
 } from '@cloudforet/mirinae';
 
-import type { RoleBindingDeleteParameters } from '@/api-clients/identity/role-binding/schema/api-verbs/delete';
-import type { UserDeleteParameters } from '@/api-clients/identity/user/schema/api-verbs/delete';
-import type { UserDisableParameters } from '@/api-clients/identity/user/schema/api-verbs/disable';
-import type { UserEnableParameters } from '@/api-clients/identity/user/schema/api-verbs/enable';
+import type { RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useUserApi } from '@/api-clients/identity/user/composables/use-user-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, userStateFormatter } from '@/services/iam/composables/refined-table-data';
+import { useRoleBindingDeleteMutation } from '@/services/iam/composables/use-role-binding-delete-mutation';
+import { useRoleListQuery } from '@/services/iam/composables/use-role-list-query';
+import { useServiceListQuery } from '@/services/iam/composables/use-service-list-query';
+import { useUserGroupListQuery } from '@/services/iam/composables/use-user-group-list-query';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
+import { useWorkspaceUserListQuery } from '@/services/iam/composables/use-workspace-user-list-query';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
-import type { UserListItemType } from '@/services/iam/types/user-type';
+
+
 
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.state;
-const userPageGetters = userPageStore.getters;
-
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
-const storeState = reactive({
-    serviceList: computed<ServiceReferenceMap>(() => allReferenceGetters.service),
-    selectedUsers: computed(() => userPageGetters.selectedUsers),
+const { userAPI } = useUserApi();
+
+const { data: workspaceUserList } = useWorkspaceUserListQuery();
+const serviceListQuery = useServiceListQuery();
+const { roleListData } = useRoleListQuery();
+
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+const { userListData: selectedUsers, workspaceUserListData: selectedWorkspaceUsers } = useUserListQuery(selectedUserIds);
+
+const { userGroupListData } = useUserGroupListQuery({
+    params: computed(() => ({
+        query: {
+            filter: [
+                { k: 'user_id', v: selectedWorkspaceUsers.value?.map((user) => user.user_id), o: 'in' },
+            ],
+        },
+    })),
 });
 
 const state = reactive({
@@ -64,14 +75,106 @@ const state = reactive({
     isRemoveOnlyWorkspace: computed(() => userPageState.modal.visible === 'removeOnlyWorkspace'),
     filteredServices: undefined,
     filteredItems: [],
-    filteredUniqueItems: [],
+    filteredUniqueItems: computed(() => {
+        const serviceList = serviceListQuery.data.value;
+        const userGroups = userGroupListData.value;
+        const _selectedUsers = userPageState.isAdminMode ? selectedUsers.value : selectedWorkspaceUsers.value;
+
+        if (!serviceList || !userGroups || !_selectedUsers?.length) return [];
+
+        const list: any[] = [];
+
+        _selectedUsers?.forEach((selectedUser) => {
+            Object.values(serviceList).forEach((service) => {
+                if (service && service.members) {
+                    if (Object.keys(service.members).includes('USER')) {
+                        if (selectedUser.user_id && service.members.USER.includes(selectedUser.user_id)) {
+                            list.push({
+                                ...selectedUser,
+                                service: service.name,
+                            });
+                        }
+                    } else {
+                        list.push({
+                            ...selectedUser,
+                            user_group: userGroups
+                                .filter((group) => group.users?.includes(selectedUser.user_id ?? ''))
+                                .map((group) => group.name),
+                        });
+                    }
+                }
+            });
+            list.push(selectedUser);
+        });
+
+
+        return Object.values(list.reduce((acc, cur) => {
+            if (!acc[cur.user_id]) {
+                const { user_id, ...rest } = cur;
+                acc[cur.user_id] = {
+                    user_id,
+                    service: [],
+                    user_group: [],
+                    ...rest,
+                };
+            }
+
+            if (cur.service !== undefined) {
+                if (!Array.isArray(acc[cur.user_id].service)) {
+                    acc[cur.user_id].service = [];
+                }
+                acc[cur.user_id].service.push(cur.service);
+            }
+            if (cur.user_group !== undefined) {
+                if (!Array.isArray(acc[cur.user_id].user_group)) {
+                    acc[cur.user_id].user_group = [];
+                }
+                acc[cur.user_id].user_group = cur.user_group;
+            }
+            return acc;
+        }, {}));
+    }),
+    selectedOnlyWorkspaceUsers: computed(() => {
+        const workspaceUsers = workspaceUserList.value;
+        const userGroups = userGroupListData.value;
+        const filteredItems = state.filteredUniqueItems;
+        const serviceList = serviceListQuery.data.value;
+
+        if (!workspaceUsers || !userGroups || !filteredItems?.length || !serviceList) return [];
+
+        return workspaceUsers
+            .filter((user) => !user.role_binding_info?.workspace_group_id
+                && filteredItems.map((item: any) => item.user_id).includes(user.user_id))
+            .map((user) => {
+                const userServiceNames: string[] = [];
+                Object.values(serviceList).forEach((service: any) => {
+                    if (service?.members?.USER?.includes(user.user_id)) {
+                        userServiceNames.push(service.name);
+                    }
+                });
+                return {
+                    ...user,
+                    user_group: userGroups
+                        .filter((group) => group.users?.includes(user.user_id ?? ''))
+                        .map((group) => group.name),
+                    service: userServiceNames,
+                };
+            });
+    }),
+    roleMap: computed<Record<string, RoleModel>>(() => {
+        const _map: Record<string, RoleModel> = {};
+        roleListData.value?.forEach((role) => {
+            _map[role.role_id] = role;
+        });
+        return _map;
+    }),
 });
 
 /* Component */
 const checkModalConfirm = async () => {
     let responses: boolean[] = [];
     let languagePrefix = 'DELETE';
-    const items = state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
+    const items = state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems;
     state.loading = true;
 
     try {
@@ -114,11 +217,65 @@ const handleClose = () => {
     });
 };
 
+const queryClient = useQueryClient();
+const { key: userListQueryKey } = useServiceQueryKey('identity', 'user', 'list');
+const { key: workspaceUserListQueryKey } = useServiceQueryKey('identity', 'workspace-user', 'list');
+const { withSuffix: withSuffixUserGetQueryKey } = useServiceQueryKey('identity', 'user', 'get');
+
+const { mutateAsync: deleteRoleBinding } = useRoleBindingDeleteMutation({
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: workspaceUserListQueryKey.value });
+        userPageStore.setSelectedIndices([]);
+    },
+});
+
+const { mutateAsync: _deleteUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.delete({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const { mutateAsync: _enableUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.enable({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
+const { mutateAsync: _disableUser } = useMutation({
+    mutationFn: (userId: string) => userAPI.disable({
+        user_id: userId,
+    }),
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: userListQueryKey.value });
+        await queryClient.invalidateQueries({ queryKey: withSuffixUserGetQueryKey(selectedUserIds.value[0] || '') });
+        userPageStore.setSelectedIndices([]);
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
+});
+
 /* API */
 const removeUser = async (role_binding_id?: string): Promise<boolean> => {
     try {
         if (!role_binding_id) return false;
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
+        await deleteRoleBinding({
             role_binding_id,
         });
         return true;
@@ -130,9 +287,7 @@ const removeUser = async (role_binding_id?: string): Promise<boolean> => {
 const deleteUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>({
-            user_id: userId,
-        });
+        await _deleteUser(userId);
         return true;
     } catch (e) {
         return false;
@@ -141,9 +296,7 @@ const deleteUser = async (userId?: string): Promise<boolean> => {
 const enableUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.enable<UserEnableParameters>({
-            user_id: userId,
-        });
+        await _enableUser(userId);
         return true;
     } catch (e) {
         return false;
@@ -152,57 +305,12 @@ const enableUser = async (userId?: string): Promise<boolean> => {
 const disableUser = async (userId?: string): Promise<boolean> => {
     try {
         if (!userId) return false;
-        await SpaceConnector.clientV2.identity.user.disable<UserDisableParameters>({
-            user_id: userId,
-        });
+        await _disableUser(userId);
         return true;
     } catch (e) {
         return false;
     }
 };
-
-/* Watcher */
-watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_service_list, nv_selected_users]) => {
-    if (nv_service_list) {
-        const list: UserListItemType[] | (UserListItemType & { service: string; })[] = [];
-        nv_selected_users.forEach((selectedUser) => {
-            Object.values(nv_service_list).forEach((service) => {
-                if (service && service.data && service.data.members) {
-                    if (Object.keys(service.data.members).includes('USER')) {
-                        if (selectedUser.user_id && service.data.members.USER.includes(selectedUser.user_id)) {
-                            list.push({
-                                ...selectedUser,
-                                service: service.label,
-                            });
-                        }
-                    } else {
-                        list.push(selectedUser);
-                    }
-                }
-            });
-            list.push(selectedUser);
-        });
-        if (list.length > 0) {
-            state.filteredUniqueItems = Object.values(list.reduce((acc, cur) => {
-                if (!acc[cur.user_id]) {
-                    const { user_id, ...rest } = cur;
-                    acc[cur.user_id] = {
-                        user_id,
-                        service: [],
-                        ...rest,
-                    };
-                }
-                if (cur.service !== undefined) {
-                    if (!Array.isArray(acc[cur.user_id].service)) {
-                        acc[cur.user_id].service = [];
-                    }
-                    acc[cur.user_id].service.push(cur.service);
-                }
-                return acc;
-            }, {}));
-        }
-    }
-}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -217,8 +325,9 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
     >
         <template #body>
             <p-data-table
+                v-if="!userPageState.isAdminMode"
                 :fields="state.fields"
-                :items="state.isRemoveOnlyWorkspace ? userPageGetters.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
+                :items="state.isRemoveOnlyWorkspace ? state.selectedOnlyWorkspaceUsers : state.filteredUniqueItems"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)"
@@ -248,7 +357,9 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                     </div>
                     <div v-else />
                 </template>
-                <template #col-user_group-format="{value}">
+                <template v-if="!userPageState.isAdminMode"
+                          #col-user_group-format="{value}"
+                >
                     <div v-if="value.length > 0">
                         <span v-for="(userGroup, i) in value"
                               :key="i"
@@ -258,7 +369,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                                      badge-type="gray200"
                                      shape="square"
                             >
-                                {{ userGroup.name }}
+                                {{ userGroup }}
                             </p-badge>
                             <p-badge v-else-if="i === 3"
                                      badge-type="blue300"
@@ -272,7 +383,7 @@ watch([() => storeState.serviceList, () => storeState.selectedUsers], ([nv_servi
                 </template>
                 <template #col-role_id-format="{value}">
                     <span v-if="!value">--</span>
-                    <span v-else> {{ userPageGetters.roleMap[value]?.name }}</span>
+                    <span v-else> {{ state.roleMap[value]?.name }}</span>
                 </template>
                 <template #col-role_type-format="{value}">
                     <span> {{ useRoleFormatter(value, true).name }}</span>

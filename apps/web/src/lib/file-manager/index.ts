@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { FileModel } from '@/schema/file-manager/model';
+import type { FileModel } from '@/api-clients/file-manager/schema/model';
 
 import type { FileManagerResourceGroupType } from '@/lib/file-manager/type';
 

@@ -3,8 +3,8 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ServiceListParameters } from '@/schema/alert-manager/service/api-verbs/list';
-import type { ServiceModel } from '@/schema/alert-manager/service/model';
+import type { ServiceListParameters } from '@/api-clients/alert-manager/service/schema/api-verbs/list';
+import type { ServiceModel } from '@/api-clients/alert-manager/service/schema/model';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import type {

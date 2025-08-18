@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import {
-    getApiQueryWithToolboxOptions,
-} from '@cloudforet/core-lib/component-util/toolbox';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { isEmpty } from 'lodash';
+
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PSelectDropdown, PStatus, PToolboxTable, PLink, PSelectStatus, PI, PTooltip,
+    PI,
+    PLink,
+    PSelectDropdown,
+    PSelectStatus,
+    PStatus, PToolboxTable,
+    PTooltip,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type {
@@ -19,8 +22,11 @@ import type {
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 import { iso8601Formatter, numberFormatter } from '@cloudforet/utils';
 
+import { useCostReportConfigApi } from '@/api-clients/cost-analysis/cost-report-config/composables/use-cost-report-config-api';
 import { ROLE_TYPE } from '@/api-clients/identity/role/constant';
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/display/constant';
@@ -37,6 +43,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
+import { useWorkspaceListPaginationQuery } from '@/services/advanced/composables/use-workspace-list-pagination-query';
 import {
     EXCEL_TABLE_FIELDS,
     WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
@@ -60,32 +67,19 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 
 const userStore = useUserStore();
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+const workspacePageState = workspacePageStore.state;
 
 const route = useRoute();
 
-const workspaceListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
-    .setSort('name', true);
-let workspaceListApiQuery = workspaceListApiQueryHelper.data;
-
 const queryTagsHelper = useQueryTags({ keyItemSets: WORKSPACE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagsHelper;
-if (route.query.selectedWorkspaceId) {
-    queryTagsHelper.setFilters([
-        {
-            k: 'workspace_id',
-            v: route.query.selectedWorkspaceId,
-            o: '=',
-        },
-    ]);
-}
+
+const workspaceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
     timezone: computed(() => userStore.state.timezone ?? 'UTC'),
-    selectedType: computed<string>(() => workspacePageState.selectedType),
-    searchFilters: computed<ConsoleFilter[]>(() => workspacePageState.searchFilters),
-    currency: computed<Currency|undefined>(() => workspacePageStore.currency),
+    currency: computed<Currency|undefined>(() => costReportConfigData.value?.results?.[0]?.currency),
+    selectedIndex: computed<number|undefined>(() => workspacePageState.selectedIndex),
 });
 const state = reactive({
     typeField: computed<ValueItem[]>(() => ([
@@ -94,6 +88,15 @@ const state = reactive({
         { label: i18n.t('IAM.WORKSPACES.DISABLE') as string, name: WORKSPACE_STATE.DISABLE },
         { label: i18n.t('IAM.WORKSPACES.DORMANT') as string, name: WORKSPACE_STATE.DORMANT },
     ])),
+    selectedType: 'ALL',
+});
+const pagination = reactive({
+    thisPage: 1,
+    pageSize: 15,
+});
+const sortState = reactive({
+    sortKey: 'created_at',
+    sortDesc: true,
 });
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
@@ -101,13 +104,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'enable',
         label: i18n.t('IAM.WORKSPACES.ENABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'ENABLED'),
+        disabled: isEmpty(workspacePageState.selectedWorkspace) || workspacePageState.selectedWorkspace?.state === 'ENABLED',
     },
     {
         type: 'item',
         name: 'disable',
         label: i18n.t('IAM.WORKSPACES.DISABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'DISABLED'),
+        disabled: isEmpty(workspacePageState.selectedWorkspace) || workspacePageState.selectedWorkspace?.state === 'DISABLED',
     },
     {
         type: 'divider',
@@ -116,15 +119,50 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.WORKSPACES.EDIT'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
+        disabled: isEmpty(workspacePageState.selectedWorkspace),
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.WORKSPACES.DELETE'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
+        disabled: isEmpty(workspacePageState.selectedWorkspace),
     },
 ]));
+
+const { costReportConfigAPI } = useCostReportConfigApi();
+const { key: costReportConfigQueryKey } = useServiceQueryKey('cost-analysis', 'cost-report-config', 'list');
+const { data: costReportConfigData } = useScopedQuery({
+    queryKey: costReportConfigQueryKey,
+    queryFn: () => costReportConfigAPI.list({}),
+    gcTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 2,
+}, ['DOMAIN']);
+const {
+    data: workspaceListData,
+    totalCount: workspaceListTotalCount,
+    refresh: refreshWorkspaceList,
+} = useWorkspaceListPaginationQuery({
+    thisPage: computed(() => pagination.thisPage),
+    pageSize: computed(() => pagination.pageSize),
+    params: computed(() => {
+        workspaceListApiQueryHelper.setFilters([
+            ...queryTagsHelper.filters.value,
+            { k: 'is_dormant', v: state.selectedType === WORKSPACE_STATE.DORMANT, o: '=' },
+        ]);
+        if (state.selectedType === WORKSPACE_STATE.ENABLE || state.selectedType === WORKSPACE_STATE.DISABLE) {
+            workspaceListApiQueryHelper.addFilter({ k: 'state', v: state.selectedType, o: '=' });
+        }
+        if (route.query.selectedWorkspaceId) {
+            workspaceListApiQueryHelper.addFilter({ k: 'workspace_id', v: route.query.selectedWorkspaceId, o: '=' });
+        }
+        return {
+            query: {
+                ...workspaceListApiQueryHelper.data,
+                sort: [{ key: sortState.sortKey, desc: sortState.sortDesc }],
+            },
+        };
+    }),
+});
 
 const getRowSelectable = (item) => item.role_type !== ROLE_TYPE.SYSTEM_ADMIN;
 
@@ -133,59 +171,25 @@ const handleSelectDropdown = (name: string) => {
 };
 
 const handleSelectType = async (value: string) => {
-    const filters = workspaceListApiQueryHelper.filters;
-    const statusFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'state');
-    const dormantFilterIndex = storeState.searchFilters.findIndex((filter) => filter.k === 'is_dormant');
-
-    const isDormantSelected = value === WORKSPACE_STATE.DORMANT;
-    const isAllSelected = value === 'ALL';
-
-    if (isDormantSelected) {
-        if (statusFilterIndex !== -1) filters.splice(statusFilterIndex, 1);
-        if (dormantFilterIndex === -1) {
-            filters.push({ k: 'is_dormant', v: true, o: '=' });
-        } else {
-            filters[dormantFilterIndex].v = true;
-        }
-    } else {
-        if (dormantFilterIndex !== -1) filters.splice(dormantFilterIndex, 1);
-        if (statusFilterIndex === -1 && !isAllSelected) {
-            filters.push({ k: 'state', v: value, o: '=' });
-        } else if (statusFilterIndex !== -1) {
-            if (isAllSelected) {
-                filters.splice(statusFilterIndex, 1);
-            } else {
-                filters[statusFilterIndex].v = value;
-            }
-        }
-    }
-
-    workspaceListApiQueryHelper.setFilters(filters);
-    workspacePageStore.$patch((_state) => {
-        _state.selectedType = value;
-        _state.searchFilters = workspaceListApiQueryHelper.filters;
-    });
-    await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
+    state.selectedType = value;
+    workspacePageStore.setSelectedIndex(undefined);
+    workspacePageStore.setSelectedWorkspace({} as WorkspaceModel);
+    await refreshWorkspaceList();
 };
 const handleSelect = (index: number[]) => {
-    workspacePageStore.$patch({ selectedIndices: index });
+    workspacePageStore.setSelectedWorkspace(workspaceListData.value?.[index[0]]);
+    workspacePageStore.setSelectedIndex(index[0]);
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    workspaceListApiQuery = getApiQueryWithToolboxOptions(workspaceListApiQueryHelper, options) ?? workspaceListApiQuery;
-    if (options.queryTags !== undefined) {
-        workspacePageStore.$patch((_state) => {
-            _state.searchFilters = workspaceListApiQueryHelper.filters;
-        });
-    }
-    if (options.pageStart !== undefined) workspacePageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) workspacePageStore.$patch({ pageLimit: options.pageLimit });
-    await workspacePageStore.load({ query: workspaceListApiQuery });
+    if (options.sortBy !== undefined) sortState.sortKey = options.sortBy;
+    if (options.sortDesc !== undefined) sortState.sortDesc = options.sortDesc;
+    if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
 };
 
 const handleExport = async () => {
     try {
         await downloadExcel({
-            data: workspacePageState.workspaces,
+            data: workspaceListData.value || [],
             fields: EXCEL_TABLE_FIELDS,
             file_name_prefix: FILE_NAME_PREFIX.workspace,
             timezone: storeState.timezone,
@@ -214,11 +218,6 @@ const getServiceAccountRouteLocationByWorkspaceName = (item: WorkspaceModel) => 
         workspaceId: item?.workspace_id,
     },
 });
-
-onMounted(async () => {
-    await workspacePageStore.fetchCostReportConfig();
-});
-
 const reduce = (arr: (number & undefined)[]) => arr.reduce((acc, value) => acc + (value ?? 0), 0);
 
 const costInfoReduce = (arr: (number | {month: any})[] | any) => {
@@ -238,13 +237,15 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :loading="false"
                          :multi-select="false"
                          :show-footer="true"
+                         :this-page.sync="pagination.thisPage"
+                         :page-size.sync="pagination.pageSize"
                          disabled
-                         :items="workspacePageState.workspaces"
-                         :select-index="workspacePageState.selectedIndices"
+                         :items="workspaceListData"
+                         :select-index="storeState.selectedIndex === undefined ? undefined : [storeState.selectedIndex]"
                          :fields="WORKSPACE_TABLE_FIELDS"
                          sort-by="name"
                          :sort-desc="true"
-                         :total-count="workspacePageState.totalCount"
+                         :total-count="workspaceListTotalCount"
                          :key-item-sets="WORKSPACE_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="WORKSPACE_SEARCH_HANDLERS.valueHandlerMap"
                          :query-tags="queryTags"
@@ -252,7 +253,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                          :get-row-selectable="getRowSelectable"
                          @select="handleSelect"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="refreshWorkspaceList"
                          @export="handleExport"
         >
             <template #toolbox-bottom>
@@ -260,7 +261,7 @@ const costInfoReduce = (arr: (number | {month: any})[] | any) => {
                     <span class="mr-2">{{ $t('IAM.WORKSPACES.STATE') }}</span>
                     <p-select-status v-for="(item, idx) in state.typeField"
                                      :key="idx"
-                                     :selected="storeState.selectedType"
+                                     :selected="state.selectedType"
                                      class="mr-2"
                                      :value="item.name"
                                      @change="handleSelectType"

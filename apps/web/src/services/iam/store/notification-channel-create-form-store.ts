@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { UserGroupChannelScheduleInfoType } from '@/schema/alert-manager/user-group-channel/type';
+import type { UserGroupChannelScheduleInfoType } from '@/api-clients/alert-manager/user-group-channel/schema/type';
 
 interface NotificationChannelCreateFormState {
     selectedProtocol: {
@@ -45,6 +45,12 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
         },
     });
 
+    const mutations = {
+        updateScheduleInfo(value: UserGroupChannelScheduleInfoType) {
+            state.scheduleInfo = value;
+        },
+    };
+
     const actions = {
         initState() {
             state.selectedProtocol = {
@@ -78,6 +84,7 @@ export const useNotificationChannelCreateFormStore = defineStore('channel-create
 
     return {
         state,
+        ...mutations,
         ...actions,
     };
 });

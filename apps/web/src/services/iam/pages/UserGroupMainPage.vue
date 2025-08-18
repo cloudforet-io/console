@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onUnmounted } from 'vue';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PHorizontalLayout } from '@cloudforet/mirinae';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
@@ -20,25 +19,8 @@ import UserPerGroupRemoveDoubleCheckModal from '@/services/iam/components/UserPe
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
 
 const userGroupPageStore = useUserGroupPageStore();
-const userGroupPageState = userGroupPageStore.state;
 
 const { hasReadWriteAccess } = usePageEditableStatus();
-
-const userGroupListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
-
-/* API */
-const refreshUserGroupList = async () => {
-    userGroupPageState.loading = true;
-    userGroupListApiQueryHelper
-        .setPageStart(userGroupPageState.pageStart).setPageLimit(userGroupPageState.pageLimit)
-        .setFilters(userGroupPageState.searchFilters);
-    try {
-        await userGroupPageStore.listUserGroups({ query: userGroupListApiQueryHelper.data });
-    } finally {
-        userGroupPageState.loading = false;
-    }
-};
 
 onUnmounted(() => {
     userGroupPageStore.reset();
@@ -56,23 +38,13 @@ onUnmounted(() => {
             </template>
         </p-horizontal-layout>
         <user-group-management-tab :has-read-write-access="hasReadWriteAccess" />
-        <user-group-management-edit-modal v-if="hasReadWriteAccess"
-                                          @confirm="refreshUserGroupList"
-        />
-        <user-group-management-add-users-modal v-if="hasReadWriteAccess"
-                                               @confirm="refreshUserGroupList"
-        />
-        <user-group-delete-double-check-modal v-if="hasReadWriteAccess"
-                                              @confirm="refreshUserGroupList"
-        />
-        <user-per-group-remove-double-check-modal v-if="hasReadWriteAccess"
-                                                  @confirm="refreshUserGroupList"
-        />
+        <user-group-management-edit-modal v-if="hasReadWriteAccess" />
+        <user-group-management-add-users-modal v-if="hasReadWriteAccess" />
+        <user-group-delete-double-check-modal v-if="hasReadWriteAccess" />
+        <user-per-group-remove-double-check-modal v-if="hasReadWriteAccess" />
         <user-group-channel-create-modal v-if="hasReadWriteAccess" />
-        <user-group-channel-set-modal v-if="hasReadWriteAccess"
-                                      @confirm="refreshUserGroupList"
-        />
-        <user-group-channel-delete-double-check-modal @confirm="refreshUserGroupList" />
+        <user-group-channel-set-modal v-if="hasReadWriteAccess" />
+        <user-group-channel-delete-double-check-modal />
     </section>
 </template>
 

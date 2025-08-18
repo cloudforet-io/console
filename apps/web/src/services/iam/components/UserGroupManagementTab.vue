@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { PTab } from '@cloudforet/mirinae';
 import type { TabItem } from '@cloudforet/mirinae/types/navigation/tabs/tab/type';
@@ -38,10 +40,10 @@ const userGroupTabs = reactive({
                :active-tab.sync="userGroupTabs.activeTab"
         >
             <template #users>
-                <user-group-management-tab-users :has-read-write-access="props.hasReadWriteAccess" />
+                <user-group-management-tab-users :has-read-write-access="props.hasReadWriteAccess ?? false" />
             </template>
             <template #notification_channel>
-                <user-group-management-tab-notification-channel :has-read-write-access="props.hasReadWriteAccess" />
+                <user-group-management-tab-notification-channel :has-read-write-access="props.hasReadWriteAccess ?? false" />
             </template>
         </p-tab>
     </section>

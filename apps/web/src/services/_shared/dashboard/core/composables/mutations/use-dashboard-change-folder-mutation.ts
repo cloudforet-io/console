@@ -5,7 +5,7 @@ import {
 import type { DashboardChangeFolderParams, DashboardModel } from '@/api-clients/dashboard/_types/dashboard-type';
 import { usePrivateDashboardApi } from '@/api-clients/dashboard/private-dashboard/composables/use-private-dashboard-api';
 import { usePublicDashboardApi } from '@/api-clients/dashboard/public-dashboard/composables/use-public-dashboard-api';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 interface UseDashboardChangeFolderMutationOptions {
     onSuccess?: (data: DashboardModel, variables: DashboardChangeFolderParams) => void|Promise<void>;

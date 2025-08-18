@@ -4,20 +4,19 @@ import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 import draggable from 'vuedraggable';
 
+import { useMutation } from '@tanstack/vue-query';
 import { sortBy } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PPaneLayout, PI, PSearch, PBadge, PLazyImg, screens, PButton,
 } from '@cloudforet/mirinae';
+import type { TreeNode } from '@cloudforet/mirinae/types/data-display/tree/type';
 
-import type { EventRuleChangeOrderParameters } from '@/schema/alert-manager/event-rule/api-verbs/change-order';
-import type { EventRuleModel } from '@/schema/alert-manager/event-rule/model';
+import { useEventRuleApi } from '@/api-clients/alert-manager/event-rule/composables/use-event-rule-api';
+import type { EventRuleChangeOrderParameters } from '@/api-clients/alert-manager/event-rule/schema/api-verbs/change-order';
+import type { EventRuleModel } from '@/api-clients/alert-manager/event-rule/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -27,23 +26,19 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import { useEventRuleListQuery } from '@/services/alert-manager/v2/composables/use-event-rule-list-query';
 import { SERVICE_DETAIL_TABS } from '@/services/alert-manager/v2/constants/common-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/v2/routes/route-constant';
 import { useServiceDetailPageStore } from '@/services/alert-manager/v2/stores/service-detail-page-store';
-import type { TreeNode } from '@/services/project/v-shared/tree/type';
 
 interface Props {
   hideSidebar: boolean;
-  items: EventRuleModel[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     hideSidebar: false,
-    items: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const serviceDetailPageStore = useServiceDetailPageStore();
 const serviceDetailPageState = serviceDetailPageStore.state;
 
@@ -52,16 +47,17 @@ const { hasReadWriteAccess } = usePageEditableStatus();
 
 const route = useRoute();
 const router = useRouter();
+const serviceId = computed<string>(() => route.params.serviceId as string);
 
 const emit = defineEmits<{(e: 'update:hide-sidebar', value: string): void }>();
 
+const { eventRuleAPI } = useEventRuleApi();
+const { eventRuleListData } = useEventRuleListQuery(serviceId);
+const referenceMap = useAllReferenceDataModel();
+
 const storeState = reactive({
-    serviceId: computed<string>(() => serviceDetailPageState.serviceInfo.service_id),
     showEventRuleFormCard: computed<boolean>(() => serviceDetailPageState.showEventRuleFormCard),
     isEventRuleEditMode: computed<boolean>(() => serviceDetailPageState.isEventRuleEditMode),
-    eventRuleInfo: computed<EventRuleModel>(() => serviceDetailPageState.eventRuleInfo),
-    webhook: computed<WebhookReferenceMap>(() => allReferenceGetters.webhook),
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
 });
 
 const state = reactive({
@@ -71,14 +67,25 @@ const state = reactive({
     searchValue: '',
     filteredItems: computed<EventRuleModel[]>(() => {
         const filtered = state.searchValue
-            ? props.items.filter((item) => item.name.toLowerCase().includes(state.searchValue.toLowerCase()))
-            : props.items;
+            ? eventRuleListData.value?.filter((item) => item.name.toLowerCase().includes(state.searchValue.toLowerCase()))
+            : eventRuleListData.value;
         return sortBy(filtered, [(item) => !item.webhook_id, 'order']);
     }),
     treeList: [],
     treeListOpenState: {} as Record<string, boolean>,
     selectedTreeId: undefined as string | undefined,
     isEditMode: false,
+});
+
+const { mutate: changeOrder } = useMutation({
+    mutationFn: eventRuleAPI.changeOrder,
+    onSuccess: () => {
+        setEventRuleInfo();
+        state.isEditMode = false;
+    },
+    onError: (error) => {
+        ErrorHandler.handleError(error, true);
+    },
 });
 
 const setTreeList = (): TreeNode[] => {
@@ -138,8 +145,8 @@ const initSidebar = async () => {
     await replaceUrlQuery({ webhookId: scope, eventRuleId: state.selectedTreeId });
 };
 const getWebhookIcon = (id: string): string | undefined => {
-    const webhook = storeState.webhook[id]?.data;
-    return webhook ? storeState.plugins[webhook.plugin_info.plugin_id]?.icon : undefined;
+    const webhook = referenceMap.alertManagerWebhook[id]?.data;
+    return webhook ? referenceMap.plugin[webhook.plugin_info.plugin_id]?.icon : undefined;
 };
 const clickResizer = () => {
     state.proxyHideSidebar = !state.proxyHideSidebar;
@@ -158,53 +165,42 @@ const handleClickItem = (value: TreeNode, idx?: number) => {
     router.push(value.data.to).catch(() => {});
     state.selectedTreeId = value.id;
 };
-const fetchAndSetEventRuleInfo = async (eventRuleId: string) => {
-    if (!eventRuleId) {
+const setEventRuleInfo = async () => {
+    if (!route.query?.eventRuleId) {
         state.selectedTreeId = undefined;
         return;
     }
-    await serviceDetailPageStore.fetchEventRuleInfo({ event_rule_id: eventRuleId });
-    state.selectedTreeId = storeState.eventRuleInfo.event_rule_id;
+    state.selectedTreeId = route.query?.eventRuleId;
 };
 
 const handleSaveOrder = async () => {
-    state.loading = true;
-    try {
-        const mismatchedIds = [] as EventRuleChangeOrderParameters[];
-
-        state.treeList.forEach((t) => {
-            if (t.children) {
-                t.children.forEach((child, index) => {
-                    if (child.data.order !== index + 1) {
-                        mismatchedIds.push({
-                            event_rule_id: child.id,
-                            order: index + 1,
-                        });
-                    }
-                });
-            }
-        });
-        await Promise.all(mismatchedIds.map((i) => SpaceConnector.clientV2.alertManager.eventRule.changeOrder<EventRuleChangeOrderParameters>(i)));
-        await fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
-        state.isEditMode = false;
-    } catch (e) {
-        ErrorHandler.handleError(e, true);
-    } finally {
-        state.loading = true;
-    }
+    const mismatchedIds = [] as EventRuleChangeOrderParameters[];
+    state.treeList.forEach((t) => {
+        if (t.children) {
+            t.children.forEach((child, index) => {
+                if (child.data.order !== index + 1) {
+                    mismatchedIds.push({
+                        event_rule_id: child.id,
+                        order: index + 1,
+                    });
+                }
+            });
+        }
+    });
+    await Promise.all(mismatchedIds.map((i) => changeOrder(i)));
 };
 
 watch([() => storeState.isEventRuleEditMode, () => storeState.showEventRuleFormCard], async ([isEditMode, showFormCard]) => {
     if (showFormCard || !isEditMode) return;
-    await fetchAndSetEventRuleInfo(route.query?.eventRuleId as string);
+    await setEventRuleInfo();
 }, { immediate: true });
 
 watch(() => route.query?.eventRuleId, async (eventRuleId) => {
-    await fetchAndSetEventRuleInfo(eventRuleId as string);
+    await setEventRuleInfo();
     if (eventRuleId) await serviceDetailPageStore.setShowEventRuleFormCard(false);
 }, { immediate: true });
 
-watch([() => props.items.length, () => storeState.showEventRuleFormCard], async ([itemLength, showFormCard]) => {
+watch([() => eventRuleListData.value?.length, () => storeState.showEventRuleFormCard], async ([itemLength, showFormCard]) => {
     if (itemLength === 0) return;
     state.treeList = setTreeList();
     if (!showFormCard && !route.query?.eventRuleId) await initSidebar();
@@ -283,7 +279,7 @@ watch(() => state.isMobileSize, (isMobileSize) => {
                                         width="1rem"
                                         height="1rem"
                             />
-                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : storeState.webhook[title.id]?.label }}</span>
+                            <span class="ml-1">{{ title.id === 'global' ? $t('ALERT_MANAGER.EVENT_RULE.GLOBAL') : referenceMap.alertManagerWebhook[title.id]?.label || title.id }}</span>
                         </div>
                         <draggable v-if="title.isOpen"
                                    v-model="title.children"

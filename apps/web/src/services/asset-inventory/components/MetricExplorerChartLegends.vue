@@ -2,6 +2,7 @@
 import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { cloneDeep } from 'lodash';
 
@@ -13,6 +14,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import { useMetricGetQuery } from '@/services/asset-inventory/composables/use-metric-get-query';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Legend } from '@/services/asset-inventory/types/asset-analysis-type';
@@ -34,17 +36,23 @@ const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'show-all-series'): void;
 }>();
 
+const route = useRoute();
+
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
     disableLegendToggle: computed<boolean>(() => [CHART_TYPE.TREEMAP, CHART_TYPE.COLUMN].includes(metricExplorerPageState.selectedChartType)),
-    chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
+    chartGroupByMenuItems: computed(() => labelKeys.value
         .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
         .map((d) => ({ name: d.key, label: d.name }))),
+});
+
+/* Query */
+const { labelKeys } = useMetricGetQuery({
+    metricId: computed(() => route.params.metricId),
 });
 
 /* Util */

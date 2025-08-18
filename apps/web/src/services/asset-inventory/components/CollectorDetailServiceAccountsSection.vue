@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!props.hasReadWriteAccess || !collectorDetailPageStore.getters.isEditableCollector"
+                                         :hide-edit-button="!props.hasReadWriteAccess || !isEditableCollector"
                                          :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
@@ -31,7 +31,7 @@
                 <p-button style-type="primary"
                           size="lg"
                           class="save-changes-button"
-                          :disabled="state.updateLoading || !state.isServiceAccountValid"
+                          :disabled="isCollectorUpdatePending || !state.isServiceAccountValid"
                           @click="handleClickSave"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -44,22 +44,21 @@
 
 <script lang="ts" setup>
 import {
-    reactive,
+    reactive, computed,
 } from 'vue';
 
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@cloudforet/mirinae';
 
-
-import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
-import type {
-    CollectorModel,
-
-} from '@/schema/inventory/collector/model';
+import { useCollectorApi } from '@/api-clients/inventory/collector/composables/use-collector-api';
+import type { CollectorUpdateParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -69,14 +68,16 @@ import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
-import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+import { useCollectorGetQuery } from '@/services/asset-inventory/composables/use-collector-get-query';
+import { getIsEditableCollector } from '@/services/asset-inventory/helpers/collector-editable-value-helper';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.state;
-
-const collectorDetailPageStore = useCollectorDetailPageStore();
+const appContextStore = useAppContextStore();
+const queryClient = useQueryClient();
+const { collectorAPI } = useCollectorApi();
 
 const props = defineProps<{
     manageDisabled?: boolean;
@@ -87,14 +88,59 @@ const state = reactive({
     totalCount: 0,
     isEditMode: false,
     isServiceAccountValid: false,
-    updateLoading: false,
 });
 
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
+const isEditableCollector = computed<boolean>(() => getIsEditableCollector(isAdminMode.value, originCollectorData.value));
 
-/* api fetchers */
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+/* Query */
+const { data: originCollectorData } = useCollectorGetQuery({
+    collectorId: computed(() => collectorFormState.collectorId),
+});
+const { key: collectorGetQueryKey } = useServiceQueryKey('inventory', 'collector', 'get', {
+    contextKey: collectorFormState.collectorId,
+});
+const { key: secretListQueryKey } = useServiceQueryKey('secret', 'secret', 'list');
+
+/* Mutation */
+const { mutate: collectorUpdateMutation, isPending: isCollectorUpdatePending } = useMutation({
+    mutationFn: (params: CollectorUpdateParameters) => collectorAPI.update(params),
+    onSuccess: () => {
+        state.isEditMode = false;
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SERVICE_ACCOUNTS'), '');
+        queryClient.invalidateQueries({ queryKey: collectorGetQueryKey.value });
+        queryClient.invalidateQueries({ queryKey: secretListQueryKey.value });
+    },
+    onError: (error) => {
+        collectorFormStore.resetAttachedServiceAccount();
+        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SERVICE_ACCOUNTS'));
+    },
+});
+
+/* event handlers */
+const handleClickEdit = () => {
+    const isExcludeOption = !!originCollectorData.value?.secret_filter?.exclude_service_accounts?.length;
+    if (isExcludeOption) {
+        collectorFormStore.$patch((_state) => {
+            _state.state.selectedServiceAccountFilterOption = 'exclude';
+        });
+    } else {
+        collectorFormStore.$patch((_state) => {
+            _state.state.selectedServiceAccountFilterOption = 'include';
+        });
+    }
+    collectorFormStore.initForm(originCollectorData.value);
+    state.isEditMode = true;
+};
+const handleChangeIsAttachedServiceAccountValid = (value: boolean) => {
+    state.isServiceAccountValid = value;
+};
+const handleClickCancel = () => {
+    state.isEditMode = false;
+};
+const handleClickSave = async () => {
     if (!collectorFormState.collectorId) throw new Error('collector_id is required');
-    const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
+    const originSecretFilter = originCollectorData.value?.secret_filter ?? {};
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormState.collectorId,
         secret_filter: {
@@ -110,43 +156,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
-};
-
-
-/* event handlers */
-const handleClickEdit = () => {
-    const isExcludeOption = !!collectorFormState.originCollector?.secret_filter?.exclude_service_accounts?.length;
-    if (isExcludeOption) {
-        collectorFormStore.$patch((_state) => {
-            _state.state.selectedServiceAccountFilterOption = 'exclude';
-        });
-    } else {
-        collectorFormStore.$patch((_state) => {
-            _state.state.selectedServiceAccountFilterOption = 'include';
-        });
-    }
-    state.isEditMode = true;
-};
-const handleChangeIsAttachedServiceAccountValid = (value: boolean) => {
-    state.isServiceAccountValid = value;
-};
-const handleClickCancel = () => {
-    state.isEditMode = false;
-};
-const handleClickSave = async () => {
-    try {
-        state.updateLoading = true;
-        const collector = await fetchCollectorUpdate();
-        collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SERVICE_ACCOUNTS'), '');
-        state.isEditMode = false;
-    } catch (error) {
-        collectorFormStore.resetAttachedServiceAccount();
-        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SERVICE_ACCOUNTS'));
-    } finally {
-        state.updateLoading = false;
-    }
+    collectorUpdateMutation(params);
 };
 
 

@@ -1,10 +1,20 @@
-import type { NoteModel } from '@/schema/inventory/note/model';
+import type { Route } from 'vue-router/types/router';
 
-export interface CloudServiceDetailPageParams {
+import type { NoteModel } from '@/api-clients/inventory/note/schema/model';
+
+// export interface CloudServiceDetailPageParams {
+//     provider: string;
+//     group: string;
+//     name?: string;
+// }
+
+type RouteParams = Route['params'];
+
+export type CloudServiceDetailPageParams = RouteParams & {
     provider: string;
     group: string;
     name?: string;
-}
+};
 
 export interface DiffItem {
     key: string;

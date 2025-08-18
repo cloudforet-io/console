@@ -11,6 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 import { useUserMfaDisableMutation } from '@/services/iam/composables/mutations/use-user-mfa-disable-mutation';
+import { useUserListQuery } from '@/services/iam/composables/use-user-list-query';
 import { USER_MODAL_MAP } from '@/services/iam/constants/modal.constant';
 import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
@@ -24,12 +25,15 @@ const emit = defineEmits<UserMFASecretKeyDeleteModalEmits>();
 
 /* Store */
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.state;
 const userPageModalState = userPageStore.modalState;
-const userPageGetters = userPageStore.getters;
 
 /* Computed */
 // Only Local Auth Type Users can be disabled (disable = delete secret key)
-const selectedMFAEnabledUsers = computed<UserListItemType[]>(() => userPageGetters.selectedUsers.filter((user) => user.auth_type === 'LOCAL' && user.mfa?.state === 'ENABLED') || []);
+const selectedUserIds = computed<string[]>(() => userPageState.selectedUserIds);
+
+const { userListData: selectedUsers } = useUserListQuery(selectedUserIds);
+const selectedMFAEnabledUsers = computed<UserListItemType[]>(() => selectedUsers.value?.filter((user) => user.auth_type === 'LOCAL' && user.mfa?.state === 'ENABLED') || []);
 
 /* API */
 // Store failed user IDs

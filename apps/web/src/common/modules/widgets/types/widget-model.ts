@@ -48,7 +48,7 @@ export interface AssetOptions {
 }
 
 export interface CostOptions {
-    data_source_id: string;
+    data_source_id?: string;
     plugin_id?: string;
     data_key: string;
 }
@@ -69,12 +69,12 @@ export interface DataTableTransformOptions {
     VALUE_MAPPING?: ValueMappingOptions;
 }
 export interface ConcatOptions {
-    data_tables: string[];
+    data_tables: string[] | number[]; // NOTE: number[] is for template generation
     // data_table_indexes: number[];
 }
 
 export interface JoinOptions {
-    data_tables: string[];
+    data_tables: string[] | number[]; // NOTE: number[] is for template generation
     how?: JoinType;
     left_keys: string[];
     right_keys: string[];

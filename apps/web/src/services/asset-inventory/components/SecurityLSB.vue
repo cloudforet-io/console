@@ -4,10 +4,10 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -18,15 +18,13 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
+import { useSecurityCloudServiceTypeList } from '@/services/asset-inventory/composables/use-security-cloud-service-type-list';
 import { ADMIN_ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/admin/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
-
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
@@ -36,10 +34,12 @@ const appContextStore = useAppContextStore();
 const route = useRoute();
 const router = useRouter();
 
+const referenceMap = useAllReferenceDataModel();
+
+const { cloudServiceTypeList, isLoading } = useSecurityCloudServiceTypeList();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    loading: computed(() => securityPageGetters.loading),
-    cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
 });
 const state = reactive({
@@ -47,21 +47,22 @@ const state = reactive({
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
     menuSet: computed<LSBItem[]>(() => {
         const defaultMenuSet: LSBItem[] = [];
-        storeState.cloudServiceTypeList?.forEach((d, index, array) => {
+        cloudServiceTypeList.value?.forEach((d, index, array) => {
+            const titleIcon = assetUrlConverter(d.items?.[0]?.tags['spaceone:icon']);
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: d.group,
-                titleIcon: d.items && assetUrlConverter(d.items[0].icon),
+                titleIcon: d.items && titleIcon,
                 id: d.group,
             });
             d.items?.forEach((i) => {
                 defaultMenuSet.push({
                     type: MENU_ITEM_TYPE.ITEM,
-                    label: `[${allReferenceGetters.provider[i.data.provider].label}] ${i.name}`,
-                    id: i.key,
+                    label: `[${referenceMap.provider[i.provider]?.label || i.provider}] ${i.name}`,
+                    id: i.cloud_service_type_id,
                     to: {
                         name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
-                        params: { group: i.data.group, provider: i.data.provider, name: i.name },
+                        params: { group: i.group, provider: i.provider, name: i.name },
                     },
                 });
             });
@@ -77,7 +78,7 @@ const state = reactive({
                 { name: i18n.t('MENU.ASSET_INVENTORY'), to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE._NAME : ASSET_INVENTORY_ROUTE._NAME } },
                 { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: { name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SECURITY._NAME : ASSET_INVENTORY_ROUTE.SECURITY._NAME } },
                 { name: state.pageParams.group || '', data: null },
-                { name: `[${allReferenceGetters.provider[state.pageParams.provider || '']?.label}] ${state.pageParams.name || ''}` },
+                { name: `[${referenceMap.provider[state.pageParams.provider]?.label || state.pageParams.provider}] ${state.pageParams.name || ''}` },
             ];
         }
         return [
@@ -93,8 +94,8 @@ const routeToFirstCloudServiceType = async () => {
         await router.replace({
             name: storeState.isAdminMode ? ADMIN_ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
             params: {
-                provider: selectedCloudServiceType?.data.provider || '',
-                group: selectedCloudServiceType?.data.group || '',
+                provider: selectedCloudServiceType?.provider || '',
+                group: selectedCloudServiceType?.group || '',
                 name: selectedCloudServiceType?.name || '',
             },
             query: route.query,
@@ -105,8 +106,10 @@ const routeToFirstCloudServiceType = async () => {
 /* Watchers */
 watch([() => state.pageParams.name, () => state.pageParams.provider, () => state.pageParams.group], async ([name, provider, group]) => {
     if (name) {
-        await securityPageStore.setSelectedCloudServiceType(group, name, provider);
-        await cloudServiceDetailPageStore.setProviderGroupName(state.pageParams);
+        const cloudServiceType = cloudServiceTypeList.value.find((d) => d.group === group);
+        const selectedCloudServiceType = cloudServiceType?.items?.find((i) => i.name === name && i.provider === provider);
+        securityPageStore.setSelectedCloudServiceType(selectedCloudServiceType);
+        cloudServiceDetailPageStore.setProviderGroupName(state.pageParams);
     }
 });
 watch(() => storeState.selectedCloudServiceType, () => {
@@ -118,8 +121,8 @@ watch(() => state.securityNavigation, async (securityNavigation) => {
 </script>
 
 <template>
-    <p-data-loader :loading="false"
-                   :data="storeState.loading ? true : storeState.cloudServiceTypeList"
+    <p-data-loader :loading="isLoading"
+                   :data="cloudServiceTypeList"
                    :loader-backdrop-color="BACKGROUND_COLOR"
                    class="security-l-s-b"
     >

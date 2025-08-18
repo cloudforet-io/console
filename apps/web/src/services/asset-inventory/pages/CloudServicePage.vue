@@ -3,36 +3,33 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
-
+import { getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancellable-fetcher';
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@cloudforet/mirinae';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/controls/toolbox/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { SpaceRouter } from '@/router';
-import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { i18n } from '@/translations';
 
 import { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 import {
     arrayToQueryString,
+    objectToQueryString,
     primitiveToQueryString,
     queryStringToArray,
     queryStringToObject,
@@ -40,18 +37,19 @@ import {
     replaceUrlQuery,
 } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import CloudServiceListCard
     from '@/services/asset-inventory/components/CloudServiceListCard.vue';
 import CloudServiceToolbox from '@/services/asset-inventory/components/CloudServiceToolbox.vue';
+import { useCloudServiceAnalyzePaginationQuery } from '@/services/asset-inventory/composables/use-cloud-service-analyze-pagination-query';
+import { useCloudServiceProviderListQuery } from '@/services/asset-inventory/composables/use-cloud-service-provider-list-query';
+import { UNIDENTIFIED_PROVIDER } from '@/services/asset-inventory/constants/cloud-service-constant';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceLSBStore } from '@/services/asset-inventory/stores/cloud-service-l-s-b-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type {
     CloudServiceCategory, CloudServiceMainPageUrlQuery,
     CloudServiceMainPageUrlQueryValue,
@@ -59,22 +57,21 @@ import type {
 import type { EmptyData, Period } from '@/services/asset-inventory/types/type';
 import { SERVICE_ACCOUNT_ROUTE } from '@/services/service-account/routes/route-constant';
 
-interface Response {
-    results: CloudServiceAnalyzeResult[];
-    more: boolean;
-}
 
 const allReferenceStore = useAllReferenceStore();
 const cloudServicePageStore = useCloudServicePageStore();
-const cloudServicePageState = cloudServicePageStore.$state;
+const cloudServicePageState = cloudServicePageStore.state;
+const cloudServicePageGetters = cloudServicePageStore.getters;
 const cloudServiceLSBStore = useCloudServiceLSBStore();
 const authorizationStore = useAuthorizationStore();
+
+const referenceMap = useAllReferenceDataModel();
+const { data: providerList } = useCloudServiceProviderListQuery();
 
 const storeState = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
 });
 const handlerState = reactive({
@@ -101,26 +98,17 @@ const handlerState = reactive({
 
 const searchQueryHelper = new QueryHelper();
 const state = reactive({
-    title: computed<string>(() => {
-        if (!isEmpty(storeState.providers[cloudServicePageState.selectedProvider])) {
-            return storeState.providers[cloudServicePageState.selectedProvider].name;
-        }
-        return cloudServicePageState.selectedProvider;
-    }),
-    // list
-    loading: true,
-    items: undefined as CloudServiceAnalyzeResult[]|undefined,
-    hasNextPage: false,
+    title: computed<string>(() => referenceMap.provider[cloudServicePageState.selectedProvider]?.name || cloudServicePageState.selectedProvider),
     pageStart: 1,
     pageLimit: 24,
     // url query
     urlQueryString: computed<CloudServiceMainPageUrlQuery>(() => ({
         provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
-        service: arrayToQueryString(cloudServicePageStore.selectedCategories),
-        region: arrayToQueryString(cloudServicePageStore.selectedRegions),
+        service: arrayToQueryString(cloudServicePageGetters.selectedCategories),
+        region: arrayToQueryString(cloudServicePageGetters.selectedRegions),
         project: arrayToQueryString(cloudServiceLSBStore.getters.selectedProjects),
         service_account: arrayToQueryString(cloudServiceLSBStore.getters.selectedServiceAccounts),
-        // period: objectToQueryString(cloudServicePageState.period),
+        period: objectToQueryString(cloudServicePageState.period),
         filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
     })),
     isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
@@ -153,31 +141,19 @@ const state = reactive({
 });
 
 /* api */
-const fetcher = getCancellableFetcher<CloudServiceAnalyzeParameters, Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
-
-const listCloudServiceType = async () => {
-    try {
-        state.loading = true;
-
-        const { status, response } = await fetcher({
-            query: getCloudServiceAnalyzeQuery(
-                [...cloudServicePageStore.allFilters, ...cloudServiceLSBStore.getters.allFilters],
-                { start: state.pageStart, limit: state.pageLimit },
-                cloudServicePageState.period,
-            ),
-        });
-        if (status === 'succeed') {
-            state.items = response.results;
-            state.hasNextPage = response.more ?? false;
-            state.loading = false;
-        }
-    } catch (e) {
-        state.items = [];
-        state.hasNextPage = false;
-        state.loading = false;
-        ErrorHandler.handleError(e);
-    }
-};
+const {
+    data: cloudServiceAnalyzeData, more, isLoading, query: cloudServiceAnalyzeQuery,
+} = useCloudServiceAnalyzePaginationQuery({
+    params: computed(() => ({
+        query: getCloudServiceAnalyzeQuery(
+            [...cloudServicePageGetters.allFilters, ...cloudServiceLSBStore.getters.allFilters],
+            { start: state.pageStart, limit: state.pageLimit },
+            cloudServicePageState.period,
+        ),
+    })),
+    thisPage: computed(() => getThisPage(state.pageStart, state.pageLimit)),
+    pageSize: computed(() => state.pageLimit),
+});
 
 /* event */
 // cloud service toolbox events
@@ -188,11 +164,10 @@ const handlePaginationUpdate = (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) {
         state.pageStart = options.pageStart;
     }
-    listCloudServiceType();
 };
 
 const handleRefresh = () => {
-    listCloudServiceType();
+    cloudServiceAnalyzeQuery.refetch();
 };
 
 /* Init */
@@ -209,25 +184,23 @@ const init = async () => {
         period: queryStringToObject<Period>(currentQuery.period),
         filters: searchQueryHelper.setKeyItemSets(handlerState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
     };
-    cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
+    const selectedProvider = providerList.value?.find((item) => item.provider === urlQueryValue.provider);
+    if (!selectedProvider && urlQueryValue.provider !== UNIDENTIFIED_PROVIDER) {
+        cloudServicePageStore.setSelectedProvider('all');
+    } else {
+        cloudServicePageStore.setSelectedProvider(selectedProvider?.provider ?? 'all');
+    }
     cloudServiceLSBStore.setSelectedProjectsToFilters(urlQueryValue.project);
     cloudServiceLSBStore.setSelectedServiceAccountsToFilters(urlQueryValue.service_account);
-    cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
     cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
     cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
-    cloudServicePageStore.$patch((_state) => {
-        _state.period = urlQueryValue.period;
-        _state.searchFilters = searchQueryHelper.filters as ConsoleFilter[];
-    });
+    cloudServicePageStore.setPeriod(urlQueryValue.period);
+    cloudServicePageStore.setSearchFilters(searchQueryHelper.filters as ConsoleFilter[]);
 
     /* register urlQueryString watcher after initiating states from url query */
     urlQueryStringWatcherStop = watch(() => state.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
-        listCloudServiceType();
     });
-
-    /* list data */
-    await listCloudServiceType();
 };
 
 (async () => {
@@ -246,7 +219,7 @@ onUnmounted(() => {
                    class="page-title"
         />
         <p-divider class="cloud-service-divider" />
-        <cloud-service-toolbox :has-next-page="state.hasNextPage"
+        <cloud-service-toolbox :has-next-page="more"
                                :handlers="handlerState"
                                :period="cloudServicePageState.period"
                                :page-size="state.pageLimit"
@@ -255,12 +228,12 @@ onUnmounted(() => {
         />
 
         <p-data-loader class="flex-grow"
-                       :data="state.items"
-                       :loading="state.loading"
+                       :data="cloudServiceAnalyzeData?.results"
+                       :loading="isLoading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <div class="cloud-service-type-wrapper">
-                <cloud-service-list-card v-for="(item, idx) in state.items"
+                <cloud-service-list-card v-for="(item, idx) in cloudServiceAnalyzeData?.results || []"
                                          :key="`${item.provider || ''}-${item.cloud_service_group || ''}-${idx}`"
                                          :item="item"
                 />

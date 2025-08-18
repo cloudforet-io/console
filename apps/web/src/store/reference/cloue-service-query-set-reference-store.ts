@@ -8,8 +8,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/api-clients/_common/schema/api-verbs/list';
-import type { CloudServiceQuerySetListParameters } from '@/schema/inventory/cloud-service-query-set/api-verbs/list';
-import type { CloudServiceQuerySetModel } from '@/schema/inventory/cloud-service-query-set/model';
+import type { CloudServiceQuerySetListParameters } from '@/api-clients/inventory/cloud-service-query-set/schema/api-verbs/list';
+import type { CloudServiceQuerySetModel } from '@/api-clients/inventory/cloud-service-query-set/schema/model';
 
 import type {
     ReferenceItem,

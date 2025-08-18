@@ -21,6 +21,7 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/api-clients/_common/schema/api-verbs/analyze';
 
+import type { Currency } from '@/store/display/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
@@ -35,9 +36,9 @@ import {
 
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
+import { useCostReportConfigQuery } from '@/services/cost-explorer/composables/use-cost-report-config-query';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
-import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -60,8 +61,6 @@ const LIMIT = 15;
 const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement|null>(null);
 const allReferenceStore = useAllReferenceStore();
-const costReportPageStore = useCostReportPageStore();
-const costReportPageGetters = costReportPageStore.getters;
 const storeState = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
@@ -146,6 +145,10 @@ const state = reactive({
         return refinedTableData;
     }),
 });
+const currency = computed<Currency>(() => costReportConfig.value?.currency || 'USD');
+
+/* Query */
+const { costReportConfig } = useCostReportConfigQuery();
 
 /* Util */
 const drawChart = (rawData: AnalyzeResponse<CostReportDataAnalyzeResult>) => {
@@ -225,7 +228,7 @@ useResizeObserver(chartContext, throttle(() => {
                         {{ storeState.providers[value] ? storeState.providers[value].name : value }}
                     </span>
                     <span v-else-if="field.name.includes('value_sum')">
-                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) }}
+                        {{ currencyMoneyFormatter(value, { currency, style: 'decimal' }) }}
                     </span>
                 </template>
             </p-data-table>

@@ -7,7 +7,7 @@ import type { APIError } from '@cloudforet/core-lib/space-connector/error';
 
 import { useTaskApi } from '@/api-clients/opsflow/task/composables/use-task-api';
 import type { TaskModel } from '@/api-clients/opsflow/task/schema/model';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 export const useTaskQuery = ({
     taskId, enabled,

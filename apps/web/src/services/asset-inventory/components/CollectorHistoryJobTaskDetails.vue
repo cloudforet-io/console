@@ -3,7 +3,7 @@ import { computed, onActivated, reactive } from 'vue';
 
 import { PTab } from '@cloudforet/mirinae';
 
-import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+import type { JobTaskModel } from '@/api-clients/inventory/job-task/schema/model';
 import { i18n } from '@/translations';
 
 import JobTaskErrorList from '@/services/asset-inventory/components/CollectorHistoryJobTaskErrorList.vue';

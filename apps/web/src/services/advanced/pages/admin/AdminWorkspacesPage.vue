@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import Vue, {
+    computed,
     onMounted, onUnmounted, reactive,
+    watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -9,9 +11,11 @@ import {
     PButton, PHeading, PHorizontalLayout, PHeadingLayout,
 } from '@cloudforet/mirinae';
 
+import { useWorkspaceApi } from '@/api-clients/identity/workspace/composables/use-workspace-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
+import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 
 import WorkspaceManagementTable from '@/services/advanced/components/WorkspaceManagementTable.vue';
@@ -19,6 +23,7 @@ import WorkspacesCreateModal from '@/services/advanced/components/WorkspacesCrea
 import WorkspacesDeleteModal from '@/services/advanced/components/WorkspacesDeleteModal.vue';
 import WorkspacesSetEnableModal from '@/services/advanced/components/WorkspacesSetEnableModal.vue';
 import WorkspacesUserManagementTab from '@/services/advanced/components/WorkspacesUserManagementTab.vue';
+import { useWorkspaceListQuery } from '@/services/advanced/composables/use-workspace-list-query';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/advanced/store/workspace-page-store';
 import UserManagementAddModal from '@/services/iam/components/UserManagementAddModal.vue';
@@ -26,10 +31,27 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
-const workspacePageState = workspacePageStore.$state;
+
 const userPageStore = useUserPageStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+const { workspaceAPI } = useWorkspaceApi();
+
+const workspaceListQueryHelper = new ApiQueryHelper().setCountOnly();
+const { key: workspaceListQueryKey, params: workspaceListQueryParams } = useServiceQueryKey('identity', 'workspace', 'list', {
+    params: computed(() => ({
+        query: workspaceListQueryHelper.data,
+    })),
+});
+const { workspaceListData } = useWorkspaceListQuery();
+
+const { data: workspaceListQueryData } = useScopedQuery({
+    queryKey: workspaceListQueryKey,
+    queryFn: async () => workspaceAPI.list(workspaceListQueryParams.value),
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+}, ['DOMAIN']);
 
 const route = useRoute();
 
@@ -40,32 +62,6 @@ const modalState = reactive({
     setEnableModalVisible: false,
     enableState: undefined as undefined| typeof WORKSPACE_STATE[keyof typeof WORKSPACE_STATE],
 });
-
-const workspaceListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
-
-const refreshWorkspaceList = async (isInit?: boolean) => {
-    if (isInit && route.query.selectedWorkspaceId) {
-        workspacePageStore.$patch((_state) => {
-            _state.searchFilters = [{ k: 'workspace_id', v: route.query.selectedWorkspaceId, o: '=' }];
-        });
-    }
-    workspacePageStore.$patch({ loading: true });
-    workspaceListApiQueryHelper
-        .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
-        .setFilters(workspacePageStore.searchFilters);
-    try {
-        await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
-        if (isInit) {
-            await workspacePageStore.$patch({ selectedIndices: [0] });
-            if (route.query.modalType) {
-                handleSelectAction(route.query.modalType as string);
-            }
-        }
-    } finally {
-        workspacePageStore.$patch({ loading: false });
-    }
-};
 
 const handleCreateWorkspace = () => {
     modalState.createType = 'CREATE';
@@ -100,7 +96,7 @@ const handleSelectAction = (name: string) => {
         modalState.setEnableModalVisible = true;
         break;
     case 'disable':
-        if (workspacePageStore.$state.workspaces.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
+        if (workspaceListData.value.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
             Vue.notify({
                 group: 'toastTopCenter',
                 type: 'alert',
@@ -117,8 +113,11 @@ const handleSelectAction = (name: string) => {
     }
 };
 
-const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN'], () => refreshWorkspaceList(true));
-callApiWithGrantGuard();
+watch(() => route.query.modalType, (modalType) => {
+    if (modalType) {
+        handleSelectAction(modalType as string);
+    }
+});
 
 onMounted(() => {
     if (route.query.hasNoWorkspace === 'true') {
@@ -127,8 +126,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    workspacePageStore.$dispose();
-    workspacePageStore.$reset();
+    workspacePageStore.init();
 });
 
 </script>
@@ -138,7 +136,7 @@ onUnmounted(() => {
         <p-heading-layout class="mb-6">
             <template #heading>
                 <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
-                           :total-count="workspacePageState.totalCount"
+                           :total-count="workspaceListQueryData?.total_count || 0"
                            use-total-count
                 />
             </template>
@@ -167,20 +165,15 @@ onUnmounted(() => {
             :visible.sync="modalState.createModalVisible"
             :create-type="modalState.createType"
             @confirm="handleConfirm"
-            @refresh="refreshWorkspaceList"
         />
         <workspaces-delete-modal v-if="hasReadWriteAccess"
                                  :visible.sync="modalState.deleteModalVisible"
-                                 @refresh="refreshWorkspaceList"
         />
         <workspaces-set-enable-modal v-if="hasReadWriteAccess"
                                      :visible.sync="modalState.setEnableModalVisible"
                                      :enable-modal-type="modalState.enableState"
-                                     @refresh="refreshWorkspaceList"
         />
-        <user-management-add-modal v-if="hasReadWriteAccess"
-                                   @confirm="refreshWorkspaceList"
-        />
+        <user-management-add-modal v-if="hasReadWriteAccess" />
     </section>
 </template>
 

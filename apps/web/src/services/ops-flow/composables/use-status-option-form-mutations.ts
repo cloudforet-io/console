@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 
 import { useTaskCategoryApi } from '@/api-clients/opsflow/task-category/composables/use-task-category-api';
 import type { TaskStatusOption, TaskStatusOptions, TaskStatusType } from '@/api-clients/opsflow/task/schema/type';
-import { useServiceQueryKey } from '@/query/query-key/use-service-query-key';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -50,14 +50,16 @@ export const useStatusOptionFormMutations = ({
                 color: form.color,
             });
 
-            await taskCategoryAPI.update({
+            const data = await taskCategoryAPI.update({
                 category_id: categoryId.value,
                 status_options: newStatusOptions,
                 force: true,
             });
+            return data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: taskCategoryListQueryKey.value });
+            queryClient.invalidateQueries({ queryKey: taskCategoryWithSuffix(data.category_id) });
             showSuccessMessage('Task status option created successfully', '');
         },
         onError: (e) => {

@@ -9,13 +9,13 @@ import {
     COLLECTOR_RULE_CONDITION_KEY,
     COLLECTOR_RULE_CONDITION_KEY_LABEL,
     COLLECTOR_RULE_CONDITION_OPERATOR_LABEL,
-} from '@/schema/inventory/collector-rule/constant';
-import type { CollectorRuleModel, AdditionalRuleAction } from '@/schema/inventory/collector-rule/model';
+} from '@/api-clients/inventory/collector-rule/schema/constant';
+import type { CollectorRuleModel, AdditionalRuleAction } from '@/api-clients/inventory/collector-rule/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n as _i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 interface Props {
     data?: CollectorRuleModel;
@@ -23,7 +23,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     data: undefined,
 });
-const allReferenceStore = useAllReferenceStore();
 
 const { getReferenceLocation } = useReferenceRouter();
 
@@ -32,6 +31,7 @@ interface Field {
     label: TranslateResult;
 }
 
+const referenceMap = useAllReferenceDataModel();
 const state = reactive({
     conditionFields: computed<Field[]>(() => (props.data?.conditions ?? []).map((condition) => ({
         name: condition.key,
@@ -62,8 +62,6 @@ const state = reactive({
         if (!props.data) return {};
         return props.data.actions;
     }),
-    projects: computed(() => allReferenceStore.getters.project),
-    region: computed(() => allReferenceStore.getters.region),
     changeProjectId: computed(() => props.data?.actions?.change_project ?? ''),
     conditions: computed(() => ({
         ANY: _i18n.t('PROJECT.EVENT_RULE.ANY'),
@@ -111,7 +109,7 @@ const state = reactive({
                             <td>{{ COLLECTOR_RULE_CONDITION_OPERATOR_LABEL[state.conditionItems[index]?.operator]?.toLowerCase() }}</td>
                             <td>
                                 <span v-if="field.label !== 'Region'">{{ state.conditionItems[index]?.value }}</span>
-                                <span v-else>{{ state.region[state.conditionItems[index]?.value]?.label }}</span>
+                                <span v-else>{{ referenceMap.region[state.conditionItems[index]?.value]?.label || state.conditionItems[index]?.value }}</span>
                             </td>
                         </tr>
                     </template>
@@ -130,14 +128,15 @@ const state = reactive({
                         >
                             <td>{{ field.label }}</td>
                             <td v-if="field.name === 'change_project'">
-                                <p-link action-icon="internal-link"
+                                <p-link v-if="referenceMap.project[state.changeProjectId]"
+                                        action-icon="internal-link"
                                         new-tab
                                         :to="getReferenceLocation(
                                             state.changeProjectId,
                                             { resource_type: 'identity.Project',
-                                              workspace_id: state.projects[state.changeProjectId]?.data?.workspaceId },)"
+                                              workspace_id: referenceMap.project[state.changeProjectId]?.data?.workspaceId },)"
                                 >
-                                    {{ state.projects[state.changeProjectId] ? state.projects[state.changeProjectId].label : state.changeProjectId ?? '--' }}
+                                    {{ referenceMap.project[state.changeProjectId]?.label || state.changeProjectId || '--' }}
                                 </p-link>
                             </td>
                             <td v-else>
