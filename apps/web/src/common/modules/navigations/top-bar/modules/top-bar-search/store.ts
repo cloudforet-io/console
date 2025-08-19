@@ -10,7 +10,6 @@ import type { ResourceSearchParameters, ResourceSearchResponse } from '@/api-cli
 import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
@@ -37,8 +36,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const workspaceStoreState = userWorkspaceStore.$state;
     const recentStore = useRecentStore();
-    const allReferenceStore = useAllReferenceStore();
-    const allReferenceGetters = allReferenceStore.getters;
 
     const orderWorkspaceList = (workspaceList: any[]) => {
         if (!storeState.currentWorkspaceId) return workspaceList;
@@ -52,7 +49,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     const storeState = reactive({
         currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
         workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
-        workspaceMap: computed(() => allReferenceGetters.workspace),
     });
     const state = reactive<TopBarSearchStoreState>({
         loading: false,
