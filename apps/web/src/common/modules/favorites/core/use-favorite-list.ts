@@ -5,7 +5,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import { useUserConfigListQuery } from '@/common/modules/favorites/core/use-user-config-list-query';
+import type { ConfigData } from '@/common/composables/config-data';
+import { useFavoriteConfigDataQuery } from '@/common/modules/favorites/core/use-favorite-config-data-query';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 
@@ -18,7 +19,8 @@ export const useFavoriteList = () => {
     const userId = computed<string|undefined>(() => userStore.state.userId);
     const currentWorkspaceId = computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId);
 
-    const { data: favoriteList } = useUserConfigListQuery({
+    const { data: favoriteList, isFetching: isFetchingFavoriteList } = useFavoriteConfigDataQuery({
+        configDataType: 'console:favorite',
         params: computed(() => {
             favoriteListApiQuery.setFilters([
                 { k: 'user_id', v: userId.value || '', o: '=' },
@@ -32,8 +34,9 @@ export const useFavoriteList = () => {
         enabled: computed(() => !!userId.value && !!currentWorkspaceId.value),
     });
 
-    const favoriteMenuList = computed(() => (favoriteList.value?.results ?? []).map((item) => item.data));
+    const favoriteMenuList = computed<ConfigData[]>(() => (favoriteList.value?.results ?? []).map((item) => item.data));
     return {
+        loading: isFetchingFavoriteList,
         favoriteMenuList,
         menuItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.MENU)),
         projectItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT)),
@@ -44,5 +47,6 @@ export const useFavoriteList = () => {
         costAnalysisItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.COST_ANALYSIS)),
         securityItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.SECURITY)),
         serviceItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.SERVICE)),
+        cloudServiceTypeItems: computed(() => favoriteMenuList.value?.filter((item) => item.itemType === FAVORITE_TYPE.CLOUD_SERVICE_TYPE)),
     };
 };

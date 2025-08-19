@@ -4,7 +4,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useUserConfigListQuery } from '@/common/modules/favorites/core/use-user-config-list-query';
+import { useFavoriteConfigDataQuery } from '@/common/modules/favorites/core/use-favorite-config-data-query';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 
@@ -15,7 +15,8 @@ export const useWorkspaceFavoriteList = () => {
 
     const userId = computed<string|undefined>(() => userStore.state.userId);
 
-    const { data: workspaceFavoriteList } = useUserConfigListQuery({
+    const { data: workspaceFavoriteList, isFetching: isFetchingWorkspaceFavoriteList } = useFavoriteConfigDataQuery({
+        configDataType: 'console:favorite:WORKSPACE',
         params: computed(() => {
             workspaceFavoriteListApiQuery.setFilters([
                 { k: 'user_id', v: userId.value || '', o: '=' },
@@ -30,6 +31,7 @@ export const useWorkspaceFavoriteList = () => {
 
     const workspaceFavoriteMenuList = computed(() => (workspaceFavoriteList.value?.results ?? []).map((item) => item.data));
     return {
-        workspaceFavoriteMenuList,
+        loading: isFetchingWorkspaceFavoriteList,
+        workspaceItems: workspaceFavoriteMenuList,
     };
 };

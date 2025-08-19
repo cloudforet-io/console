@@ -6,23 +6,28 @@ import type { UserConfigListParameters } from '@/api-clients/config/user-config/
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-interface UseUserConfigListQueryOptions {
+import type { ConfigData } from '@/common/composables/config-data';
+
+
+interface UseFavoriteConfigDataQueryOptions {
+    configDataType: 'console:favorite' | 'console:favorite:WORKSPACE';
     params: ComputedRef<UserConfigListParameters>;
     enabled?: ComputedRef<boolean>;
 }
 
 
 
-export const useUserConfigListQuery = ({ params, enabled }: UseUserConfigListQueryOptions) => {
+export const useFavoriteConfigDataQuery = ({ configDataType = 'console:favorite', params, enabled }: UseFavoriteConfigDataQueryOptions) => {
     const { userConfigAPI } = useUserConfigApi();
 
     const { key, params: queryParams } = useServiceQueryKey('config', 'user-config', 'list', {
+        contextKey: configDataType,
         params,
     });
 
     return useScopedQuery({
         queryKey: key,
-        queryFn: () => userConfigAPI.list(queryParams.value),
+        queryFn: () => userConfigAPI.list<ConfigData>(queryParams.value),
         enabled: computed(() => {
             if (enabled === undefined) {
                 return true;
