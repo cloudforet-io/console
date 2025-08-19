@@ -11,18 +11,21 @@ import type { ServiceAccountStatParameters } from '@/api-clients/identity/servic
 import type { ServiceAccountUpdateParameters } from '@/api-clients/identity/service-account/schema/api-verbs/update';
 import type { ServiceAccountUpdateSecretDataParameters } from '@/api-clients/identity/service-account/schema/api-verbs/update-secret-data';
 import type { ServiceAccountModel } from '@/api-clients/identity/service-account/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useServiceAccountApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('serviceAccount');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>,
-        update: SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>,
-        delete: SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>),
         get: SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>,
         list: SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>,
         stat: SpaceConnector.clientV2.identity.serviceAccount.stat<ServiceAccountStatParameters, StatResponse>,
-        updateSecretData: SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>,
-        deleteSecretData: SpaceConnector.clientV2.identity.serviceAccount.deleteSecretData<ServiceAccountDeleteSecretDataParameters>,
+        updateSecretData: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>),
+        deleteSecretData: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.serviceAccount.deleteSecretData<ServiceAccountDeleteSecretDataParameters>),
     };
 
     return {

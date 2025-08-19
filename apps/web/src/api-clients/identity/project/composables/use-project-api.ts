@@ -13,19 +13,22 @@ import type { ProjectStatParameters } from '@/api-clients/identity/project/schem
 import type { ProjectUpdateParameters } from '@/api-clients/identity/project/schema/api-verbs/udpate';
 import type { ProjectUpdateProjectTypeParameters } from '@/api-clients/identity/project/schema/api-verbs/update-project-type';
 import type { ProjectModel } from '@/api-clients/identity/project/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useProjectApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('project');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>,
-        update: SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>,
-        delete: SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>),
         get: SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>,
         list: SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>,
-        addUsers: SpaceConnector.clientV2.identity.project.addUsers<ProjectAddUsersParameters, ProjectModel>,
-        removeUsers: SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters, ProjectModel>,
-        changeProjectGroup: SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters, ProjectModel>,
-        updateProjectType: SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>,
+        addUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.addUsers<ProjectAddUsersParameters, ProjectModel>),
+        removeUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters, ProjectModel>),
+        changeProjectGroup: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters, ProjectModel>),
+        updateProjectType: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>),
         stat: SpaceConnector.clientV2.identity.project.stat<ProjectStatParameters, StatResponse>,
     };
 

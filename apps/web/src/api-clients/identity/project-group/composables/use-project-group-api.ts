@@ -12,18 +12,21 @@ import type { ProjectGroupRemoveUsersParameters } from '@/api-clients/identity/p
 import type { ProjectGroupStatParameters } from '@/api-clients/identity/project-group/schema/api-verbs/stat';
 import type { ProjectGroupUpdateParameters } from '@/api-clients/identity/project-group/schema/api-verbs/update';
 import type { ProjectGroupModel } from '@/api-clients/identity/project-group/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useProjectGroupApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('projectGroup');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>,
-        update: SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>,
-        delete: SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>),
         get: SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>,
         list: SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>,
-        addUsers: SpaceConnector.clientV2.identity.projectGroup.addUsers<ProjectGroupAddUsersParameters, ProjectGroupModel>,
-        removeUsers: SpaceConnector.clientV2.identity.projectGroup.removeUsers<ProjectGroupRemoveUsersParameters, ProjectGroupModel>,
-        changeParentGroup: SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters, ProjectGroupModel>,
+        addUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.addUsers<ProjectGroupAddUsersParameters, ProjectGroupModel>),
+        removeUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.removeUsers<ProjectGroupRemoveUsersParameters, ProjectGroupModel>),
+        changeParentGroup: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters, ProjectGroupModel>),
         stat: SpaceConnector.clientV2.identity.projectGroup.stat<ProjectGroupStatParameters, StatResponse>,
     };
 

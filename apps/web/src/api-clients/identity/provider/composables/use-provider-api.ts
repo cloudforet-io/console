@@ -9,13 +9,16 @@ import type { ProviderListParameters } from '@/api-clients/identity/provider/sch
 import type { ProviderStatParameters } from '@/api-clients/identity/provider/schema/api-verbs/stat';
 import type { ProviderUpdateParameters } from '@/api-clients/identity/provider/schema/api-verbs/update';
 import type { ProviderModel } from '@/api-clients/identity/provider/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useProviderApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('provider');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.provider.create<ProviderCreateParameters, ProviderModel>,
-        update: SpaceConnector.clientV2.identity.provider.update<ProviderUpdateParameters, ProviderModel>,
-        delete: SpaceConnector.clientV2.identity.provider.delete<ProviderDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.provider.create<ProviderCreateParameters, ProviderModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.provider.update<ProviderUpdateParameters, ProviderModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.provider.delete<ProviderDeleteParameters>),
         get: SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>,
         list: SpaceConnector.clientV2.identity.provider.list<ProviderListParameters, ListResponse<ProviderModel>>,
         stat: SpaceConnector.clientV2.identity.provider.stat<ProviderStatParameters, StatResponse>,

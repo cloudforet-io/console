@@ -6,10 +6,13 @@ import type { FindWorkspaceUserParameters } from '@/api-clients/identity/workspa
 import type { WorkspaceUserGetParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/get';
 import type { WorkspaceUserListParameters } from '@/api-clients/identity/workspace-user/schema/api-verbs/list';
 import type { WorkspaceUserModel } from '@/api-clients/identity/workspace-user/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useWorkspaceUserApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('workspaceUser');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>),
         get: SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>,
         list: SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>,
         find: SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, WorkspaceUserModel>,

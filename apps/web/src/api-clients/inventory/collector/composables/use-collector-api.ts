@@ -10,17 +10,21 @@ import type { CollectorUpdateParameters } from '@/api-clients/inventory/collecto
 import type { CollectorUpdatePluginParameters } from '@/api-clients/inventory/collector/schema/api-verbs/update-plugin';
 import type { CollectorModel } from '@/api-clients/inventory/collector/schema/model';
 import type { JobModel } from '@/api-clients/inventory/job/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useCollectorApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('collector');
+
     const actions = {
-        collect: SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>,
-        create: SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>,
-        delete: SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>,
+        collect: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>),
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>),
+
         get: SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>,
         list: SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>,
-        update: SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>,
-        updatePlugin: SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>,
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>),
+        updatePlugin: wrapResourceCacheRefresh(SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>),
     };
 
     return {

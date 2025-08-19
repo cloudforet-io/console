@@ -9,17 +9,20 @@ import type { UserGroupListParameters } from '@/api-clients/identity/user-group/
 import type { UserGroupRemoveUsersParameters } from '@/api-clients/identity/user-group/schema/api-verbs/remove-users';
 import type { UserGroupUpdateParameters } from '@/api-clients/identity/user-group/schema/api-verbs/update';
 import type { UserGroupModel } from '@/api-clients/identity/user-group/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 
 export const useUserGroupApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('userGroup');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>,
-        update: SpaceConnector.clientV2.identity.userGroup.update<UserGroupUpdateParameters, UserGroupModel>,
-        delete: SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.userGroup.create<UserGroupCreateParameters, UserGroupModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.userGroup.update<UserGroupUpdateParameters, UserGroupModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.userGroup.delete<UserGroupDeleteUserGroupParameters>),
         get: SpaceConnector.clientV2.identity.userGroup.get<UserGroupGetParameters, UserGroupModel>,
         list: SpaceConnector.clientV2.identity.userGroup.list<UserGroupListParameters, ListResponse<UserGroupModel>>,
-        addUsers: SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>,
-        removeUsers: SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>,
+        addUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.userGroup.addUsers<UserGroupAddUsersParameters, UserGroupModel>),
+        removeUsers: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.userGroup.removeUsers<UserGroupRemoveUsersParameters, UserGroupModel>),
     };
 
     return {
