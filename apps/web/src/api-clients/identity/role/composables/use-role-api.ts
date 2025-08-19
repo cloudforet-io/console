@@ -10,16 +10,19 @@ import type { RoleListParameters } from '@/api-clients/identity/role/schema/api-
 import type { RoleListBasicRoleParameters } from '@/api-clients/identity/role/schema/api-verbs/list-basic-role';
 import type { RoleUpdateParameters } from '@/api-clients/identity/role/schema/api-verbs/update';
 import type { BasicRoleModel, RoleModel } from '@/api-clients/identity/role/schema/model';
+import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 export const useRoleApi = () => {
+    const { wrapResourceCacheRefresh } = useResourceCacheSync('role');
+
     const actions = {
-        create: SpaceConnector.clientV2.identity.role.create<RoleCreateParameters, RoleModel>,
-        update: SpaceConnector.clientV2.identity.role.update<RoleUpdateParameters, RoleModel>,
-        delete: SpaceConnector.clientV2.identity.role.delete<RoleDeleteParameters>,
+        create: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.role.create<RoleCreateParameters, RoleModel>),
+        update: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.role.update<RoleUpdateParameters, RoleModel>),
+        delete: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.role.delete<RoleDeleteParameters>),
         get: SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>,
         list: SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>,
-        enable: SpaceConnector.clientV2.identity.role.enable<RoleEnableParameters, RoleModel>,
-        disable: SpaceConnector.clientV2.identity.role.disable<RoleDisableParameters, RoleModel>,
+        enable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.role.enable<RoleEnableParameters, RoleModel>),
+        disable: wrapResourceCacheRefresh(SpaceConnector.clientV2.identity.role.disable<RoleDisableParameters, RoleModel>),
         listBasicRole: SpaceConnector.clientV2.identity.role.listBasicRole<RoleListBasicRoleParameters, ListResponse<BasicRoleModel>>,
     };
 

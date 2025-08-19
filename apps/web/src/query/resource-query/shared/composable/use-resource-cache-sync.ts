@@ -7,60 +7,56 @@ import type { ResourceCacheType, ResourceKeyType } from '@/query/resource-query/
 
 
 
-type MutationCallback<T> = () => Promise<T>;
-type callbackForReferenceRefresh = () => Promise<void>;
+type Obj = Record<string, any>;
+type AnyFn = (...args: any[]) => any;
+type AwaitedRet<F extends AnyFn> = Awaited<ReturnType<F>>;
 
-export const useResourceCacheSync = <T extends Record<string, any>>(resourceType: ResourceKeyType) => {
+
+export const useResourceCacheSync = (resourceType: ResourceKeyType) => {
     const queryClient = useQueryClient();
 
-    const mutateWithResourceCacheUpdate = async (
-        mutationCallback: MutationCallback<T>,
-    ): Promise<T> => {
-        const response = await mutationCallback();
-        await _updateResourceCache<T>(resourceType, response, queryClient);
-        return response;
-    };
-
-    const refreshResourceCache = async (
-        mutationCallback: callbackForReferenceRefresh,
-    ): Promise<void> => {
-        await mutationCallback();
+    const wrapResourceCacheRefresh = <F extends AnyFn>(fn: F) => async (...args: Parameters<F>): Promise<AwaitedRet<F>> => {
         const { key: referenceQueryKey } = useResourceQueryKey(resourceType);
-        await queryClient.invalidateQueries({ queryKey: referenceQueryKey.value });
+        try {
+            const res = await fn(...args);
+            return res;
+        } finally {
+            await queryClient.invalidateQueries({ queryKey: referenceQueryKey.value });
+        }
     };
 
-    return { mutateWithResourceCacheUpdate, refreshResourceCache };
+    const wrapResourceCacheUpdate = <F extends AnyFn>(fn: F) => async (...args: Parameters<F>): Promise<AwaitedRet<F>> => {
+        const res = await Promise.resolve(fn(...args));
+        await _updateResourceCache(resourceType, res as Obj, queryClient);
+        return res;
+    };
+
+    return { wrapResourceCacheRefresh, wrapResourceCacheUpdate };
 };
 
 
-const _updateResourceCache = async <T extends Record<string, any>>(
+const _updateResourceCache = async <T extends Obj>(
     resourceType: ResourceKeyType,
     newData: T,
     queryClient: QueryClient,
 ) => {
     const { key: referenceQueryKey, withSuffix } = useResourceQueryKey(resourceType);
-
-    const idKey = RESOURCE_CONFIG_MAP[resourceType].idKey;
+    const idKey = RESOURCE_CONFIG_MAP[resourceType].idKey as keyof T;
 
     if (!idKey || typeof newData !== 'object' || newData === null || !(idKey in newData)) {
         throw new Error(`Invalid resource key or data for type: ${resourceType}`);
     }
 
-    queryClient.setQueryData<ResourceCacheType<T>>(referenceQueryKey, (oldData: ResourceCacheType<T>|undefined) => {
-        const currentResults = oldData ?? {};
-        const newDataId = newData[idKey];
+    queryClient.setQueryData<ResourceCacheType<T>>(referenceQueryKey.value, (oldData) => {
+        const currentResults = (oldData ?? {}) as ResourceCacheType<T>;
+        const newDataId = newData[idKey] as PropertyKey;
 
         if (newDataId in currentResults) {
-            const updatedResults = { ...currentResults };
-            updatedResults[newDataId] = newData;
-            return updatedResults;
+            return { ...currentResults, [newDataId]: newData };
         }
-
-        return {
-            ...currentResults,
-            [newDataId]: newData,
-        };
+        return { ...currentResults, [newDataId]: newData };
     });
+
     await Promise.all([
         queryClient.invalidateQueries({ queryKey: withSuffix('stat') }),
         queryClient.invalidateQueries({ queryKey: withSuffix('list') }),
