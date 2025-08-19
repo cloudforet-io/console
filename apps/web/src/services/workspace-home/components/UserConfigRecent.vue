@@ -3,13 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
-import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import type {
     ReferenceData,
@@ -17,7 +11,6 @@ import type {
 } from '@/lib/helper/config-data-helper';
 
 import { useConvertReferencedConfigData } from '@/common/composables/config-data';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import { useRecentList } from '@/common/modules/recents/use-recent-list';
 
@@ -26,10 +19,7 @@ import UserConfigsItem from '@/services/workspace-home/components/UserConfigsIte
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
-const gnbStore = useGnbStore();
-const gnbStoreGetters = gnbStore.getters;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const currentWorkspaceId = computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId);
 
 /* Recent */
 const recentConfigData = useRecentList();
@@ -38,50 +28,42 @@ const convertedRecentConfigData = useConvertReferencedConfigData({
         ...i.data,
         itemType: i.data.type,
         itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
+        workspaceId: currentWorkspaceId.value || '',
     }))),
     projectConfigList: computed(() => (recentConfigData.projectRecentList.value ?? []).map((i) => ({
         ...i.data,
         itemType: i.data.type,
         itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
+        workspaceId: currentWorkspaceId.value || '',
     }))),
     projectGroupConfigList: computed(() => (recentConfigData.projectGroupRecentList.value ?? []).map((i) => ({
         ...i.data,
         itemType: i.data.type,
         itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
+        workspaceId: currentWorkspaceId.value || '',
     }))),
     costQuerySetConfigList: computed(() => (recentConfigData.costAnalysisRecentList.value ?? []).map((i) => ({
         ...i.data,
         itemType: i.data.type,
         itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
+        workspaceId: currentWorkspaceId.value || '',
     }))),
     allConfigList: computed(() => (recentConfigData.menuRecentList.value ?? []).map((i) => ({
         ...i.data,
         itemType: i.data.type,
         itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
+        workspaceId: currentWorkspaceId.value || '',
     }))),
 });
 
 
-const storeState = reactive({
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
-    // recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-});
 const state = reactive({
     recentList: computed<(ReferenceData | undefined)[]>(() => {
         const _recentList = (recentConfigData.menuRecentList.value ?? []).map((i) => convertRecentToReferenceData({
             ...i.data,
             itemType: i.data.type,
             itemId: i.data.id,
-            workspaceId: storeState.currentWorkspaceId || '',
+            workspaceId: currentWorkspaceId.value || '',
         }));
         return _recentList.filter((i) => !!i && !i?.isDeleted).splice(0, 10);
     }),
