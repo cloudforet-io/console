@@ -9,7 +9,7 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { useFavoriteList } from '@/common/modules/favorites/core/use-favorite-list';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
@@ -18,12 +18,13 @@ import { STARRED_SERVICE_ITEMS } from '@/services/workspace-home/constants/works
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { StarredServiceItem } from '@/services/workspace-home/types/workspace-home-type';
 
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
 const { width } = useWindowSize();
+
+/* Favorite */
+const favoriteData = useFavoriteList();
 
 const storeState = reactive({
     favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageState.favoriteMenuList),
@@ -43,27 +44,27 @@ const dropdownState = reactive({
         const results: SelectDropdownMenuItem[] = [{
             name: 'All', label: i18n.t('HOME.CONFIG_STARRED_ALL'), type: 'item',
         }];
-        if (favoriteGetters.menuItems.length) {
+        if (favoriteData.menuItems.value?.length) {
             results.push({
                 name: FAVORITE_TYPE.MENU, label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'item',
             });
         }
-        if (favoriteGetters.dashboardItems.length) {
+        if (favoriteData.dashboardItems.value?.length) {
             results.push({
                 name: FAVORITE_TYPE.DASHBOARD, label: i18n.t('MENU.DASHBOARDS'), type: 'item',
             });
         }
-        if (favoriteGetters.projectItems.length) {
+        if (favoriteData.projectItems.value?.length) {
             results.push({
                 name: FAVORITE_TYPE.PROJECT, label: i18n.t('MENU.PROJECT'), type: 'item',
             });
         }
-        if (favoriteGetters.costAnalysisItems.length) {
+        if (favoriteData.costAnalysisItems.value?.length) {
             results.push({
                 name: FAVORITE_TYPE.COST_ANALYSIS, label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: 'item',
             });
         }
-        if (favoriteGetters.serviceItems.length) {
+        if (favoriteData.serviceItems.value?.length) {
             results.push({
                 name: FAVORITE_TYPE.SERVICE, label: i18n.t('MENU.ALERT_MANAGER_SERVICE'), type: 'item',
             });

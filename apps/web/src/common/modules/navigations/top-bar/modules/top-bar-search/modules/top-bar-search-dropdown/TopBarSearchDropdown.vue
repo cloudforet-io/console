@@ -17,7 +17,6 @@ import { useAuthorizationStore } from '@/store/authorization/authorization-store
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     topBarSearchReferenceRouter,
@@ -31,6 +30,7 @@ import TopBarSearchServiceTab
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useRecentCreate } from '@/common/modules/recents/use-recent-create';
 
 interface Props {
     isFocused: boolean;
@@ -49,7 +49,6 @@ const SEARCH_LIMIT = 15;
 const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
-const recentStore = useRecentStore();
 const windowSize = useWindowSize();
 const authorizationStore = useAuthorizationStore();
 
@@ -58,6 +57,9 @@ const { getReferenceLocation } = useReferenceRouter();
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
 const tabRef = ref<null | Vue>(null);
+
+/* Recent */
+const { mutateAsync: createRecent } = useRecentCreate();
 
 
 const getTabHeaderHeight = () => {
@@ -117,10 +119,10 @@ const handleUpdateContentsSize = debounce((height: number) => {
     if (state.contentsHeight !== height) state.contentsHeight = height;
 }, 100);
 
-const handleSelect = (item) => {
+const handleSelect = async (item) => {
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, item?.tags));
-        recentStore.createRecent({
+        await createRecent({
             workspaceId: item?.workspace_id,
             type: RECENT_TYPE.CLOUD_SERVICE,
             id: item?.resource_id,
