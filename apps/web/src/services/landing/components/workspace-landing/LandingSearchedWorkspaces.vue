@@ -7,7 +7,7 @@ import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/mod
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
 
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';
@@ -22,16 +22,17 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+/* Favorite */
+const { workspaceItems: workspaceFavoriteItems } = useWorkspaceFavoriteList();
+
 const userStore = useUserStore();
 
 const state = reactive({
     isShowAll: false,
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const favoriteOrderList = sortBy(searchedWorkspaceList.value, (workspaceItem) => {
-            const correspondingAItem = favoriteGetters.workspaceItems?.find((item) => item?.itemId === workspaceItem.workspace_id);
-            return correspondingAItem ? favoriteGetters.workspaceItems?.indexOf(correspondingAItem) : Infinity;
+            const correspondingAItem = workspaceFavoriteItems.value?.find((item) => item?.itemId === workspaceItem.workspace_id);
+            return correspondingAItem ? workspaceFavoriteItems.value?.indexOf(correspondingAItem) : Infinity;
         });
         const [active, dormant] = partition(favoriteOrderList, (item) => !item.is_dormant);
 

@@ -25,7 +25,6 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -38,7 +37,6 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
-const favoriteStore = useFavoriteStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
@@ -112,7 +110,6 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
 
 watch(() => state.selectedMenuId, async (selectedMenuId) => {
     await gnbStore.initState();
-    await favoriteStore.fetchFavorite();
 
     if (selectedMenuId === MENU_ID.COST_ANALYSIS) {
         await gnbStore.fetchCostQuerySet();

@@ -2,44 +2,22 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI } from '@cloudforet/mirinae';
 
-import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
-import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
-import type { ServiceReferenceMap } from '@/store/reference/service-reference-store';
 
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
-import {
-    convertCloudServiceConfigToReferenceData,
-    convertCostAnalysisConfigToReferenceData,
-    convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData,
-    convertMetricConfigToReferenceData,
-    convertMetricExampleConfigToReferenceData,
-    convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData,
-    convertWorkspaceConfigToReferenceData,
-    convertServiceConfigToReferenceData,
-} from '@/lib/helper/config-data-helper';
-import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
-import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { useConvertReferencedConfigData } from '@/common/composables/config-data';
+import { useFavoriteCreateMutation } from '@/common/modules/favorites/core/use-favorite-create-mutation';
+import { useFavoriteDeleteMutation } from '@/common/modules/favorites/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/favorites/core/use-favorite-list';
+import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
 import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+
 
 
 interface Props {
@@ -49,67 +27,67 @@ interface Props {
     readOnly?: boolean;
     visibleActiveCaseOnly?: boolean;
 }
+interface Emits {
+    (e: 'click-favorite'): void;
+}
 
 const props = withDefaults(defineProps<Props>(), {
     scale: '1',
     readOnly: false,
     visibleActiveCaseOnly: false,
 });
+const emit = defineEmits<Emits>();
 
-const route = useRoute();
-const router = useRouter();
-
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const appContextStore = useAppContextStore();
-const favoriteStore = useFavoriteStore();
-const favoriteStoreGetters = favoriteStore.getters;
-const gnbStore = useGnbStore();
-const gnbStoreGetters = gnbStore.getters;
-const { getAllMenuList } = useAllMenuList();
+
+/* Favorite */
+const favoriteData = useFavoriteList();
+const { loading: isLoadingWorkspaceFavoriteData, ...workspaceFavoriteData } = useWorkspaceFavoriteList();
+const { loading: isLoadingConvertedFavoriteData, ...convertedFavoriteData } = useConvertReferencedConfigData({
+    allConfigList: favoriteData.favoriteMenuList,
+    projectConfigList: favoriteData.projectItems,
+    projectGroupConfigList: favoriteData.projectGroupItems,
+    metricConfigList: favoriteData.metricItems,
+    metricExampleConfigList: favoriteData.metricExampleItems,
+    serviceConfigList: favoriteData.serviceItems,
+    dashboardConfigList: favoriteData.dashboardItems,
+    costQuerySetConfigList: favoriteData.costAnalysisItems,
+    cloudServiceConfigList: favoriteData.cloudServiceTypeItems,
+    workspaceConfigList: workspaceFavoriteData.workspaceItems,
+});
+
+const { mutateAsync: createFavorite, isPending: isCreatingFavorite } = useFavoriteCreateMutation();
+const { mutateAsync: deleteFavorite, isPending: isDeletingFavorite } = useFavoriteDeleteMutation();
 
 
-/* Query */
-const {
-    publicDashboardListQuery,
-    privateDashboardListQuery,
-} = useGlobalDashboardQuery();
 
-const emit = defineEmits<{(e: 'click-favorite'): void;
-}>();
 
-const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
 const storeState = reactive({
-    favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
-    favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    service: computed<ServiceReferenceMap>(() => allReferenceStore.getters.service),
-    metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
-    costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
 });
 const state = reactive({
     active: computed(() => {
-        const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? storeState.favoriteWorkspaceMenuList : storeState.favoriteMenuList;
+        const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? workspaceFavoriteData.workspaceItems.value : favoriteData.favoriteMenuList.value;
         const favoriteItem = targetList.findIndex((d) => (d.itemId === props?.itemId
             && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
 });
 
+const preLoading = computed(() => isLoadingWorkspaceFavoriteData.value || isLoadingConvertedFavoriteData.value);
+const triggerLoading = computed(() => isCreatingFavorite.value || isDeletingFavorite.value);
+
 const handleClickFavoriteButton = async (event: MouseEvent) => {
     if (storeState.isAdminMode) return;
     event.stopPropagation();
+
+    if (preLoading.value || triggerLoading.value) return;
     if (props.readOnly) return;
     if (state.active) {
-        await favoriteStore.deleteFavorite({
+        await deleteFavorite({
             itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
             itemId: props?.itemId,
@@ -121,41 +99,40 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
             itemId: props?.itemId,
         };
         const referenceData = convertFavoriteToReferenceData(params);
-        await favoriteStore.createFavorite(referenceData || params);
+        await createFavorite(referenceData || params);
     }
     emit('click-favorite');
 };
 const convertFavoriteToReferenceData = (favoriteConfig: FavoriteConfig): ReferenceData|undefined => {
     const { itemType } = favoriteConfig;
     if (itemType === FAVORITE_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([favoriteConfig], dashboardList.value)[0];
+        return convertedFavoriteData.convertedDashboard.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.PROJECT) {
-        return convertProjectConfigToReferenceData([favoriteConfig], storeState.projects)[0];
+        return convertedFavoriteData.convertedProject.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-        return convertProjectGroupConfigToReferenceData([favoriteConfig], storeState.projectGroups)[0];
+        return convertedFavoriteData.convertedProjectGroup.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.CLOUD_SERVICE || itemType === FAVORITE_TYPE.SECURITY) {
-        return convertCloudServiceConfigToReferenceData([favoriteConfig], storeState.cloudServiceTypes)[0];
+        return convertedFavoriteData.convertedCloudServiceType.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.METRIC) {
-        return convertMetricConfigToReferenceData([favoriteConfig], storeState.metrics)[0];
+        return convertedFavoriteData.convertedMetric.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
-        return convertMetricExampleConfigToReferenceData([favoriteConfig], storeState.metricExamples)[0];
+        return convertedFavoriteData.convertedMetricExample.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.COST_ANALYSIS) {
-        return convertCostAnalysisConfigToReferenceData([favoriteConfig], storeState.costQuerySets, storeState.costDataSource)[0];
+        return convertedFavoriteData.convertedCostQuerySet.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.WORKSPACE) {
-        return convertWorkspaceConfigToReferenceData([favoriteConfig], storeState.workspaceList)[0];
+        return convertedFavoriteData.convertedWorkspace.value.find((d) => d.itemId === props?.itemId);
     }
     if (itemType === FAVORITE_TYPE.SERVICE) {
-        return convertServiceConfigToReferenceData([favoriteConfig], storeState.service)[0];
+        return convertedFavoriteData.convertedService.value.find((d) => d.itemId === props?.itemId);
     }
-    const allMenuList = getAllMenuList(route, router);
-    return convertMenuConfigToReferenceData([favoriteConfig], allMenuList)[0];
+    return convertedFavoriteData.convertedMenu.value.find((d) => d.itemId === props?.itemId);
 };
 </script>
 

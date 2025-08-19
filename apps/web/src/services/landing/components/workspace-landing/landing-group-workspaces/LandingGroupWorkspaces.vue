@@ -13,8 +13,7 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
 
 import { gray } from '@/styles/colors';
 
@@ -41,12 +40,12 @@ const router = useRouter();
 const landingPageStore = useLandingPageStore();
 const landingPageState = landingPageStore.state;
 const userStore = useUserStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+
+/* Favorite */
+const { loading: isLoadingWorkspaceFavoriteList, workspaceItems: workspaceFavoriteItems } = useWorkspaceFavoriteList();
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => userStore.getters.isDomainAdmin),
-    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems as FavoriteItem[], 'label')),
 });
 const state = reactive({
     isShowAll: false,
@@ -58,8 +57,8 @@ const state = reactive({
     }),
     workspaceBoardSets: computed<WorkspaceBoardSet[]>(() => {
         const favoriteOrderList = sortBy(state.selectedGroupWorkspaceList, (workspaceItem) => {
-            const correspondingAItem = storeState.favoriteList?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
-            return correspondingAItem ? storeState.favoriteList?.indexOf(correspondingAItem) : Infinity;
+            const correspondingAItem = workspaceFavoriteItems.value?.find((favoriteItem) => favoriteItem?.itemId === workspaceItem.workspace_id);
+            return correspondingAItem ? workspaceFavoriteItems.value?.indexOf(correspondingAItem) : Infinity;
         });
         const [active, dormant] = partition(favoriteOrderList, (item) => !item.is_dormant);
 
@@ -84,7 +83,7 @@ const state = reactive({
         return state.selectedGroupWorkspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < state.selectedGroupWorkspaceList.length;
     }),
 });
-const isLoading = computed<boolean>(() => isWorkspaceListLoading.value || isWorkspaceListByGroupLoading.value);
+const isLoading = computed<boolean>(() => isWorkspaceListLoading.value || isWorkspaceListByGroupLoading.value || isLoadingWorkspaceFavoriteList.value);
 const showEmptyContents = computed<boolean>(() => {
     if (isLoading.value) return false;
     if (landingPageState.selectedWorkspaceGroupId !== 'all') return false;
