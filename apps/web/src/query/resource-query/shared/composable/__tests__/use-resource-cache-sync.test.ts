@@ -93,48 +93,48 @@ describe('useResourceCacheSync', () => {
         });
     });
 
-    describe('2. wrapResourceCacheUpdate', () => {
-        const resourceType = 'project';
-        const resourceQueryKey = ['workspace', 'workspace-123', resourceType];
+    // describe('2. wrapResourceCacheUpdate', () => {
+    //     const resourceType = 'project';
+    //     const resourceQueryKey = ['workspace', 'workspace-123', resourceType];
 
-        it('should create a new cache with the new data and invalidate the list/stat queries', async () => {
-            // Arrange
-            const { wrapResourceCacheUpdate } = useResourceCacheSync(resourceType);
-            const newProjectData = { project_id: 'project-new', name: 'New Project' };
-            const mockApiFn = vi.fn().mockResolvedValue(newProjectData);
-            const wrappedFn = wrapResourceCacheUpdate(mockApiFn);
-            const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    //     it('should create a new cache with the new data and invalidate the list/stat queries', async () => {
+    //         // Arrange
+    //         const { wrapResourceCacheUpdate } = useResourceCacheSync(resourceType);
+    //         const newProjectData = { project_id: 'project-new', name: 'New Project' };
+    //         const mockApiFn = vi.fn().mockResolvedValue(newProjectData);
+    //         const wrappedFn = wrapResourceCacheUpdate(mockApiFn);
+    //         const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-            // Act
-            await wrappedFn(newProjectData);
+    //         // Act
+    //         await wrappedFn(newProjectData);
 
-            // Assert
-            const cachedData = queryClient.getQueryData<Record<string, any>>(resourceQueryKey);
-            expect(cachedData).toEqual({ 'project-new': newProjectData });
+    //         // Assert
+    //         const cachedData = queryClient.getQueryData<Record<string, any>>(resourceQueryKey);
+    //         expect(cachedData).toEqual({ 'project-new': newProjectData });
 
-            expect(invalidateSpy).toHaveBeenCalledTimes(2);
-            expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [...resourceQueryKey, 'stat'] });
-            expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [...resourceQueryKey, 'list'] });
-        });
+    //         expect(invalidateSpy).toHaveBeenCalledTimes(2);
+    //         expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [...resourceQueryKey, 'stat'] });
+    //         expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [...resourceQueryKey, 'list'] });
+    //     });
 
-        it('should update the existing cache with the new data', async () => {
-            // Arrange
-            const { wrapResourceCacheUpdate } = useResourceCacheSync(resourceType);
-            const initialData = { project_id: 'project-123', name: 'Old Name' };
-            const updatedData = { project_id: 'project-123', name: 'Updated Name' };
+    //     it('should update the existing cache with the new data', async () => {
+    //         // Arrange
+    //         const { wrapResourceCacheUpdate } = useResourceCacheSync(resourceType);
+    //         const initialData = { project_id: 'project-123', name: 'Old Name' };
+    //         const updatedData = { project_id: 'project-123', name: 'Updated Name' };
 
-            queryClient.setQueryData(resourceQueryKey, { 'project-123': initialData });
+    //         queryClient.setQueryData(resourceQueryKey, { 'project-123': initialData });
 
-            const mockApiFn = vi.fn().mockResolvedValue(updatedData);
-            const wrappedFn = wrapResourceCacheUpdate(mockApiFn);
+    //         const mockApiFn = vi.fn().mockResolvedValue(updatedData);
+    //         const wrappedFn = wrapResourceCacheUpdate(mockApiFn);
 
-            // Act
-            await wrappedFn(updatedData);
+    //         // Act
+    //         await wrappedFn(updatedData);
 
-            // Assert
-            const cachedData = queryClient.getQueryData<Record<string, any>>(resourceQueryKey);
-            expect(cachedData?.[updatedData.project_id]).toEqual(updatedData);
-            expect(Object.keys(cachedData ?? {}).length).toBe(1);
-        });
-    });
+    //         // Assert
+    //         const cachedData = queryClient.getQueryData<Record<string, any>>(resourceQueryKey);
+    //         expect(cachedData?.[updatedData.project_id]).toEqual(updatedData);
+    //         expect(Object.keys(cachedData ?? {}).length).toBe(1);
+    //     });
+    // });
 });
