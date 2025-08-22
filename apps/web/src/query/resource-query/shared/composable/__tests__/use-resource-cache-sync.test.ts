@@ -4,6 +4,7 @@ import {
     describe, it, expect, vi, beforeEach,
 } from 'vitest';
 
+import { resourceQueryClient } from '@/query/clients';
 import { useResourceCacheSync } from '@/query/resource-query/shared/composable/use-resource-cache-sync';
 
 vi.mock('@tanstack/vue-query', async (importOriginal) => {
@@ -61,7 +62,7 @@ describe('useResourceCacheSync', () => {
             const { wrapResourceCacheRefresh } = useResourceCacheSync('project');
             const mockApiFn = vi.fn().mockResolvedValue({ status: 'success' });
             const wrappedFn = wrapResourceCacheRefresh(mockApiFn);
-            const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+            const invalidateSpy = vi.spyOn(resourceQueryClient, 'invalidateQueries');
 
             // Act
             await wrappedFn({ name: 'new-project' });
@@ -81,7 +82,7 @@ describe('useResourceCacheSync', () => {
             const { wrapResourceCacheRefresh } = useResourceCacheSync('project');
             const mockApiFn = vi.fn().mockRejectedValue(new Error('API Error'));
             const wrappedFn = wrapResourceCacheRefresh(mockApiFn);
-            const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+            const invalidateSpy = vi.spyOn(resourceQueryClient, 'invalidateQueries');
 
             // Act & Assert
             await expect(wrappedFn()).rejects.toThrow('API Error');
