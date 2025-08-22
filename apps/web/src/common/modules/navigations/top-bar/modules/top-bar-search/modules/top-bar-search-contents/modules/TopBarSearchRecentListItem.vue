@@ -35,7 +35,6 @@ const { getReferenceLocation } = useReferenceRouter();
 const { mutateAsync: deleteRecent } = useRecentDelete();
 
 const storeState = reactive({
-    workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
     currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
     activeTab: computed(() => topBarSearchStore.state.activeTab),
     serviceAccountMap: computed(() => allReferenceStore.getters.serviceAccount),

@@ -70,7 +70,8 @@ export const useRecentList = ({ limit = 15 }: UseRecentListOptions = {}) => {
                 { k: 'data.id', v: MENU_ID.WORKSPACE_HOME, o: '!=' },
                 // NOTE: Code corresponding to data stored as 'home-dashboard'
                 { k: 'data.id', v: 'home-dashboard', o: '!=' },
-            ]).setPageLimit(limit);
+            ]);
+            // .setPageLimit(limit); // TODO: find solution for this
 
             if (currentWorkspaceId.value) {
                 recentListApiQuery.addFilter({ k: 'data.workspace_id', v: currentWorkspaceId.value, o: '=' });
@@ -184,15 +185,15 @@ export const useRecentList = ({ limit = 15 }: UseRecentListOptions = {}) => {
         }),
     });
 
-    const { data: metricExplorerRecentList, isFetching: isFetchingMetricExplorerRecentList } = useRecentQueryByType({
-        type: RECENT_TYPE.METRIC_EXPLORER,
-        params: computed(() => getRecentListParams.value(RECENT_TYPE.METRIC_EXPLORER)),
-        enabled: computed(() => {
-            if (!userId.value) return false;
-            if (!currentWorkspaceId.value) return false;
-            return true;
-        }),
-    });
+    // const { data: metricExplorerRecentList, isFetching: isFetchingMetricExplorerRecentList } = useRecentQueryByType({
+    //     type: RECENT_TYPE.METRIC_EXPLORER,
+    //     params: computed(() => getRecentListParams.value(RECENT_TYPE.METRIC_EXPLORER)),
+    //     enabled: computed(() => {
+    //         if (!userId.value) return false;
+    //         if (!currentWorkspaceId.value) return false;
+    //         return true;
+    //     }),
+    // });
 
     const { data: securityRecentList, isFetching: isFetchingSecurityRecentList } = useRecentQueryByType({
         type: RECENT_TYPE.SECURITY,
@@ -216,7 +217,7 @@ export const useRecentList = ({ limit = 15 }: UseRecentListOptions = {}) => {
         cloudServiceRecentList,
         cloudServiceTypeRecentList,
         costAnalysisRecentList,
-        metricExplorerRecentList,
+        // metricExplorerRecentList,
         securityRecentList,
         workspaceRecentLoading: isFetchingWorkspaceRecentList,
         recentLoading: computed(() => isFetchingMenuRecentList.value
@@ -230,7 +231,7 @@ export const useRecentList = ({ limit = 15 }: UseRecentListOptions = {}) => {
                 || isFetchingCloudServiceRecentList.value
                 || isFetchingCloudServiceTypeRecentList.value
                 || isFetchingCostAnalysisRecentList.value
-                || isFetchingMetricExplorerRecentList.value
+                // || isFetchingMetricExplorerRecentList.value
                 || isFetchingSecurityRecentList.value),
     };
 };

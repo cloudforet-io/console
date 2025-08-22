@@ -22,9 +22,9 @@ import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
-import type { FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { ConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import {
     yellow, gray,
@@ -44,8 +44,6 @@ const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const domainStore = useDomainStore();
 const domainGetters = domainStore.getters;
 
@@ -57,10 +55,13 @@ const appContextStore = useAppContextStore();
 const userStore = useUserStore();
 
 const referenceMap = useAllReferenceDataModel();
+const {
+    costAnalysisItems: favoriteCostAnalysisItems,
+} = useFavoriteList();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
+    // favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
     unifiedCostCurrency: computed(() => domainGetters.domainUnifiedCostCurrency ?? DEFAULT_UNIFIED_COST_CURRENCY),
     isAdminUser: computed<boolean>(() => userStore.state.roleType === 'DOMAIN_ADMIN'),
 });
@@ -118,8 +119,8 @@ const state = reactive({
         },
     ] : [])),
     favoriteItemMap: computed(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        storeState.favoriteItems?.forEach((d) => {
+        const result: Record<string, ConfigData> = {};
+        favoriteCostAnalysisItems.value?.forEach((d) => {
             result[d.itemId] = d;
         });
         return result;

@@ -8,8 +8,8 @@ import {
 } from '@cloudforet/mirinae';
 
 
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
@@ -31,8 +31,8 @@ const projects = computed(() => projectListStore.getProjectsByGroupId(props.proj
 const projectGroups = computed(() => projectListStore.getProjectGroupsByParentId(props.projectGroupId));
 
 /* favorite */
-const favoriteStore = useFavoriteStore();
-const isStarred = computed(() => favoriteStore.getters.projectGroupItems.some((item) => item.itemId === props.projectGroupId));
+const { projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
+const isStarred = computed(() => favoriteProjectGroupItems.value?.some((item) => item.itemId === props.projectGroupId));
 
 /* project group select */
 const router = useRouter();

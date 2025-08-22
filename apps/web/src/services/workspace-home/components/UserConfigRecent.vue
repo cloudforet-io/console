@@ -73,18 +73,18 @@ const state = reactive({
 const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData|undefined => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertedRecentConfigData.convertedDashboard.value.find((d) => d.itemId === recentConfig.id);
+        return convertedRecentConfigData.convertedDashboard.value.find((d) => d.itemId === recentConfig.itemId);
     }
     if (itemType === RECENT_TYPE.PROJECT) {
-        return convertedRecentConfigData.convertedProject.value.find((d) => d.itemId === recentConfig.id);
+        return convertedRecentConfigData.convertedProject.value.find((d) => d.itemId === recentConfig.itemId);
     }
     if (itemType === RECENT_TYPE.PROJECT_GROUP) {
-        return convertedRecentConfigData.convertedProjectGroup.value.find((d) => d.itemId === recentConfig.id);
+        return convertedRecentConfigData.convertedProjectGroup.value.find((d) => d.itemId === recentConfig.itemId);
     }
     if (itemType === RECENT_TYPE.COST_ANALYSIS) {
-        return convertedRecentConfigData.convertedCostQuerySet.value.find((d) => d.itemId === recentConfig.id);
+        return convertedRecentConfigData.convertedCostQuerySet.value.find((d) => d.itemId === recentConfig.itemId);
     }
-    return convertedRecentConfigData.convertedMenu.value.find((d) => d.itemId === recentConfig.id);
+    return convertedRecentConfigData.convertedMenu.value.find((d) => d.itemId === recentConfig.itemId);
 };
 </script>
 

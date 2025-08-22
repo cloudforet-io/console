@@ -10,8 +10,8 @@ import type { ProjectType } from '@/api-clients/identity/project/schema/type';
 
 import { useProviderReferenceStore, type ProviderItem } from '@/store/reference/provider-reference-store';
 
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import ProjectActionDropdownButton from '@/services/project/v2/components/ProjectActionDropdownButton.vue';
@@ -28,8 +28,8 @@ const props = defineProps<{
 }>();
 
 /* favorite */
-const favoriteStore = useFavoriteStore();
-const isStarred = computed(() => favoriteStore.getters.projectItems.some((item) => item.itemId === props.projectId));
+const { projectItems: favoriteProjectItems } = useFavoriteList();
+const isStarred = computed(() => favoriteProjectItems.value?.some((item) => item.itemId === props.projectId));
 
 /* provider */
 const providerReferenceStore = useProviderReferenceStore();

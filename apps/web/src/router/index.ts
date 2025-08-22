@@ -2,6 +2,7 @@ import Vue from 'vue';
 import type { NavigationGuardNext, Route, RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
+import type { QueryClient } from '@tanstack/vue-query';
 import { clone } from 'lodash';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
@@ -25,7 +26,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { useAuthorizationStore } from '@/store/authorization/authorization-store';
 import { pinia } from '@/store/pinia';
 
-import { getRecentConfig } from '@/lib/helper/router-recent-helper';
+import { setRecentConfig } from '@/lib/helper/router-recent-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { GTag } from '@/lib/site-analytics/gtag';
@@ -60,6 +61,7 @@ export class SpaceRouter {
         routes: RouteConfig[],
         afterGrantedCallback: () => void,
         authorizationStore: ReturnType<typeof useAuthorizationStore>,
+        queryClient: QueryClient,
     ) {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
@@ -156,20 +158,7 @@ export class SpaceRouter {
                     return;
                 }
 
-                const recent = getRecentConfig(to);
-                if (recent) {
-                    SpaceConnector.clientV2.config.userConfig.set({
-                        name: `console:recent:${recent.itemType}:${recent.workspaceId}:${recent.itemId}`,
-                        data: {
-                            id: recent.itemId,
-                            workspace_id: recent.workspaceId,
-                            type: recent.itemType,
-                            label: recent.itemId,
-                        },
-                    }).catch((e) => {
-                        console.error(e);
-                    });
-                }
+                setRecentConfig(to, queryClient);
             }
         });
 

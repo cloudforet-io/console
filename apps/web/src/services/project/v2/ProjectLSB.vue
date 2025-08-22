@@ -17,8 +17,8 @@ import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue'
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBStarredTree from '@/common/modules/navigations/new-lsb/LSBStarredTree.vue';
 import LSBTitle from '@/common/modules/navigations/new-lsb/LSBTitle.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
-import { type FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
+import type { FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
@@ -33,9 +33,10 @@ const props = defineProps<{
 }>();
 
 /* starred */
-const favoriteStore = useFavoriteStore();
+const { projectItems: favoriteProjectItems, projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
+
 const { starredItems } = useProjectStarredTree({
-    favoriteItems: computed(() => favoriteStore.getters.favoriteMenuList as FavoriteItem[]),
+    favoriteItems: computed(() => [...(favoriteProjectItems.value ?? []), ...(favoriteProjectGroupItems.value ?? [])] as FavoriteConfig[]),
 });
 
 /* create button */

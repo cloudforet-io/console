@@ -17,10 +17,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 import { PROJECT_ROUTE_V1 } from '@/services/project/v1/routes/route-constant';
 
@@ -32,16 +33,19 @@ interface Props {
     skipRedirect?: boolean;
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+interface Emits {
+    (e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
-}>();
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
-const recentStore = useRecentStore();
+const { projectItems: favoriteProjectItems, projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
+const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
+const { mutateAsync: deleteRecent } = useRecentDelete();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -79,14 +83,14 @@ const deleteProject = async () => {
     await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
         project_id: props.targetId as string,
     });
-    await recentStore.deleteRecent({
+    await deleteRecent({
         type: RECENT_TYPE.PROJECT,
         itemId: props.targetId,
     });
     showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-    const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === props.targetId);
+    const isFavoriteItem = favoriteProjectItems.value?.find((item) => item.itemId === props.targetId);
     if (isFavoriteItem) {
-        await favoriteStore.deleteFavorite({
+        await deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT,
             workspaceId: state.currentWorkspaceId || '',
             itemId: props.targetId as string,
@@ -99,9 +103,9 @@ const deleteProjectGroup = async () => {
         project_group_id: props.targetId,
     });
     showSuccessMessage(_i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-    const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === props.targetId);
+    const isFavoriteItem = favoriteProjectGroupItems.value?.find((item) => item.itemId === props.targetId);
     if (isFavoriteItem) {
-        await favoriteStore.deleteFavorite({
+        await deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT_GROUP,
             workspaceId: state.currentWorkspaceId || '',
             itemId: props.targetId,

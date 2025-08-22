@@ -5,6 +5,8 @@ import {
     PI, PTextHighlighting, PLink, PTooltip,
 } from '@cloudforet/mirinae';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
@@ -23,11 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
     workspaceId: '',
 });
 const topBarSearchStore = useTopBarSearchStore();
+const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
 
-const storeState = reactive({
-    workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
-    currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
-});
+const currentWorkspaceId = computed(() => topBarSearchStore.storeState.currentWorkspaceId);
 
 const state = reactive({
     tooltipText: computed(() => `${props.label}${props.description ? ` ∙ ${props.description}` : ''}`),
@@ -61,18 +62,18 @@ const state = reactive({
                     </span>
                 </div>
             </p-tooltip>
-            <div v-if="props.workspaceId !== storeState.currentWorkspaceId"
+            <div v-if="props.workspaceId !== currentWorkspaceId"
                  class="lower-part"
             >
                 <div class="left-part">
-                    <workspace-logo-icon :text="storeState.workspaceMap[props.workspaceId]?.label"
-                                         :theme="storeState.workspaceMap[props.workspaceId]?.data?.tags?.theme"
+                    <workspace-logo-icon :text="workspaceMap[props.workspaceId]?.label || props.workspaceId"
+                                         :theme="workspaceMap[props.workspaceId]?.data?.tags?.theme"
                                          size="xxs"
                     />
                     <p-link new-tab
                             action-icon="internal-link"
                     >
-                        <span class="label">{{ storeState.workspaceMap[props.workspaceId]?.label }}</span>
+                        <span class="label">{{ workspaceMap[props.workspaceId]?.label || props.workspaceId }}</span>
                     </p-link>
                 </div>
             </div>

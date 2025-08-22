@@ -13,9 +13,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+
 
 import { peacock } from '@/styles/colors';
 
@@ -33,8 +34,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+const { projectItems: favoriteProjectItems } = useFavoriteList();
+
 const projectPageStore = useProjectPageStore();
 
 
@@ -43,7 +44,7 @@ const router = useRouter();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    favoriteItems: computed(() => favoriteGetters.projectItems),
+    favoriteItems: computed(() => favoriteProjectItems.value),
 });
 
 const state = reactive({

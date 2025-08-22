@@ -25,7 +25,7 @@ import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vu
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { gray, yellow } from '@/styles/colors';
@@ -50,10 +50,13 @@ const referenceMap = useAllReferenceDataModel();
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+
+const {
+    metricItems: favoriteMetrics,
+    metricExampleItems: favoriteMetricExamples,
+} = useFavoriteList();
 
 const storeState = reactive({
     providers: computed(() => allReferenceStore.getters.provider),
@@ -180,7 +183,7 @@ const { data: currentNamespaceMetrics, isLoading: currentNamespaceMetricsLoading
 const favoriteMetricItemsApiQueryHelper = new ApiQueryHelper();
 const { data: favoriteMetricItems, isLoading: favoriteMetricItemsLoading } = useMetricListQuery({
     params: computed(() => {
-        const _favoriteMetricIds = favoriteGetters.metricItems.map((item) => item.itemId);
+        const _favoriteMetricIds = favoriteMetrics.value?.map((item) => item.itemId);
         favoriteMetricItemsApiQueryHelper.setFilters([{ k: 'metric_id', v: _favoriteMetricIds, o: '=' }]);
         return {
             query: favoriteMetricItemsApiQueryHelper.data,
@@ -190,7 +193,7 @@ const { data: favoriteMetricItems, isLoading: favoriteMetricItemsLoading } = use
 const metricExampleListApiQueryHelper = new ApiQueryHelper();
 const { data: favoriteMetricExampleItems, isLoading: favoriteMetricExampleItemsLoading } = useMetricExampleListQuery({
     params: computed(() => {
-        const _favoriteMetricExampleIds = favoriteGetters.metricExampleItems.map((item) => item.itemId);
+        const _favoriteMetricExampleIds = favoriteMetricExamples.value?.map((item) => item.itemId);
         metricExampleListApiQueryHelper.setFilters([{ k: 'example_id', v: _favoriteMetricExampleIds, o: '=' }]);
         return {
             query: metricExampleListApiQueryHelper.data,

@@ -25,9 +25,9 @@ import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vu
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
-import type { FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { ConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import { gray } from '@/styles/colors';
 
@@ -38,14 +38,16 @@ import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const appContextStore = useAppContextStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const authorizationStore = useAuthorizationStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
 const route = useRoute();
+
+const {
+    dashboardItems: favoriteDashboards,
+} = useFavoriteList();
 
 /* Query */
 const {
@@ -59,7 +61,6 @@ const {
 
 const storeState = reactive({
     isWorkspaceOwner: computed(() => authorizationStore.state.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    favoriteItems: computed(() => favoriteGetters.dashboardItems),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
@@ -82,8 +83,8 @@ const state = reactive({
     publicV2DashboardMenuSet: computed(() => getDashboardMenuSet(queryState.publicDashboardItems)),
     privateV2DashboardMenuSet: computed(() => getDashboardMenuSet(queryState.privateDashboardItems)),
     favoriteItemMap: computed(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        storeState.favoriteItems?.forEach((d) => {
+        const result: Record<string, ConfigData> = {};
+        favoriteDashboards.value?.forEach((d) => {
             result[d.itemId] = d;
         });
         return result;
