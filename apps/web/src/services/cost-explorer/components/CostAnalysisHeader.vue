@@ -24,7 +24,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
@@ -48,14 +49,16 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.state;
 const costQuerySetGetters = costQuerySetStore.getters;
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
 
 const router = useRouter();
+
+/* Favorite */
+const { costAnalysisItems: favoriteCostAnalysisItems } = useFavoriteList();
+const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
 
 /* Query */
 const {
@@ -115,12 +118,12 @@ const { mutate: deleteCostQuerySet } = useMutation({
             },
         }).catch(() => {});
 
-        const isFavoriteItem = favoriteGetters.costAnalysisItems.find((item) => item.itemId === state.itemIdForDeleteQuery);
+        const isFavoriteItem = favoriteCostAnalysisItems.value?.find((item) => item.itemId === state.itemIdForDeleteQuery);
         if (isFavoriteItem) {
-            await favoriteStore.deleteFavorite({
+            await deleteFavorite({
                 itemType: FAVORITE_TYPE.COST_ANALYSIS,
                 workspaceId: state.currentWorkspaceId || '',
-                itemId: state.itemIdForDeleteQuery,
+                itemId: state.itemIdForDeleteQuery as string,
             });
         }
     },
