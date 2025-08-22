@@ -2,6 +2,7 @@ import { computed, watch } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { serviceQueryClient as queryClient } from '@/query/clients';
 import { SpaceRouter } from '@/router';
 import { setI18nLocale } from '@/translations';
 
@@ -47,6 +48,8 @@ const initRouter = (domainId?: string) => {
     const globalConfigSchemaStore = useGlobalConfigSchemaStore(pinia);
     const allReferenceStore = useAllReferenceStore(pinia);
     const authorizationStore = useAuthorizationStore(pinia);
+
+
     const afterGrantedCallback = () => allReferenceStore.flush();
 
     const adminChildren = integralRoutes[0].children?.find(
@@ -67,9 +70,9 @@ const initRouter = (domainId?: string) => {
     }
 
     if (!domainId) {
-        SpaceRouter.init(errorRoutes, afterGrantedCallback, authorizationStore);
+        SpaceRouter.init(errorRoutes, afterGrantedCallback, authorizationStore, queryClient);
     } else {
-        SpaceRouter.init(integralRoutes, afterGrantedCallback, authorizationStore);
+        SpaceRouter.init(integralRoutes, afterGrantedCallback, authorizationStore, queryClient);
     }
     isRouterInitialized = true;
 };
