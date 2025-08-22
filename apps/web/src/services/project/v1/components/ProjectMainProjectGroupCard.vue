@@ -8,8 +8,8 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import { i18n } from '@/translations';
 
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
@@ -26,12 +26,12 @@ interface Props {
 const props = defineProps<Props>();
 const router = useRouter();
 
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+const { projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
+
 const projectPageStore = useProjectPageStore();
 
 const storeState = reactive({
-    favoriteItems: computed(() => favoriteGetters.projectGroupItems),
+    favoriteItems: computed(() => favoriteProjectGroupItems.value),
 });
 
 const state = reactive({

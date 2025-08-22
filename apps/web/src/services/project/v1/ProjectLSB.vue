@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
+import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
 
@@ -12,6 +13,7 @@ import {
 import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import { ALERT_STATE } from '@/api-clients/monitoring/alert/schema/constants';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -24,7 +26,8 @@ import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
+import type { FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo, peacock } from '@/styles/colors';
@@ -36,8 +39,10 @@ import { useProjectPageStore } from '@/services/project/v1/stores/project-page-s
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
+const referenceMap = useAllReferenceDataModel();
+const projectMap = referenceMap.project;
+const projectGroupMap = referenceMap.projectGroup;
+const { projectItems: favoriteProjectItems, projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const projectDetailPageStore = useProjectDetailPageStore();
@@ -49,11 +54,7 @@ const menuRef = ref<any|null>(null);
 
 const storeState = reactive({
     projectItems: computed<ProjectReferenceItem[]>(() => Object.values(allReferenceStore.getters.project)),
-    favoriteItems: computed(() => favoriteGetters.favoriteMenuList.filter((favoriteMenu) => {
-        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT) return true;
-        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT_GROUP) return true;
-        return false;
-    })),
+    favoriteItems: computed<FavoriteConfig[]>(() => [...(favoriteProjectItems.value ?? []), ...(favoriteProjectGroupItems.value ?? [])] as FavoriteConfig[]),
     currentWorkspaceId: computed(() => workspaceStoreGetters.currentWorkspaceId as string),
 });
 
@@ -64,28 +65,29 @@ const state = reactive({
         if (d.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
             return {
                 type: MENU_ITEM_TYPE.ITEM,
-                label: d.label,
-                id: d.name,
+                label: projectGroupMap[d.itemId]?.name || d.itemId || '',
+                id: d.itemId || '',
                 icon: { name: 'ic_folder-filled', color: indigo[500] },
                 to: {
                     name: PROJECT_ROUTE_V1._NAME,
-                    params: { projectGroupId: d.itemId },
-                },
-                favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
+                    params: { projectGroupId: d.itemId || '' },
+                } as Location,
+                favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.itemId || '' },
             };
         }
         return {
             type: MENU_ITEM_TYPE.ITEM,
-            label: d.label,
-            id: d.name,
+            label: projectMap[d.itemId]?.name || d.itemId || '',
+            id: d.itemId || '',
             icon: { name: 'ic_document-filled', color: peacock[600] },
             to: {
                 name: PROJECT_ROUTE_V1.DETAIL.TAB.SUMMARY._NAME,
-                params: { id: d.itemId },
-            },
-            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
+                params: { id: d.itemId || '' },
+            } as Location,
+            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.itemId || '' },
         };
     })),
+
     isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE_V1._NAME),
     projectLandingMenuSet: computed(() => [
         {

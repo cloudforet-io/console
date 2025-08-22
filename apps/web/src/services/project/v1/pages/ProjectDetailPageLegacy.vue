@@ -31,12 +31,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 import { peacock } from '@/styles/colors';
 
@@ -61,10 +62,11 @@ const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
-const recentStore = useRecentStore();
+const { projectItems: favoriteProjectItems } = useFavoriteList();
+const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
 const userWorkspaceStore = useUserWorkspaceStore();
+
+const { mutateAsync: deleteRecent } = useRecentDelete();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const { getReferenceLocation } = useReferenceRouter();
@@ -72,7 +74,7 @@ const { getReferenceLocation } = useReferenceRouter();
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    favoriteItems: computed(() => favoriteGetters.projectItems),
+    favoriteItems: computed(() => favoriteProjectItems.value),
 });
 const state = reactive({
     item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
@@ -150,15 +152,15 @@ const projectDeleteFormConfirm = async () => {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             project_id: projectDetailPageState.projectId as string,
         });
-        await recentStore.deleteRecent({
+        await deleteRecent({
             type: RECENT_TYPE.PROJECT,
             itemId: projectDetailPageState.projectId as string,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.push({ name: PROJECT_ROUTE_V1._NAME });
-        const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectDetailPageState.projectId);
+        const isFavoriteItem = favoriteProjectItems.value?.find((item) => item.itemId === projectDetailPageState.projectId);
         if (isFavoriteItem) {
-            await favoriteStore.deleteFavorite({
+            await deleteFavorite({
                 itemType: FAVORITE_TYPE.PROJECT,
                 workspaceId: storeState.currentWorkspaceId || '',
                 itemId: projectDetailPageState.projectId as string,
