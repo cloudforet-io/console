@@ -6,7 +6,8 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-delete-mutation';
@@ -14,8 +15,8 @@ import { useDashboardFolderDeleteMutation } from '@/services/_shared/dashboard/c
 
 export const useDashboardBundleDeleteWorkflow = () => {
     const queryClient = useQueryClient();
-    const favoriteStore = useFavoriteStore();
-    const favoriteGetters = favoriteStore.getters;
+    const { dashboardItems: favoriteDashboardItems } = useFavoriteList();
+    const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
     const userWorkspaceStore = useUserWorkspaceStore();
 
     const currentWorkspaceId = computed(() => userWorkspaceStore.getters.currentWorkspaceId);
@@ -28,9 +29,9 @@ export const useDashboardBundleDeleteWorkflow = () => {
 
     const { mutateAsync: deleteDashboard, isPending: dashboardLoading } = useDashboardDeleteMutation({
         onSuccess: async (_, variables) => {
-            const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === variables.dashboard_id);
+            const isFavoriteItem = favoriteDashboardItems.value?.find((item) => item.itemId === variables.dashboard_id);
             if (isFavoriteItem) {
-                await favoriteStore.deleteFavorite({
+                await deleteFavorite({
                     itemType: FAVORITE_TYPE.DASHBOARD,
                     workspaceId: currentWorkspaceId.value || '',
                     itemId: variables.dashboard_id,

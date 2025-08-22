@@ -12,17 +12,16 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-delete-mutation';
 import { useDashboardQuery } from '@/services/dashboards/composables/use-dashboard-query';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-
-const recentStore = useRecentStore();
 
 interface Props {
     visible?: boolean;
@@ -35,11 +34,16 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void,
 }>();
 
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const router = useRouter();
+
+const { mutateAsync: deleteRecent } = useRecentDelete();
+
+/* Favorite */
+const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
+const { dashboardItems: favoriteDashboardItems } = useFavoriteList();
+
 /* Query */
 const {
     keys,
@@ -71,13 +75,13 @@ const { mutate: deleteDashboard, isPending: loading } = useDashboardDeleteMutati
         const _isPrivate = params.dashboard_id.startsWith('private');
         const dashboardListQueryKey = _isPrivate ? keys.privateDashboardListQueryKey : keys.publicDashboardListQueryKey;
         await queryClient.invalidateQueries({ queryKey: dashboardListQueryKey.value });
-        await recentStore.deleteRecent({
+        await deleteRecent({
             type: RECENT_TYPE.DASHBOARD,
             itemId: props.dashboardId,
         });
-        const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === params.dashboard_id);
+        const isFavoriteItem = favoriteDashboardItems.value?.find((item) => item.itemId === params.dashboard_id);
         if (isFavoriteItem) {
-            await favoriteStore.deleteFavorite({
+            await deleteFavorite({
                 itemType: FAVORITE_TYPE.DASHBOARD,
                 workspaceId: storeState.currentWorkspaceId || '',
                 itemId: params.dashboard_id,
