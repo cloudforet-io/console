@@ -16,10 +16,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 import { useProjectPageModalStore } from '@/services/project/v2/stores/project-page-modal-store';
 
@@ -31,9 +32,10 @@ const visible = computed(() => projectPageModalStore.state.deleteModalVisible &&
 const isProject = computed(() => projectPageModalStore.state.targetType === 'project');
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
-const recentStore = useRecentStore();
+const { projectItems: favoriteProjectItems, projectGroupItems: favoriteProjectGroupItems } = useFavoriteList();
+const { mutateAsync: deleteFavorite } = useFavoriteDeleteMutation();
+const { mutateAsync: deleteRecent } = useRecentDelete();
+
 
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -76,14 +78,14 @@ const deleteProject = async (projectId: string) => {
     });
     queryClient.invalidateQueries({ queryKey: projectListQueryKey.value });
     queryClient.removeQueries({ queryKey: projectQueryKeyWithSuffix(projectId) });
-    await recentStore.deleteRecent({
+    await deleteRecent({
         type: RECENT_TYPE.PROJECT,
         itemId: projectId,
     });
     showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-    const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectId);
+    const isFavoriteItem = favoriteProjectItems.value?.find((item) => item.itemId === projectId);
     if (isFavoriteItem) {
-        await favoriteStore.deleteFavorite({
+        await deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT,
             workspaceId: state.currentWorkspaceId || '',
             itemId: projectId,
@@ -100,9 +102,9 @@ const deleteProjectGroup = async (projectGroupId: string) => {
     queryClient.invalidateQueries({ queryKey: projectGroupListQueryKey.value });
     queryClient.removeQueries({ queryKey: projectGroupQueryKeyWithSuffix(projectGroupId) });
     showSuccessMessage(_i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-    const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === projectGroupId);
+    const isFavoriteItem = favoriteProjectGroupItems.value?.find((item) => item.itemId === projectGroupId);
     if (isFavoriteItem) {
-        await favoriteStore.deleteFavorite({
+        await deleteFavorite({
             itemType: FAVORITE_TYPE.PROJECT_GROUP,
             workspaceId: state.currentWorkspaceId || '',
             itemId: projectGroupId,

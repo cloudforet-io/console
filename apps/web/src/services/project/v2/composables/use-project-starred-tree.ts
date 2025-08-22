@@ -6,14 +6,14 @@ import type { TreeNodeIcon, TreeNodeRoutePredicate } from '@cloudforet/mirinae/t
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import type { LSBItemProps } from '@/common/modules/navigations/new-lsb/type';
-import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
 
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 
-export const useProjectStarredTree = ({ favoriteItems }: { favoriteItems: Ref<FavoriteItem[]>}) => {
+export const useProjectStarredTree = ({ favoriteItems }: { favoriteItems: Ref<FavoriteConfig[]>}) => {
     const referenceMap = useAllReferenceDataModel();
 
     const projectFavoriteItems = computed(() => favoriteItems.value.filter((favoriteMenu) => {
@@ -29,7 +29,7 @@ export const useProjectStarredTree = ({ favoriteItems }: { favoriteItems: Ref<Fa
         name: (item.itemType === FAVORITE_TYPE.PROJECT
             ? referenceMap.project[item.itemId]?.name
             : referenceMap.projectGroup[item.itemId]?.name
-        ) ?? item.label ?? item.name ?? item.itemId,
+        ) ?? item.itemId,
         icon: item.itemType === FAVORITE_TYPE.PROJECT ? projectIcon : projectGroupIcon,
         link: {
             to: {
