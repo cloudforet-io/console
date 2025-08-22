@@ -43,4 +43,12 @@ export const DEFAULT_ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.NOTICE },
         ],
     },
+    {
+        id: MENU_ID.MY_PAGE,
+        hideOnSiteMap: true,
+        subMenuList: [
+            { id: MENU_ID.ACCOUNT_PROFILE },
+            { id: MENU_ID.NOTIFICATIONS },
+        ],
+    },
 ];
