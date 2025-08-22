@@ -10,9 +10,9 @@ import type { Route } from '@cloudforet/mirinae/types/navigation/breadcrumbs/typ
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import ServiceDetailHeader from '@/services/alert-manager/v2/components/ServiceDetailHeader.vue';
 import ServiceDetailTabs from '@/services/alert-manager/v2/components/ServiceDetailTabs.vue';

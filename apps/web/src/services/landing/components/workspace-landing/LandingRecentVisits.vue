@@ -15,11 +15,11 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import type { RecentConfig } from '@/common/modules/navigations/type';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { RecentItem } from '@/common/modules/user-config/recent/use-recent-list';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';
@@ -28,10 +28,13 @@ import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
+interface Props {
+    recentList: RecentItem[];
+}
+
+const props = defineProps<Props>();
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const recentStore = useRecentStore();
-const recentState = recentStore.state;
 
 const router = useRouter();
 
@@ -39,7 +42,7 @@ const state = reactive({
     popoverVisible: false,
     selectedPopoverItem: '',
 });
-const recentWorkspace = computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
+const recentWorkspace = computed<RecentConfig[]>(() => (props.recentList ?? []).map((i) => ({
     itemType: i.data.type,
     workspaceId: i.data.workspace_id,
     itemId: i.data.id,

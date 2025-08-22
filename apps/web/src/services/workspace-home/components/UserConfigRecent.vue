@@ -1,94 +1,90 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PFieldTitle } from '@cloudforet/mirinae';
 
-import type { UserConfigModel } from '@/api-clients/config/user-config/schema/model';
-import type { CostQuerySetModel } from '@/api-clients/cost-analysis/cost-query-set/schema/model';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import type {
     ReferenceData,
     ConfigData,
 } from '@/lib/helper/config-data-helper';
-import {
-    convertCostAnalysisConfigToReferenceData,
-    convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData,
-    convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData,
-} from '@/lib/helper/config-data-helper';
-import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
-import { useGlobalDashboardQuery } from '@/common/composables/global-dashboard/use-global-dashboard-query';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useRecentList } from '@/common/modules/user-config/recent/use-recent-list';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
-import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
-const route = useRoute();
-const router = useRouter();
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
-const gnbStore = useGnbStore();
-const gnbStoreGetters = gnbStore.getters;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageState = workspaceHomePageStore.state;
-const { getAllMenuList } = useAllMenuList();
+const currentWorkspaceId = computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId);
 
-/* Query */
-const {
-    publicDashboardListQuery,
-    privateDashboardListQuery,
-} = useGlobalDashboardQuery();
-
-const dashboardList = computed(() => [...(publicDashboardListQuery?.data?.value ?? []), ...(privateDashboardListQuery?.data?.value ?? [])]);
-const storeState = reactive({
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
-    projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+/* Recent */
+const recentConfigData = useRecentList();
+const convertedRecentConfigData = useConvertReferencedConfigData({
+    dashboardConfigList: computed(() => (recentConfigData.dashboardRecentList.value ?? []).map((i) => ({
+        ...i.data,
+        itemType: i.data.type,
+        itemId: i.data.id,
+        workspaceId: currentWorkspaceId.value || '',
+    }))),
+    projectConfigList: computed(() => (recentConfigData.projectRecentList.value ?? []).map((i) => ({
+        ...i.data,
+        itemType: i.data.type,
+        itemId: i.data.id,
+        workspaceId: currentWorkspaceId.value || '',
+    }))),
+    projectGroupConfigList: computed(() => (recentConfigData.projectGroupRecentList.value ?? []).map((i) => ({
+        ...i.data,
+        itemType: i.data.type,
+        itemId: i.data.id,
+        workspaceId: currentWorkspaceId.value || '',
+    }))),
+    costQuerySetConfigList: computed(() => (recentConfigData.costAnalysisRecentList.value ?? []).map((i) => ({
+        ...i.data,
+        itemType: i.data.type,
+        itemId: i.data.id,
+        workspaceId: currentWorkspaceId.value || '',
+    }))),
+    allConfigList: computed(() => (recentConfigData.menuRecentList.value ?? []).map((i) => ({
+        ...i.data,
+        itemType: i.data.type,
+        itemId: i.data.id,
+        workspaceId: currentWorkspaceId.value || '',
+    }))),
 });
+
+
 const state = reactive({
-    recentList: computed<ReferenceData[]>(() => {
-        const _recentList = storeState.recentList.map((i) => convertRecentToReferenceData({
+    recentList: computed<(ReferenceData | undefined)[]>(() => {
+        const _recentList = (recentConfigData.menuRecentList.value ?? []).map((i) => convertRecentToReferenceData({
             ...i.data,
             itemType: i.data.type,
             itemId: i.data.id,
-            workspaceId: storeState.currentWorkspaceId || '',
+            workspaceId: currentWorkspaceId.value || '',
         }));
-        return _recentList.filter((i) => i && !i?.isDeleted).splice(0, 10);
+        return _recentList.filter((i) => !!i && !i?.isDeleted).splice(0, 10);
     }),
 });
 
-const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
+const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData|undefined => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
-        return convertDashboardConfigToReferenceData([recentConfig], dashboardList.value)[0];
+        return convertedRecentConfigData.convertedDashboard.value.find((d) => d.itemId === recentConfig.id);
     }
     if (itemType === RECENT_TYPE.PROJECT) {
-        return convertProjectConfigToReferenceData([recentConfig], storeState.projects)[0];
+        return convertedRecentConfigData.convertedProject.value.find((d) => d.itemId === recentConfig.id);
     }
     if (itemType === RECENT_TYPE.PROJECT_GROUP) {
-        return convertProjectGroupConfigToReferenceData([recentConfig], storeState.projectGroups)[0];
+        return convertedRecentConfigData.convertedProjectGroup.value.find((d) => d.itemId === recentConfig.id);
     }
     if (itemType === RECENT_TYPE.COST_ANALYSIS) {
-        return convertCostAnalysisConfigToReferenceData([recentConfig], storeState.costQuerySets, storeState.costDataSource)[0];
+        return convertedRecentConfigData.convertedCostQuerySet.value.find((d) => d.itemId === recentConfig.id);
     }
-    const allMenuList = getAllMenuList(route, router);
-    return convertMenuConfigToReferenceData([recentConfig], allMenuList)[0];
+    return convertedRecentConfigData.convertedMenu.value.find((d) => d.itemId === recentConfig.id);
 };
 </script>
 

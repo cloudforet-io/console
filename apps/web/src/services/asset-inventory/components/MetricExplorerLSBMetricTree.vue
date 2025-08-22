@@ -8,8 +8,8 @@ import type { TreeDisplayMap, TreeNode } from '@cloudforet/mirinae/types/data-di
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { gray } from '@/styles/colors';
 

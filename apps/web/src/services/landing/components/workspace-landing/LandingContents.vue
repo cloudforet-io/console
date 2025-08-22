@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -15,9 +15,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
-import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useRecentList } from '@/common/modules/user-config/recent/use-recent-list';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';
@@ -26,9 +24,6 @@ import LandingSearchedWorkspaces from '@/services/landing/components/workspace-l
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const favoriteStore = useFavoriteStore();
-const recentStore = useRecentStore();
-const recentState = recentStore.state;
 
 const router = useRouter();
 const { width } = useWindowSize();
@@ -36,6 +31,9 @@ const { width } = useWindowSize();
 const userStore = useUserStore();
 
 const { hasReadWriteAccess } = usePageEditableStatus();
+
+/* Recent */
+const { workspaceRecentList } = useRecentList({ limit: 6 });
 
 const storeState = reactive({
     userId: computed<string|undefined>(() => userStore.state.userId),
@@ -60,13 +58,6 @@ const handleClickButton = () => {
     }).href, '_blank');
 };
 
-onMounted(async () => {
-    await recentStore.fetchRecent({
-        type: RECENT_TYPE.WORKSPACE,
-        limit: 6,
-    });
-    await favoriteStore.fetchWorkspaceFavorite();
-});
 </script>
 
 <template>
@@ -90,7 +81,9 @@ onMounted(async () => {
                       class="workspace-search-bar"
                       @update:value="handleSearch"
             />
-            <landing-recent-visits v-if="recentState.recentMenuList.length > 0 && !state.isSearchMode" />
+            <landing-recent-visits v-if="workspaceRecentList && !state.isSearchMode"
+                                   :recent-list="workspaceRecentList"
+            />
             <p-divider v-if="!state.isSearchMode" />
             <landing-searched-workspaces v-show="state.isSearchMode"
                                          :search-text="state.searchText"

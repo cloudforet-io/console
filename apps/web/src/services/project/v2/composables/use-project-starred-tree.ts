@@ -5,9 +5,9 @@ import type { TreeNodeIcon, TreeNodeRoutePredicate } from '@cloudforet/mirinae/t
 
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { LSBItemProps } from '@/common/modules/navigations/new-lsb/type';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
 

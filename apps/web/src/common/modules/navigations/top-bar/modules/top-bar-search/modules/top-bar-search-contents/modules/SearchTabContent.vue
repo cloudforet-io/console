@@ -14,15 +14,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchEmpty.vue';
 import TopBarSearchRecentListItem
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchRecentListItem.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchRecentListItem.vue';
 import TopBarSearchWorkspaceFilter
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
-
-
+import { useGetSearchTabRecentList } from '@/common/modules/navigations/top-bar/modules/top-bar-search/use-get-search-tab-recent-list';
 
 
 interface Props {
@@ -31,33 +30,44 @@ interface Props {
     focusingDirection: string;
 }
 
+interface Emits {
+    (event: 'select', item: SuggestionItem): void;
+    (event: 'close'): void;
+    (event: 'move-focus-end'): void;
+    (event: 'update:isFocused', value: boolean): void;
+    (event: 'update:contents-size', value: number): void;
+}
+
 const props = withDefaults(defineProps<Props>(), {
     searchLimit: 15,
     isFocused: false,
     focusingDirection: 'DOWNWARD',
 });
+const emit = defineEmits<Emits>();
+
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
 const topBarSearchStore = useTopBarSearchStore();
 
-const emit = defineEmits<{(event: 'select', item: SuggestionItem): void;
-    (event: 'close'): void;
-    (event: 'move-focus-end'): void;
-    (event: 'update:isFocused', value: boolean): void;
-    (event: 'update:contents-size', value: number): void;
-}>();
 
 const contentsRef = ref<null | HTMLElement>(null);
 const contentsSize = useElementSize(contentsRef);
+
+/* Recent */
+const { getRecentListBySearchTab } = useGetSearchTabRecentList();
 
 const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     searchMenuList: computed(() => topBarSearchStore.state.searchMenuList),
-    recentMenuList: computed(() => [
-        { name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.RECENTLY_VIEWED'), type: 'header' },
-        ...topBarSearchStore.state.recentMenuList]),
+    recentMenuList: computed(() => {
+        const activeTab = topBarSearchStore.state.activeTab;
+        return [
+            { name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.RECENTLY_VIEWED'), type: 'header' },
+            ...getRecentListBySearchTab(activeTab),
+        ];
+    }),
     serviceMenuCount: computed(() => state.searchMenuList?.length ?? 0),
     currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
@@ -83,18 +93,6 @@ watch(() => contentsSize.height.value, (height) => {
     emit('update:contents-size', height);
 });
 
-// /* Watcher */
-// HACK: for focusing
-// watch(() => props.isFocused, (isFocused) => {
-//     if (isFocused) {
-//         if (props.focusingDirection === 'DOWNWARD') {
-//             if (state.inputText.length === 0) {
-//                 state.focusingType = SUGGESTION_TYPE.MENU;
-//         } else {
-//             state.focusingType = props.items[props.items.length - 1].itemType;
-//         }
-//     }
-// });
 </script>
 <template>
     <div class="search-tab-content">
@@ -105,7 +103,7 @@ watch(() => contentsSize.height.value, (height) => {
                 <p-data-loader key="recent-menu-list"
                                class="data-loader-wrapper"
                                :loading="topBarSearchStore.state.loading"
-                               :data="topBarSearchStore.state.recentMenuList"
+                               :data="state.recentMenuList"
                 >
                     <p-context-menu class="search-list-context"
                                     :menu="state.recentMenuList"
@@ -132,7 +130,7 @@ watch(() => contentsSize.height.value, (height) => {
             <div ref="contentsRef">
                 <p-data-loader :loading="topBarSearchStore.state.loading"
                                class="data-loader-wrapper"
-                               :data="state.searchMenuList"
+                               :data="getRecentListBySearchTab(topBarSearchStore.state.activeTab)"
                 >
                     <p-context-menu class="search-list-context"
                                     :menu="state.searchMenuList"

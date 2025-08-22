@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 import { hashKey } from '@tanstack/vue-query';
 
-import { referenceQueryClient as queryClient } from '@/query/clients';
+import { resourceQueryClient as queryClient } from '@/query/clients';
 import type { QueryKeyArray } from '@/query/core/query-key/types/query-key-type';
 
 export const useWatchedQueryCache = <T>(queryKey: QueryKeyArray) => {

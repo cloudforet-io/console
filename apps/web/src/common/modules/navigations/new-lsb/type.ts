@@ -3,7 +3,7 @@ import type { Location, Route } from 'vue-router';
 
 import type { TreeNodeDisplayType, TreeNodeIcon, TreeNodeLink } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 export type HighlightTagType = 'new' | 'beta' | 'update';
 export type LSBRouterPredicate = (to: Location, currentRoute: Route) => boolean;

@@ -17,9 +17,9 @@ import type { ServiceReferenceMap } from '@/store/reference/service-reference-st
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteItem, FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import type { RecentType, RecentConfig } from '@/common/modules/navigations/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteItem, FavoriteType, FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 export interface ConfigData extends Omit<RecentConfig, 'itemType'>, Omit<FavoriteConfig, 'itemType'> {
     itemType: RecentType|FavoriteType;
@@ -183,6 +183,9 @@ export const convertMetricConfigToReferenceData = (config: ConfigData[]|null, me
         } else {
             results.push({
                 ...d,
+                name: d.itemId,
+                label: d.itemId,
+                icon: d.itemId.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
                 isDeleted: !resource,
             });
         }

@@ -11,12 +11,12 @@ import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type { RecentItem } from '@/common/modules/navigations/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 interface Props {
     recentItem?: RecentItem;
@@ -27,10 +27,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const topBarSearchStore = useTopBarSearchStore();
 const allReferenceStore = useAllReferenceStore();
-const recentStore = useRecentStore();
 const router = useRouter();
 
 const { getReferenceLocation } = useReferenceRouter();
+
+/* Recent */
+const { mutateAsync: deleteRecent } = useRecentDelete();
 
 const storeState = reactive({
     workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
@@ -148,8 +150,8 @@ const handleClick = () => {
     topBarSearchStore.setIsActivated(false);
 };
 
-const handleDeleteRecent = () => {
-    recentStore.deleteRecent({ name: state.recentId });
+const handleDeleteRecent = async () => {
+    await deleteRecent({ name: state.recentId });
 };
 </script>
 

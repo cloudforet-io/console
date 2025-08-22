@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
@@ -19,17 +19,18 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
-import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+
 import { useCurrentMenuId } from '@/common/composables/current-menu-id';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useWorkspaceFavoriteList } from '@/common/modules/user-config/favorite/core/use-workspace-favorite-list';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentCreate } from '@/common/modules/user-config/recent/use-recent-create';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import { gray, violet } from '@/styles/colors';
 
@@ -48,39 +49,47 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
-const favoriteStore = useFavoriteStore();
-const favoriteGetters = favoriteStore.getters;
-const recentStore = useRecentStore();
 
 const { currentMenuId } = useCurrentMenuId();
 
 const router = useRouter();
 
-const selectDropdownRef = ref<PSelectDropdown|null>(null);
+const selectDropdownRef = ref<InstanceType<typeof PSelectDropdown>|null>(null);
+
+
+/* Favorite */
+const { loading: isLoadingWorkspaceFavoriteItems, workspaceItems } = useWorkspaceFavoriteList();
+const { loading: isLoadingConvertedWorkspaceFavoriteItems, convertedWorkspace } = useConvertReferencedConfigData({
+    allConfigList: workspaceItems,
+    workspaceConfigList: workspaceItems,
+});
+const preLoading = computed(() => isLoadingWorkspaceFavoriteItems.value || isLoadingConvertedWorkspaceFavoriteItems.value);
+
+/* Recent */
+const { mutateAsync: createRecent } = useRecentCreate();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    favoriteItems: computed<ReferenceData[]>(() => {
-        const sortedList = sortBy(favoriteGetters.workspaceItems, 'label');
-        return convertWorkspaceConfigToReferenceData(
-            sortedList ?? [],
-            storeState.workspaceList,
-        );
-    }),
+    favoriteItems: computed<ReferenceData[]>(() => sortBy(convertedWorkspace.value ?? [], 'label')),
 });
 const state = reactive({
     visibleSelectDropdown: false,
     searchText: '',
 });
 
-const selectWorkspace = (name: string): void => {
+const selectWorkspace = async (name: string) => {
     const workspaceId = name;
     if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
+    await createRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        workspaceId,
+        id: workspaceId,
+    });
     router.push({ name: MENU_INFO_MAP[currentMenuId.value].routeName, params: { workspaceId } }).catch(() => {});
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
@@ -138,18 +147,7 @@ watch(() => storeState.favoriteItems, async () => {
     if (!selectDropdownRef.value) return;
     await selectDropdownRef.value?.reloadMenu();
 });
-watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
-    if (!selectedWorkspace) return;
-    recentStore.createRecent({
-        type: RECENT_TYPE.WORKSPACE,
-        workspaceId: selectedWorkspace?.workspace_id || '',
-        id: selectedWorkspace?.workspace_id || '',
-    });
-}, { immediate: true });
 
-onMounted(() => {
-    favoriteStore.fetchWorkspaceFavorite();
-});
 </script>
 
 <template>
@@ -174,6 +172,7 @@ onMounted(() => {
                            :class="{'workspace-dropdown': true}"
                            style-type="transparent"
                            menu-width="20rem"
+                           :loading="preLoading"
                            :visible-menu.sync="state.visibleSelectDropdown"
                            :handler="menuHandler"
                            :search-text.sync="state.searchText"

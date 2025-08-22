@@ -8,7 +8,7 @@ import { PI, screens, PTooltip } from '@cloudforet/mirinae';
 
 import { i18n } from '@/translations';
 
-import TopBarSearchDropdown from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/TopBarSearchDropdown.vue';
+import TopBarSearchContents from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/TopBarSearchContents.vue';
 import TopBarSearchInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchInput.vue';
 import TopBarSearchMobileInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchMobileInput.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -123,7 +123,7 @@ onUnmounted(() => {
             </span>
         </p-tooltip>
 
-        <top-bar-search-dropdown v-show="state.visible"
+        <top-bar-search-contents v-show="state.visible"
                                  :focusing-direction.sync="state.focusingDirection"
                                  :is-focused="state.isFocusOnSuggestion"
                                  @move-focus-end="handleMoveFocusEnd"
@@ -136,7 +136,7 @@ onUnmounted(() => {
                                              @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                 />
             </template>
-        </top-bar-search-dropdown>
+        </top-bar-search-contents>
         <div v-if="state.visible & state.isOverMobileSize"
              class="background-block"
              @click="handleHideSearchMenu"

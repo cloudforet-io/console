@@ -25,7 +25,7 @@ export const useServiceReferenceDataModel: ReferenceDataModelImplementationAdapt
     } = useReferenceDataModel<ServiceModel, ServiceReferenceItem>(
         RESOURCE_CONFIG_MAP.service.resourceKey,
         (serviceInfo: ServiceModel) => ({
-            key: serviceInfo.service_key,
+            key: serviceInfo.service_id,
             label: serviceInfo.name,
             name: serviceInfo.service_id,
             data: serviceInfo,

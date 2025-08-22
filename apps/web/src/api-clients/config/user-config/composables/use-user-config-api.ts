@@ -16,7 +16,7 @@ export const useUserConfigApi = () => {
         delete: SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>,
         get: <T = Record<string, any>>(params: UserConfigGetParameters) => SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel<T>>(params),
         list: <T = Record<string, any>>(params: UserConfigListParameters) => SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<T>>>(params),
-        set: SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>,
+        set: <T = Record<string, any>>(params: UserConfigSetParameters) => SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel<T>>(params),
     };
 
     return {

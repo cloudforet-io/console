@@ -23,21 +23,27 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchEmpty.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+import { useGetSearchTabRecentList } from '@/common/modules/navigations/top-bar/modules/top-bar-search/use-get-search-tab-recent-list';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useRecentCreate } from '@/common/modules/user-config/recent/use-recent-create';
 
 interface Props {
     searchLimit: number;
     isFocused: boolean;
     focusingDirection: string;
+}
+
+interface Emits {
+    (event: 'move-focus-end'): void;
+    (event: 'update:contents-size', value: number): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,15 +54,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const topBarSearchStore = useTopBarSearchStore();
-const recentStore = useRecentStore();
 const authorizationStore = useAuthorizationStore();
 const { getAllMenuList } = useAllMenuList();
 
 const route = useRoute();
 const router = useRouter();
-const emit = defineEmits<{(event: 'move-focus-end'): void;
-    (event: 'update:contents-size', value: number): void;
-}>();
+const emit = defineEmits<Emits>();
+
+/* Recent */
+const { getRecentListBySearchTab } = useGetSearchTabRecentList();
+const { mutateAsync: createRecent } = useRecentCreate();
 
 const contentRef = ref<null | HTMLElement>(null);
 const contentSize = useElementSize(contentRef);
@@ -96,13 +103,9 @@ const state = reactive({
         return results;
     }),
     recentMenuList: computed(() => {
-        const _recentMenuList: RecentItem[] = [];
-        recentStore.state.recentMenuList.forEach((i) => {
-            if (authorizationStore.getters.pageAccessPermissionMap[i.data.id]) {
-                _recentMenuList.push(i);
-            }
-        });
-        return _recentMenuList.map((r: RecentItem) => {
+        const allRecentList = getRecentListBySearchTab(topBarSearchStore.state.activeTab);
+        const recentMenuListFilteredByAccess = allRecentList.filter((i) => authorizationStore.getters.pageAccessPermissionMap[i.data.id]);
+        return recentMenuListFilteredByAccess.map((r: RecentItem) => {
             // NOTE: Code corresponding to data stored as 'home-dashboard'
             const id = r.data.id === 'home-dashboard' ? MENU_ID.WORKSPACE_HOME : r.data.id;
             return {
@@ -158,13 +161,16 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     }
 };
 
-const handleSelect = (item) => {
+const handleSelect = async (item) => {
     const menuId = item.id;
     const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
     if (menuInfo && router.currentRoute.name !== menuId) {
         router.push({ name: menuInfo.routeName }).catch(() => {});
-        recentStore.createRecent({
-            type: RECENT_TYPE.SERVICE, workspaceId: storeState.currentWorkspaceId ?? '', id: menuId, label: item.label,
+        await createRecent({
+            type: RECENT_TYPE.SERVICE,
+            workspaceId: storeState.currentWorkspaceId ?? '',
+            id: menuId,
+            options: { label: item.label },
         });
     }
     topBarSearchStore.setIsActivated(false, {
@@ -189,10 +195,6 @@ watch(() => storeState.trimmedInputText, debounce(async (trimmedText) => {
 }, 300, {
     leading: true,
 }));
-
-watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
-    if (storeState.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [storeState.currentWorkspaceId] });
-}, { immediate: true });
 
 // /* Watcher */
 watch(() => props.isFocused, (isFocused) => {
