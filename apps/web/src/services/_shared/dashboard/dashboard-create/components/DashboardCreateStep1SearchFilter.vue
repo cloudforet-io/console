@@ -7,35 +7,26 @@ import {
     PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,
 } from '@cloudforet/mirinae';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap, PluginItem } from '@/store/reference/provider-reference-store';
 
+import { useProviderList } from '@/services/_shared/dashboard/dashboard-create/composables/use-provider-list';
 import { DASHBOARD_LABELS } from '@/services/_shared/dashboard/dashboard-create/constants/dashboard-labels';
+import type { FilterLabelItem } from '@/services/_shared/dashboard/dashboard-create/types/dashboard-create-filter-type';
 
-export interface FilterLabelItem {
-    label: string;
-    name: string;
-    image?: string;
-}
 interface Props {
     labels: string[];
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
-    (e:'select-provider', plugins: FilterLabelItem[]):void;
-    (e:'select-plugin', plugins: PluginItem[]):void;
-}>();
+interface Emits {
+    (e:'select-label', labels: FilterLabelItem[]):void;
+    (e:'select-provider', providers: FilterLabelItem[]):void;
+}
 
-const allReferenceStore = useAllReferenceStore();
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+
+const { providerList, loading } = useProviderList();
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    providerList: computed(() => (Object.values(state.providers) as PluginItem[]).map((provider) => ({
-        label: provider.name,
-        name: provider.key,
-        image: provider.icon,
-    }))),
     labels: computed(() => Object.values(DASHBOARD_LABELS)),
     labelList: computed(() => uniq([...state.labels, ...props.labels]).map((label) => ({
         label,
@@ -59,12 +50,14 @@ const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
 <template>
     <div class="dashboard-create-step-1-search-filter">
         <div class="label-container">
-            <div class="label">
+            <div v-if="!loading"
+                 class="label"
+            >
                 <p-field-title class="title">
                     {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PROVIDER') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="provider in state.providerList"
+                    <p-checkbox v-for="provider in providerList"
                                 :key="provider.name"
                                 class="label-item"
                                 :selected="state.selectedProviders"
@@ -108,8 +101,9 @@ const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
                                appearance-type="badge"
                                selection-label="Provider"
                                show-select-marker
+                               :loading="loading"
                                :show-delete-all-button="false"
-                               :menu="state.providerList"
+                               :menu="providerList"
                                :selected="state.selectedProviders"
                                @update:selected="handleChangeProviderFilter"
             >

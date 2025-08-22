@@ -16,10 +16,7 @@ import { PDataLoader } from '@cloudforet/mirinae';
 import { numberFormatter } from '@cloudforet/utils';
 
 import { COST_DATA_FIELD_MAP } from '@/api-clients/dashboard/_constants/widget-constant';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -52,7 +49,10 @@ const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
+const regionMap = referenceMap.region;
+
 const state = reactive({
     loading: true,
     data: null as FullData | null,
@@ -69,15 +69,31 @@ const state = reactive({
     ]),
     legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
-    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
+    chartData: computed<MapChartData[]>(() => {
+        const referencedData = (state.data?.results ?? []).map((d) => ({
+            ...d,
+            continent_code: regionMap[d.region_code]?.continent?.continent_code,
+        }));
+        const refinedChartData = getRefinedMapChartData(referencedData);
+
+        return refinedChartData.map((d) => ({
+            ...d,
+            pieChartData: Object.entries(d._unrefinedChartData).map(([provider, cost]) => ({
+                category: providerMap[provider]?.label || provider,
+                color: providerMap[provider]?.color || '',
+                provider,
+                value: cost as number,
+                pieSettings: {
+                    fill: providerMap[provider]?.color || '',
+                    stroke: providerMap[provider]?.color || '',
+                },
+            })),
+        }));
+    }),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
-});
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -232,8 +248,8 @@ defineExpose<WidgetExpose<FullData>>({
                     >
                         <span v-if="legend.name"
                               class="circle"
-                              :style="{background: storeState.providers[legend.name]?.color}"
-                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
+                              :style="{background: providerMap[legend.name]?.color}"
+                        /><span class="label">{{ providerMap[legend.name]?.label || legend.name }}</span>
                     </span>
                 </div>
             </p-data-loader>
