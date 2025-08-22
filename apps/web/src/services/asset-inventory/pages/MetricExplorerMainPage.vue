@@ -12,30 +12,19 @@ import MetricImgVisualization from '@/assets/images/metric/img_visualization.png
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useUserStore } from '@/store/user/user-store';
-
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { RecentItem } from '@/common/modules/navigations/type';
-import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
-const recentStore = useRecentStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const userStore = useUserStore();
 
 const referenceMap = useAllReferenceDataModel();
-const storeState = reactive({
-    language: computed<string|undefined>(() => userStore.state.language),
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-});
+
 
 const state = reactive({
     cardList: computed(() => [
@@ -85,18 +74,6 @@ const handleClickLearnMore = () => {
     window.open('https://cloudforet.io/ko/docs/guides/asset-inventory/metric-explorer', '_blank');
 };
 
-const fetchRecentList = async () => {
-    const recentList = await recentStore.fetchRecent({
-        type: RECENT_TYPE.METRIC_EXPLORER,
-        workspaceIds: [storeState.currentWorkspaceId ?? ''],
-        limit: 10,
-    });
-    state.recentList = recentList;
-};
-
-(async () => {
-    await fetchRecentList();
-})();
 </script>
 
 <template>
