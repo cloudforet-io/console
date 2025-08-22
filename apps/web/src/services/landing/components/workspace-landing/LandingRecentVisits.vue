@@ -15,11 +15,11 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import type { RecentConfig } from '@/common/modules/navigations/type';
-import type { RecentItem } from '@/common/modules/recents/use-recent-list';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { RecentItem } from '@/common/modules/user-config/recent/use-recent-list';
 
 import { workspaceStateFormatter } from '@/services/advanced/composables/refined-table-data';
 import { WORKSPACE_STATE } from '@/services/advanced/constants/workspace-constant';

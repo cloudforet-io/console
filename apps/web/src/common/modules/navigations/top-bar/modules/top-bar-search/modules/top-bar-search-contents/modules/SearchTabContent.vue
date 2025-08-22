@@ -14,16 +14,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchEmpty.vue';
 import TopBarSearchRecentListItem
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchRecentListItem.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchRecentListItem.vue';
 import TopBarSearchWorkspaceFilter
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { useGetSearchTabRecentList } from '@/common/modules/navigations/top-bar/modules/top-bar-search/use-get-search-tab-recent-list';
-
-
 
 
 interface Props {
@@ -132,7 +130,7 @@ watch(() => contentsSize.height.value, (height) => {
             <div ref="contentsRef">
                 <p-data-loader :loading="topBarSearchStore.state.loading"
                                class="data-loader-wrapper"
-                               :data="state.searchMenuList"
+                               :data="getRecentListBySearchTab(topBarSearchStore.state.activeTab)"
                 >
                     <p-context-menu class="search-list-context"
                                     :menu="state.searchMenuList"

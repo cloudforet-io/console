@@ -24,11 +24,11 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';

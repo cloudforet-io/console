@@ -26,14 +26,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchEmpty.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { useGetSearchTabRecentList } from '@/common/modules/navigations/top-bar/modules/top-bar-search/use-get-search-tab-recent-list';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useRecentCreate } from '@/common/modules/recents/use-recent-create';
+import { useRecentCreate } from '@/common/modules/user-config/recent/use-recent-create';
 
 interface Props {
     searchLimit: number;

@@ -6,8 +6,8 @@ import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { useDashboardDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-delete-mutation';
 import { useDashboardFolderDeleteMutation } from '@/services/_shared/dashboard/core/composables/mutations/use-dashboard-folder-delete-mutation';

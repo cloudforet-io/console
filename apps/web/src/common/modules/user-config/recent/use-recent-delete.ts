@@ -10,7 +10,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { RecentType } from '@/common/modules/navigations/type';
-import type { RecentItem } from '@/common/modules/recents/use-recent-list';
+import type { RecentItem } from '@/common/modules/user-config/recent/use-recent-list';
 
 
 

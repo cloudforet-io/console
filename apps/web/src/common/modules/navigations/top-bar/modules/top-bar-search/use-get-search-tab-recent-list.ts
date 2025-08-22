@@ -1,5 +1,5 @@
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
-import { useRecentList } from '@/common/modules/recents/use-recent-list';
+import { useRecentList } from '@/common/modules/user-config/recent/use-recent-list';
 
 export const useGetSearchTabRecentList = () => {
     const recentData = useRecentList();

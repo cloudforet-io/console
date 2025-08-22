@@ -27,9 +27,9 @@ import { useGlobalConfigUiAffectsSchema } from '@/lib/config/global-config/compo
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 

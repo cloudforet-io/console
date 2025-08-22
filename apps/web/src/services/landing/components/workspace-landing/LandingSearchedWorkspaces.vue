@@ -7,7 +7,7 @@ import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/mod
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
+import { useWorkspaceFavoriteList } from '@/common/modules/user-config/favorite/core/use-workspace-favorite-list';
 
 import LandingWorkspaceBoard from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingWorkspaceBoard.vue';
 import { useUserProfileGetWorkspacesQuery } from '@/services/landing/composables/use-user-profile-get-workspaces-query';

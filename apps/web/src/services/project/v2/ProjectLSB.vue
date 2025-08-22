@@ -13,12 +13,12 @@ import type { TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-disp
 
 import { i18n } from '@/translations';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { type FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import LSBContainer from '@/common/modules/navigations/new-lsb/LSBContainer.vue';
 import LSBDivider from '@/common/modules/navigations/new-lsb/LSBDivider.vue';
 import LSBStarredTree from '@/common/modules/navigations/new-lsb/LSBStarredTree.vue';
 import LSBTitle from '@/common/modules/navigations/new-lsb/LSBTitle.vue';
+import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { type FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo, peacock } from '@/styles/colors';
 

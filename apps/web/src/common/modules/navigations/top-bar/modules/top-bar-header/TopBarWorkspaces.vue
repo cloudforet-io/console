@@ -21,15 +21,16 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useConvertReferencedConfigData } from '@/common/composables/config-data';
+
 import { useCurrentMenuId } from '@/common/composables/current-menu-id';
-import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useRecentCreate } from '@/common/modules/recents/use-recent-create';
+import { useWorkspaceFavoriteList } from '@/common/modules/user-config/favorite/core/use-workspace-favorite-list';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useRecentCreate } from '@/common/modules/user-config/recent/use-recent-create';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import { gray, violet } from '@/styles/colors';
 

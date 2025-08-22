@@ -15,7 +15,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useUserStore } from '@/store/user/user-store';
 
 import { usePageEditableStatus } from '@/common/composables/page-editable-status';
-import { useRecentList } from '@/common/modules/recents/use-recent-list';
+import { useRecentList } from '@/common/modules/user-config/recent/use-recent-list';
 
 import { ADMIN_ADVANCED_ROUTE } from '@/services/advanced/routes/admin/route-constant';
 import LandingGroupWorkspaces from '@/services/landing/components/workspace-landing/landing-group-workspaces/LandingGroupWorkspaces.vue';

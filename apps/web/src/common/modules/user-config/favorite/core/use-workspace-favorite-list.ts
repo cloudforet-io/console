@@ -4,8 +4,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useFavoriteConfigDataQuery } from '@/common/modules/favorites/core/use-favorite-config-data-query';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteConfigDataQuery } from '@/common/modules/user-config/favorite/core/use-favorite-config-data-query';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 
 const workspaceFavoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);

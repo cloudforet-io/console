@@ -18,9 +18,9 @@ import type { MenuId } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { LSBIcon, LSBItem } from '@/common/modules/navigations/lsb/type';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 interface Props {
     item: LSBItem;

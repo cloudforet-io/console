@@ -10,9 +10,10 @@ import type {
     ConfigData,
 } from '@/lib/helper/config-data-helper';
 
-import { useConvertReferencedConfigData } from '@/common/composables/config-data';
+
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useRecentList } from '@/common/modules/recents/use-recent-list';
+import { useRecentList } from '@/common/modules/user-config/recent/use-recent-list';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 

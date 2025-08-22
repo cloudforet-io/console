@@ -13,16 +13,16 @@ import { getParsedKeysWithManagedCostQueryFavoriteKey } from '@/lib/helper/confi
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import { useAllMenuList } from '@/lib/menu/use-all-menu-list';
 
-
-import { useCloudServiceTypeMap } from '@/common/composables/config-data/composables/use-cloud-service-type-map';
-import { useCostQuerySetMap } from '@/common/composables/config-data/composables/use-cost-query-set-map';
-import { useDashboardMap } from '@/common/composables/config-data/composables/use-dashboard-map';
-import { useMetricExampleMap } from '@/common/composables/config-data/composables/use-metric-example-map';
-import { useWorkspaceMap } from '@/common/composables/config-data/composables/use-workspace-map';
+import type { RecentConfig, RecentType } from '@/common/modules/navigations/type';
 import {
     FAVORITE_TYPE, type FavoriteConfig, type FavoriteType, type FavoriteItem,
-} from '@/common/modules/favorites/favorite-button/type';
-import type { RecentConfig, RecentType } from '@/common/modules/navigations/type';
+} from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useCloudServiceTypeMap } from '@/common/modules/user-config/shared/_internal/use-cloud-service-type-map';
+import { useCostQuerySetMap } from '@/common/modules/user-config/shared/_internal/use-cost-query-set-map';
+import { useDashboardMap } from '@/common/modules/user-config/shared/_internal/use-dashboard-map';
+import { useMetricExampleMap } from '@/common/modules/user-config/shared/_internal/use-metric-example-map';
+import { useWorkspaceMap } from '@/common/modules/user-config/shared/_internal/use-workspace-map';
+
 
 export interface ConfigData extends Omit<RecentConfig, 'itemType'>, Omit<FavoriteConfig, 'itemType'> {
     itemType: RecentType|FavoriteType;

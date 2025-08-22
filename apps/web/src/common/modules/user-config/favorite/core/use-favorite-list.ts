@@ -5,9 +5,10 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useUserStore } from '@/store/user/user-store';
 
-import type { ConfigData } from '@/common/composables/config-data';
-import { useFavoriteConfigDataQuery } from '@/common/modules/favorites/core/use-favorite-config-data-query';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+
+import { useFavoriteConfigDataQuery } from '@/common/modules/user-config/favorite/core/use-favorite-config-data-query';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { ConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 
 const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);

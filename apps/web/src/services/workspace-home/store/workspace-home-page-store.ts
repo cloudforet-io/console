@@ -18,9 +18,9 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useBookmarkStore } from '@/common/components/bookmark/store/bookmark-store';
 import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import type {
     BookmarkType,

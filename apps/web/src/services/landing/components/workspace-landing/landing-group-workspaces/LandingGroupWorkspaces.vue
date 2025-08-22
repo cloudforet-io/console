@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 
 import { useUserStore } from '@/store/user/user-store';
 
-import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
+import { useWorkspaceFavoriteList } from '@/common/modules/user-config/favorite/core/use-workspace-favorite-list';
 
 import { gray } from '@/styles/colors';
 

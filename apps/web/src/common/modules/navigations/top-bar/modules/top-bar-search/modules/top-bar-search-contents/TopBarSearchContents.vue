@@ -22,15 +22,15 @@ import {
     topBarSearchReferenceRouter,
 } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import SearchTabContent
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/SearchTabContent.vue';
 import TopBarSearchListItem
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchListItem.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchListItem.vue';
 import TopBarSearchServiceTab
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceTab.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-contents/modules/TopBarSearchServiceTab.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-import { useRecentCreate } from '@/common/modules/recents/use-recent-create';
+import { useRecentCreate } from '@/common/modules/user-config/recent/use-recent-create';
 
 interface Props {
     isFocused: boolean;
@@ -147,7 +147,7 @@ const handleSelect = async (item) => {
 
 <template>
     <div ref="dropdownRef"
-         class="top-bar-search-dropdown"
+         class="top-bar-search-contents"
     >
         <div ref="searchInputRef">
             <slot name="search-input" />
@@ -271,7 +271,7 @@ const handleSelect = async (item) => {
 </template>
 
 <style lang="postcss" scoped>
-.top-bar-search-dropdown {
+.top-bar-search-contents {
     @apply fixed rounded-xs;
     display: flex;
     flex-direction: column;
@@ -297,7 +297,7 @@ const handleSelect = async (item) => {
 }
 
 @screen tablet {
-    .top-bar-search-dropdown {
+    .top-bar-search-contents {
         max-height: unset;
         max-width: unset;
         width: 100vw;

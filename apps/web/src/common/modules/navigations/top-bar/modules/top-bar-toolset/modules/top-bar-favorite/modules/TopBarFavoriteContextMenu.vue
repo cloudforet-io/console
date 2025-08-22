@@ -27,14 +27,14 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import type { ReferenceData } from '@/common/composables/config-data';
-import { useConvertReferencedConfigData } from '@/common/composables/config-data';
-import { useFavoriteDeleteMutation } from '@/common/modules/favorites/core/use-favorite-delete-mutation';
-import { useFavoriteList } from '@/common/modules/favorites/core/use-favorite-list';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteItem, FavoriteType } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { ReferenceData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';

@@ -15,9 +15,9 @@ import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-
 import { queryStringToArray, queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
 import MetricExplorerDataTable from '@/services/asset-inventory/components/MetricExplorerDataTable.vue';

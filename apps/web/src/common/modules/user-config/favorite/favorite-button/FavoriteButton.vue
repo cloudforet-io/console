@@ -10,13 +10,14 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 
-import { useConvertReferencedConfigData } from '@/common/composables/config-data';
-import { useFavoriteCreateMutation } from '@/common/modules/favorites/core/use-favorite-create-mutation';
-import { useFavoriteDeleteMutation } from '@/common/modules/favorites/core/use-favorite-delete-mutation';
-import { useFavoriteList } from '@/common/modules/favorites/core/use-favorite-list';
-import { useWorkspaceFavoriteList } from '@/common/modules/favorites/core/use-workspace-favorite-list';
-import type { FavoriteType, FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+
+import { useFavoriteCreateMutation } from '@/common/modules/user-config/favorite/core/use-favorite-create-mutation';
+import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
+import { useWorkspaceFavoriteList } from '@/common/modules/user-config/favorite/core/use-workspace-favorite-list';
+import type { FavoriteType, FavoriteConfig } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { useConvertReferencedConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 
 

@@ -16,7 +16,7 @@ import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-ba
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type { RecentItem } from '@/common/modules/navigations/type';
-import { useRecentDelete } from '@/common/modules/recents/use-recent-delete';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 interface Props {
     recentItem?: RecentItem;

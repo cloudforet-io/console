@@ -6,7 +6,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 
 import type { MenuId } from '@/lib/menu/config';
 
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 
 export const MENU_ITEM_TYPE = {

@@ -20,12 +20,12 @@ import type { ProjectReferenceItem } from '@/store/reference/project-reference-s
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
+import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { indigo, peacock } from '@/styles/colors';
 

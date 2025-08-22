@@ -9,14 +9,14 @@ import {
 
 import { i18n } from '@/translations';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type {
     FavoriteMenuItem,
 } from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
+import FavoriteButton from '@/common/modules/user-config/favorite/favorite-button/FavoriteButton.vue';
+import type { FavoriteType } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { gray, indigo, peacock } from '@/styles/colors';
 

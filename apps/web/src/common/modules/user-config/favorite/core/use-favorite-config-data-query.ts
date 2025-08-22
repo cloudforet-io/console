@@ -6,7 +6,7 @@ import type { UserConfigListParameters } from '@/api-clients/config/user-config/
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 
-import type { ConfigData } from '@/common/composables/config-data';
+import type { ConfigData } from '@/common/modules/user-config/shared/use-convert-referenced-config-data';
 
 
 interface UseFavoriteConfigDataQueryOptions {

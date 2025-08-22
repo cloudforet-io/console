@@ -12,9 +12,9 @@ import {
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 
-import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteStore } from '@/common/modules/user-config/favorite/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { useProjectPageStore } from '@/services/project/v1/stores/project-page-store';
 

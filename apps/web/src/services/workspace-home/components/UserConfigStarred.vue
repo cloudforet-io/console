@@ -9,9 +9,9 @@ import type { SelectDropdownMenuItem } from '@cloudforet/mirinae/types/controls/
 
 import { i18n } from '@/translations';
 
-import { useFavoriteList } from '@/common/modules/favorites/core/use-favorite-list';
-import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
+import type { FavoriteItem } from '@/common/modules/user-config/favorite/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { STARRED_SERVICE_ITEMS } from '@/services/workspace-home/constants/workspace-home-constant';

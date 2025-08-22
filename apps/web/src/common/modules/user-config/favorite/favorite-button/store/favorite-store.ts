@@ -17,7 +17,7 @@ import { useUserStore } from '@/store/user/user-store';
 import type { ReferenceData, ConfigData } from '@/lib/helper/config-data-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 
 

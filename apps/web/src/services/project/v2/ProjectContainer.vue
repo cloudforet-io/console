@@ -7,13 +7,13 @@ import { i18n } from '@/translations';
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { useProjectOrGroupId } from '@/services/project/v2/composables/use-project-or-group-id';
 import ProjectLSB from '@/services/project/v2/ProjectLSB.vue';

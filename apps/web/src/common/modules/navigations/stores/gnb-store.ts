@@ -18,8 +18,8 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { useUserStore } from '@/store/user/user-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+import type { FavoriteOptions } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 interface GnbStoreState {
     breadcrumbs: Breadcrumb[];

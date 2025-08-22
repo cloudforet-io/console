@@ -6,8 +6,8 @@ import {
 } from '@cloudforet/mirinae';
 import type { TreeNodeRoutePredicate } from '@cloudforet/mirinae/types/data-display/tree/new-tree/type';
 
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSBItem from '@/common/modules/navigations/new-lsb/LSBItem.vue';
+import { FAVORITE_TYPE } from '@/common/modules/user-config/favorite/favorite-button/type';
 
 import { PROJECT_ROUTE_V2 } from '@/services/project/v2/routes/route-constant';
 import { useProjectListStore } from '@/services/project/v2/stores/project-list-store';
