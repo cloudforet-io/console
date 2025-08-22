@@ -14,8 +14,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
 
 import { useServiceAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-service-account-delete-mutation';
 import { useTrustedAccountDeleteMutation } from '@/services/service-account/composables/mutations/use-trusted-account-delete-mutation';
@@ -40,10 +40,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const appContextStore = useAppContextStore();
-const recentStore = useRecentStore();
 const router = useRouter();
 
 const referenceMap = useAllReferenceDataModel();
+
+const { mutateAsync: deleteRecent } = useRecentDelete();
 
 const {
     serviceAccountData,
@@ -77,7 +78,7 @@ const handleConfirmDelete = async () => {
             await deleteServiceAccount({
                 service_account_id: props.serviceAccountId ?? '',
             });
-            await recentStore.deleteRecent({
+            await deleteRecent({
                 type: RECENT_TYPE.SERVICE_ACCOUNT,
                 itemId: props.serviceAccountId ?? '',
             });
