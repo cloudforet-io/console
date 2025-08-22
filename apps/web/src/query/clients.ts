@@ -12,4 +12,11 @@ export const serviceQueryClient = new QueryClient();
  * This client is used internally by the reference data system for managing its own cache.
  * It's not meant to be used directly in service context.
  */
-export const referenceQueryClient = new QueryClient();
+export const resourceQueryClient = new QueryClient();
+
+/**
+ * Dedicated query client for the config feature.
+ * This client is used internally by the config feature for managing its own cache.
+ * It's not meant to be used directly in service context.
+ */
+export const configFeatureQueryClient = new QueryClient();

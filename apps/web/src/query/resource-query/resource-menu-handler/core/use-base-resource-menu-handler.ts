@@ -1,6 +1,6 @@
 import type { MenuAttachHandler } from '@cloudforet/mirinae';
 
-import { referenceQueryClient as queryClient } from '@/query/clients';
+import { resourceQueryClient as queryClient } from '@/query/clients';
 import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import { RESOURCE_MENU_FETCH_CONFIG } from '@/query/resource-query/resource-menu-handler/config/resource-menu-fetch-config';
 import { generateMenuQueryHandler } from '@/query/resource-query/resource-menu-handler/core/menu-query-handler.generator';

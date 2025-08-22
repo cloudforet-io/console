@@ -3,7 +3,7 @@ import {
     ref,
 } from 'vue';
 
-import { referenceQueryClient as queryClient } from '@/query/clients';
+import { resourceQueryClient as queryClient } from '@/query/clients';
 import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import { useReferenceReactiveCache } from '@/query/resource-query/reference-data-model/composables/_internal/use-reference-reactive-cache';
 import { getRepository } from '@/query/resource-query/reference-data-model/core/repository-registry';

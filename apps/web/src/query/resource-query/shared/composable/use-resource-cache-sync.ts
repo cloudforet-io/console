@@ -1,4 +1,4 @@
-import { referenceQueryClient as queryClient } from '@/query/clients';
+import { resourceQueryClient as queryClient } from '@/query/clients';
 import { useResourceQueryKey } from '@/query/core/query-key/use-resource-query-key';
 import type { ResourceKeyType } from '@/query/resource-query/shared/types/resource-type';
 
