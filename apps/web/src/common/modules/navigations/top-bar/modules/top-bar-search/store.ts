@@ -12,12 +12,9 @@ import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
-import type { RecentItem } from '@/common/modules/navigations/type';
-import { recentNSearchTabMap } from '@/common/modules/navigations/type';
 
 interface TopBarSearchStoreState {
     loading: boolean;
@@ -25,7 +22,7 @@ interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activeTab: SearchTab;
-    recentMenuList: RecentItem[];
+    // recentMenuList: RecentItem[];
     searchMenuList: ResourceModel[];
     // workspace filter
     recentAccessedWorkspaces: string[];
@@ -35,7 +32,7 @@ interface TopBarSearchStoreState {
 export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const workspaceStoreState = userWorkspaceStore.$state;
-    const recentStore = useRecentStore();
+    // const recentStore = useRecentStore();
 
     const orderWorkspaceList = (workspaceList: any[]) => {
         if (!storeState.currentWorkspaceId) return workspaceList;
@@ -56,7 +53,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         isActivated: false,
         inputText: '',
         activeTab: 'service',
-        recentMenuList: [],
+        // recentMenuList: [],
         searchMenuList: [],
         // workspace filter
         recentAccessedWorkspaces: [],
@@ -70,7 +67,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             if (state.inputText) return state.inputText.trim();
             return '';
         }),
-        isRecentEmpty: computed<boolean>(() => state.recentMenuList.length === 0),
+        // isRecentEmpty: computed<boolean>(() => state.recentMenuList.length === 0),
         selectedWorkspaces: computed<string[]>(() => state.stagedWorkspaces.filter((workspace) => workspace.isSelected).map((workspace) => workspace.workspaceId)),
     });
 
@@ -143,7 +140,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     };
     watch([() => getters.trimmedInputText, () => state.activeTab], (trimmedText) => {
         state.loading = true;
-        state.recentMenuList = [];
+        // state.recentMenuList = [];
         if (trimmedText) {
             state.searchMenuList = [];
         }
@@ -157,16 +154,16 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         () => state.allWorkspacesChecked,
     ], debounce(async ([trimmedText, workspaces, tab]) => {
         state.loading = true;
-        state.recentMenuList = [];
-        if (!trimmedText && storeState.currentWorkspaceId) {
-            const recentRes = await recentStore.fetchRecent({
-                type: recentNSearchTabMap[tab],
-                workspaceIds: [storeState.currentWorkspaceId],
-            });
-            if (tab !== SEARCH_TAB.SERVICE) state.recentMenuList = recentRes;
-            state.loading = false;
-            return;
-        }
+        // state.recentMenuList = [];
+        // if (!trimmedText && storeState.currentWorkspaceId) {
+        //     const recentRes = await recentStore.fetchRecent({
+        //         type: recentNSearchTabMap[tab],
+        //         workspaceIds: [storeState.currentWorkspaceId],
+        //     });
+        //     if (tab !== SEARCH_TAB.SERVICE) state.recentMenuList = recentRes;
+        //     state.loading = false;
+        //     return;
+        // }
 
         state.searchMenuList = [];
         const isServiceTab = tab === SEARCH_TAB.SERVICE;
@@ -179,9 +176,9 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         state.loading = false;
     }, 500));
 
-    watch(() => recentStore.state.totalCount, () => {
-        state.recentMenuList = recentStore.state.recentMenuList;
-    });
+    // watch(() => recentStore.state.totalCount, () => {
+    //     state.recentMenuList = recentStore.state.recentMenuList;
+    // });
 
 
     return {
