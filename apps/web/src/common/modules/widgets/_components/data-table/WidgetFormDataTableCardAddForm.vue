@@ -15,12 +15,10 @@ import {
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import {
@@ -63,9 +61,9 @@ interface Props {
     /* Validation */
     formInvalid: boolean;
 }
-const MAX_GROUP_BY_COUNT = 5;
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
+
+interface Emits {
+    (e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
     (e: 'update:selected-group-by-tags-map', value: Record<string, string[]>): void;
     (e: 'update:data-field-name', value: string): void;
@@ -74,19 +72,22 @@ const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>):
     (e: 'update:selected-time-diff-date', value: string): void;
     (e: 'update:time-diff-data-name', value: string): void;
     (e: 'update:form-invalid', value: boolean): void;
-}>();
+}
 
-const allReferenceStore = useAllReferenceStore();
+const MAX_GROUP_BY_COUNT = 5;
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+
 const appContextStore = useAppContextStore();
+const referenceMap = useAllReferenceDataModel();
+const metricMap = referenceMap.metric;
+const costDataSourceMap = referenceMap.costDataSource;
 
-const storeState = reactive({
-    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-});
+
+const isAdminMode = computed<boolean>(() => appContextStore.getters.isAdminMode);
 const { allItems: costDataSourceMenuItems } = useCostDataSourceFilterMenuItems({
-    isAdminMode: computed(() => storeState.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSources[props.sourceId ?? '']),
+    isAdminMode,
+    costDataSource: computed(() => costDataSourceMap[props.sourceId ?? '']),
 });
 
 const state = reactive({
@@ -150,7 +151,7 @@ const groupByState = reactive({
         }
         if (props.sourceType === DATA_SOURCE_DOMAIN.UNIFIED_COST) {
             const groupByItemValueList = Object.values(GROUP_BY_ITEM_MAP);
-            if (!storeState.isAdminMode) return groupByItemValueList.filter((d) => d.name !== 'workspace_id').map((d) => ({ name: d.name, label: d.label }));
+            if (!isAdminMode.value) return groupByItemValueList.filter((d) => d.name !== 'workspace_id').map((d) => ({ name: d.name, label: d.label }));
             return groupByItemValueList.map((d) => ({ name: d.name, label: d.label }));
         }
         return [...assetFilterState.metricItems];
@@ -194,9 +195,9 @@ const groupByTagsState = reactive({
 
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metrics[props.sourceId ?? '']?.data?.labels_info;
+        const metricLabelsInfo = metricMap[props.sourceId ?? '']?.data?.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => {
-            if (storeState.isAdminMode) return true;
+            if (isAdminMode.value) return true;
             return labelInfo.key !== 'workspace_id';
         }) : [];
     }),

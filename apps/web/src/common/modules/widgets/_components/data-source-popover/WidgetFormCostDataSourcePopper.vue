@@ -18,10 +18,13 @@ interface Props {
     selectedCostDataSourceId?: string;
     selectedCostDataType?: string;
 }
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:selected-cost-data-source-id', costDataSourceId: string): void;
+interface Emits {
+    (e: 'update:selected-cost-data-source-id', costDataSourceId: string): void;
     (e: 'update:selected-cost-data-type', costDataType: string): void;
-}>();
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 
 const referenceMap = useAllReferenceDataModel();

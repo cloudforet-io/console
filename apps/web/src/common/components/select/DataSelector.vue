@@ -11,17 +11,22 @@ import type { MenuAttachHandler } from '@cloudforet/mirinae/types/hooks/use-cont
 
 import type { DataSelectorItem } from '@/common/components/select/type';
 
-const props = defineProps<{
+interface Props {
     label?: string;
     menu?: DataSelectorItem[];
     handler?: MenuAttachHandler<DataSelectorItem>;
     showSelectMarker?: boolean;
     multiSelectable?: boolean;
     selected?: DataSelectorItem[];
-}>();
-const emit = defineEmits<{(e: 'update:selected', value: DataSelectorItem[]): void;
+}
+interface Emits {
+    (e: 'update:selected', value: DataSelectorItem[]): void;
     (e: 'update:search-text', value: string): void;
-}>();
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<Emits>();
 
 const slots = useSlots();
 
@@ -71,39 +76,37 @@ watch([() => props.menu, () => props.handler, () => props.selected], () => {
 </script>
 
 <template>
-    <div>
-        <div class="flex flex-col gap-2">
-            <p-field-title class="py-0 px-3"
-                           :label="props.label"
-                           required
-            />
-            <p-context-menu :menu="refinedMenu"
-                            class="data-selector-context-menu"
-                            :loading="loading"
-                            :search-text="searchText"
-                            searchable
-                            :selected="selected"
-                            :show-select-marker="props.showSelectMarker"
-                            :multi-selectable="props.multiSelectable"
-                            @click-show-more="showMoreMenu()"
-                            @update:search-text="handleUpdateSearchText"
-                            @update:selected="handleUpdateSelected"
+    <div class="flex flex-col gap-2">
+        <p-field-title class="py-0 px-3"
+                       :label="props.label"
+                       required
+        />
+        <p-context-menu :menu="refinedMenu"
+                        class="data-selector-context-menu"
+                        :loading="loading"
+                        :search-text="searchText"
+                        searchable
+                        :selected="selected"
+                        :show-select-marker="props.showSelectMarker"
+                        :multi-selectable="props.multiSelectable"
+                        @click-show-more="showMoreMenu()"
+                        @update:search-text="handleUpdateSearchText"
+                        @update:selected="handleUpdateSelected"
+        >
+            <template #header>
+                <slot name="context-menu-header" />
+            </template>
+            <template #no-data-format>
+                <slot name="no-data-area" />
+            </template>
+            <template v-for="(_, slot) of menuSlots"
+                      #[slot]="scope"
             >
-                <template #header>
-                    <slot name="context-menu-header" />
-                </template>
-                <template #no-data-format>
-                    <slot name="no-data-area" />
-                </template>
-                <template v-for="(_, slot) of menuSlots"
-                          #[slot]="scope"
-                >
-                    <slot :name="`menu-${slot}`"
-                          v-bind="scope"
-                    />
-                </template>
-            </p-context-menu>
-        </div>
+                <slot :name="`menu-${slot}`"
+                      v-bind="scope"
+                />
+            </template>
+        </p-context-menu>
     </div>
 </template>
 

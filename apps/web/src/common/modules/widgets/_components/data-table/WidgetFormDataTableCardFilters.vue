@@ -18,11 +18,9 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import type { AutocompleteHandler } from '@cloudforet/mirinae/types/controls/dropdown/select-dropdown/type';
 
 import type { MetricLabelKey } from '@/api-clients/inventory/metric/schema/type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import type {
@@ -81,10 +79,12 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;}>();
-const allReferenceStore = useAllReferenceStore();
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const appContextStore = useAppContextStore();
+
+const referenceMap = useAllReferenceDataModel();
+const metricMap = referenceMap.metric;
 
 /* Query */
 const {
@@ -95,8 +95,6 @@ const {
 
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     dataTable: computed(() => dataTableList.value.find((d) => d.data_table_id === props.dataTableId)),
 });
 
@@ -129,7 +127,7 @@ const state = reactive({
 });
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
+        const metricLabelsInfo = metricMap[props.sourceId ?? '']?.data?.labels_info;
         const _refinedLabelKeys = cloneDeep(metricLabelsInfo || []);
         const projectLabelInfoIndex = _refinedLabelKeys.findIndex((d) => d.key === 'project_id');
         if (projectLabelInfoIndex > -1) {
@@ -289,7 +287,7 @@ const getCostMenuHandler = (
 };
 const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
-        let variableModelInfo: VariableModelMenuHandlerInfo;
+        let variableModelInfo: VariableModelMenuHandlerInfo|undefined;
         let queryOptions: Record<string, any> = {};
         if (isEmpty(labelKey.reference)) {
             const MetricVariableModel = new VariableModelFactory(

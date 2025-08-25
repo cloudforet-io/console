@@ -9,10 +9,9 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import type { Currency } from '@/store/display/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { hexToRgba } from '@/lib/helper/color-convert-helper';
 
@@ -43,6 +42,7 @@ import type { TableWidgetField } from '@/common/modules/widgets/types/widget-dat
 import type { TableDataItem } from '@/common/modules/widgets/types/widget-data-type';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataInfo } from '@/common/modules/widgets/types/widget-model';
+
 
 import {
     blue, green, red, yellow,
@@ -83,19 +83,25 @@ interface Props {
   textWrapInfo?: TextWrapValue;
   missingValueInfo?: MissingValueValue;
 }
+interface Emits {
+    (e: 'update:sort-by', value: Query['sort']): void;
+    (e: 'update:this-page', value: number): void;
+}
+
+
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:sort-by', value: Query['sort']): void;
-  (e: 'update:this-page', value: number): void;
-}>();
-const allReferenceStore = useAllReferenceStore();
+const emit = defineEmits<Emits>();
 
-const storeState = reactive({
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    workspace: computed(() => allReferenceStore.getters.workspace),
-    region: computed(() => allReferenceStore.getters.region),
-    serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
-});
+/* Reference Data */
+const referenceMap = useAllReferenceDataModel();
+const referenceValueMap = {
+    project: referenceMap.project,
+    workspace: referenceMap.workspace,
+    region: referenceMap.region,
+    serviceAccount: referenceMap.serviceAccount,
+};
 
+/* State */
 const state = reactive({
     proxySortBy: useProxyValue('sortBy', props, emit),
     proxyThisPage: useProxyValue('thisPage', props, emit),
@@ -133,7 +139,7 @@ const getComparisonInfo = (fieldName: string) => `${fieldName} Compared to ${pro
 const getField = (field: TableWidgetField): string => {
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.reference) {
         const referenceKey = REFERENCE_FIELD_MAP[field.fieldInfo?.reference];
-        return storeState?.[referenceKey]?.[field.label]?.name || field.label || field.name;
+        return referenceValueMap?.[referenceKey]?.[field.label]?.name || field.label || field.name;
     }
     if (field.fieldInfo?.type === 'dataField' && field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat) {
         return getFormattedDate(field.name, state.refinedDateFormat);
@@ -161,7 +167,7 @@ const getValue = (item: TableDataItem, field: TableWidgetField) => {
         if (Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
             const referenceKey = REFERENCE_FIELD_MAP[field.name];
             const referenceValueKey = item[field.name];
-            return storeState[referenceKey][referenceValueKey]?.label || storeState[referenceKey][referenceValueKey]?.name || referenceValueKey || '-';
+            return referenceValueMap?.[referenceKey]?.[referenceValueKey]?.label || referenceValueMap?.[referenceKey]?.[referenceValueKey]?.name || referenceValueKey || '-';
         }
         if (field.fieldInfo?.additionalType === 'dateFormat' && !!state.refinedDateFormat && item[props.fields[0].name] !== 'Total') {
             return getFormattedDate(item[field.name], state.refinedDateFormat);

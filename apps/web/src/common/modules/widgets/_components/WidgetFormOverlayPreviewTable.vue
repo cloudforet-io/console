@@ -19,12 +19,12 @@ import type { DataTableLoadResponse } from '@/api-clients/dashboard/_types/widge
 import type { PrivateDataTableModel } from '@/api-clients/dashboard/private-data-table/schema/model';
 import type { DataTableLoadParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/load';
 import type { PublicDataTableModel } from '@/api-clients/dashboard/public-data-table/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { useDataTableLoadQuery } from '@/common/modules/widgets/_composables/data-table/use-data-table-load-query';
+import { usePrivateDataTableLoadQuery } from '@/common/modules/widgets/_composables/data-table/use-private-data-table-load-query';
+import { usePublicDataTableLoadQuery } from '@/common/modules/widgets/_composables/data-table/use-public-data-table-load-query';
 import { useWidgetDataTableListQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-list-query';
 import { DATA_TABLE_OPERATOR } from '@/common/modules/widgets/_constants/data-table-constant';
 import { REFERENCE_FIELD_MAP } from '@/common/modules/widgets/_constants/widget-constant';
@@ -54,7 +54,19 @@ type DataTableModel = PublicDataTableModel|PrivateDataTableModel;
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
-const allReferenceStore = useAllReferenceStore();
+const referenceMap = useAllReferenceDataModel();
+const projectMap = referenceMap.project;
+const workspaceMap = referenceMap.workspace;
+const regionMap = referenceMap.region;
+const serviceAccountMap = referenceMap.serviceAccount;
+
+const ReferenceValueMap = {
+    project: projectMap,
+    workspace: workspaceMap,
+    region: regionMap,
+    serviceAccount: serviceAccountMap,
+};
+
 const route = useRoute();
 const dashboardId = computed(() => route.params.dashboardId);
 const { refinedVars } = useDashboardRefinedVars(dashboardId);
@@ -69,17 +81,12 @@ const {
 const storeState = reactive({
     selectedDataTableId: computed<string|undefined>(() => widgetGenerateState.selectedDataTableId),
     dataTableLoadFailed: computed(() => widgetGenerateState.dataTableLoadFailed),
-    // reference
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    workspace: computed(() => allReferenceStore.getters.workspace),
-    region: computed(() => allReferenceStore.getters.region),
-    serviceAccount: computed(() => allReferenceStore.getters.serviceAccount),
 });
 
 const state = reactive({
     isPrivate: computed(() => storeState.selectedDataTableId?.startsWith('private')),
     selectedDataTable: computed<DataTableModel|undefined>(() => dataTableList.value.find((d) => d.data_table_id === storeState.selectedDataTableId)),
-    data: computed<DataTableLoadResponse | null>(() => queryResult?.data?.value || null),
+    data: computed<DataTableLoadResponse | null>(() => ((state.isPrivate ? privateQueryResult?.data?.value : publicQueryResult?.data?.value) || null)),
     labelFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.labels_info ?? {})))),
     dataFields: computed<string[]>(() => (dataTableLoading.value === true ? [] : sortWidgetTableFields(Object.keys(state.selectedDataTable?.data_info ?? {})))),
     dataInfo: computed<DataInfo|undefined>(() => state.selectedDataTable?.data_info),
@@ -218,7 +225,7 @@ const getValue = (item, field: PreviewTableField) => {
     if (field.type === 'LABEL' && Object.keys(REFERENCE_FIELD_MAP).includes(field.name)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.name];
         const referenceValueKey = item[field.name];
-        const referenceItem = storeState[referenceKey]?.[referenceValueKey];
+        const referenceItem = ReferenceValueMap[referenceKey]?.[referenceValueKey];
         return referenceItem?.label || referenceItem?.name || referenceValueKey || '-';
     }
     if (field.type === 'DATA') {
@@ -230,7 +237,7 @@ const getValue = (item, field: PreviewTableField) => {
 const getFieldName = (field: PreviewTableField) => {
     if (field.type === 'DATA' && !!field.reference && Object.keys(REFERENCE_FIELD_MAP).includes(field.reference)) {
         const referenceKey = REFERENCE_FIELD_MAP[field.reference];
-        const refernceItem = storeState[referenceKey]?.[field.name];
+        const refernceItem = ReferenceValueMap[referenceKey]?.[field.name];
         return refernceItem?.label || refernceItem?.name || field.name;
     }
     return field.name;
@@ -246,7 +253,7 @@ const getSortIcon = (field: PreviewTableField) => {
     // return '';
 };
 
-const queryResult = useDataTableLoadQuery({
+const privateQueryResult = usePrivateDataTableLoadQuery({
     dataTableId: computed(() => storeState.selectedDataTableId),
     params: computed<DataTableLoadParameters>(() => ({
         data_table_id: storeState.selectedDataTableId as string,
@@ -256,9 +263,19 @@ const queryResult = useDataTableLoadQuery({
         vars: refinedVars.value,
     })),
 });
-const dataTableLoading = computed<boolean>(() => queryResult.isLoading.value || queryResult.isFetching.value);
-const isError = computed<boolean>(() => queryResult.isError.value);
-const errorMessage = computed<string>(() => queryResult.error?.value?.message);
+const publicQueryResult = usePublicDataTableLoadQuery({
+    dataTableId: computed(() => storeState.selectedDataTableId),
+    params: computed<DataTableLoadParameters>(() => ({
+        data_table_id: storeState.selectedDataTableId as string,
+        granularity: state.selectedGranularity,
+        sort: state.sortBy,
+        page: state.page,
+        vars: refinedVars.value,
+    })),
+});
+const dataTableLoading = computed<boolean>(() => privateQueryResult.isLoading.value || privateQueryResult.isFetching.value || publicQueryResult.isLoading.value || publicQueryResult.isFetching.value);
+const isError = computed<boolean>(() => privateQueryResult.isError.value || publicQueryResult.isError.value);
+const errorMessage = computed<string>(() => privateQueryResult.error?.value?.message || publicQueryResult.error?.value?.message || '');
 
 
 watch([() => storeState.selectedDataTableId, () => state.selectedDataTable], async ([dataTableId]) => {
