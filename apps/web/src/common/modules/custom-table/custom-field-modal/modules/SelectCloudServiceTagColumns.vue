@@ -29,15 +29,20 @@ import type {
     QueryItem, ValueHandlerMap, ValueHandler, KeyItemSet,
 } from '@cloudforet/mirinae/types/controls/search/query-search/type';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProviderList } from '@/common/modules/custom-table/custom-field-modal/composables/use-provider-list';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 
-const allReferenceStore = useAllReferenceStore();
 
-const props = withDefaults(defineProps<{
+type Provider = {
+    label: string;
+    key: string;
+    imageUrl?: string;
+    icon?: string;
+};
+
+interface Props {
     selectedTagKeys?: string[];
     options?: {
         provider?: string;
@@ -45,44 +50,48 @@ const props = withDefaults(defineProps<{
         cloudServiceType?: string;
     };
     isServerPage?: boolean;
-}>(), {
+}
+
+interface Emits {
+    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
+}
+
+const props = withDefaults(defineProps<Props>(), {
     selectedTagKeys: () => [],
     options: () => ({}),
     isServerPage: false,
 });
 
-const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void}>();
+const emit = defineEmits<Emits>();
+
 
 /* providers */
-const providersMap = computed<ProviderReferenceMap>(() => ({
-    ...allReferenceStore.getters.provider,
-    custom: {
-        label: 'Custom',
-        key: 'custom',
-        icon: 'ic_cloud-filled',
-    },
+const { providerList } = useProviderList();
+const providersMap = computed<Record<string, Provider>>(() => ({
+    ...providerList.value.reduce((acc, provider) => {
+        acc[provider.name] = provider;
+        return acc;
+    }, {
+        custom: {
+            label: 'Custom',
+            key: 'custom',
+            icon: 'ic_cloud-filled',
+        },
+    }),
 }));
-const providers = computed<ProviderItem[]>(() => Object.values(providersMap.value));
-const providerKeys = computed<string[]>(() => providers.value.map((provider) => provider.key));
+const providerKeys = computed<string[]>(() => providerList.value.map((provider) => provider.name));
 
 /* key items */
 const keyItemSets = computed<KeyItemSet[]>(() => [{
     title: 'Provider',
-    items: [
-        ...providers.value.map((provider) => ({
-            label: provider.label,
-            name: provider.key,
-            imageUrl: provider.key !== 'custom' ? provider.icon : undefined,
-            icon: provider.key === 'custom' ? provider.icon : undefined,
-        })),
-    ],
+    items: providerList.value,
 }]);
 
 /* value handler */
 const valueHandlerMap = computed<ValueHandlerMap>(() => {
     const result = { custom: getTags };
-    providers.value.forEach((provider) => {
-        result[provider.key] = getTags;
+    providerList.value.forEach((provider) => {
+        result[provider.name] = getTags;
     });
     return result;
 });
@@ -127,7 +136,7 @@ const getQueryItemsFromTagKeys = (tagKeys: string[]): QueryItem[] => tagKeys.map
     const value = query.slice(dotPosition + 1);
     return {
         key: {
-            label: providersMap.value[key].label,
+            label: providersMap.value[key]?.label,
             name: key,
         },
         value: {

@@ -1,9 +1,6 @@
 import { groupBy, sum } from 'lodash';
 
 
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
-
 
 interface ContinentInfo {
     continent_code: string;
@@ -58,35 +55,33 @@ export interface Data {
     [dataField: string]: any;
 }
 
-export const getRefinedMapChartData = (results: Data[]|null, regions: RegionReferenceMap, providers: ProviderReferenceMap): MapChartData[] => {
+export const getRefinedMapChartData = (results: Data[]|null): MapChartData[] => {
     if (!results) return [];
-    const costDataByProvider = getCostDataByProvider(results, regions);
-    return Object.keys(costDataByProvider).map((continent) => ({
+    const costDataByProvider = getCostDataByProvider(results);
+    return Object.entries(costDataByProvider).map(([continent, costData]) => ({
         title: CONTINENT_INFO[continent]?.continent_label,
         continent_code: CONTINENT_INFO[continent]?.continent_code,
         latitude: CONTINENT_INFO[continent]?.latitude,
         longitude: CONTINENT_INFO[continent]?.longitude,
         width: 48,
         height: 48,
-        pieChartData: Object.entries(costDataByProvider[continent]).map(([provider, cost]) => ({
-            category: providers[provider]?.label || provider,
-            color: providers[provider]?.color || '',
-            provider,
-            value: cost as number,
-            pieSettings: {
-                fill: providers[provider]?.color || '',
-                stroke: providers[provider]?.color || '',
-            },
-        })),
+        pieChartData: [],
+        _unrefinedChartData: costData,
+        // pieChartData: Object.entries(costDataByProvider[continent]).map(([provider, cost]) => ({
+        //     category: providers[provider]?.label || provider,
+        //     color: providers[provider]?.color || '',
+        //     provider,
+        //     value: cost as number,
+        //     pieSettings: {
+        //         fill: providers[provider]?.color || '',
+        //         stroke: providers[provider]?.color || '',
+        //     },
+        // })),
     }));
 };
 
-const getCostDataByProvider = (results: Data[], regions: RegionReferenceMap): CostDataByProvider => {
-    const data = results.map((d) => ({
-        ...d,
-        continent_code: regions[d.region_code]?.continent?.continent_code,
-    }));
-    const continentGroupBy = groupBy(data, 'continent_code');
+const getCostDataByProvider = (results: Data[]): CostDataByProvider => {
+    const continentGroupBy = groupBy(results, 'continent_code');
     const result = {};
     Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
         const providerGroupBy = groupBy(cItem, 'provider');
@@ -124,4 +119,7 @@ export interface MapChartData {
     height: number;
     width: number;
     pieChartData: PieChartData[];
+    _unrefinedChartData: {
+        [provider: string]: number;
+    }
 }

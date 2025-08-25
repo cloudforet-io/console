@@ -33,8 +33,8 @@ type DropdownCategoriesType = {
     title: string;
 };
 
-const props = withDefaults(defineProps<{
-     selectedId?: string;
+interface Props {
+    selectedId?: string;
      selectedIds?: string[];
      selectionType?: 'single'|'multiple';
      appearanceType?: 'badge'|'stack';
@@ -55,7 +55,15 @@ const props = withDefaults(defineProps<{
      size?: 'sm'|'md';
      pageSize?: number;
      showDeleteAllButton?: boolean;
-}>(), {
+}
+
+interface Emits {
+    (event: 'update:selected-id', value?: string): void;
+    (event: 'update:selected-ids', value: string[]): void;
+    (event: 'formatted-selected-ids', value: Record<MembersType, string[]>): void;
+}
+
+const props = withDefaults(defineProps<Props>(), {
     selectedId: undefined,
     selectedIds: undefined,
     selectionType: 'single',
@@ -79,10 +87,7 @@ const props = withDefaults(defineProps<{
     showDeleteAllButton: true,
 });
 
-const emit = defineEmits<{(event: 'update:selected-id', value?: string): void;
-    (event: 'update:selected-ids', value: string[]): void;
-    (event: 'formatted-selected-ids', value: Record<MembersType, string[]>): void;
-}>();
+const emit = defineEmits<Emits>();
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;

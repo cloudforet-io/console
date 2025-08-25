@@ -27,12 +27,11 @@ import type { PublicWidgetModel } from '@/api-clients/dashboard/public-widget/sc
 import { i18n } from '@/translations';
 
 import { useDisplayStore } from '@/store/display/display-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useCostDataSourceMap } from '@/common/composables/data-source/use-cost-data-source-map';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
@@ -83,7 +82,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
-const allReferenceStore = useAllReferenceStore();
 const displayStore = useDisplayStore();
 const { publicDataTableAPI } = usePublicDataTableApi();
 const { privateDataTableAPI } = usePrivateDataTableApi();
@@ -110,19 +108,17 @@ const {
 const queryClient = useQueryClient();
 const { getDashboardManageable } = useDashboardManageable();
 const dashboardManageable = computed(() => getDashboardManageable(dashboard.value));
+const { getCostDataSourceMap } = useCostDataSourceMap();
 
 /* State */
 const containerRef = ref<HTMLElement|null>(null);
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
-const storeState = reactive({
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
-});
 const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed<boolean>(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(widgetList.value, containerWidth.value)),
+    refinedWidgetInfoList: computed<RefinedWidgetInfo[]>(() => getRefinedWidgetInfoList(widgetList.value)),
     overlayType: 'EDIT' as 'EDIT' | 'EXPAND',
     showExpandOverlay: false,
     remountWidgetId: undefined as string|undefined,
@@ -269,12 +265,16 @@ const listWidgetDataTables = async (widgetId: string) => {
     try {
         const { results } = await _fetcher({ widget_id: widgetId });
         if (!results) return [];
+        const costDataSourceMap = await getCostDataSourceMap();
         const _refinedResults = cloneDeep(results);
         results.forEach((r, idx) => {
             if (r.data_type === DATA_TABLE_TYPE.ADDED && r.source_type === 'COST') {
                 const _dataSourceId = r.options.COST?.data_source_id;
-                _refinedResults[idx].options.COST.plugin_id = storeState.costDataSource[_dataSourceId]?.data?.plugin_info?.plugin_id;
-                _refinedResults[idx].options.COST.data_source_id = undefined;
+                const dataSource = costDataSourceMap[_dataSourceId ?? ''];
+                if (dataSource) {
+                    _refinedResults[idx].options.COST.plugin_id = dataSource.plugin_info?.plugin_id;
+                    _refinedResults[idx].options.COST.data_source_id = undefined;
+                }
             }
         });
         return _refinedResults ?? [];

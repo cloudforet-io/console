@@ -14,13 +14,12 @@ import type { DashboardModel } from '@/api-clients/dashboard/_types/dashboard-ty
 import type { DashboardTemplateModel } from '@/api-clients/repository/dashboard-template/schema/model';
 import { i18n } from '@/translations';
 
-
 import { useDashboardSharedContext } from '@/services/_shared/dashboard/core/composables/_internal/use-dashboard-shared-context';
 import DashboardCreateBlankBoardItem from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateBlankBoardItem.vue';
-import type { FilterLabelItem } from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/_shared/dashboard/dashboard-create/components/DashboardCreateStep1SearchFilter.vue';
 import { useDashboardTemplateQuery } from '@/services/_shared/dashboard/dashboard-create/composables/use-dashboard-template-query';
 import { useDashboardCreatePageStore } from '@/services/_shared/dashboard/dashboard-create/stores/dashboard-create-page-store';
+import type { FilterLabelItem } from '@/services/_shared/dashboard/dashboard-create/types/dashboard-create-filter-type';
 import DashboardFolderTree from '@/services/dashboards/components/dashboard-folder/DashboardFolderTree.vue';
 import { ADMIN_DASHBOARDS_ROUTE } from '@/services/dashboards/routes/admin/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';

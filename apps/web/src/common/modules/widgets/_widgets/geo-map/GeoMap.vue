@@ -15,10 +15,8 @@ import { throttle } from 'lodash';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { WidgetLoadResponse } from '@/api-clients/dashboard/_types/widget-type';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetDataTableQuery } from '@/common/modules/widgets/_composables/data-table/use-widget-data-table-query';
@@ -36,9 +34,6 @@ import type {
 
 import { coral, gray } from '@/styles/colors';
 
-
-
-
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const REGION_FIELD = 'Region';
@@ -52,17 +47,34 @@ const { dateRange } = useWidgetDateRange({
     granularity: computed<GranularityValue>(() => props.widgetOptions?.granularity?.value as GranularityValue),
 });
 const chartContext = ref<HTMLElement|null>(null);
-const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
-});
+const referenceMap = useAllReferenceDataModel();
+const regionMap = referenceMap.region;
+
 const state = reactive({
     mapLoaded: false,
     isPrivateWidget: computed<boolean>(() => props.widgetId.startsWith('private')),
 
     data: computed<WidgetLoadResponse | null>(() => loadQuery.data?.value || null),
+    chartData: computed<any[]>(() => {
+        if (!state.data) return [];
+        return state.data?.results?.map((result) => {
+            const _targetRegion = regionMap[result[REGION_FIELD]];
+            return {
+                name: _targetRegion?.label || result[REGION_FIELD],
+                value: [
+                    _targetRegion?.continent?.longitude ?? 0,
+                    _targetRegion?.continent?.latitude ?? 0,
+                    result[widgetOptionsState.dataFieldInfo?.data as string] ?? 0,
+                ],
+                itemStyle: {
+                    normal: {
+                        color: coral[400],
+                    },
+                },
+            };
+        });
+    }),
     chart: null as EChartsType | null,
-    chartData: [],
     unit: computed<string|undefined>(() => widgetFrameProps.value.unitMap?.[widgetOptionsState.dataFieldInfo?.data as string]),
     chartOptions: computed<MapSeriesOption>(() => ({
         map: 'world',
@@ -138,28 +150,6 @@ const loadMap = async () => {
     registerMap('world', geoJson);
     state.mapLoaded = true;
 };
-const drawChart = async (rawData: WidgetLoadResponse|null) => {
-    if (!rawData) return;
-    const _seriesData: any[] = [];
-    rawData.results?.forEach((result) => {
-        const _targetRegion = storeState.regions[result[REGION_FIELD]];
-        _seriesData.push({
-            name: _targetRegion?.label || result[REGION_FIELD],
-            value: [
-                _targetRegion?.continent.longitude,
-                _targetRegion?.continent.latitude,
-                result[widgetOptionsState.dataFieldInfo?.data as string],
-            ],
-            itemStyle: {
-                normal: {
-                    color: coral[400],
-                },
-            },
-        });
-    });
-
-    state.chartData = _seriesData;
-};
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, {
     dateRange,
@@ -174,10 +164,9 @@ watch([() => state.chartData, () => chartContext.value, () => state.mapLoaded], 
         state.chart.setOption(state.chartOptions, true);
     }
 });
-watch([() => state.data, () => props.widgetOptions, dataTable], async ([newData,, _dataTable]) => {
+watch([() => state.convertedChartData, () => props.widgetOptions, dataTable], async ([,, _dataTable]) => {
     if (!_dataTable) return;
     await loadMap();
-    await drawChart(newData);
 }, { immediate: true });
 
 useResizeObserver(chartContext, throttle(() => {

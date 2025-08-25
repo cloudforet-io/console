@@ -7,6 +7,7 @@ import type { WidgetModel } from '@/api-clients/dashboard/_types/widget-type';
 import type { DataTableListParameters } from '@/api-clients/dashboard/public-data-table/schema/api-verbs/list';
 
 
+import { useCostDataSourceMap } from '@/common/composables/data-source/use-cost-data-source-map';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -16,7 +17,6 @@ import type {
     ConcatOptions, CostOptions, DataTableTransformOptions, EvalOptions, JoinOptions, PivotOptions, QueryOptions, ValueMappingOptions,
 } from '@/common/modules/widgets/types/widget-model';
 
-import { useCostDataSourceMap } from '@/services/_shared/dashboard/core/composables/use-cost-data-source-map';
 import { useDataTableListQueryFetcher } from '@/services/_shared/dashboard/core/composables/use-data-table-list-query-fetcher';
 import type { SharedDashboardLayout, SharedDataTableInfo, SharedWidgetInfo } from '@/services/dashboards/types/shared-dashboard-type';
 

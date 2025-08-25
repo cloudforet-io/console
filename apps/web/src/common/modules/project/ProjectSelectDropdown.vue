@@ -56,6 +56,12 @@ interface Props {
     showDropdownLeftArea?: boolean;
 }
 
+interface Emits {
+    (e: 'select', value: ProjectTreeNodeData[]): void;
+    (e: 'close'): void;
+    (e: 'update:selected-project-ids', value: string[]): void;
+}
+
 const props = withDefaults(defineProps<Props>(), {
     multiSelectable: false,
     projectSelectable: true,
@@ -77,10 +83,7 @@ const props = withDefaults(defineProps<Props>(), {
     showDropdownLeftArea: false,
 });
 
-const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
-    (e: 'close'): void;
-    (e: 'update:selected-project-ids', value: string[]): void;
-}>();
+const emit = defineEmits<Emits>();
 
 const allReferenceStore = useAllReferenceStore();
 

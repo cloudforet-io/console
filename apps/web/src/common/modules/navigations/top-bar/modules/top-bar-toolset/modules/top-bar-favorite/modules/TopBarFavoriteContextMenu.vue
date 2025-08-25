@@ -12,7 +12,6 @@ import {
 } from '@cloudforet/mirinae';
 import type { ContextMenuType, MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
-import type { MetricExampleModel } from '@/api-clients/inventory/metric-example/schema/model';
 import { i18n } from '@/translations';
 
 import { useReferenceRouter } from '@/router/composables/use-reference-router';
@@ -27,7 +26,7 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import { useMetricExampleFavoriteMap } from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/composables/use-metric-example-favorite-map';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 import { useFavoriteDeleteMutation } from '@/common/modules/user-config/favorite/core/use-favorite-delete-mutation';
 import { useFavoriteList } from '@/common/modules/user-config/favorite/core/use-favorite-list';
@@ -58,8 +57,6 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const gnbStore = useGnbStore();
-const gnbStoreGetters = gnbStore.getters;
 const authorizationStore = useAuthorizationStore();
 const { getReferenceLocation } = useReferenceRouter();
 
@@ -78,12 +75,13 @@ const { loading: isLoadingConvertedConfigData, ...convertedConfigMap } = useConv
     cloudServiceConfigList: favoriteConfigData.cloudServiceTypeItems,
 });
 const { mutateAsync: deleteFavorite, isPending: isDeletingFavorite } = useFavoriteDeleteMutation();
+const { map: metricExampleMap } = useMetricExampleFavoriteMap();
+
 
 const router = useRouter();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     pageAccessPermissionList: computed<MenuId[]>(() => authorizationStore.getters.pageAccessPermissionList),
 });
 const state = reactive({
@@ -261,13 +259,14 @@ const handleSelect = (item: FavoriteMenuItem) => {
             },
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
-        const metricId = storeState.metricExamples.find((example) => example.example_id === item.name)?.metric_id;
-        if (!metricId) return;
+        const exampleId = item.name || '';
+        const relatedMetric = metricExampleMap.value.get(exampleId);
+        if (!relatedMetric) return;
         router.push({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
-                metricId,
-                metricExampleId: item.name || '',
+                metricId: relatedMetric.metric_id,
+                metricExampleId: exampleId,
             },
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {

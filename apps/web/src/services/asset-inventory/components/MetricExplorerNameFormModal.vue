@@ -13,6 +13,7 @@ import {
 
 import { useMetricExampleApi } from '@/api-clients/inventory/metric-example/composables/use-metric-example-api';
 import { useMetricApi } from '@/api-clients/inventory/metric/composables/use-metric-api';
+import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,7 +21,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { useMetricExampleGetQuery } from '@/services/asset-inventory/composables/use-metric-example-get-query';
 import { useMetricExampleListQuery } from '@/services/asset-inventory/composables/use-metric-example-list-query';
@@ -35,18 +35,20 @@ interface Props {
     visible: boolean;
     type?: string;
 }
+interface Emits {
+    (e: 'update:visible', visible: boolean): void;
+    (e: 'save-as', name?: string): void;
+}
+
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     type: NAME_FORM_MODAL_TYPE.EDIT_NAME,
 });
-const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
-    (e: 'save-as', name?: string): void;
-}>();
+const emit = defineEmits<Emits>();
 
 const router = useRouter();
 const route = useRoute();
 
-const gnbStore = useGnbStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
@@ -102,7 +104,7 @@ const { data: currentMetric, metricGetQueryKey } = useMetricGetQuery({
 const { data: currentMetricExample, metricExampleGetQueryKey } = useMetricExampleGetQuery({
     metricExampleId: computed(() => route.params.metricExampleId),
 });
-const { data: namespaceMetricExamples, metricExampleListQueryKey } = useMetricExampleListQuery({
+const { data: namespaceMetricExamples } = useMetricExampleListQuery({
     params: computed(() => ({
         namespace_id: metricExplorerPageState.selectedNamespaceId,
     })),
@@ -114,16 +116,17 @@ const { data: currentNamespaceMetrics, metricListQueryKey } = useMetricListQuery
 });
 
 /* Mutations */
+const { key: metricExampleListBaseQueryKey } = useServiceQueryKey('inventory', 'metric-example', 'list');
 const { metricAPI } = useMetricApi();
 const { metricExampleAPI } = useMetricExampleApi();
 const queryClient = useQueryClient();
 const { mutate: createMetricExample, isPending: isCreateMetricExamplePending } = useMutation({
     mutationFn: metricExampleAPI.create,
     onSuccess: async (data) => {
-        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
+        // NOTE: This invalidateQueries is for both of the metric-example and metric-example-favorite
+        queryClient.invalidateQueries({ queryKey: metricExampleListBaseQueryKey.value });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
-        await gnbStore.fetchMetricExample();
         await router.replace({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
             params: {
@@ -139,10 +142,10 @@ const { mutate: createMetricExample, isPending: isCreateMetricExamplePending } =
 const { mutate: updateMetricExampleName, isPending: isUpdateMetricExampleNamePending } = useMutation({
     mutationFn: metricExampleAPI.update,
     onSuccess: async () => {
-        queryClient.invalidateQueries({ queryKey: metricExampleListQueryKey.value });
+        // NOTE: This invalidateQueries is for both of the metric-example and metric-example-favorite
+        queryClient.invalidateQueries({ queryKey: metricExampleListBaseQueryKey.value });
         queryClient.invalidateQueries({ queryKey: metricExampleGetQueryKey.value });
         state.proxyVisible = false;
-        await gnbStore.fetchMetricExample();
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     },
     onError: async (e) => {

@@ -7,9 +7,10 @@ import {
     PI, PIconButton, PLazyImg, PTooltip,
 } from '@cloudforet/mirinae';
 
-import { useReferenceRouter } from '@/router/composables/use-reference-router';
+import type { PublicDashboardModel } from '@/api-clients/dashboard/public-dashboard/schema/model';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useReferenceRouter } from '@/router/composables/use-reference-router';
 
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
@@ -17,6 +18,8 @@ import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modul
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { useRecentDelete } from '@/common/modules/user-config/recent/use-recent-delete';
+import { useCloudServiceTypeMap } from '@/common/modules/user-config/shared/_internal/use-cloud-service-type-map';
+import { useDashboardMap } from '@/common/modules/user-config/shared/_internal/use-dashboard-map';
 
 interface Props {
     recentItem?: RecentItem;
@@ -26,21 +29,22 @@ const props = withDefaults(defineProps<Props>(), {
     recentItem: undefined,
 });
 const topBarSearchStore = useTopBarSearchStore();
-const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
 
 const { getReferenceLocation } = useReferenceRouter();
+const referenceMap = useAllReferenceDataModel();
+const serviceAccountMap = referenceMap.serviceAccount;
+const projectMap = referenceMap.project;
+
 
 /* Recent */
 const { mutateAsync: deleteRecent } = useRecentDelete();
+const { map: cloudServiceTypeMap } = useCloudServiceTypeMap();
+const { map: dashboardMap } = useDashboardMap();
 
 const storeState = reactive({
     currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
     activeTab: computed(() => topBarSearchStore.state.activeTab),
-    serviceAccountMap: computed(() => allReferenceStore.getters.serviceAccount),
-    projectMap: computed(() => allReferenceStore.getters.project),
-    cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
-    publicDashboardMap: computed(() => allReferenceStore.getters.publicDashboard),
 });
 
 const splitCloudServiceInfo = (id:string): {provider:string; group:string; name: string} => {
@@ -61,15 +65,17 @@ const state = reactive({
             return state.resourceId;
         }
         const { provider, group, name } = splitCloudServiceInfo(state.resourceId);
-        return Object.values(storeState.cloudServiceTypeMap).filter((item) => item?.data?.provider === provider && item?.data?.group === group && item.name === name)[0]?.key;
+        const cloudServiceTypeList = Array.from(cloudServiceTypeMap.value.values());
+        const cloudServiceType = cloudServiceTypeList.find((item) => item?.provider === provider && item?.group === group && item.name === name);
+        return cloudServiceType?.cloud_service_type_id;
     }),
     isDeleted: computed(() => {
         if (storeState.activeTab === SEARCH_TAB.SERVICE_ACCOUNT) {
-            return !storeState.serviceAccountMap[state.resourceId];
+            return !serviceAccountMap[state.resourceId];
         } if (storeState.activeTab === SEARCH_TAB.PROJECT) {
-            return !storeState.projectMap[state.resourceId];
+            return !projectMap[state.resourceId];
         } if (storeState.activeTab === SEARCH_TAB.DASHBOARD) {
-            return !storeState.publicDashboardMap[state.resourceId];
+            return !dashboardMap.value.get(state.resourceId);
         } if (storeState.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
             return !props.recentItem?.data?.resource_id;
         }
@@ -92,9 +98,10 @@ const state = reactive({
     cloudServiceIconName: computed(() => props.recentItem?.tags?.icon),
     description: computed(() => {
         if (storeState.activeTab === SEARCH_TAB.DASHBOARD) {
-            if (storeState.publicDashboardMap[state.convertResourceId]?.data?.resourceGroup === 'PROJECT') {
-                const projectId = storeState.publicDashboardMap[state.convertResourceId]?.data?.projectId;
-                return `Single Project (${storeState.projectMap[projectId]?.label})`;
+            const dashboard = dashboardMap.value.get(state.convertResourceId) as PublicDashboardModel | undefined;
+            if (dashboard?.resource_group === 'PROJECT') {
+                const projectId = dashboard?.project_id;
+                return `Single Project (${projectMap[projectId]?.label || projectId})`;
             }
             return 'Workspace';
         } if (storeState.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
@@ -110,20 +117,20 @@ const state = reactive({
 
 const getLabelByResourceId = (resourceId: string, activeTab: SearchTab) => {
     if (activeTab === SEARCH_TAB.SERVICE_ACCOUNT) {
-        const provider = storeState.serviceAccountMap[resourceId]?.provider;
+        const provider = serviceAccountMap[resourceId]?.provider;
         let accountId;
         if (provider === 'aws') {
-            accountId = storeState.serviceAccountMap[resourceId]?.data?.account_id;
+            accountId = serviceAccountMap[resourceId]?.data?.data?.account_id;
         } else if (provider === 'google_cloud') {
-            accountId = storeState.serviceAccountMap[resourceId]?.data?.project_id;
+            accountId = serviceAccountMap[resourceId]?.data?.data?.project_id;
         } else if (provider === 'azure') {
-            accountId = storeState.serviceAccountMap[resourceId]?.data?.subscription_id;
+            accountId = serviceAccountMap[resourceId]?.data?.data?.subscription_id;
         }
-        return `${storeState.serviceAccountMap[resourceId]?.label} (${accountId ?? resourceId})`;
+        return `${serviceAccountMap[resourceId]?.label || resourceId} (${accountId ?? resourceId})`;
     } if (activeTab === SEARCH_TAB.PROJECT) {
-        return storeState.projectMap[resourceId]?.label;
+        return projectMap[resourceId]?.label || resourceId;
     } if (activeTab === SEARCH_TAB.DASHBOARD) {
-        return storeState.publicDashboardMap[resourceId]?.label;
+        return dashboardMap.value.get(resourceId)?.name || resourceId;
     } if (activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         return props.recentItem?.data?.label ?? '';
     }
