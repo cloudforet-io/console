@@ -91,7 +91,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             state.stagedWorkspaces = orderedWorkspaceList.slice(0, 3).map((workspace) => ({
                 workspaceId: workspace.value,
                 label: workspace.label,
-                theme: workspace.tags?.theme,
                 isSelected: workspace.value === storeState.currentWorkspaceId,
             }));
         },

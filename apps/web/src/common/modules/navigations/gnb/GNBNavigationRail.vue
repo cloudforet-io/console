@@ -12,11 +12,11 @@ import {
 } from '@cloudforet/mirinae';
 import type { ContextMenuType } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
+import type { CostDataSourceModel } from '@/api-clients/cost-analysis/data-source/schema/model';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { DisplayMenu } from '@/store/menu/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -26,6 +26,7 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import { useCurrentMenuId } from '@/common/composables/current-menu-id';
+import { useCostDataSourceMap } from '@/common/composables/data-source/use-cost-data-source-map';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { ADMIN_COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/admin/route-constant';
@@ -37,14 +38,14 @@ interface GNBMenuType extends DisplayMenu {
     disabled?: boolean;
 }
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const appContextStore = useAppContextStore();
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const { getAllMenuList } = useAllMenuList();
+const { getCostDataSourceMap } = useCostDataSourceMap();
+
 
 const route = useRoute();
 const router = useRouter();
@@ -57,13 +58,13 @@ const storeState = reactive({
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
     currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
-    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
 
 const noParentsMenuList:MenuId[] = [MENU_ID.WORKSPACE_HOME, MENU_ID.DASHBOARDS, MENU_ID.PROJECT, MENU_ID.SERVICE_ACCOUNT];
 
 const state = reactive({
     isInit: false as boolean|undefined,
+    costDataSourceMap: undefined as Record<string, CostDataSourceModel> | undefined,
     isHovered: false,
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     isMenuDescription: undefined as boolean | undefined,
@@ -71,7 +72,7 @@ const state = reactive({
         let results = [] as GNBMenuType[];
         const allMenuList = getAllMenuList(route, router);
         const menuList = allMenuList.filter((d) => !d.hideOnGNB);
-        if (state.isInit && isEmpty(storeState.costDataSource)) {
+        if (state.isInit && isEmpty(state.costDataSourceMap ?? {})) {
             results = removeCostExplorerFromMenuList(menuList);
         } else results = menuList;
         return results;
@@ -144,6 +145,8 @@ const removeCostExplorerFromMenuList = (list: GNBMenuType[]) => {
 
 onMounted(async () => {
     state.isInit = true;
+    const costDataSourceMap = await getCostDataSourceMap();
+    state.costDataSourceMap = costDataSourceMap;
 });
 </script>
 

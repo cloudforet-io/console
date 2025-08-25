@@ -70,7 +70,6 @@ const state = reactive({
     }),
     serviceMenuCount: computed(() => state.searchMenuList?.length ?? 0),
     currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
-    stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     recentMode: computed(() => state.inputText.length === 0),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),

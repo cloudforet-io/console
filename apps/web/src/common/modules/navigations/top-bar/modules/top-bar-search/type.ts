@@ -12,7 +12,6 @@ export type FocusingDirection = typeof focusingDirection[number];
 export interface StageWorkspace {
     workspaceId: string,
     label: string,
-    theme?: string,
     isSelected: boolean
 }
 

@@ -22,8 +22,7 @@ import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/t
 import { useResourceApi } from '@/api-clients/search/resource/composables/use-resource-api';
 import type { ResourceModel } from '@/api-clients/search/resource/schema/model';
 import { useServiceQueryKey } from '@/query/core/query-key/use-service-query-key';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -32,12 +31,11 @@ import {
 } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 const topBarSearchStore = useTopBarSearchStore();
+const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
 
 const storeState = reactive({
-    workspaceMap: computed(() => allReferenceGetters.workspace),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     selectedWorkspaces: computed(() => topBarSearchStore.getters.selectedWorkspaces),
     isAllSelected: computed(() => topBarSearchStore.state.allWorkspacesChecked),
@@ -134,7 +132,6 @@ const handleSelectItem = (item:MenuItem) => {
         topBarSearchStore.addStagedWorkspace({
             workspaceId: item.name,
             label: item.label,
-            theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
             isSelected: false,
         });
     }
@@ -202,7 +199,7 @@ watch(() => state.searchText, (val) => {
                         <div class="workspace-item-wrapper">
                             <span class="workspace-item">
                                 <workspace-logo-icon :text="workspace.label"
-                                                     :theme="workspace.theme"
+                                                     :theme="workspaceMap[workspace.workspaceId]?.data?.tags?.theme"
                                                      size="xs"
                                                      :class="{'opacity-70': storeState.isAllSelected}"
                                 /> <span class="label">{{ workspace.label }}</span>
@@ -238,7 +235,7 @@ watch(() => state.searchText, (val) => {
                 <template #item--format="{ item }">
                     <span class="search-workspace-item">
                         <workspace-logo-icon :text="item.label"
-                                             :theme="storeState.workspaceMap[item?.name]?.data?.tags?.theme"
+                                             :theme="workspaceMap[item?.name]?.data?.tags?.theme"
                                              size="xs"
                         /> <span class="label">{{ item.label }}</span>
                     </span>
