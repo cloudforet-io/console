@@ -38,6 +38,7 @@ const props = withDefaults(defineProps<{
 });
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
 const queryClient = useQueryClient();
 const state = reactive({
     tagTypeList: computed(() => [
@@ -134,11 +135,11 @@ const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => 
             </p-badge>
         </template>
         <template #col-provider-format="{ value }">
-            <p-badge v-if="referenceMap.provider[value]"
-                     :background-color="referenceMap.provider[value]?.color"
+            <p-badge v-if="providerMap[value]"
+                     :background-color="providerMap[value]?.color"
                      text-color="white"
             >
-                {{ referenceMap.provider[value]?.label || value }}
+                {{ providerMap[value]?.label || value }}
             </p-badge>
         </template>
     </tags-panel>

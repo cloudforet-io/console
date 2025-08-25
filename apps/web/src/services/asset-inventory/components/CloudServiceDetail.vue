@@ -84,6 +84,8 @@ const userStore = useUserStore();
 const router = useRouter();
 const serviceRouter = useServiceRouter(router);
 const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
+const projectMap = referenceMap.project;
 const { cloudServiceAPI } = useCloudServiceApi();
 
 const { data: schemaData } = useCloudServicePageSchemaGetQuery({
@@ -363,7 +365,7 @@ watch(schemaData, (schema) => {
                                            size="md"
                                            @click="handleClickLinkButton('workspace', value, state.data)"
                             >
-                                {{ referenceMap.workspace[value]?.label || value }}
+                                {{ workspaceMap[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
@@ -377,7 +379,7 @@ watch(schemaData, (schema) => {
                                            size="md"
                                            @click="handleClickLinkButton('project', value, state.data)"
                             >
-                                {{ referenceMap.project[value]?.label || value }}
+                                {{ projectMap[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"

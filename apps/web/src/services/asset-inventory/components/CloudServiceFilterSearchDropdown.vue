@@ -60,6 +60,9 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.state;
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
+const regionMap = referenceMap.region;
+
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
@@ -87,7 +90,7 @@ const state = reactive({
     }),
     regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => {
         const regionKey = d.region_code === 'global' ? `${d.region_code}-${d.provider}` : d.region_code;
-        const region = referenceMap.region[regionKey];
+        const region = regionMap[regionKey];
         if (!region) {
             return {
                 name: regionKey,
@@ -99,7 +102,7 @@ const state = reactive({
             };
         }
         const continentLabel = region.continent?.continent_label ?? '';
-        const provider = region.data?.provider ? referenceMap.provider[region.data.provider] : undefined;
+        const provider = region.data?.provider ? providerMap[region.data.provider] : undefined;
         return {
             name: regionKey,
             label: `${provider?.label} ${region.name} ${continentLabel}`,
@@ -171,7 +174,7 @@ const handleChangeSelected = (selected: SelectDropdownMenuItem[]) => {
                 <div class="region-type">
                     <text-highlighting class="region-provider"
                                        :style="{color: item.color}"
-                                       :text="referenceMap.provider[item.provider]?.label || item.provider"
+                                       :text="providerMap[item.provider]?.label || item.provider"
                                        :term="state.searchTerm"
                                        style-type="secondary"
                     />

@@ -94,6 +94,8 @@ const { data: schemaData } = useCloudServicePageSchemaGetQuery({
 
 const { referenceFieldFormatter } = useReferenceFieldFormatter();
 const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
+const projectMap = referenceMap.project;
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
     selectIndex: [] as number[],
@@ -321,7 +323,7 @@ watch(schemaData, (schema) => {
                                            size="md"
                                            @click="handleClickLinkButton('workspace', value, item.cloud_service_id, item)"
                             >
-                                {{ referenceMap.workspace[value]?.label || value }}
+                                {{ workspaceMap[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
@@ -335,7 +337,7 @@ watch(schemaData, (schema) => {
                                            size="md"
                                            @click="handleClickLinkButton('project', item.workspace_id, value, item)"
                             >
-                                {{ referenceMap.project[value]?.label || value }}
+                                {{ projectMap[value]?.label || value }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"

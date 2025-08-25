@@ -55,6 +55,7 @@ const userStore = useUserStore();
 const userState = userStore.state;
 
 const referenceMap = useAllReferenceDataModel();
+const alertManagerWebhookMap = referenceMap.alertManagerWebhook;
 
 const storeState = reactive({
     timezone: computed<string>(() => userState.timezone || ''),
@@ -145,7 +146,7 @@ const refreshhAlertData = () => {
 };
 const getCreatedByNames = (id: string): string => {
     if (id.includes('webhook')) {
-        return referenceMap.alertManagerWebhook[id]?.label || id;
+        return alertManagerWebhookMap[id]?.label || id;
     }
     return id;
 };

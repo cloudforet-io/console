@@ -66,6 +66,8 @@ const serviceRouter = useServiceRouter(router);
 
 const { visibleContents } = useContentsAccessibility(MENU_ID.OPS_FLOW);
 const referenceMap = useAllReferenceDataModel();
+const workspaceMap = referenceMap.workspace;
+const projectMap = referenceMap.project;
 
 /* Tabs */
 const state = reactive({
@@ -218,7 +220,7 @@ const monitoringState: MonitoringProps = reactive({
                                    size="md"
                                    @click="handleClickLinkButton('workspace', value, item.cloud_service_id, item)"
                     >
-                        {{ referenceMap.workspace[value]?.label || value }}
+                        {{ workspaceMap[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
                              class="link-mark"
                              height="0.875rem"
@@ -232,7 +234,7 @@ const monitoringState: MonitoringProps = reactive({
                                    size="md"
                                    @click="handleClickLinkButton('project', item.workspace_id, value, item)"
                     >
-                        {{ referenceMap.project[value]?.label || value }}
+                        {{ projectMap[value]?.label || value }}
                         <p-i name="ic_arrow-right-up"
                              class="link-mark"
                              height="0.875rem"

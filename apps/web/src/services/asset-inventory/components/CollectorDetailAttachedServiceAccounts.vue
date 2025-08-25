@@ -67,6 +67,9 @@ const attachedServiceAccountList = computed(() => [
 ]);
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
+const serviceAccountMap = referenceMap.serviceAccount;
+const projectMap = referenceMap.project;
 
 const state = reactive({
     timezone: computed<string|undefined>(() => userStore.state.timezone),
@@ -185,10 +188,10 @@ watch(totalCount, (newTotalCount) => {
                          @refresh="handleToolboxTableRefresh"
         >
             <template #col-service_account_id-format="{value}">
-                {{ referenceMap.serviceAccount[value]?.label || value }}
+                {{ serviceAccountMap[value]?.label || value }}
             </template>
             <template #col-project_id-format="{value}">
-                <p-link v-if="referenceMap.project[value]"
+                <p-link v-if="projectMap[value]"
                         action-icon="internal-link"
                         new-tab
                         :to="getReferenceLocation(value,{
@@ -196,15 +199,15 @@ watch(totalCount, (newTotalCount) => {
                             workspace_id: userWorkspaceStore.getters.currentWorkspaceId
                         })"
                 >
-                    {{ referenceMap.project[value]?.label || value }}
+                    {{ projectMap[value]?.label || value }}
                 </p-link>
             </template>
             <template #col-provider-format="{value}">
-                <p-badge v-if="referenceMap.provider[value]"
-                         :background-color="referenceMap.provider[value]?.color"
+                <p-badge v-if="providerMap[value]"
+                         :background-color="providerMap[value]?.color"
                          text-color="white"
                 >
-                    {{ referenceMap.provider[value]?.label || value }}
+                    {{ providerMap[value]?.label || value }}
                 </p-badge>
             </template>
             <template #col-collect-format="{item}">

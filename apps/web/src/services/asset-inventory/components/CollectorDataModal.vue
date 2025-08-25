@@ -35,6 +35,8 @@ const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.state;
 
 const referenceMap = useAllReferenceDataModel();
+const providerMap = referenceMap.provider;
+const serviceAccountMap = referenceMap.serviceAccount;
 
 const { collectorAPI } = useCollectorApi();
 
@@ -51,7 +53,7 @@ const state = reactive({
         }
         return recentJob.value.status === JOB_STATE.IN_PROGRESS;
     }),
-    provider: computed(() => (selectedCollectorData.value?.provider ? referenceMap.provider[selectedCollectorData.value.provider] : undefined)),
+    provider: computed(() => (selectedCollectorData.value?.provider ? providerMap[selectedCollectorData.value.provider] : undefined)),
     accountName: computed(() => {
         const collectDataType = collectorDataModalState.collectDataType;
         if (collectDataType === COLLECT_DATA_TYPE.ENTIRE) {
@@ -61,7 +63,7 @@ const state = reactive({
         const selectedSecret = collectorDataModalState.selectedSecret;
         if (!selectedSecret) return '';
         const id = selectedSecret.service_account_id;
-        return referenceMap.serviceAccount[id]?.name || id;
+        return serviceAccountMap[id]?.name || id;
     }),
     secretFilter: computed(() => selectedCollectorData.value?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),

@@ -134,7 +134,7 @@ const providerState = reactive({
     ]),
     selectedItem: computed(() => {
         if (UNIDENTIFIED_PROVIDER === cloudServicePageState.selectedProvider) return UNIDENTIFIED_PROVIDER;
-        const selelcted = referenceMap.provider[cloudServicePageState.selectedProvider];
+        const selelcted = providerMap[cloudServicePageState.selectedProvider];
         if (selelcted) {
             return selelcted.key;
         } return 'all';

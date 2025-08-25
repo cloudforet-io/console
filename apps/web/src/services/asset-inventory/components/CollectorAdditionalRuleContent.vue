@@ -32,6 +32,8 @@ interface Field {
 }
 
 const referenceMap = useAllReferenceDataModel();
+const regionMap = referenceMap.region;
+const projectMap = referenceMap.project;
 const state = reactive({
     conditionFields: computed<Field[]>(() => (props.data?.conditions ?? []).map((condition) => ({
         name: condition.key,
@@ -109,7 +111,7 @@ const state = reactive({
                             <td>{{ COLLECTOR_RULE_CONDITION_OPERATOR_LABEL[state.conditionItems[index]?.operator]?.toLowerCase() }}</td>
                             <td>
                                 <span v-if="field.label !== 'Region'">{{ state.conditionItems[index]?.value }}</span>
-                                <span v-else>{{ referenceMap.region[state.conditionItems[index]?.value]?.label || state.conditionItems[index]?.value }}</span>
+                                <span v-else>{{ regionMap[state.conditionItems[index]?.value]?.label || state.conditionItems[index]?.value }}</span>
                             </td>
                         </tr>
                     </template>
@@ -128,15 +130,15 @@ const state = reactive({
                         >
                             <td>{{ field.label }}</td>
                             <td v-if="field.name === 'change_project'">
-                                <p-link v-if="referenceMap.project[state.changeProjectId]"
+                                <p-link v-if="projectMap[state.changeProjectId]"
                                         action-icon="internal-link"
                                         new-tab
                                         :to="getReferenceLocation(
                                             state.changeProjectId,
                                             { resource_type: 'identity.Project',
-                                              workspace_id: referenceMap.project[state.changeProjectId]?.data?.workspaceId },)"
+                                              workspace_id: projectMap[state.changeProjectId]?.data?.workspaceId },)"
                                 >
-                                    {{ referenceMap.project[state.changeProjectId]?.label || state.changeProjectId || '--' }}
+                                    {{ projectMap[state.changeProjectId]?.label || state.changeProjectId || '--' }}
                                 </p-link>
                             </td>
                             <td v-else>

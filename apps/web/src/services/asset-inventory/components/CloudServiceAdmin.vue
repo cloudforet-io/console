@@ -35,6 +35,7 @@ interface UserItem {
 
 const userStore = useUserStore();
 const referenceMap = useAllReferenceDataModel();
+const userMap = referenceMap.user;
 
 const state = reactive({
     fields: [
@@ -45,7 +46,7 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
-            user_name: referenceMap.user[d]?.name || d,
+            user_name: userMap[d]?.name || d,
         }));
         return users.filter((d) => {
             const searchText = state.searchText.toLowerCase();

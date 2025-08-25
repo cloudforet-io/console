@@ -2,6 +2,7 @@
 import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { useQueryClient } from '@tanstack/vue-query';
 import { throttle } from 'lodash';
 
 import type { WorkspaceModel } from '@/api-clients/identity/workspace/schema/model';
@@ -21,6 +22,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const router = useRouter();
 
+const queryClient = useQueryClient();
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
@@ -34,6 +37,8 @@ const handleToggleAdminMode = throttle(async () => {
         return;
     }
     appContextStore.setGlobalGrantLoading(true);
+    // NOTE: clear service query cache
+    queryClient.clear();
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         if (state.workspaceList.length === 0) {
