@@ -23,14 +23,12 @@ import { useScopedPaginationQuery } from '@/query/service-query/pagination/use-s
 import { useScopedQuery } from '@/query/service-query/use-scoped-query';
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import type { DayType } from '@/common/components/schedule-setting-form/schedule-setting-form';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { usePluginMap } from '@/services/iam/composables/use-plugin-map';
 import { useUserGroupChannelGetQuery } from '@/services/iam/composables/use-user-group-channel-get-query';
 import {
     USER_GROUP_CHANNELS_SEARCH_HANDLERS,
@@ -38,6 +36,7 @@ import {
 } from '@/services/iam/constants/user-group-constant';
 import { useNotificationChannelCreateFormStore } from '@/services/iam/store/notification-channel-create-form-store';
 import { useUserGroupPageStore } from '@/services/iam/store/user-group-page-store';
+
 
 
 
@@ -50,8 +49,6 @@ const props = defineProps<Props>();
 const userGroupPageStore = useUserGroupPageStore();
 const userGroupPageState = userGroupPageStore.state;
 const userGroupPageGetters = userGroupPageStore.getters;
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
 
 const notificationChannelCreateFormStore = useNotificationChannelCreateFormStore();
 
@@ -108,9 +105,7 @@ const { data: userGroupChannelListData, totalCount: userGroupChannelListTotalCou
     verb: 'list',
 }, ['DOMAIN', 'WORKSPACE']);
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceGetters.plugin),
-});
+const { pluginMap } = usePluginMap();
 
 const tableState = reactive({
     fields: computed(() => [
@@ -169,13 +164,17 @@ const { key: notificationProtocolListQueryKey } = useServiceQueryKey('alert-mana
 const { data: notificationProtocolListData } = useScopedQuery({
     queryKey: notificationProtocolListQueryKey,
     queryFn: async () => notificationProtocolAPI.list(),
-    select: (data) => data.results?.map((i) => ({
-        plugin_info: i.plugin_info,
-        name: i.name,
-        protocol_id: i.protocol_id,
-        icon: storeState.plugins[i.plugin_info.plugin_id]?.icon || '',
-    })),
-    enabled: computed(() => Object.keys(storeState.plugins).length > 0),
+    select: (data) => data.results?.map((i) => {
+        const plugin = pluginMap.value?.[i.plugin_info.plugin_id];
+        const pluginIcon = plugin?.tags?.icon ? assetUrlConverter(plugin.tags.icon) : '';
+        return {
+            plugin_info: i.plugin_info,
+            name: i.name,
+            protocol_id: i.protocol_id,
+            icon: pluginIcon,
+        };
+    }),
+    enabled: computed(() => pluginMap.value && Object.keys(pluginMap.value).length > 0),
     gcTime: 1000 * 60 * 2,
     staleTime: 1000 * 30,
 }, ['DOMAIN', 'WORKSPACE']);
@@ -216,10 +215,12 @@ const handleUpdateModal = async (modalType: string) => {
             if (protocol_id) {
                 const protocolResult = notificationProtocolListData.value?.find((protocol) => protocol.protocol_id === protocol_id);
 
-                if (protocolResult && storeState.plugins[protocolResult?.plugin_info.plugin_id] !== undefined) {
+                const plugin = pluginMap.value?.[protocolResult?.plugin_info.plugin_id ?? ''];
+                if (protocolResult && plugin) {
+                    const pluginIcon = plugin?.tags?.icon ? assetUrlConverter(plugin.tags.icon) : '';
                     notificationChannelCreateFormStore.$patch((_state) => {
                         _state.state.selectedProtocol.protocol_id = protocol_id;
-                        _state.state.selectedProtocol.icon = storeState.plugins[protocolResult?.plugin_info.plugin_id]?.icon || '';
+                        _state.state.selectedProtocol.icon = pluginIcon;
                         _state.state.selectedProtocol.name = protocolResult?.name as string;
                         _state.state.channelName = name;
                         _state.state.scheduleInfo = {

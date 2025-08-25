@@ -1,28 +1,26 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { sortBy } from 'lodash';
+import { startCase, toLower } from 'lodash';
 
 import {
-    PContextMenu, PDivider, PFieldGroup, PFieldTitle, PRadio, PRadioGroup, PSelectDropdown,
+    PDivider, PFieldGroup, PRadio, PRadioGroup, PSelectDropdown, PLazyImg,
 } from '@cloudforet/mirinae';
 import type { MenuItem } from '@cloudforet/mirinae/types/controls/context-menu/type';
 
 import type { DashboardGlobalVariable } from '@/api-clients/dashboard/_types/dashboard-global-variable-type';
 import { useAllReferenceDataModel } from '@/query/resource-query/reference-data-model';
+import { useResourceMenuHandlerMap } from '@/query/resource-query/resource-menu-handler';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+
 
 import { MENU_ID } from '@/lib/menu/config';
 import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
 import MetricDataVariableModel from '@/lib/variable-models/managed-model/resource-model/metric-data-variable-model';
 
+import DataSelector from '@/common/components/select/DataSelector.vue';
 import { useContentsAccessibility } from '@/common/composables/contents-accessibility';
 import {
     useCostDataSourceFilterMenuItems,
@@ -44,25 +42,56 @@ interface Props {
     originalData?: DashboardGlobalVariable;
     data: DynamicVariableData;
 }
+interface Emits {
+    (e: 'update:is-valid', isValid: boolean): void;
+    (e: 'update:data', data: DynamicVariableData): void;
+}
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
     originalData: undefined,
 });
-const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
-    (e: 'update:data', data: DynamicVariableData): void;
-}>();
+const emit = defineEmits<Emits>();
 
-const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const { visibleContents } = useContentsAccessibility(MENU_ID.ASSET_INVENTORY);
 
 const referenceMap = useAllReferenceDataModel();
-const storeState = reactive({
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+const costDataSourceMap = referenceMap.costDataSource;
+const metricMap = referenceMap.metric;
+const providerMap = referenceMap.provider;
+const namespaceMap = referenceMap.namespace;
+
+const resourceMenuHandlerMap = useResourceMenuHandlerMap();
+
+
+const menuHandlerState = reactive({
+    dataSourceMenuHandler: resourceMenuHandlerMap.costDataSource(),
+    categoryMenuHandler: computed(() => resourceMenuHandlerMap.namespace({
+        dataKey: 'group',
+        menuFilters: [{
+            k: 'category',
+            v: 'ASSET',
+            o: '=',
+        }],
+    })),
+    namespaceMenuHandler: computed(() => (state.selectedCategory ? resourceMenuHandlerMap.namespace({
+        menuFilters: [{
+            k: 'group',
+            v: state.selectedCategory,
+            o: '=',
+        }],
+    }) : undefined)),
+    metricMenuHandler: computed(() => (state.selectedNamespaceId ? resourceMenuHandlerMap.metric({
+        menuFilters: [{
+            k: 'namespace_id',
+            v: state.selectedNamespaceId,
+            o: '=',
+        }],
+    }) : undefined)),
 });
+const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
+
+
 const state = reactive({
     proxyIsValid: useProxyValue<boolean>('isValid', props, emit),
     isAllValid: computed<boolean>(() => {
@@ -109,7 +138,7 @@ const state = reactive({
     }),
     valuesFromMenuItems: computed<MenuItem[]>(() => {
         if (state.selectedSourceFrom === 'asset') {
-            const _labelsInfo = referenceMap.metric[state.selectedMetricId]?.data?.labels_info || [];
+            const _labelsInfo = metricMap[state.selectedMetricId]?.data?.labels_info || [];
             return _labelsInfo.map((d) => ({ name: d.key, label: d.name }));
         }
         return costDataSourceFilterMenuItems.value;
@@ -125,84 +154,22 @@ const state = reactive({
     }),
     /* Asset */
     // category
-    categoryMenuItems: computed<MenuItem[]>(() => {
-        const groups = Object.values(storeState.namespaces).map((d) => d.data.group);
-        const _groupMenuItems: MenuItem[] = [];
-        const _uniqueGroups = Array.from(new Set(groups));
-        sortBy(_uniqueGroups, (group) => group !== 'common').forEach((group) => {
-            if (!group) return;
-            if (group === 'common') {
-                _groupMenuItems.push({
-                    type: 'item',
-                    name: group,
-                    label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON'),
-                });
-            } else {
-                // provider case
-                const providerData = referenceMap.provider[group];
-                if (providerData) {
-                    _groupMenuItems.push({
-                        type: 'item',
-                        name: providerData.key,
-                        label: providerData.label,
-                        imageUrl: providerData.data?.icon,
-                    });
-                }
-            }
-        });
-        return _groupMenuItems.filter((d) => d.label?.toString().toLowerCase().includes(state.categorySearchText.toLowerCase()));
-    }),
     categorySearchText: '',
     selectedCategory: undefined as undefined|string,
-    selectedCategoryMenuItem: computed<MenuItem[]>(() => state.categoryMenuItems.filter((d) => d.name === state.selectedCategory)),
     // namespace
-    namespaceMenuItems: computed<MenuItem[]>(() => {
-        if (!state.selectedCategory) return [];
-        return Object.values(storeState.namespaces)
-            .filter((d) => d.data.group === state.selectedCategory)
-            .filter((d) => d.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
-            .map((namespace) => ({
-                type: 'item',
-                name: namespace.key,
-                label: namespace.label,
-                imageUrl: namespace.data?.icon,
-            }));
-    }),
     namespaceSearchText: '',
     selectedNamespaceId: undefined as undefined|string,
-    selectedNamespaceMenuItem: computed<MenuItem[]>(() => state.namespaceMenuItems.filter((d) => d.name === state.selectedNamespaceId)),
     // metric
-    metricMenuItems: computed<MenuItem[]>(() => {
-        if (!state.selectedNamespaceId) return [];
-        const _metrics = Object.values(storeState.metrics)
-            .filter((d) => d.data.namespace_id === state.selectedNamespaceId)
-            .filter((d) => d.label.toLowerCase().includes(state.metricSearchText.toLowerCase()));
-        return _metrics.map((d) => ({
-            type: 'item',
-            name: d.key,
-            label: d.label,
-        }));
-    }),
     metricSearchText: '',
     selectedMetricId: undefined as undefined|string,
-    selectedMetricMenuItem: computed<MenuItem[]>(() => state.metricMenuItems.filter((d) => d.name === state.selectedMetricId)),
     /* Cost */
-    costDataSourceMenuItems: computed<MenuItem[]>(() => {
-        const _filteredCostDataSources = Object.values(storeState.costDataSources)
-            .filter((d) => d.label.toLowerCase().includes(state.costDataSourceSearchText.toLowerCase()));
-        return _filteredCostDataSources.map((d) => ({
-            type: 'item',
-            name: d.key,
-            label: d.label,
-        }));
-    }),
     costDataSourceSearchText: '',
     selectedCostDataSourceId: undefined as string|undefined,
-    selectedCostDataSourceMenuItem: computed<MenuItem[]>(() => state.costDataSourceMenuItems.filter((d) => d.name === state.selectedCostDataSourceId)),
 });
+
 const { allItems: costDataSourceFilterMenuItems } = useCostDataSourceFilterMenuItems({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    costDataSource: computed(() => storeState.costDataSources[state.selectedCostDataSourceId]),
+    costDataSource: computed(() => costDataSourceMap[state.selectedCostDataSourceId]),
 });
 
 /* Util */
@@ -212,9 +179,9 @@ const initExistingVariable = (originalData: DashboardGlobalVariable) => {
     if (_reference.resourceType === MetricDataVariableModel.meta.resourceType) {
         state.selectedSourceFrom = 'asset';
         state.selectedMetricId = _reference.dataSourceId || '';
-        const _targetMetric = storeState.metrics[state.selectedMetricId];
-        state.selectedNamespaceId = _targetMetric?.data.namespace_id || '';
-        state.selectedCategory = storeState.namespaces[state.selectedNamespaceId]?.data.group;
+        const _targetMetric = metricMap[state.selectedMetricId];
+        state.selectedNamespaceId = _targetMetric?.data?.namespace_id || '';
+        state.selectedCategory = namespaceMap[state.selectedNamespaceId]?.data?.group || '';
         state.selectedValuesFrom = _reference.dataKey;
     } else if (_reference.resourceType === CostVariableModel.meta.resourceType) {
         state.selectedSourceFrom = 'cost';
@@ -236,27 +203,27 @@ const handleChangeSourceFrom = (sourceFrom: string) => {
     state.selectedCostDataSourceId = undefined;
     state.selectedValuesFrom = undefined;
 };
-const handleSelectCategory = (item: MenuItem) => {
-    if (state.selectedCategory === item.name) return;
-    state.selectedCategory = item.name;
+const handleSelectCategory = (item: MenuItem[]) => {
+    if (state.selectedCategory === item?.[0]?.name) return;
+    state.selectedCategory = item?.[0]?.name;
     state.selectedNamespaceId = undefined;
     state.selectedMetricId = undefined;
     state.selectedValuesFrom = undefined;
 };
-const handleSelectNamespace = (item: MenuItem) => {
-    if (state.selectedNamespaceId === item.name) return;
-    state.selectedNamespaceId = item.name;
+const handleSelectNamespace = (item: MenuItem[]) => {
+    if (state.selectedNamespaceId === item?.[0]?.name) return;
+    state.selectedNamespaceId = item?.[0]?.name;
     state.selectedMetricId = undefined;
     state.selectedValuesFrom = undefined;
 };
-const handleSelectMetric = (item: MenuItem) => {
-    if (state.selectedMetricId === item.name) return;
-    state.selectedMetricId = item.name;
+const handleSelectMetric = (item: MenuItem[]) => {
+    if (state.selectedMetricId === item?.[0]?.name) return;
+    state.selectedMetricId = item?.[0]?.name;
     state.selectedValuesFrom = undefined;
 };
-const handleSelectCostDataSource = (item: MenuItem) => {
-    if (state.selectedCostDataSourceId === item.name) return;
-    state.selectedCostDataSourceId = item.name;
+const handleSelectCostDataSource = (item: MenuItem[]) => {
+    if (state.selectedCostDataSourceId === item?.[0]?.name) return;
+    state.selectedCostDataSourceId = item?.[0]?.name;
     state.selectedValuesFrom = undefined;
 };
 const handleChangeValuesFrom = (valuesFrom: string) => {
@@ -303,51 +270,67 @@ watch(() => visibleContents.value, (value) => {
             <!-- Asset Data Source -->
             <template v-if="state.selectedSourceFrom === 'asset'">
                 <div class="data-source-select-col">
-                    <p-field-title class="field-title"
+                    <data-selector class="h-full"
                                    :label="i18n.t('DASHBOARDS.DETAIL.VARIABLES.CATEGORY')"
-                                   required
-                    />
-                    <p-context-menu :menu="state.categoryMenuItems"
-                                    :search-text.sync="state.categorySearchText"
-                                    searchable
-                                    :selected="state.selectedCategoryMenuItem"
-                                    @select="handleSelectCategory"
+                                   :handler="menuHandlerState.categoryMenuHandler"
+                                   @update:selected="handleSelectCategory"
                     >
-                        <template #item--format="{ item }">
+                        <template #menu-item--format="{item}">
                             <div v-if="item.name === 'common'"
                                  class="flex gap-1"
                             >
                                 <img src="@/assets/images/img_common-asset@2x.png"
                                      alt="common-namespace-image"
-                                     class="common-category-image"
+                                     class="category-image"
                                 >
+                                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON') }}
+                            </div>
+                            <div v-else
+                                 class="inline-flex gap-1"
+                            >
+                                <p-lazy-img :src="providerMap[item.name]?.data?.icon"
+                                            :alt="item.label"
+                                            width="1rem"
+                                            height="1rem"
+                                            class="category-image"
+                                />
+                                {{ providerMap[item.name]?.label || customSnakeToTitleCase(item.name) }}
+                            </div>
+                        </template>
+                    </data-selector>
+                </div>
+                <div class="data-source-select-col">
+                    <data-selector :key="state.selectedCategory"
+                                   class="h-full"
+                                   :label="i18n.t('DASHBOARDS.DETAIL.VARIABLES.NAMESPACE')"
+                                   :handler="menuHandlerState.namespaceMenuHandler"
+                                   @update:selected="handleSelectNamespace"
+                    >
+                        <template #menu-item--format="{item}">
+                            <div class="inline-flex gap-1">
+                                <img v-if="item.data.group === 'common'"
+                                     src="@/assets/images/img_common-asset@2x.png"
+                                     alt="common-namespace-image"
+                                     class="category-image"
+                                >
+                                <p-lazy-img v-else
+                                            :src="item.data?.icon"
+                                            :alt="item.label"
+                                            width="1rem"
+                                            height="1rem"
+                                            class="category-image"
+                                />
                                 {{ item.label }}
                             </div>
                         </template>
-                    </p-context-menu>
+                    </data-selector>
                 </div>
                 <div class="data-source-select-col">
-                    <p-field-title class="field-title"
-                                   :label="i18n.t('DASHBOARDS.DETAIL.VARIABLES.NAMESPACE')"
-                                   required
-                    />
-                    <p-context-menu :menu="state.namespaceMenuItems"
-                                    :search-text.sync="state.namespaceSearchText"
-                                    searchable
-                                    :selected="state.selectedNamespaceMenuItem"
-                                    @select="handleSelectNamespace"
-                    />
-                </div>
-                <div class="data-source-select-col">
-                    <p-field-title class="field-title"
+                    <data-selector :key="state.selectedNamespaceId"
+                                   class="h-full"
                                    :label="i18n.t('DASHBOARDS.DETAIL.VARIABLES.METRIC')"
-                                   required
-                    />
-                    <p-context-menu :menu="state.metricMenuItems"
-                                    :search-text.sync="state.metricSearchText"
-                                    searchable
-                                    :selected="state.selectedMetricMenuItem"
-                                    @select="handleSelectMetric"
+                                   :handler="menuHandlerState.metricMenuHandler"
+                                   @update:selected="handleSelectMetric"
                     />
                 </div>
             </template>
@@ -355,15 +338,10 @@ watch(() => visibleContents.value, (value) => {
             <div v-else-if="state.selectedSourceFrom === 'cost'"
                  class="data-source-select-col cost-data-source"
             >
-                <p-field-title class="field-title"
+                <data-selector class="h-full"
                                :label="i18n.t('DASHBOARDS.DETAIL.VARIABLES.DATA_SOURCE')"
-                               required
-                />
-                <p-context-menu :menu="state.costDataSourceMenuItems"
-                                :search-text.sync="state.costDataSourceSearchText"
-                                :selected="state.selectedCostDataSourceMenuItem"
-                                searchable
-                                @select="handleSelectCostDataSource"
+                               :handler="menuHandlerState.dataSourceMenuHandler"
+                               @update:selected="handleSelectCostDataSource"
                 />
             </div>
         </div>
@@ -416,17 +394,15 @@ watch(() => visibleContents.value, (value) => {
 .data-source-wrapper {
     @apply bg-white rounded-md border border-gray-200 grid grid-cols-12;
     width: 100%;
-    height: 22.5rem;
+    height: 24rem;
     margin-bottom: 1rem;
     .data-source-select-col {
         @apply border-r border-gray-200 col-span-4;
         display: flex;
         flex-direction: column;
-        height: inherit;
+        height: 24rem;
+        overflow-y: hidden;
         padding: 0.75rem 0;
-        .field-title {
-            padding: 0 0.75rem 0.25rem 0.75rem;
-        }
         &:last-child {
             @apply border-r-0;
         }
@@ -438,11 +414,10 @@ watch(() => visibleContents.value, (value) => {
             @apply col-span-12;
         }
     }
+}
 
-    /* custom design-system component - p-context-menu */
-    :deep(.p-context-menu) {
-        border: none;
-        overflow-y: auto;
-    }
+.category-image {
+    width: 1rem;
+    height: 1rem;
 }
 </style>
