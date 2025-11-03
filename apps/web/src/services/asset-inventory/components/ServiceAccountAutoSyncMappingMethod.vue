@@ -10,6 +10,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue';
+import type { MappingItem } from '@/common/components/mapping-method/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import WorkspaceDropdown from '@/services/asset-inventory/components/WorkspaceDropdown.vue';
@@ -37,9 +38,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
-    workspaceMappingOptions: computed(() => WORKSPACE_MAPPING_OPTIONS),
-    projectGroupMappingOptions: computed(() => PROJECT_GROUP_MAPPING_OPTIONS),
-    organizationTerms: computed(() => CSP_ORGANIZATION_TERMS[serviceAccountPageState.selectedProvider] ?? {}),
+    organizationTerms: computed<{ name: string; group: string }>(() => CSP_ORGANIZATION_TERMS[serviceAccountPageState.selectedProvider] ?? {}),
     workspaceMapping: 'ALL_GROUPS_SINGLE_WORKSPACE' as WorkspaceMappingType,
     projectGroupMapping: 'SKIP' as ProjectGroupMappingType,
     customDepth: null,
@@ -48,7 +47,7 @@ const state = reactive({
     isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
     isCreatePage: computed(() => serviceAccountPageState.originServiceAccountItem?.resource_group === undefined),
     isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
-    mappingItems: computed(() => {
+    mappingItems: computed<MappingItem[]>(() => {
         const baseItems = state.isDomainForm ? [
             {
                 imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
@@ -88,12 +87,12 @@ const state = reactive({
     } : {
         projectGroupMappingType: state.projectGroupMapping,
     })),
-    selectedWorkspaceMappingOptionLabel: computed(() => {
+    selectedWorkspaceMappingOptionLabel: computed<string>(() => {
         const option = WORKSPACE_MAPPING_OPTIONS.find((opt) => opt.value === state.workspaceMapping);
         if (!option) return '';
         return option.target ? `${option.name} → ${option.target}` : option.name;
     }),
-    selectedProjectGroupMappingOptionLabel: computed(() => {
+    selectedProjectGroupMappingOptionLabel: computed<string>(() => {
         const option = PROJECT_GROUP_MAPPING_OPTIONS.find((opt) => opt.value === state.projectGroupMapping);
         if (!option) return '';
         return option.target ? `${option.name} → ${option.target}` : option.name;
@@ -143,7 +142,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                         />
 
                         <div class="flex flex-col gap-2">
-                            <div v-for="option in state.workspaceMappingOptions"
+                            <div v-for="option in WORKSPACE_MAPPING_OPTIONS"
                                  :key="option.value"
                             >
                                 <p-radio v-model="state.workspaceMapping"
@@ -187,7 +186,6 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                                 type="number"
                                                 min="1"
                                                 :invalid="state.customDepth !== null && state.customDepth < 1"
-                                                invalid-text="sdfsdfsfs"
                                                 placeholder="Enter depth"
                                             />
                                         </p-field-group>
@@ -242,7 +240,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                    class="mb-1"
                     />
                     <div class="flex flex-col gap-2">
-                        <div v-for="option in state.projectGroupMappingOptions"
+                        <div v-for="option in PROJECT_GROUP_MAPPING_OPTIONS"
                              :key="option.value"
                         >
                             <p-radio v-model="state.projectGroupMapping"
