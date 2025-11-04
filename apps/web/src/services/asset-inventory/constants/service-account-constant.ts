@@ -35,7 +35,19 @@ export const PROVIDER_ACCOUNT_NAME = {
     azure: 'Subscription',
 } as const;
 
+// 워크스페이스 매핑 타입 상수
+export const WORKSPACE_MAPPING_TYPE = {
+    ALL_GROUPS_SINGLE_WORKSPACE: 'ALL_GROUPS_SINGLE_WORKSPACE',
+    TOP_LEVEL_GROUPS: 'TOP_LEVEL_GROUPS',
+    LEAF_LEVEL_GROUPS: 'LEAF_LEVEL_GROUPS',
+    CUSTOM_DEPTH_GROUPS: 'CUSTOM_DEPTH_GROUPS',
+} as const;
 
+// 프로젝트 그룹 매핑 타입 상수
+export const PROJECT_GROUP_MAPPING_TYPE = {
+    NESTED_SUB_GROUPS: 'NESTED_SUB_GROUPS',
+    SKIP: 'SKIP',
+} as const;
 
 
 /* Agent Account - k8s OpenCost Options
@@ -54,22 +66,22 @@ export const WORKSPACE_MAPPING_OPTIONS: WorkspaceMappingOption[] = [
     {
         name: 'All Groups',
         target: 'Single Workspace',
-        value: 'ALL_GROUPS_SINGLE_WORKSPACE',
+        value: WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE,
     },
     {
         name: 'Top-Level Groups',
         target: 'Multiple Workspaces',
-        value: 'TOP_LEVEL_GROUPS',
+        value: WORKSPACE_MAPPING_TYPE.TOP_LEVEL_GROUPS,
     },
     {
         name: 'Leaf-Level Groups',
         target: 'Multiple Workspaces',
-        value: 'LEAF_LEVEL_GROUPS',
+        value: WORKSPACE_MAPPING_TYPE.LEAF_LEVEL_GROUPS,
     },
     {
         name: 'Custom Depth Groups',
         target: 'Multiple Workspaces',
-        value: 'CUSTOM_DEPTH_GROUPS',
+        value: WORKSPACE_MAPPING_TYPE.CUSTOM_DEPTH_GROUPS,
     },
 ];
 
@@ -78,12 +90,12 @@ export const PROJECT_GROUP_MAPPING_OPTIONS: ProjectGroupMappingOption[] = [
     {
         name: 'Nested Sub-Groups',
         target: 'Project Groups',
-        value: 'NESTED_SUB_GROUPS',
+        value: PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS,
     },
     {
         name: 'Skip Sub-Group Mapping',
         target: '',
-        value: 'SKIP',
+        value: PROJECT_GROUP_MAPPING_TYPE.SKIP,
     },
 ];
 

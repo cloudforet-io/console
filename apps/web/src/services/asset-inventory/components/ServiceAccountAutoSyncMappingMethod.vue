@@ -18,6 +18,8 @@ import {
     WORKSPACE_MAPPING_OPTIONS,
     PROJECT_GROUP_MAPPING_OPTIONS,
     CSP_ORGANIZATION_TERMS,
+    WORKSPACE_MAPPING_TYPE,
+    PROJECT_GROUP_MAPPING_TYPE,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import type {
@@ -39,8 +41,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
     selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
     organizationTerms: computed<{ name: string; group: string }>(() => CSP_ORGANIZATION_TERMS[serviceAccountPageState.selectedProvider] ?? {}),
-    workspaceMapping: 'ALL_GROUPS_SINGLE_WORKSPACE' as WorkspaceMappingType,
-    projectGroupMapping: 'SKIP' as ProjectGroupMappingType,
+    workspaceMapping: WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE as WorkspaceMappingType,
+    projectGroupMapping: PROJECT_GROUP_MAPPING_TYPE.SKIP as ProjectGroupMappingType,
     customDepth: null,
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -60,7 +62,7 @@ const state = reactive({
         ] : [];
 
         // Leaf-Level Groups 선택 시: not_possible_project_group 아이콘 표시
-        if (state.workspaceMapping === 'LEAF_LEVEL_GROUPS') {
+        if (state.workspaceMapping === WORKSPACE_MAPPING_TYPE.LEAF_LEVEL_GROUPS) {
             return [
                 ...baseItems,
                 {
@@ -82,8 +84,8 @@ const state = reactive({
     formData: computed(() => (state.isDomainForm ? {
         workspaceMappingType: state.workspaceMapping,
         projectGroupMappingType: state.projectGroupMapping,
-        customDepth: state.workspaceMapping === 'CUSTOM_DEPTH_GROUPS' ? state.customDepth : undefined,
-        selectedSingleWorkspace: state.workspaceMapping === 'ALL_GROUPS_SINGLE_WORKSPACE' ? state.selectedWorkspace : '',
+        customDepth: state.workspaceMapping === WORKSPACE_MAPPING_TYPE.CUSTOM_DEPTH_GROUPS ? state.customDepth : undefined,
+        selectedSingleWorkspace: state.workspaceMapping === WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE ? state.selectedWorkspace : '',
     } : {
         projectGroupMappingType: state.projectGroupMapping,
     })),
@@ -113,8 +115,8 @@ watch(() => state.formData, (formData) => {
 
 watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
     if (item) {
-        state.workspaceMapping = item.sync_options?.workspace_mapping_type ?? 'ALL_GROUPS_SINGLE_WORKSPACE';
-        state.projectGroupMapping = item.sync_options?.project_group_mapping_type ?? 'NESTED_SUB_GROUPS';
+        state.workspaceMapping = item.sync_options?.workspace_mapping_type ?? WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE;
+        state.projectGroupMapping = item.sync_options?.project_group_mapping_type ?? PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS;
         state.customDepth = item.sync_options?.custom_depth ?? 1;
     }
 }, { immediate: true });
@@ -156,7 +158,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                 </p-radio>
 
                                 <!-- ALL_GROUPS_SINGLE_WORKSPACE: Workspace Dropdown -->
-                                <div v-if="state.workspaceMapping === option.value && option.value === 'ALL_GROUPS_SINGLE_WORKSPACE'"
+                                <div v-if="state.workspaceMapping === option.value && option.value === WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE"
                                      class="mt-2 ml-6"
                                 >
                                     <p-pane-layout class="p-4 flex flex-col gap-1">
@@ -169,7 +171,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
 
 
                                 <!-- CUSTOM_DEPTH_GROUPS: Depth 입력 -->
-                                <div v-if="state.workspaceMapping === option.value && option.value === 'CUSTOM_DEPTH_GROUPS'"
+                                <div v-if="state.workspaceMapping === option.value && option.value === WORKSPACE_MAPPING_TYPE.CUSTOM_DEPTH_GROUPS"
                                      class="mt-2 ml-6"
                                 >
                                     <p-pane-layout class="p-4 flex flex-col gap-2">
