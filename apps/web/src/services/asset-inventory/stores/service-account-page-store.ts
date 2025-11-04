@@ -25,7 +25,10 @@ import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
+import { WORKSPACE_MAPPING_TYPE, PROJECT_GROUP_MAPPING_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
+import type {
+    BaseInformationForm, CredentialForm, ProjectGroupMappingType, WorkspaceMappingType,
+} from '@/services/asset-inventory/types/service-account-page-type';
 
 
 interface Getters {
@@ -63,6 +66,9 @@ interface FormState {
     selectedSingleWorkspace: string;
     skipProjectGroup: boolean;
     scheduleHours: number[];
+    workspaceMappingType: WorkspaceMappingType;
+    projectGroupMappingType: ProjectGroupMappingType;
+    customDepth: number | null;
 }
 
 const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
@@ -96,6 +102,9 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
+        workspaceMappingType: WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE,
+        projectGroupMappingType: PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS,
+        customDepth: null,
         skipProjectGroup: false,
         scheduleHours: [] as number[],
     });
@@ -133,6 +142,9 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.selectedSingleWorkspace = '';
             formState.skipProjectGroup = false;
             formState.scheduleHours = [];
+            formState.workspaceMappingType = WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE;
+            formState.projectGroupMappingType = PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS;
+            formState.customDepth = null;
             state.syncJobList = [];
             state.costReportConfig = null;
         },
@@ -142,6 +154,9 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.selectedSingleWorkspace = state.originServiceAccountItem?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = state.originServiceAccountItem?.sync_options?.skip_project_group ?? false;
             formState.additionalOptions = state.originServiceAccountItem?.plugin_options ?? {};
+            formState.workspaceMappingType = state.originServiceAccountItem?.sync_options?.workspace_mapping_type ?? WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE;
+            formState.projectGroupMappingType = state.originServiceAccountItem?.sync_options?.project_group_mapping_type ?? PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS;
+            formState.customDepth = state.originServiceAccountItem?.sync_options?.custom_depth ?? null;
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
         setFormState: (key:string, data: any) => {
