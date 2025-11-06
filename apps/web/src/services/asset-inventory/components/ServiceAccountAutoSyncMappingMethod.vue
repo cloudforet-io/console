@@ -100,6 +100,8 @@ const state = reactive({
         if (!option) return '';
         return option.target ? `${option.name} → ${option.target}` : option.name;
     }),
+    customDepthMaxDepth: computed<number>(() => CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]),
+    customDepthInvalid: computed<boolean>(() => state.customDepth !== null && (state.customDepth < 1 || state.customDepth > state.customDepthMaxDepth)),
 });
 
 const handleUpdateWorkspace = (workspaceId:string) => {
@@ -181,10 +183,9 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                             <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_DESCRIPTION',
                                                         { csp_max_depth: CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider] }) }}</span>
                                         </p>
-                                        <p-field-group :invalid="state.customDepth !== null && (state.customDepth < 1
-                                                           || state.customDepth > CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider])"
+                                        <p-field-group :invalid="state.customDepthInvalid"
                                                        :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_INVALID', {
-                                                           csp_max_depth: CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]
+                                                           csp_max_depth: state.customDepthMaxDepth
                                                        })"
                                                        required
                                         >
@@ -192,8 +193,8 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                                 v-model.number="state.customDepth"
                                                 type="number"
                                                 min="1"
-                                                :max="CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]"
-                                                :invalid="state.customDepth !== null && (state.customDepth < 1 || state.customDepth > CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider])"
+                                                :max="state.customDepthMaxDepth"
+                                                :invalid="state.customDepth !== null && (state.customDepth < 1 || state.customDepth > state.customDepthMaxDepth)"
                                                 placeholder="Enter depth"
                                             />
                                         </p-field-group>
