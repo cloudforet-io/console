@@ -61,3 +61,10 @@ export interface AutoSyncForm {
     customDepth?: number; // 커스텀 뎁스 선택시 사용
     selectedSingleWorkspace?: string; // ALL_GROUPS_SINGLE_WORKSPACE 선택시 사용
 }
+
+// 각 CSP별 Custom Depth 최대 뎁스
+export const CUSTOM_DEPTH_MAX_DEPTH: Record<string, number> = {
+    aws: 2000,
+    google_cloud: 11,
+    azure: 8,
+};

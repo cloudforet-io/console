@@ -14,11 +14,10 @@ export interface TrustedAccountCreateParameters {
         hours: number[];
     };
     sync_options?: {
-        workspace_mappint_type?: WorkspaceMappingType;
-        project_group_mapping_type?: ProjectGroupMappingType;
-        custom_depth?: number;
-        skip_project_group?: boolean;
-        single_workspace_id?: string;
+        workspace_mapping_type: WorkspaceMappingType;
+        project_group_mapping_type: ProjectGroupMappingType;
+        custom_depth: number;
+        single_workspace_id: string;
     };
     plugin_options?: Record<string, any>;
     tags?: Tags;

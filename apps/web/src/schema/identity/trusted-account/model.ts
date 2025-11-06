@@ -16,7 +16,6 @@ export interface TrustedAccountModel {
         workspace_mapping_type: WorkspaceMappingType;
         project_group_mapping_type: ProjectGroupMappingType;
         custom_depth: number;
-        skip_project_group: boolean;
         single_workspace_id: string;
     };
     plugin_options?: Record<string, any>;

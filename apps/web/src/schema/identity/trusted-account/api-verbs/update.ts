@@ -1,5 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 
+import type { ProjectGroupMappingType, WorkspaceMappingType } from '@/services/asset-inventory/types/service-account-page-type';
+
 export interface TrustedAccountUpdateParameters {
     trusted_account_id: string;
     name?: string;
@@ -9,7 +11,9 @@ export interface TrustedAccountUpdateParameters {
         hours: number[];
     };
     sync_options?: {
-        skip_project_group: boolean;
+        workspace_mapping_type: WorkspaceMappingType;
+        project_group_mapping_type: ProjectGroupMappingType;
+        custom_depth: number;
         single_workspace_id: string;
     };
     plugin_options?: Record<string, any>;
