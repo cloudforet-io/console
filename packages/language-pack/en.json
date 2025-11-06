@@ -3062,8 +3062,8 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
 			"AUTO_SYNC": {
-				"CUSTOM_DEPTH_DESCRIPTION": "Accounts directly belonging to a depth higher than the selected depth are not mapped.",
-				"CUSTOM_DEPTH_INVALID": "Must be bigger than 1",
+				"CUSTOM_DEPTH_DESCRIPTION": "Accounts directly belonging to a depth higher than the selected depth are not mapped. (Max: {csp_max_depth})",
+				"CUSTOM_DEPTH_INVALID": "Must be greater than 0 and less than or equal to {csp_max_depth}",
 				"DELETE_CHECK_MODAL": {
 					"DESC": "It cannot be deleted due to the trusted account which is set to be auto-synced. If necessary, disable the auto sync for that service account ({serviceAccountName}) in order to delete it.",
 					"TITLE": "Unable to delete it"

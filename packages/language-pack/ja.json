@@ -3062,8 +3062,8 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"AUTO_SYNC": {
-				"CUSTOM_DEPTH_DESCRIPTION": "選択したDepthより上位のDepthに直接属するアカウントはマッピングされません。",
-				"CUSTOM_DEPTH_INVALID": "1より大きい必要があります",
+				"CUSTOM_DEPTH_DESCRIPTION": "選択したDepthより上位のDepthに直接属するアカウントはマッピングされません。(最大: {csp_max_depth})",
+				"CUSTOM_DEPTH_INVALID": "0より大きく、{csp_max_depth}以下の値を入力してください。",
 				"DELETE_CHECK_MODAL": {
 					"DESC": "信頼されたアカウントが自動同期に設定されているため、削除できません。削除が必要な場合は、まずそのサービスアカウント({serviceAccountName})の自動同期を無効にしてください。",
 					"TITLE": "削除できません"
