@@ -22,9 +22,10 @@ import {
     PROJECT_GROUP_MAPPING_TYPE,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
-import type {
-    WorkspaceMappingType,
-    ProjectGroupMappingType,
+import {
+    type WorkspaceMappingType,
+    type ProjectGroupMappingType,
+    CUSTOM_DEPTH_MAX_DEPTH,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 const CUSTOM_DEPTH = 'Custom Depth';
@@ -177,17 +178,22 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                                     <p-pane-layout class="p-4 flex flex-col gap-2">
                                         <p class="flex flex-col gap-1 text-xs">
                                             <span class="font-bold text-gray-600">{{ CUSTOM_DEPTH }}</span>
-                                            <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_DESCRIPTION') }}</span>
+                                            <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_DESCRIPTION',
+                                                        { csp_max_depth: CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider] }) }}</span>
                                         </p>
-                                        <p-field-group :invalid="state.customDepth !== null && state.customDepth < 1"
-                                                       :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_INVALID')"
+                                        <p-field-group :invalid="state.customDepth !== null && (state.customDepth < 1
+                                                           || state.customDepth > CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider])"
+                                                       :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.CUSTOM_DEPTH_INVALID', {
+                                                           csp_max_depth: CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]
+                                                       })"
                                                        required
                                         >
                                             <p-text-input
                                                 v-model.number="state.customDepth"
                                                 type="number"
                                                 min="1"
-                                                :invalid="state.customDepth !== null && state.customDepth < 1"
+                                                :max="CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]"
+                                                :invalid="state.customDepth !== null && (state.customDepth < 1 || state.customDepth > CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider])"
                                                 placeholder="Enter depth"
                                             />
                                         </p-field-group>
