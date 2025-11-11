@@ -92,13 +92,13 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
 
     const formState = reactive<FormState>({
         // baseInformation
-        isBaseInformationFormValid: true,
+        isBaseInformationFormValid: false,
         baseInformation: {},
         // credential
-        isCredentialFormValid: true,
+        isCredentialFormValid: false,
         credential: {},
         // autoSync
-        isAutoSyncFormValid: true,
+        isAutoSyncFormValid: false,
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
@@ -135,8 +135,10 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             state.selectedProvider = '';
             state.originServiceAccountItem = {};
             formState.baseInformation = {};
-            formState.isBaseInformationFormValid = true;
-            formState.isAutoSyncFormValid = true;
+            formState.isBaseInformationFormValid = false;
+            formState.isCredentialFormValid = false;
+            formState.credential = {};
+            formState.isAutoSyncFormValid = false;
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};
             formState.selectedSingleWorkspace = '';
@@ -152,7 +154,6 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = state.originServiceAccountItem?.schedule?.state === 'ENABLED';
             formState.scheduleHours = state.originServiceAccountItem?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = state.originServiceAccountItem?.sync_options?.single_workspace_id ?? '';
-            formState.skipProjectGroup = state.originServiceAccountItem?.sync_options?.skip_project_group ?? false;
             formState.additionalOptions = state.originServiceAccountItem?.plugin_options ?? {};
             formState.workspaceMappingType = state.originServiceAccountItem?.sync_options?.workspace_mapping_type ?? WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE;
             formState.projectGroupMappingType = state.originServiceAccountItem?.sync_options?.project_group_mapping_type ?? PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS;

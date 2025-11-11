@@ -235,7 +235,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.isCredentialFormValid = isAllValid;
     });
-});
+}, { immediate: true });
 const schemaApiQueryHelper = new ApiQueryHelper();
 const getSecretSchema = async (isTrustingSchema:boolean) => {
     const trustedAccountRelatedSchemas = isTrustingSchema ? serviceAccountSchemaStore.getters.trustingSecretSchemaList : (storeState.trustedAccountSchema?.related_schemas ?? []);
