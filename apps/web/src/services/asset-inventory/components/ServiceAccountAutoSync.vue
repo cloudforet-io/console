@@ -75,8 +75,10 @@ const handleClickSaveButton = async () => {
                 hours: serviceAccountPageFormState.scheduleHours,
             },
             sync_options: {
-                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                project_group_mapping_type: serviceAccountPageFormState.projectGroupMappingType,
                 single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                custom_depth: serviceAccountPageFormState.customDepth ?? 1,
+                workspace_mapping_type: serviceAccountPageFormState.workspaceMappingType,
             },
             plugin_options: serviceAccountPageFormState.additionalOptions,
         });
