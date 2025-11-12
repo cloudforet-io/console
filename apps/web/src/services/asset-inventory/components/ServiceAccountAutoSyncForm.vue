@@ -40,9 +40,12 @@ const state = reactive({
     additionalOptions: {},
     isScheduleHoursValid: computed(() => ((state.isAutoSyncEnabled) ? !!serviceAccountPageFormState.scheduleHours.length : true)),
     isAdditionalOptionsValid: false,
+    isMappingMethodValid: false,
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
-        return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
+        return state.isScheduleHoursValid
+            && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true)
+            && state.isMappingMethodValid;
     }),
 });
 
@@ -76,11 +79,18 @@ const handleAdditionalOptionsValidate = (isValid:boolean) => {
     state.isAdditionalOptionsValid = state.isAutoSyncEnabled ? isValid : true;
 };
 
+const handleMappingMethodValidate = (isValid:boolean) => {
+    state.isMappingMethodValid = state.isAutoSyncEnabled ? isValid : true;
+};
 
 const handleChangeToggle = (e:boolean) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.isAutoSyncEnabled = e;
     });
+    // Auto Sync가 비활성화되면 mapping method validation을 즉시 true로 설정
+    if (!e) {
+        state.isMappingMethodValid = true;
+    }
 };
 
 watch(() => state.additionalOptions, (additionalOptions) => {
@@ -91,7 +101,7 @@ watch(() => state.isAllValid, (isAllValid) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.isAutoSyncFormValid = isAllValid;
     });
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -108,7 +118,9 @@ watch(() => state.isAllValid, (isAllValid) => {
             </p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <service-account-auto-sync-mapping-method mode="UPDATE" />
+            <service-account-auto-sync-mapping-method mode="UPDATE"
+                                                      @update:is-valid="handleMappingMethodValidate"
+            />
             <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
                 <p-field-title label="Additional Options"
                                size="lg"

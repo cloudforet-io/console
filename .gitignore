@@ -23,3 +23,7 @@ dev/*.env
 user.json
 .vercel
 .env*.local
+
+# Claude
+.claude/*
+CLAUDE.md

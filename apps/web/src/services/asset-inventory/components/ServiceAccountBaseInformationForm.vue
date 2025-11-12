@@ -12,11 +12,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import TagsInput from '@/common/components/inputs/TagsInput.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
@@ -48,7 +50,7 @@ const {
     serviceAccountName: (val: string) => {
         if (val?.length < 2) {
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
-        } if (state.serviceAccountNames.includes(val)) {
+        } if (state.allAccountNames.includes(val)) {
             if (state.originForm?.accountName === val) return true;
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
         }
@@ -68,6 +70,9 @@ const state = reactive({
         }),
     })),
     serviceAccountNames: [] as string[],
+    trustedAccountNames: [] as string[],
+    allAccountNames: computed<string[]>(() => [...state.serviceAccountNames, ...state.trustedAccountNames]),
+    isLoadingNames: false,
     customSchemaForm: {},
     isCustomSchemaFormValid: undefined,
     tags: {},
@@ -80,10 +85,25 @@ const state = reactive({
         projectForm: state.projectForm,
         tags: state.tags,
     })),
-    isAllValid: computed(() => ((invalidState.serviceAccountName === false)
-        && (state.isTrustedAccount ? true : state.isProjectFormValid)
-        && state.isTagsValid
-        && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
+    isAllValid: computed(() => {
+        // Name validation: must be valid (false means valid in invalidState)
+        const isNameValid = invalidState.serviceAccountName === false;
+
+        // Account name must have a value (not empty)
+        const hasName = !!serviceAccountName.value;
+
+        // Project form validation (only for non-trusted accounts)
+        const isProjectValid = state.isTrustedAccount ? true : state.isProjectFormValid;
+
+        // Tags validation
+        const isTagsValidValue = state.isTagsValid;
+
+        // Custom schema validation (account_id etc.)
+        // When schema exists, validation must be true (not undefined or false)
+        const isSchemaValid = isEmpty(props.schema) ? true : state.isCustomSchemaFormValid === true;
+
+        return isNameValid && hasName && isProjectValid && isTagsValidValue && isSchemaValid;
+    }),
     isChanged: false,
 });
 
@@ -99,12 +119,43 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
 
 /* Api */
 const listServiceAccounts = async () => {
-    const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-        query: {
-            only: ['name'],
-        },
-    });
-    state.serviceAccountNames = (results ?? []).map((v) => v.name);
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+            query: {
+                only: ['name'],
+            },
+        });
+        state.serviceAccountNames = (results ?? []).map((v) => v.name);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.serviceAccountNames = [];
+    }
+};
+
+const listTrustedAccounts = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
+            query: {
+                only: ['name'],
+            },
+        });
+        state.trustedAccountNames = (results ?? []).map((v) => v.name);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.trustedAccountNames = [];
+    }
+};
+
+const fetchAllAccountNames = async () => {
+    state.isLoadingNames = true;
+    try {
+        await Promise.all([
+            listServiceAccounts(),
+            listTrustedAccounts(),
+        ]);
+    } finally {
+        state.isLoadingNames = false;
+    }
 };
 
 /* Event */
@@ -131,21 +182,23 @@ const handleChangeProjectForm = (projectForm) => {
 
 /* Init */
 (async () => {
-    await listServiceAccounts();
+    await fetchAllAccountNames();
 })();
 
 /* Watcher */
 watch([() => state.isAllValid, () => state.isChanged], ([isAllValid, isChanged]) => {
-    if (props.mode === 'UPDATE' && !isChanged) {
+    // UPDATE 모드: validation + changed 모두 체크
+    if (props.mode === 'UPDATE') {
         serviceAccountPageStore.$patch((_state) => {
-            _state.formState.isBaseInformationFormValid = false;
+            _state.formState.isBaseInformationFormValid = isAllValid && isChanged;
         });
         return;
     }
+    // CREATE 모드: validation만 체크
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.isBaseInformationFormValid = isAllValid;
     });
-});
+}, { immediate: true });
 watch(() => state.formData, (formData) => {
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.baseInformation = formData;

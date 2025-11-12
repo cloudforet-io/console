@@ -63,6 +63,11 @@ const state = reactive({
     pageLimit: PAGE_SIZE,
 });
 
+// Watch for prop changes to sync internal state
+watch(() => props.selected, (newSelected) => {
+    state.selected = newSelected;
+});
+
 const fetchWorkspace = async (searchText?:string) => {
     try {
         state.loading = true;

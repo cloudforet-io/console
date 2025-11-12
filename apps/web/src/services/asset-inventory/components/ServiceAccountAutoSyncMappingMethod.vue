@@ -34,13 +34,23 @@ const props = withDefaults(defineProps<{mode:'UPDATE'|'READ'}>(), {
     mode: 'UPDATE',
 });
 
+const emit = defineEmits<{(event: 'update:is-valid', value: boolean): void;
+}>();
+
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
-    selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
+    selectedWorkspace: computed({
+        get: () => serviceAccountPageStore.formState.selectedSingleWorkspace ?? '',
+        set: (value: string) => {
+            serviceAccountPageStore.$patch((_state) => {
+                _state.formState.selectedSingleWorkspace = value;
+            });
+        },
+    }),
     organizationTerms: computed<{ name: string; group: string }>(() => CSP_ORGANIZATION_TERMS[serviceAccountPageState.selectedProvider] ?? {}),
     workspaceMapping: WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE as WorkspaceMappingType,
     projectGroupMapping: PROJECT_GROUP_MAPPING_TYPE.SKIP as ProjectGroupMappingType,
@@ -93,21 +103,36 @@ const state = reactive({
     selectedWorkspaceMappingOptionLabel: computed<string>(() => {
         const option = WORKSPACE_MAPPING_OPTIONS.find((opt) => opt.value === state.workspaceMapping);
         if (!option) return '';
-        return option.target ? `${option.name} → ${option.target}` : option.name;
+        return option.target ? `${option.name} ➔ ${option.target}` : option.name;
     }),
     selectedProjectGroupMappingOptionLabel: computed<string>(() => {
         const option = PROJECT_GROUP_MAPPING_OPTIONS.find((opt) => opt.value === state.projectGroupMapping);
         if (!option) return '';
-        return option.target ? `${option.name} → ${option.target}` : option.name;
+        return option.target ? `${option.name} ➔ ${option.target}` : option.name;
     }),
     customDepthMaxDepth: computed<number>(() => CUSTOM_DEPTH_MAX_DEPTH[serviceAccountPageState.selectedProvider]),
     customDepthInvalid: computed<boolean>(() => state.customDepth !== null && (state.customDepth < 1 || state.customDepth > state.customDepthMaxDepth)),
+    // Validation states
+    isWorkspaceMappingValid: computed<boolean>(() => {
+        if (state.workspaceMapping === WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE) {
+            return !!state.selectedWorkspace;
+        }
+        return true;
+    }),
+    isProjectGroupMappingValid: computed<boolean>(() => {
+        if (state.workspaceMapping === WORKSPACE_MAPPING_TYPE.CUSTOM_DEPTH_GROUPS) {
+            return !state.customDepthInvalid && state.customDepth !== null;
+        }
+        return true;
+    }),
+    isMappingMethodValid: computed<boolean>(() => {
+        if (!state.isDomainForm) return true;
+        return state.isWorkspaceMappingValid && state.isProjectGroupMappingValid;
+    }),
 });
 
 const handleUpdateWorkspace = (workspaceId:string) => {
-    serviceAccountPageStore.$patch((_state) => {
-        _state.formState.selectedSingleWorkspace = workspaceId;
-    });
+    state.selectedWorkspace = workspaceId;
 };
 
 watch(() => state.formData, (formData) => {
@@ -116,14 +141,40 @@ watch(() => state.formData, (formData) => {
     });
 });
 
+// Initialize from store formState (for CREATE mode) or originServiceAccountItem (for UPDATE mode)
 watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
     if (item) {
         state.workspaceMapping = item.sync_options?.workspace_mapping_type ?? WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE;
         state.projectGroupMapping = item.sync_options?.project_group_mapping_type ?? PROJECT_GROUP_MAPPING_TYPE.NESTED_SUB_GROUPS;
-        state.customDepth = item.sync_options?.custom_depth ?? 1;
+        state.customDepth = item.sync_options?.custom_depth ?? null;
     }
 }, { immediate: true });
 
+// Sync workspaceMapping from formState on mount (for cases where store is already populated)
+watch(() => serviceAccountPageStore.formState.workspaceMappingType, (newType) => {
+    if (newType && newType !== state.workspaceMapping) {
+        state.workspaceMapping = newType;
+    }
+}, { immediate: true });
+
+// Sync projectGroupMapping from formState on mount
+watch(() => serviceAccountPageStore.formState.projectGroupMappingType, (newType) => {
+    if (newType && newType !== state.projectGroupMapping) {
+        state.projectGroupMapping = newType;
+    }
+}, { immediate: true });
+
+// Sync customDepth from formState on mount
+watch(() => serviceAccountPageStore.formState.customDepth, (newDepth) => {
+    if (newDepth !== undefined && newDepth !== state.customDepth) {
+        state.customDepth = newDepth;
+    }
+}, { immediate: true });
+
+// Emit validation state whenever any validation-related state changes
+watch(() => state.isMappingMethodValid, (isValid) => {
+    emit('update:is-valid', isValid);
+}, { immediate: true });
 </script>
 
 <template>
@@ -205,19 +256,23 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                     </div>
                     <div v-else>
                         <div class="flex gap-1 flex-wrap items-center">
-                            <span>{{ state.selectedWorkspaceMappingOptionLabel }} ➔</span>
-                            <div v-if="state.selectedWorkspace"
-                                 class="flex gap-1"
-                            >
+                            <!-- All Groups → workspace name -->
+                            <template v-if="state.workspaceMapping === WORKSPACE_MAPPING_TYPE.ALL_GROUPS_SINGLE_WORKSPACE && state.selectedWorkspace">
+                                <span>All Groups ➔</span>
                                 <workspace-logo-icon :text="state.selectedWorkspaceItem?.name || ''"
                                                      :theme="state.selectedWorkspaceItem?.tags?.theme"
                                                      size="xs"
                                 />
                                 <span class="workspace-name">{{ state.selectedWorkspaceItem?.name }}</span>
-                            </div>
-                            <div v-else>
-                                Multiple workspaces
-                            </div>
+                            </template>
+                            <!-- Custom Depth Groups → Multiple workspaces -->
+                            <template v-else-if="state.workspaceMapping === WORKSPACE_MAPPING_TYPE.CUSTOM_DEPTH_GROUPS && state.customDepth">
+                                <span>Groups of {{ state.customDepth }} depth ➔ Multiple workspaces</span>
+                            </template>
+                            <!-- Other cases: use label as is -->
+                            <template v-else>
+                                <span>{{ state.selectedWorkspaceMappingOptionLabel }}</span>
+                            </template>
                         </div>
                     </div>
                 </div>
