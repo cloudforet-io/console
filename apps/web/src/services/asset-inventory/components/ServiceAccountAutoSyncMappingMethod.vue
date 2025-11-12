@@ -175,24 +175,6 @@ watch(() => serviceAccountPageStore.formState.customDepth, (newDepth) => {
 watch(() => state.isMappingMethodValid, (isValid) => {
     emit('update:is-valid', isValid);
 }, { immediate: true });
-
-// Watch individual validation dependencies to ensure reactivity
-watch(() => state.selectedWorkspace, () => {
-    emit('update:is-valid', state.isMappingMethodValid);
-});
-
-watch(() => state.workspaceMapping, () => {
-    emit('update:is-valid', state.isMappingMethodValid);
-});
-
-watch(() => state.customDepth, () => {
-    emit('update:is-valid', state.isMappingMethodValid);
-});
-
-watch(() => state.projectGroupMapping, () => {
-    emit('update:is-valid', state.isMappingMethodValid);
-});
-
 </script>
 
 <template>
