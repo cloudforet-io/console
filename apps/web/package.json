@@ -63,7 +63,7 @@
     "hashids": "^2.2.1",
     "highlight.js": "^11.5.1",
     "html-to-image": "^1.9.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^10.0.2",
