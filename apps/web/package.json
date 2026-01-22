@@ -67,7 +67,7 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^10.0.2",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "numeral": "^2.0.6",
     "pinia": "^2.2.7",
     "portal-vue": "^2.1.7",

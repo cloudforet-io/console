@@ -22,7 +22,7 @@
     "bytes": "^3.1.2",
     "dayjs": "^1.10.7",
     "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@cloudforet/mirinae": "*",
