@@ -1,5 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
+import type { AzureManagementGroupMappingType } from '@/schema/identity/trusted-account/type';
 
 export interface TrustedAccountModel {
     trusted_account_id: string;
@@ -13,6 +14,7 @@ export interface TrustedAccountModel {
     sync_options?: {
         skip_project_group: boolean;
         single_workspace_id: string;
+        azure_management_group_mapping_type?: AzureManagementGroupMappingType; // only for Azure
     };
     plugin_options?: Record<string, any>;
     tags: Tags;
