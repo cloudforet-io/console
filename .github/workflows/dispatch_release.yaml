@@ -108,16 +108,6 @@ jobs:
           username: ${{ secrets.CLOUDFORET_DEV_DOCKER_USERNAME }}
           password: ${{ secrets.CLOUDFORET_DEV_DOCKER_PASSWORD }}
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
-        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
-
       - name: Build and push to dockerhub
         uses: docker/build-push-action@v4
         env:
@@ -132,8 +122,6 @@ jobs:
           tags: |
             ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:latest
             ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:${{ env.VERSION }}
-            ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:latest
-            ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:${{ env.VERSION }}
           provenance: false
 
       - name: Notice when job fails
