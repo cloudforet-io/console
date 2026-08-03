@@ -27,6 +27,7 @@ import { ACTION_ICON } from '@cloudforet/mirinae/src/inputs/link/type';
 import type { DataTableFieldType } from '@cloudforet/mirinae/types/data-display/tables/data-table/type';
 import type { ValueItem } from '@cloudforet/mirinae/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@cloudforet/mirinae/types/navigation/toolbox/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -367,7 +368,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                     </span>
                 </template>
                 <template #col-created_at-format="{value}">
-                    {{ dayjs(value).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                    {{ iso8601Formatter(value, state.timezone) }}
                 </template>
             </p-data-table>
         </div>
