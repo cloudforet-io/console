@@ -367,7 +367,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                     </span>
                 </template>
                 <template #col-created_at-format="{value}">
-                    {{ dayjs(value.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                    {{ dayjs(value).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
                 </template>
             </p-data-table>
         </div>
