@@ -1,6 +1,5 @@
 import { computed, reactive } from 'vue';
 
-import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -29,8 +28,6 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
         //
         recentReportDataLoading: false,
         hasReport: false,
-        recentReportMonth: undefined as string|undefined,
-        recentIssueDate: undefined as string|undefined,
         //
         reportListLoading: false,
         reportListTotalCount: 0,
@@ -118,19 +115,15 @@ export const useCostReportPageStore = defineStore('page-cost-report', () => {
         if (!costReportConfigId) return;
         try {
             state.recentReportDataLoading = true;
-            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+            const { total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
                 status: 'SUCCESS',
                 query: {
-                    only: ['report_month', 'issue_date'],
+                    only: ['report_month'],
                     filter: [
                         { k: 'cost_report_config_id', v: costReportConfigId, o: 'eq' },
                     ],
                 },
             });
-            const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];
-            const issueDateList: string[] = results?.map((report) => report.issue_date) ?? [];
-            state.recentReportMonth = reportMonthList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
-            state.recentIssueDate = issueDateList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
             state.hasReport = (total_count ?? 0) > 0;
         } catch (e) {
             ErrorHandler.handleError(e);

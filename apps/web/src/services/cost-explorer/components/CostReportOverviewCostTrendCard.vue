@@ -28,6 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { getLatestMonth } from '@/services/cost-explorer/helpers/cost-report-month-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -50,8 +51,8 @@ const state = reactive({
     loading: true,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
-        const _defaultStart = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
-        const _defaultEnd = costReportPageState.recentReportMonth;
+        const _defaultStart = dayjs.utc(getLatestMonth()).subtract(11, 'month').format('YYYY-MM');
+        const _defaultEnd = getLatestMonth();
         const _default: SelectDropdownMenuItem = {
             name: 'last12Months', label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS')} (${_defaultStart} ~ ${_defaultEnd})`,
         };
@@ -70,15 +71,13 @@ const state = reactive({
         { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
-    previousTotalAmount: computed<number>(() => {
-        if (!costReportPageState.recentReportMonth) return 0;
-        return getPreviousTotalAmount(costReportPageState.recentReportMonth, state.data?.results);
-    }),
+    // 라벨(state.period.end)과 값이 항상 같은 월에서 나오도록 조회 기간의 마지막 달을 기준으로 삼는다.
+    previousTotalAmount: computed<number>(() => getPreviousTotalAmount(state.period.end, state.data?.results)),
     last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(state.data?.results)),
     period: computed(() => {
         if (state.selectedDate === 'last12Months') {
-            const start = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
-            const end = costReportPageState.recentReportMonth;
+            const start = dayjs.utc(getLatestMonth()).subtract(11, 'month').format('YYYY-MM');
+            const end = getLatestMonth();
             return { start, end };
         }
         const start = `${state.selectedDate}-01`;
@@ -95,11 +94,11 @@ const state = reactive({
 });
 
 /* Util */
-const getPreviousTotalAmount = (recentReportMonth: string, results?: CostReportDataAnalyzeResult[]): number => {
+const getPreviousTotalAmount = (targetMonth: string, results?: CostReportDataAnalyzeResult[]): number => {
     if (!results) return 0;
     let _totalAmount = 0;
     results.forEach((item) => {
-        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === recentReportMonth);
+        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === targetMonth);
         if (_valueSum) {
             _totalAmount += _valueSum.value;
         }

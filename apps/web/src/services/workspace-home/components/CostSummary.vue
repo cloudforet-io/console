@@ -34,6 +34,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { getCurrentMonth, getLatestMonth } from '@/services/cost-explorer/helpers/cost-report-month-helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
@@ -93,24 +94,51 @@ const state = reactive({
     }),
     selectedProjects: [] as Array<string>,
 
-    period: computed(() => {
-        const reportMonth = dayjs().utc();
-        const reportMonthPeriod = state.isDesktopSize ? 12 : 6;
-        const start = dayjs(reportMonth).utc().subtract(reportMonthPeriod, 'month').format('YYYY-MM');
-        const end = reportMonth.format('YYYY-MM');
-        return { start, end };
+    latestMonth: computed<string>(() => getLatestMonth()),
+    currentMonth: computed<string>(() => getCurrentMonth()),
+    // 차트는 '최신 월'(저번 달)에서 끝낸다. 진행 중인 달은 부분 집계라 추이선에 섞으면 급감한 것처럼 읽힌다.
+    chartPeriod: computed(() => {
+        const monthCount = state.isDesktopSize ? 12 : 6;
+        return {
+            start: dayjs.utc(state.latestMonth).subtract(monthCount - 1, 'month').format('YYYY-MM'),
+            end: state.latestMonth,
+        };
     }),
-    recentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 2]),
-    currentMonthValue: computed<XYChartData|undefined>(() => state.chartData[state.chartData.length - 1]),
+    // 조회 범위는 차트보다 한 달 넓다. 진행 중인 달은 is_confirmed: false 로 존재하므로 같은 호출로 받아온다.
+    period: computed(() => ({ start: state.chartPeriod.start, end: state.currentMonth })),
+    // 값과 날짜 라벨이 어긋나지 않도록, 배열 위치가 아니라 월(날짜 키)로 조회한다.
+    recentMonthValue: computed<XYChartData|undefined>(() => state.chartData?.find((d) => d.date === state.latestMonth)),
+    currentMonthValue: computed<XYChartData|undefined>(() => state.chartData?.find((d) => d.date === state.currentMonth)),
     recentDateRangeText: computed<string>(() => {
-        const lastMonth = dayjs().utc().subtract(1, 'month');
-        return `${lastMonth.startOf('month').format('YYYY-MM-DD')} ~ ${lastMonth.endOf('month').format('YYYY-MM-DD')}`;
+        const latestMonth = dayjs.utc(state.latestMonth);
+        return `${latestMonth.startOf('month').format('YYYY-MM-DD')} ~ ${latestMonth.endOf('month').format('YYYY-MM-DD')}`;
     }),
     currentDateRangeText: computed<string>(() => {
-        const currentMonth = dayjs().utc();
-        return `${currentMonth.startOf('month').format('YYYY-MM-DD')} ~ ${currentMonth.format('YYYY-MM-DD')}`;
+        // 진행 중인 달이므로 오늘까지의 누적 구간을 표시한다.
+        const currentMonth = dayjs.utc(state.currentMonth);
+        return `${currentMonth.startOf('month').format('YYYY-MM-DD')} ~ ${dayjs.utc().format('YYYY-MM-DD')}`;
     }),
 });
+
+/**
+ * analyze 응답은 is_confirmed(멤버는 project_id 까지)로 그룹핑되어 있어 한 달이 여러 엔트리로 흩어진다.
+ * 월 단위로 합치지 않으면 날짜 키 조회가 중복 중 하나만 집어가 값이 누락된다.
+ * 확정 여부는 실제 값이 잡힌 그룹의 것을 그 달의 상태로 삼는다.
+ */
+const getMergedChartData = (results?: CostReportDataAnalyzeResult[]): XYChartData[] => {
+    const mergedByDate = new Map<string, XYChartData>();
+    (results ?? []).forEach((item) => {
+        item?.value_sum?.forEach((valueSum) => {
+            const prev = mergedByDate.get(valueSum.date);
+            mergedByDate.set(valueSum.date, {
+                date: valueSum.date,
+                value: (prev?.value ?? 0) + (valueSum.value ?? 0),
+                is_confirmed: valueSum.value ? item.is_confirmed : prev?.is_confirmed,
+            });
+        });
+    });
+    return sortBy(Array.from(mergedByDate.values()), 'date');
+};
 
 const handleSelectedProject = async (selectedProject: string[]) => {
     state.selectedProjects = selectedProject;
@@ -125,6 +153,8 @@ const analyzeCostReportData = async () => {
             query: {
                 start: state.period.start,
                 end: state.period.end,
+                // is_confirmed 는 필터가 아니라 group_by 로 둔다.
+                // 진행 중인 달은 is_confirmed: false 로만 존재하므로, 필터로 걸면 이번 달 카드가 영구히 비게 된다.
                 group_by: state.isWorkspaceMember ? ['project_id', 'is_confirmed'] : ['is_confirmed'],
                 fields: {
                     value_sum: {
@@ -139,11 +169,7 @@ const analyzeCostReportData = async () => {
                 ] : undefined,
             },
         });
-        const _chartData = (results || []).flatMap((item) => item?.value_sum?.map((valueSum) => ({
-            ...valueSum,
-            is_confirmed: item.is_confirmed,
-        })));
-        state.chartData = sortBy(_chartData, 'date');
+        state.chartData = getMergedChartData(results);
     } catch (e) {
         state.chartData = undefined;
         ErrorHandler.handleError(e);
@@ -199,15 +225,23 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                         <div class="price-view">
                             <p>{{ $t('HOME.COST_SUMMARY_LAST_MONT_TOTAL_COST') }}</p>
                             <p class="price">
-                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.recentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
-                                <p-status v-bind="costStateSummaryFormatter(state.recentMonthValue?.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
-                                          :text="state.recentMonthValue?.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIMATED')"
-                                          class="capitalize state"
-                                />
+                                <template v-if="state.recentMonthValue">
+                                    <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
+                                    <span>{{ currencyMoneyFormatter(state.recentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                    <p-status v-bind="costStateSummaryFormatter(state.recentMonthValue.is_confirmed ? COST_SUMMARY_STATE_TYPE.CONFIRM : COST_SUMMARY_STATE_TYPE.ESTIMATED)"
+                                              :text="state.recentMonthValue.is_confirmed ? $t('HOME.CONFIRM') : $t('HOME.ESTIMATED')"
+                                              class="capitalize state"
+                                    />
+                                </template>
+                                <span v-else>-</span>
                             </p>
                             <p class="date">
                                 {{ state.recentDateRangeText }}
+                            </p>
+                            <p v-if="!state.recentMonthValue"
+                               class="no-data-text"
+                            >
+                                {{ $t('HOME.COST_SUMMARY_NO_DATA_FOR_MONTH') }}
                             </p>
                         </div>
                         <p-divider class="divider"
@@ -216,20 +250,28 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                         <div class="price-view">
                             <p>{{ $t('HOME.COST_SUMMARY_CURRENT_TOTAL_COST') }}</p>
                             <p class="price">
-                                <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                                <span>{{ currencyMoneyFormatter(state.currentMonthValue?.value, { currency: state.currency, style: 'decimal' }) }}</span>
-                                <p-status v-bind="costStateSummaryFormatter(COST_SUMMARY_STATE_TYPE.AGGREGATING)"
-                                          :text="$t('HOME.AGGREGATING')"
-                                          class="capitalize state"
-                                />
+                                <template v-if="state.currentMonthValue">
+                                    <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
+                                    <span>{{ currencyMoneyFormatter(state.currentMonthValue.value, { currency: state.currency, style: 'decimal' }) }}</span>
+                                    <p-status v-bind="costStateSummaryFormatter(COST_SUMMARY_STATE_TYPE.AGGREGATING)"
+                                              :text="$t('HOME.AGGREGATING')"
+                                              class="capitalize state"
+                                    />
+                                </template>
+                                <span v-else>-</span>
                             </p>
                             <p class="date">
                                 {{ state.currentDateRangeText }}
                             </p>
+                            <p v-if="!state.currentMonthValue"
+                               class="no-data-text"
+                            >
+                                {{ $t('HOME.COST_SUMMARY_NO_DATA_FOR_MONTH') }}
+                            </p>
                         </div>
                     </div>
                     <span class="chart-description">{{ $t('HOME.COST_SUMMARY_DESC') }}</span>
-                    <cost-summary-chart :period="state.period"
+                    <cost-summary-chart :period="state.chartPeriod"
                                         :currency="state.currency"
                                         :data="state.chartData"
                     />
@@ -298,6 +340,10 @@ watch(() => storeState.costReportConfig, async (costReportConfig) => {
                 .date {
                     @apply text-label-sm text-gray-500;
                     margin-top: 0.5rem;
+                }
+                .no-data-text {
+                    @apply text-label-sm text-gray-500;
+                    margin-top: 0.25rem;
                 }
             }
         }

@@ -15,8 +15,9 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import type { Currency } from '@/store/modules/display/type';
 
-import { green, blue, coral } from '@/styles/colors';
+import { green, coral } from '@/styles/colors';
 
+import { getLatestMonth } from '@/services/cost-explorer/helpers/cost-report-month-helper';
 import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 
 interface Props {
@@ -37,38 +38,44 @@ const state = reactive({
         if (!data) return [];
         return data;
     }),
-    chartValueData: computed<string[]>(() => state.chartData.map((m) => m.value)),
-    chartDateData: computed<string[]>(() => state.chartData.map((m) => m.date)),
+    // 데이터에 없는 달도 축에 남겨야 indexOf 가 항상 유효하고, 비어 있는 구간이 공백으로 드러난다.
+    chartDateData: computed<string[]>(() => {
+        const start = dayjs.utc(props.period?.start);
+        const end = dayjs.utc(props.period?.end);
+        // 유효하지 않은 period 로 while 이 끝나지 않는 것을 막는다.
+        if (!start.isValid() || !end.isValid() || start.isAfter(end, 'month')) return [];
+        const dates: string[] = [];
+        let cursor = start;
+        while (!cursor.isAfter(end, 'month')) {
+            dates.push(cursor.format('YYYY-MM'));
+            cursor = cursor.add(1, 'month');
+        }
+        return dates;
+    }),
+    chartValueData: computed<Array<number|null>>(() => state.chartDateData.map((date) => {
+        const target = state.chartData.find((d) => d.date === date);
+        return target?.value ?? null;
+    })),
+    // 축의 마지막 달(= 최신 월)이 아직 확정 전일 때만 구간 색을 나눈다.
+    // 단색이면 빈 배열을 반환해 visualMap 자체를 걸지 않는다.
+    // 한쪽이 열린 구간만 남으면 echarts 가 gradient stop 을 하나도 못 만들어 라인 렌더가 통째로 깨진다.
     chartPieces: computed(() => {
-        const lastMonth = dayjs().utc().subtract(1, 'month').format('YYYY-MM');
-        const currentMonth = dayjs().utc().format('YYYY-MM');
-        const currentMarkArea = {
-            gt: state.chartDateData.indexOf(currentMonth) - 1 || 0,
-            lte: state.chartDateData.indexOf(currentMonth) || 0,
-            color: blue[500],
-        };
-        const lastMonthData = state.chartData.find((i) => i.date === lastMonth);
-        if (lastMonthData && !lastMonthData?.is_confirmed) {
+        const latestMonthIndex = state.chartDateData.indexOf(getLatestMonth());
+        const latestMonthData = state.chartData.find((i) => i.date === getLatestMonth());
+        if (latestMonthIndex > 0 && latestMonthData && !latestMonthData.is_confirmed) {
             return [
                 {
-                    lte: state.chartDateData.indexOf(lastMonth) - 1,
+                    lte: latestMonthIndex - 1,
                     color: green[700],
                 },
                 {
-                    gt: state.chartDateData.indexOf(lastMonth) - 1,
-                    lte: state.chartDateData.indexOf(lastMonth),
+                    gt: latestMonthIndex - 1,
+                    lte: latestMonthIndex,
                     color: coral[400],
                 },
-                currentMarkArea,
             ];
         }
-        return [
-            {
-                lte: state.chartDateData.indexOf(currentMonth) - 1 || 0,
-                color: green[700],
-            },
-            currentMarkArea,
-        ];
+        return [];
     }),
     chartOptions: computed<LineSeriesOption>(() => ({
         grid: {
@@ -80,7 +87,15 @@ const state = reactive({
         },
         tooltip: {
             trigger: 'axis',
-            valueFormatter: (val) => numberFormatter(val) || '',
+            formatter: (params) => {
+                const target = Array.isArray(params) ? params[0] : params;
+                if (!target) return '';
+                // 데이터가 없는 달은 마커만 뜨고 값이 비어 보이므로, 카드와 동일하게 '-' 로 표기한다.
+                const value = target.value === null || target.value === undefined
+                    ? '-'
+                    : numberFormatter(target.value) || '-';
+                return `${target.axisValue}<br>${target.marker}${value}`;
+            },
         },
         xAxis: {
             type: 'category',
@@ -100,15 +115,21 @@ const state = reactive({
             },
             splitNumber: 4,
         },
-        visualMap: {
-            show: false,
-            dimension: 0,
-            pieces: state.chartPieces,
-        },
+        ...(state.chartPieces.length ? {
+            visualMap: {
+                show: false,
+                dimension: 0,
+                pieces: state.chartPieces,
+            },
+        } : {}),
         series: [
             {
                 data: state.chartValueData,
                 type: 'line',
+                ...(state.chartPieces.length ? {} : {
+                    itemStyle: { color: green[700] },
+                    lineStyle: { color: green[700] },
+                }),
             },
         ],
     })),
@@ -118,7 +139,7 @@ useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
 }, 300));
 /* Watcher */
-watch([() => state.chartData, () => chartContext.value], ([, chartCtx]) => {
+watch([() => state.chartData, () => props.period, () => chartContext.value], ([,, chartCtx]) => {
     if (chartCtx) {
         state.chart = init(chartContext.value);
         state.chart.setOption(state.chartOptions, true);
