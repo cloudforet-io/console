@@ -47,6 +47,7 @@ import {
     COST_REPORT_GROUP_BY_ITEM_MAP,
     GROUP_BY,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { getLatestMonth } from '@/services/cost-explorer/helpers/cost-report-month-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -82,7 +83,10 @@ const state = reactive({
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
-    currentDate: undefined as Dayjs | undefined,
+    hasData: computed<boolean>(() => !!state.data?.results?.length),
+    // 발행된 리포트가 아니라 달력 기준으로 초기 월을 정한다. watcher 를 거치지 않으므로 초기화 순서에 의존하지 않는다.
+    currentDate: dayjs.utc(getLatestMonth()) as Dayjs,
+    isNextButtonDisabled: computed<boolean>(() => state.currentDate.isSame(dayjs.utc(getLatestMonth()), 'month')),
     currentDateRangeText: computed<string>(() => {
         if (!state.currentDate) return '';
         return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
@@ -267,13 +271,9 @@ watch([() => chartContext.value, () => state.loading, () => state.data], async (
         drawChart(data);
     }
 });
-watch(() => costReportPageState.recentReportMonth, async (after) => {
-    if (!after) return;
-    state.currentDate = dayjs.utc(after);
-}, { immediate: true });
 watch([
     () => costReportPageGetters.currency,
-    () => () => costReportPageState.costReportConfig?.cost_report_config_id,
+    () => costReportPageState.costReportConfig?.cost_report_config_id,
 ], ([_currency, _cost_report_config_id]) => {
     if (!_currency || !_cost_report_config_id) return;
     analyzeCostReportData();
@@ -313,7 +313,7 @@ useResizeObserver(chartContext, throttle(() => {
             <div class="grid grid-cols-12 gap-4">
                 <div class="left-part">
                     <p-date-pagination :date="state.currentDate"
-                                       :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
+                                       :disable-next-button="state.isNextButtonDisabled"
                                        @update:date="handleChangeDate"
                     />
                     <div class="date-range-text">
@@ -327,12 +327,22 @@ useResizeObserver(chartContext, throttle(() => {
                                     width="8rem"
                                     height="2rem"
                         />
+                        <div v-else-if="!state.hasData"
+                             class="summary-value"
+                        >
+                            <span class="value">-</span>
+                        </div>
                         <div v-else
                              class="summary-value"
                         >
                             <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                             <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
                         </div>
+                        <p v-if="!state.loading && !state.hasData"
+                           class="no-data-text"
+                        >
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.NO_CONFIRMED_REPORT_FOR_MONTH') }}
+                        </p>
                     </div>
                     <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
                                    style-type="highlight"
@@ -436,6 +446,10 @@ useResizeObserver(chartContext, throttle(() => {
             @apply text-display-md;
             font-weight: 700;
             padding-left: 0.125rem;
+        }
+        .no-data-text {
+            @apply text-label-sm text-gray-500;
+            padding-top: 0.25rem;
         }
     }
     .chart-wrapper {
