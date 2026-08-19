@@ -80,13 +80,13 @@ const state = reactive({
     baseInfo: undefined as CostReportModel|undefined,
     currency: computed<Currency>(() => state.baseInfo?.currency ?? 'USD'),
     isExpired: false,
+    // 리포트 대상 기간은 report_month('YYYY-MM') 가 실제 값이다. issue_date 에서 한 달을 빼는 역산은
+    // 재발행/지연 발행처럼 발행일과 대상 월의 간격이 한 달이 아닌 경우 틀린 기간을 보여준다.
     reportDateRage: computed<string>(() => {
-        const baseDate = dayjs(state.baseInfo?.issue_date);
-        if (!baseDate) return '';
-        const lastMonth = baseDate.subtract(1, 'month');
-        const startDate = lastMonth.startOf('month').format('YYYY-MM-DD');
-        const endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
-        return `${startDate} ~ ${endDate}`;
+        const reportMonth = state.baseInfo?.report_month;
+        const baseDate = dayjs.utc(reportMonth);
+        if (!reportMonth || !baseDate.isValid()) return '';
+        return `${baseDate.startOf('month').format('YYYY-MM-DD')} ~ ${baseDate.endOf('month').format('YYYY-MM-DD')}`;
     }),
     totalCost: computed<number>(() => sum(tableState.costByProduct.map((d) => d._total_value_sum))),
     chartOptions: computed<PieSeriesOption>(() => ({
@@ -348,7 +348,10 @@ const handlePrint = () => {
                 <p v-if="!config.get('COST_REPORT.EXCLUDE.HEADERS.issue_date')"
                    class="report-info"
                 >
-                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
+                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }}
+                    <span v-if="state.reportDateRage"
+                          class="real-date-range"
+                    >({{ state.reportDateRage }})</span>
                 </p>
             </div>
             <div class="total"

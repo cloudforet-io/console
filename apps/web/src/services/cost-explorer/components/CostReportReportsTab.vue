@@ -88,8 +88,11 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 /* Util */
-const getDateRangeText = (date: string): string => {
-    const _date = dayjs.utc(date).subtract(1, 'month');
+// 리포트 대상 기간은 report_month('YYYY-MM') 가 실제 값이다. issue_date 에서 한 달을 빼는 역산은
+// 재발행/지연 발행처럼 발행일과 대상 월의 간격이 한 달이 아닌 경우 틀린 기간을 보여준다.
+const getDateRangeText = (reportMonth?: string): string => {
+    const _date = dayjs.utc(reportMonth);
+    if (!reportMonth || !_date.isValid()) return '';
     return `${_date.startOf('month').format('YYYY-MM-DD')} ~ ${_date.endOf('month').format('YYYY-MM-DD')}`;
 };
 const getCustomPeriodText = (start?: string, end?: string): string => {
@@ -244,12 +247,12 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                     </template>
                 </p-heading>
             </template>
-            <template #col-issue_date-format="{value}">
+            <template #col-issue_date-format="{value, item}">
                 <div class="date-text">
                     {{ value }}
                 </div>
                 <div class="date-range-text">
-                    {{ getDateRangeText(value) }}
+                    {{ getDateRangeText(item.report_month) }}
                 </div>
             </template>
             <template #col-report_number-format="{value, item}">
